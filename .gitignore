@@ -1,0 +1,20 @@
+# Nested upstream aestimo checkout keeps its own history
+/git/
+
+# Prior-session scratch outputs at repo root
+/output/
+/hello_well/
+/sample_1qw_barrierdope_ingaas/
+/integrated_photonics_study_guide/
+/.agents/
+
+# Python / caches
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+mpl-cache/
+
+# Large binary sim artifacts inside checkpoints are versioned deliberately;
+# keep them, but drop stray temp files
+*.tmp
+*.log.lock

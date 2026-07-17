@@ -1,0 +1,136 @@
+# ============================================================================
+# Single source of truth for the replication of
+#   Fathi et al., "Quantum-Well-Metasurface to Maximize Nonlinear
+#   Polarization", arXiv:2604.15476 (2026)
+# All scripts read parameters from this file; nothing physical is hardcoded.
+# Companion evidence (same group / same growth lineage):
+#   [APL2023] Ramesh et al., APL 123, 251111 (2023)  -> formalism + r_ehh DFT
+#   [Ref38]   Ramesh et al., arXiv:2602.23246 (2026) -> same 16-period structure
+# ============================================================================
+
+material:
+  system: GaAs/AlGaAs
+  # barrier / wide QW / coupling barrier / narrow QW  (one 30 nm period)
+  period_layers_nm: [18.2, 7.1, 1.8, 2.9]
+  n_periods: 16
+  film_thickness_nm: 595            # NOTE: > 16*30=480; ~115 nm unitemized cap/
+                                    # buffer/terminating layers (Ref38 mentions a
+                                    # 10 nm GaAs cap; etch stops were removed).
+                                    # Electronic problem solved on 1 period with
+                                    # thick-barrier BCs; 595 nm used ONLY for the
+                                    # optical/metasurface film thickness.
+  al_fraction: null                 # NOT stated in the paper. Calibrated in
+                                    # Phase 2 (target below). Ref38 states
+                                    # Al0.55Ga0.45As for the same structure; the
+                                    # calibrated abrupt-model value absorbs the
+                                    # interface-grading redshift and may differ.
+  al_fraction_ref38: 0.55           # documentary anchor, NOT the calibration
+  substrate: "Al2O3 (sapphire), 500 um, epoxy-bonded (353ND EPO-TEK)"
+  temperature_K: 300.0
+
+structure_variants:
+  ideal:
+    grading_width_nm: 0.0           # abrupt square wells
+  graded:
+    grading_width_nm: 1.0           # Ref38 EDS: "gradients were mostly linear
+                                    # across 1 nm"; plan default 0.3-0.6 nm was
+                                    # superseded by this documentary value.
+                                    # Sweep 0-1 nm happens in Phase 6.
+
+calibration:
+  # Tune al_fraction (abrupt structure) so E(HH2->CB2) hits the SH photon energy.
+  target_E22_eV: 1.58               # SH at ~785 nm  (pump 1.57 um)
+  tolerance_eV: 0.020               # Phase 2 gate: +/- 20 meV
+  scan_al_fraction: [0.30, 0.60]    # scan window (plan says start 0.3-0.4;
+                                    # widened to include Ref38's 0.55)
+  scan_step: 0.025
+  # Context: Ref38 simulated E11=1.49 eV, E22=1.62 eV (ideal, x=0.55);
+  # measured SHG resonance 1560-1567 nm pump -> E22(real, graded) ~= 1.58-1.59 eV.
+
+solver:
+  # Frozen conventions from reference_data/acqw_solver_consensus_v1 (prior work)
+  aestimo:
+    grid_nm: 0.05
+    quantum_region_pad_nm: 6.0
+    subnumber_e: 3
+    subnumber_h: 6                  # capture HH1, HH2, HH3 (anticrossing!) + LH
+    computation_scheme: 0           # Schrodinger-only; structure is undoped, so
+                                    # Poisson is trivial (verified in Phase 2)
+  kdotpy:
+    n_bands: 8
+    # Use the SAME calibrated al_fraction as Phase 2 -- no recalibration.
+    # Band-parameter alignment table:
+    #   reference_data/acqw_solver_consensus_v1/docs/BAND_PARAMETER_MANIFEST.md
+    luttinger_source: "aestimo database (gamma1/2/3 GaAs 6.8/1.9/2.73) unless
+                       stated; Vurgaftman 2001 comparison set documented there"
+  band_offsets:
+    cbo_fraction: 0.65              # aestimo alloy database (Qc)
+    gaas_eg_eV: 1.4223              # aestimo database, 300 K
+    alas_gamma_eg_eV: 3.0000
+    algaas_bowing_eV: 0.37
+
+chi2:
+  broadening_gamma_meV: 5
+  k_integration_bz_fraction: 0.1    # truncate 2D k-integral at BZ/10
+  target_pump_um: 1.57
+  target_sh_nm: 785
+  pump_scan_nm: [700, 1700]
+  savgol_order: 3
+  # Interband dipole r_e,hh choice (paper used DFT/HSE06):
+  interband_dipole:
+    method: kane                    # |r_ehh| = sqrt(hbar^2 E_P / (2 m0 Eg^2))
+    kane_Ep_eV: 28.8                # Vurgaftman 2001 GaAs -> r_ehh ~= 7.38 A
+    dft_r_ehh_angstrom: 7.51        # [APL2023] HSE06 value; Kane is within 2%
+  spin_degeneracy: 2
+  # Film-average / fill-factor convention [Ref38 Methods]:
+  #   "MQW region" = wells + coupling barrier + 3 nm of period barrier each side
+  fill_factor:
+    qw_region_nm: 17.8              # 7.1+1.8+2.9+2*3.0
+    period_nm: 30.0                 # -> ratio 0.593 ~ the paper's "~60%"
+  measured_chi2_eff_MQW_nm_per_V: 1.6   # 1.2 if SH absorption not credited
+  simulated_film_avg_pm_per_V: 1183     # Fig. 11 backing value (plan)
+  reference_LiNbO3_chi2_zzz_pm_per_V: 51.9  # at 1567 nm via Miller's rule
+  bulk_GaAs_chi2_xyz_pm_per_V: 370
+  # Additional absolute anchors for the prefactor validation (Phase 4):
+  anchors:
+    apl2023_peak_nm_per_V: 1.80     # 12.5 nm total QW, s=0.45, x=0.40 [APL2023]
+    ref38_ideal_16pd_pm_per_V: 2340 # abrupt interfaces, film-avg [Ref38]
+    ref38_meas_16pd_pm_per_V: 1170  # measured at 1550 nm [Ref38]
+    ref38_eds_sim_pm_per_V: [1200, 1363]  # graded Al / Ga profile sims [Ref38]
+
+metasurface:
+  pillar: {material: TiO2, height_nm: 390, radius_nm: 230}
+  period_nm: {x: 891, y: 650}
+  polarization: "x (p-pol)"
+  mqw_index_780nm: [3.39, 0.11]     # n + ik from ellipsometry (paper Methods)
+  mqw_index_1550nm_est: 3.30        # literature-weighted GaAs/AlGaAs estimate;
+                                    # repo has no ellipsometry file (documented)
+  tio2_index_est: {n_1550: 2.28, n_780: 2.42}   # amorphous ALD TiO2 literature
+  al2o3_index_est: {n_1550: 1.746, n_780: 1.760}
+  scan:
+    wavelength_nm: [1500, 1620]
+    angles_deg: [0, 8]
+    tilt_axis: y
+  gmr_B: {sim_nm: 1580, exp_nm: 1567, q_factor_exp: 1124,
+          sh_linewidth_nm: 0.90, pump_linewidth_nm: 1.39, angle_deg: 0.3}
+  enhancement: {ExEz_vs_45deg: 57, ExEz_vs_normal_ExEx: 11.5}
+  chi2_eff_MQW_plus_MS_nm_per_V: 14 # 17 with SH-absorption correction
+
+bnn:
+  input_space:
+    wide_well_nm: [5.0, 9.0]
+    narrow_well_nm: [2.0, 4.0]
+    coupling_barrier_nm: [1.0, 3.0]
+    al_fraction_delta: [-0.1, 0.1]  # around calibrated value
+    grading_width_nm: [0.0, 1.0]
+  outputs: [E22_eV, delta_z22_nm, chi2_peak_nm_per_V, chi2_peak_wavelength_nm]
+  n_train_target: 500
+  n_kdotpy_shift_test: 50
+  gates: {rmse_E22_meV: 10, rmse_chi2_peak_frac: 0.20}
+
+misc:
+  coherence_length_shg_um: {MQW: 1.8, LiNbO3: 9.6}
+  laser: {center_nm: 1560, pulse_fs: 70, rep_rate_MHz: 100, avg_power_mW: 330}
+  dephasing_fs: 30
+
+fig2e_anchors: []                   # digitized in Phase 4 from output/paper_render

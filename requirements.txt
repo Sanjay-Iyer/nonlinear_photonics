@@ -1,0 +1,9 @@
+# Core Scientific and Numerical Packages
+numpy>=1.22.0
+scipy>=1.8.0
+
+# Data Visualization and Plotting
+matplotlib>=3.5.0
+
+# Schrödinger-Poisson Solver Platform
+aestimo>=0.9.0
