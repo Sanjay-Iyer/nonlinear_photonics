@@ -1,0 +1,28 @@
+{
+  "phase": "phase1_structure",
+  "timestamp": "20260717_153623",
+  "git_commit": "e7712a417b0d9e54e927161223c1c503df1bf332",
+  "seed": 0,
+  "argv": [
+    "build_structure.py",
+    "--variant",
+    "both"
+  ],
+  "versions": {
+    "python": "3.11.15",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "matplotlib": "3.11.0",
+    "yaml": "6.0.3",
+    "torch": "2.12.1+cpu",
+    "kdotpy": "1.4.0",
+    "grcwa": "0.1.2",
+    "h5py": "3.16.0",
+    "pandas": "3.0.3"
+  },
+  "variant": "both"
+}
+[15:36:25] variant=ideal: grading=0.0 nm, x_barrier=0.55, E_c_barrier=1.9268 eV, E_v_barrier=-0.2717 eV, total z=48.2 nm
+[15:36:25] variant=graded: grading=1.0 nm, x_barrier=0.55, E_c_barrier=1.9268 eV, E_v_barrier=-0.2717 eV, total z=48.2 nm
+[15:36:26] wrote fig2a_bandedges.png/.svg
