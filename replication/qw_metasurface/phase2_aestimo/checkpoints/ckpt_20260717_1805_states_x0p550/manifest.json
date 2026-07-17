@@ -1,0 +1,50 @@
+{
+  "created": "2026-07-17T18:05:46",
+  "git_commit": "84148d17a2eed22daae44945a74aa701e66aac8a",
+  "config_path": "C:\\code\\nonlinear_photonics\\replication\\qw_metasurface\\config\\paper_params.yaml",
+  "config_sha256": "ac75a0e45fb7ecaeae678aa6209215ed58c4fdb4a2f9bd9aa9a53267d8ffd174",
+  "inputs": {
+    "calibrated_al_fraction": 0.55,
+    "variants": [
+      "ideal",
+      "graded"
+    ]
+  },
+  "key_outputs": {
+    "ideal": {
+      "E11_eV": 1.4960008652645753,
+      "E22_eV": 1.657124724324161,
+      "delta_z_HH2_CB2_nm": 0.8283218453552266,
+      "localization": {
+        "HH1_wide": true,
+        "HH2_wide": false,
+        "CB1_wide": true,
+        "CB2_narrow": true
+      }
+    },
+    "graded": {
+      "E11_eV": 1.4994065860981505,
+      "E22_eV": 1.6736868282973147,
+      "delta_z_HH2_CB2_nm": 3.348924134031382,
+      "localization": {
+        "HH1_wide": true,
+        "HH2_wide": true,
+        "CB1_wide": true,
+        "CB2_narrow": true
+      }
+    }
+  },
+  "versions": {
+    "python": "3.11.15",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "matplotlib": "3.11.0",
+    "yaml": "6.0.3",
+    "torch": "2.12.1+cpu",
+    "kdotpy": "1.4.0",
+    "grcwa": "0.1.2",
+    "h5py": "3.16.0",
+    "pandas": "3.0.3"
+  }
+}

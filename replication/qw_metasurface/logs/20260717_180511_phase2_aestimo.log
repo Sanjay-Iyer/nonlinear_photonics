@@ -1,0 +1,41 @@
+{
+  "phase": "phase2_aestimo",
+  "timestamp": "20260717_180511",
+  "git_commit": "84148d17a2eed22daae44945a74aa701e66aac8a",
+  "seed": 0,
+  "argv": [
+    "run_states.py",
+    "--variant",
+    "both"
+  ],
+  "versions": {
+    "python": "3.11.15",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "matplotlib": "3.11.0",
+    "yaml": "6.0.3",
+    "torch": "2.12.1+cpu",
+    "kdotpy": "1.4.0",
+    "grcwa": "0.1.2",
+    "h5py": "3.16.0",
+    "pandas": "3.0.3"
+  },
+  "variant": "both"
+}
+[18:05:48] calib x=0.300: E22=1.5975 eV (target 1.58)
+[18:06:10] calib x=0.325: E22=1.6048 eV (target 1.58)
+[18:06:32] calib x=0.350: E22=1.6117 eV (target 1.58)
+[18:06:52] calib x=0.375: E22=1.6184 eV (target 1.58)
+[18:07:10] calib x=0.400: E22=1.6247 eV (target 1.58)
+[18:07:31] calib x=0.425: E22=1.6307 eV (target 1.58)
+[18:07:53] calib x=0.450: E22=1.6365 eV (target 1.58)
+[18:08:14] calib x=0.475: E22=1.6420 eV (target 1.58)
+[18:08:33] calib x=0.500: E22=1.6473 eV (target 1.58)
+[18:08:49] calib x=0.525: E22=1.6523 eV (target 1.58)
+[18:09:04] calib x=0.550: E22=1.6571 eV (target 1.58)
+[18:09:23] calib x=0.575: E22=1.6617 eV (target 1.58)
+[18:09:40] calib x=0.600: E22=1.6661 eV (target 1.58)
+[18:09:40] calibrated x* = 0.55
+[18:09:56] ideal: E11=1.4960 E22=1.6571 dz22=0.828 {'HH1_wide': True, 'HH2_wide': False, 'CB1_wide': True, 'CB2_narrow': True}
+[18:10:15] graded: E11=1.4994 E22=1.6737 dz22=3.349 {'HH1_wide': True, 'HH2_wide': True, 'CB1_wide': True, 'CB2_narrow': True}

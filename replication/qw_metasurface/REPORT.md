@@ -125,8 +125,62 @@ Outputs: `structure_{ideal,graded}.npz` + `.csv`, `fig2a_bandedges.png/.svg`.
 **Gate:** ✅ band-edge plot visually consistent with Fig. 2a — two coupled wells,
 correct asymmetry (wide left, thin right), graded variant shows sloped interfaces.
 
-## Phase 2 — aestimo envelope states and matrix elements
-_(pending)_
+## Phase 2 — aestimo envelope states and matrix elements ✅ GATE PASSED (with documented interpretation)
+
+**Date:** 2026-07-17 · script `phase2_aestimo/run_states.py` ·
+checkpoint `ckpt_20260717_1805_states_x0p550`
+
+### Solver validation
+The aestimo 3×3 solve reproduces the frozen `acqw_solver_consensus_v1` benchmark:
+E11 = **1.4960 eV** (consensus 1.4955), E22 = **1.6571 eV** (consensus 1.6557) at
+x=0.55 abrupt. Poisson confirmed trivial: `computation_scheme=0`, `doping_max=0`.
+
+### Al-fraction calibration — see [DISCREPANCY.md](phase2_aestimo/DISCREPANCY.md)
+The plan's literal target E(HH2→CB2)=1.58 eV is **unreachable** in the physical
+range: E22 spans **1.598–1.666 eV** over x∈[0.30,0.60], and driving x below 0.30
+to reach 1.58 eV **collapses the Δz centroid asymmetry** (Δz: −0.06 nm at x=0.30 →
++0.83 nm at x=0.55) that is the entire χ⁽²⁾ mechanism. Root cause: the 1.58 eV
+target conflated the metasurface GMR *operating* wavelength (1.58 µm pump, Phase 5)
+with the *material* χ⁽²⁾ resonance (Fig-2e peak at ~1500 nm pump → SH 1.65 eV).
+
+**Resolution (user-approved):** adopt **x = 0.55** (Ref38's documented value for
+this exact stack), calibration target reinterpreted as the Fig-2e χ⁽²⁾ peak
+(~1500 nm pump, E22≈1.65 eV). This reproduces the solver consensus, preserves the
+asymmetry, and — confirmed in Phase 4 — places the χ⁽²⁾ peak at ~1500 nm.
+
+### Results at x = 0.55
+
+| Quantity | ideal (abrupt) | graded (1 nm) | Paper |
+|----------|---------------:|--------------:|-------|
+| E11 (HH1→CB1) | 1.4960 eV | 1.4994 eV | ~1.49 eV (Ref38) |
+| E22 (HH2→CB2) | 1.6571 eV | 1.6737 eV | ~1.62 eV (Ref38 sim) |
+| Δz(HH2,CB2) | +0.828 nm | +3.349 nm | large offset (Fig 2b) |
+| ⟨e1\|z\|e2⟩ | 0.905 nm | 0.964 nm | — |
+
+**Interband selection rules (both variants):** diagonal overlaps
+\|⟨hh1\|e1⟩\|=0.86, \|⟨hh2\|e2⟩\|=0.71–0.84 are **strong**; cross terms
+\|⟨hh1\|e2⟩\|, \|⟨hh2\|e1⟩\| ≈ 0.03–0.05 are **weak** — exactly the pattern
+Ref38 Eqs. 4–5 require for χ_xzx ≠ χ_xxz.
+
+### HH2 localization — resolved by the graded structure
+| Claim | ideal | graded | Paper Fig 2a |
+|-------|:-----:|:------:|:------------:|
+| HH1 wide | ✅ | ✅ | ✅ |
+| HH2 wide | ❌ (narrow 0.73) | ✅ (wide 0.58) | ✅ |
+| CB1 wide | ✅ | ✅ | ✅ |
+| CB2 narrow | ✅ | ✅ | ✅ |
+
+The **graded (realistic, EDS-corrected) structure — the one the paper states it
+used for "realistic simulations" — reproduces all four localization claims,
+including HH2-wide.** The abrupt structure puts energy-ordered HH2 in the narrow
+well (the extensively-audited `ROOT_CAUSE_REPORT` finding, which only tested
+abrupt stacks); interface grading pushes the structure past the HH2/HH3
+anticrossing so the wide branch becomes energy-ordered HH2. Both energy-ordered
+and well-character views are recorded in the checkpoint.
+
+**Gate:** ✅ localization matches the paper (fully for the graded/realistic
+variant); calibrated transition reproduces the Fig-2e peak per the approved
+interpretation. χ⁽²⁾-relevant matrix elements and selection rules verified.
 
 ## Phase 3 — kdotpy multiband k·p cross-check
 _(pending)_

@@ -19,12 +19,17 @@ material:
                                     # Electronic problem solved on 1 period with
                                     # thick-barrier BCs; 595 nm used ONLY for the
                                     # optical/metasurface film thickness.
-  al_fraction: null                 # NOT stated in the paper. Calibrated in
-                                    # Phase 2 (target below). Ref38 states
-                                    # Al0.55Ga0.45As for the same structure; the
-                                    # calibrated abrupt-model value absorbs the
-                                    # interface-grading redshift and may differ.
-  al_fraction_ref38: 0.55           # documentary anchor, NOT the calibration
+  al_fraction: 0.55                 # CALIBRATED (Phase 2, 2026-07-17). Not stated
+                                    # in the main paper; equals Ref38's documented
+                                    # Al0.55Ga0.45As for this exact stack. Chosen
+                                    # over the literal 1.58 eV target because that
+                                    # target is unreachable in x in [0.30,0.60]
+                                    # (E22 min 1.598 eV) and forcing x low collapses
+                                    # the Delta_z asymmetry that drives chi2. x=0.55
+                                    # gives E22=1.657 eV -> SH-resonant at ~1497 nm
+                                    # pump, matching the Fig 2e peak. See
+                                    # phase2_aestimo/DISCREPANCY.md.
+  al_fraction_ref38: 0.55           # documentary anchor (now == calibrated)
   substrate: "Al2O3 (sapphire), 500 um, epoxy-bonded (353ND EPO-TEK)"
   temperature_K: 300.0
 
