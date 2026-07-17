@@ -1,0 +1,24 @@
+{
+  "phase": "phase3_kdotpy",
+  "timestamp": "20260717_181938",
+  "git_commit": "f066cd5a5309339d93367fd2277b02ee658a0b51",
+  "seed": 0,
+  "argv": [
+    "run_kdotpy.py"
+  ],
+  "versions": {
+    "python": "3.11.15",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "matplotlib": "3.11.0",
+    "yaml": "6.0.3",
+    "torch": "2.12.1+cpu",
+    "kdotpy": "1.4.0",
+    "grcwa": "0.1.2",
+    "h5py": "3.16.0",
+    "pandas": "3.0.3"
+  }
+}
+[18:19:40] a=0.565325 nm, kmax(BZ/10)=1.1114 nm^-1, kpoints=8
+[18:20:01] dE11=11.1 meV dE22=12.3 meV

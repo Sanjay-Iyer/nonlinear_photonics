@@ -1,0 +1,42 @@
+{
+  "created": "2026-07-17T18:20:02",
+  "git_commit": "f066cd5a5309339d93367fd2277b02ee658a0b51",
+  "config_path": "C:\\code\\nonlinear_photonics\\replication\\qw_metasurface\\config\\paper_params.yaml",
+  "config_sha256": "ac75a0e45fb7ecaeae678aa6209215ed58c4fdb4a2f9bd9aa9a53267d8ffd174",
+  "inputs": {
+    "al_fraction": 0.55,
+    "kmax_nm_inv": 1.1114288784645268,
+    "k_points": 8,
+    "model": "kdotpy 8o axial"
+  },
+  "key_outputs": {
+    "E11_eV": 1.5070710200000001,
+    "E22_eV": 1.66940325,
+    "comparison": {
+      "aestimo_checkpoint": "C:\\code\\nonlinear_photonics\\replication\\qw_metasurface\\phase2_aestimo\\checkpoints\\ckpt_20260717_1810_states_x0p550",
+      "aestimo_E11_eV": 1.4960008652645753,
+      "kdotpy_E11_eV": 1.5070710200000001,
+      "dE11_meV": 11.07015473542483,
+      "aestimo_E22_eV": 1.657124724324161,
+      "kdotpy_E22_eV": 1.66940325,
+      "dE22_meV": 12.278525675839091,
+      "aestimo_dz22_nm": 0.8283218453552266,
+      "kdotpy_dz22_nm": 0.016000000000000007,
+      "gate_E22_within_30meV": true,
+      "gate_E11_within_30meV": true
+    }
+  },
+  "versions": {
+    "python": "3.11.15",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "matplotlib": "3.11.0",
+    "yaml": "6.0.3",
+    "torch": "2.12.1+cpu",
+    "kdotpy": "1.4.0",
+    "grcwa": "0.1.2",
+    "h5py": "3.16.0",
+    "pandas": "3.0.3"
+  }
+}

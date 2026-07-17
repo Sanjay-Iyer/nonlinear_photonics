@@ -182,8 +182,44 @@ and well-character views are recorded in the checkpoint.
 variant); calibrated transition reproduces the Fig-2e peak per the approved
 interpretation. χ⁽²⁾-relevant matrix elements and selection rules verified.
 
-## Phase 3 — kdotpy multiband k·p cross-check
-_(pending)_
+## Phase 3 — kdotpy multiband k·p cross-check ✅ GATE PASSED
+
+**Date:** 2026-07-17 · script `phase3_kdotpy/run_kdotpy.py` ·
+checkpoint `ckpt_20260717_1820_kdotpy_x0p55`
+
+Independent 8-band Kane k·p check at the **same** calibrated x=0.55 (no
+recalibration), via the prior session's validated kdotpy backend driven with
+`cpu 1` (the multiprocessing pool fails under the sandbox). E(k∥) computed to
+BZ/10 = 1.11 nm⁻¹ (a = 0.565 nm).
+
+### Zone-center transition energies vs aestimo
+
+| Transition | aestimo 3×3 | kdotpy 8-band | Δ (meV) | Gate (≤30 meV) |
+|-----------|------------:|--------------:|--------:|:--------------:|
+| E11 (HH1→CB1) | 1.4960 eV | 1.5071 eV | +11.1 | ✅ |
+| E22 (HH2→CB2) | 1.6571 eV | 1.6694 eV | +12.3 | ✅ |
+
+Both transitions agree to ~12 meV — comfortably inside the plan's 30 meV
+tolerance and consistent with the frozen three-solver consensus
+(aestimo 1.4955/1.6557, kdotpy 1.5071/1.6694). Valence dispersion shows the
+expected HH/LH mixing (anticrossings near k∥≈0.3–0.4 nm⁻¹, `fig_kdotpy_dispersion`).
+Hole character ordering at k=0: HH, HH, LH, HH — HH1/HH2 are the two highest
+HH-like states, matching Phase 2.
+
+### Centroid caveat (documented)
+kdotpy's `obs z` centroids with the **approximate** GaAs/AlGaAs material file
+(`kdotpy_gaas_materials.mat`) come out near-zero for all bound states
+(Δz(HH2,CB2)=0.016 nm vs aestimo 0.83 nm) — the material params are a first-probe
+approximation and the 8-band→(HH,LH,SO) envelope mapping needed for a quantitative
+centroid/Eq.2 evaluation was flagged `eq2_chi2_valid=false` in the prior work. The
+**energy** cross-check (the gate) is unaffected. The frozen consensus with aligned
+inputs independently places kdotpy HH2 narrow-dominated (64%), matching aestimo's
+abrupt-structure ordering. Consequence for Phase 4: the "kdotpy route" χ⁽²⁾ uses
+kdotpy **energies** with envelope matrix elements from the aestimo grid (hybrid),
+flagged there.
+
+**Gate:** ✅ HH2→CB2 within 12.3 meV of aestimo (<30 meV); localization ordering
+consistent.
 
 ## Phase 4 — χ⁽²⁾ spectrum
 _(pending)_
