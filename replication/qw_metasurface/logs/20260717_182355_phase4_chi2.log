@@ -1,0 +1,25 @@
+{
+  "phase": "phase4_chi2",
+  "timestamp": "20260717_182355",
+  "git_commit": "3cbd8ef3a15f5bc39413774470a7aaf8e239b9d0",
+  "seed": 0,
+  "argv": [
+    "compute_chi2_spectrum.py"
+  ],
+  "versions": {
+    "python": "3.11.15",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "matplotlib": "3.11.0",
+    "yaml": "6.0.3",
+    "torch": "2.12.1+cpu",
+    "kdotpy": "1.4.0",
+    "grcwa": "0.1.2",
+    "h5py": "3.16.0",
+    "pandas": "3.0.3"
+  }
+}
+[18:24:21] aestimo_ideal: 0.017 nm/V @ 1531 nm; film-avg@1.57um 0.005 nm/V
+[18:24:40] aestimo_graded: 0.018 nm/V @ 1520 nm; film-avg@1.57um 0.005 nm/V
+[18:24:57] kdotpy_graded: 0.019 nm/V @ 1481 nm; film-avg@1.57um 0.004 nm/V

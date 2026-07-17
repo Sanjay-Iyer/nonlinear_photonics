@@ -221,8 +221,61 @@ flagged there.
 **Gate:** ✅ HH2→CB2 within 12.3 meV of aestimo (<30 meV); localization ordering
 consistent.
 
-## Phase 4 — χ⁽²⁾ spectrum
-_(pending)_
+## Phase 4 — χ⁽²⁾ spectrum ⚠️ POSITION GATE PASS, MAGNITUDE GATE FAIL (documented)
+
+**Date:** 2026-07-17 · scripts `phase4_chi2/compute_chi2_spectrum.py`,
+`phase4_chi2/sensitivity.py` · see [DISCREPANCY.md](phase4_chi2/DISCREPANCY.md)
+
+Complete paper Eq. (2)–(3) double sum over all [m,n,l] (electron + heavy-hole
+channels, coherent −e(z_e − z_h) sign, in-plane k-integration to BZ/10, Γ=5 meV,
+Kane r_ehh=0.736 nm, Nz=2/period, 2 HH + 2 electron states). Origin-independence
+verified (Δ~1e-9). Reused the prior session's validated
+`chi2_micro_audit.compute_chi2_eq2_full`.
+
+**Reported value = the full coherent Eq-2 sum** (the physical observable), per the
+user's decision. Channel magnitudes are diagnostics.
+
+| Route | coherent peak | peak λ | e-channel | @1.57 µm | cancellation |
+|-------|--------------:|-------:|----------:|---------:|-------------:|
+| aestimo ideal | 0.061 nm/V | 1490 nm | 2.80 nm/V | 0.025 nm/V | 97.8% |
+| aestimo graded | **0.167 nm/V** | **1475 nm** | 2.34 nm/V | 0.062 nm/V | 92.5% |
+| kdotpy graded (hybrid) | 0.162 nm/V | 1438 nm | 2.28 nm/V | 0.050 nm/V | 92.4% |
+| **Paper** | ~3 (Fig 2e) / 1.2 film-avg | ~1500 nm | — | 1.6 (meas) | — |
+
+- **Peak position gate: ✅ PASS** — 1438–1490 nm vs paper ~1500 nm (within ±75 nm).
+- **Peak magnitude gate: ❌ FAIL** — coherent sum 0.06–0.17 nm/V is ~7–17× below the
+  paper. The electron and hole channels each reach ~2.3–2.8 nm/V (matching the
+  paper's ~3 nm/V) but destructively interfere ~92–98%.
+- **Sign structure** χ_xzx = χ_xxz = −χ_yzy = −χ_yyz verified analytically from the
+  HH interband selection rules (y-loop carries an odd m_j=±3/2 ladder factor →
+  sign flip; intersubband z-leg polarization-independent). Not brute-forced.
+
+### Sensitivity analysis (the central finding)
+The coherent χ⁽²⁾ is the small residual of two ~2.2 nm/V opposing channels. A
+4000-draw Monte-Carlo perturbing the dominant inputs by plausible envelope-vs-DFT
+deltas (interband overlaps ±8%, diagonal centroids ±0.20 nm, off-diagonal
+intersubband ±8%, transition energies ±10 meV) gives:
+
+| χ⁽²⁾ coherent peak (nm/V) | p5 | p16 | median | p84 | p95 |
+|---|---:|---:|---:|---:|---:|
+| MC distribution | 0.127 | 0.145 | **0.177** | 0.211 | 0.235 |
+
+**P(peak ≥ 1.2 nm/V) = 0.** The residual is *robust* to ≤10% random state errors —
+it does **not** reach the paper value. A "reach" scan shows the electron/hole
+cancellation would have to be **systematically halved** (hole-channel scale
+α≈0.50) to hit 1.2 nm/V. Conclusion: **the ~7× gap is systematic, not
+state-fidelity noise** — consistent with the paper's DFT/HSE06-corrected Nextnano
+states producing less cancellation than envelope-solver states, rather than a
+random-error effect. `fig_chi2_sensitivity_hist` shows the tight MC peak far below
+the paper markers.
+
+**Gate:** position ✅, magnitude ❌ (documented as a systematic envelope-solver
+limitation, quantified; not resolvable without the authors' exact states).
+
+> **Phase 5 decision pending** (per user): do not proceed against the ≈14 nm/V
+> χ⁽²⁾_eff,MQW+MS target using the uncancelled ~2 nm/V channel value. Awaiting the
+> user's choice: run Phase 5 with the honest coherent χ⁽²⁾_eff,MQW (~0.17 nm/V) and
+> record the inherited ~10× miss, or hold Phase 5.
 
 ## Phase 5 — Metasurface GMR simulation
 _(pending)_

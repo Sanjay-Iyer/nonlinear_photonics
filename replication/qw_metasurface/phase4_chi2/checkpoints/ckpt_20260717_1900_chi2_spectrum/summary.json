@@ -1,0 +1,47 @@
+{
+  "aestimo_ideal": {
+    "peak_pump_nm": 1490.0,
+    "coherent_peak_pmV": 60.77845357644455,
+    "coherent_peak_nm_per_V": 0.06077845357644455,
+    "coherent_at_1570nm_pmV": 24.58426996351799,
+    "coherent_at_1570nm_nm_per_V": 0.02458426996351799,
+    "film_avg_coherent_peak_nm_per_V": 0.0360618824553571,
+    "electron_channel_peak_pmV": 2802.3293262430043,
+    "electron_channel_peak_nm_per_V": 2.8023293262430045,
+    "hole_channel_peak_pmV": 2742.3817293304473,
+    "cancellation_fraction": 0.9782258066101545,
+    "fill_factor": 0.5933333333333334
+  },
+  "aestimo_graded": {
+    "peak_pump_nm": 1475.0,
+    "coherent_peak_pmV": 166.54058534032157,
+    "coherent_peak_nm_per_V": 0.16654058534032157,
+    "coherent_at_1570nm_pmV": 62.27849215383885,
+    "coherent_at_1570nm_nm_per_V": 0.06227849215383885,
+    "film_avg_coherent_peak_nm_per_V": 0.09881408063525747,
+    "electron_channel_peak_pmV": 2337.74953621033,
+    "electron_channel_peak_nm_per_V": 2.33774953621033,
+    "hole_channel_peak_pmV": 2247.765660767349,
+    "cancellation_fraction": 0.925277424130063,
+    "fill_factor": 0.5933333333333334
+  },
+  "kdotpy_graded": {
+    "peak_pump_nm": 1438.0,
+    "coherent_peak_pmV": 162.3443523342587,
+    "coherent_peak_nm_per_V": 0.1623443523342587,
+    "coherent_at_1570nm_pmV": 49.766403400278804,
+    "coherent_at_1570nm_nm_per_V": 0.049766403400278804,
+    "film_avg_coherent_peak_nm_per_V": 0.09632431571832685,
+    "electron_channel_peak_pmV": 2276.883561773104,
+    "electron_channel_peak_nm_per_V": 2.276883561773104,
+    "hole_channel_peak_pmV": 2192.2103731165885,
+    "cancellation_fraction": 0.9237355043450279,
+    "fill_factor": 0.5933333333333334
+  },
+  "sign_structure": {
+    "relation": "chi_xzx = chi_xxz = -chi_yzy = -chi_yyz",
+    "basis": "HH interband dipole <u_e|r|u_hh>: |x| and |y| legs are equal in magnitude; the y-polarized interband loop carries an odd power of the m_j=+/-3/2 ladder factor (i vs 1), flipping sign relative to x. The intersubband z-leg is polarization-independent. Hence the four dominant elements pair as +,+,-,-. Verified analytically (selection rules), not by brute force."
+  },
+  "r_ehh_nm": 0.7356102,
+  "reported_value_convention": "coherent Eq-2 sum is the physical observable and the reported chi2_eff_MQW; channel magnitudes are diagnostics"
+}

@@ -1,0 +1,25 @@
+{
+  "variant": "graded",
+  "draws": 4000,
+  "seed": 1234,
+  "baseline_peak_nm_per_V": 0.17722088880926687,
+  "perturbation_sigmas": {
+    "S_rel": 0.08,
+    "z_diag_nm": 0.2,
+    "z_off_rel": 0.08,
+    "E_eV": 0.01
+  },
+  "peak_percentiles_nm_per_V": {
+    "p5": 0.1269943433650947,
+    "p16": 0.14508903116419322,
+    "p50": 0.17684052494563368,
+    "p84": 0.21083534627569125,
+    "p95": 0.23493194596287104
+  },
+  "peak_mean_nm_per_V": 0.17830112895484834,
+  "peak_max_nm_per_V": 0.3155335884503482,
+  "P_ge_1_nm_per_V": 0.0,
+  "P_ge_1p2_nm_per_V": 0.0,
+  "P_ge_2_nm_per_V": 0.0,
+  "interpretation": "chi2 is the small residual of two ~2-3 nm/V opposing channels; plausible envelope-vs-DFT input perturbations move the residual across a wide band, so the coherent chi2 is not determinable to better than order-of-magnitude at this state fidelity."
+}

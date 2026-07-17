@@ -1,0 +1,29 @@
+{
+  "phase": "phase4_sensitivity",
+  "timestamp": "20260717_190221",
+  "git_commit": "3cbd8ef3a15f5bc39413774470a7aaf8e239b9d0",
+  "seed": 1234,
+  "argv": [
+    "sensitivity.py",
+    "--variant",
+    "graded",
+    "--draws",
+    "4000"
+  ],
+  "versions": {
+    "python": "3.11.15",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "matplotlib": "3.11.0",
+    "yaml": "6.0.3",
+    "torch": "2.12.1+cpu",
+    "kdotpy": "1.4.0",
+    "grcwa": "0.1.2",
+    "h5py": "3.16.0",
+    "pandas": "3.0.3"
+  },
+  "variant": "graded",
+  "draws": 4000
+}
+[19:03:56] baseline peak 0.0000; median 0.000; p5-p95 [0.000,0.000]; P>=1.2=0.00

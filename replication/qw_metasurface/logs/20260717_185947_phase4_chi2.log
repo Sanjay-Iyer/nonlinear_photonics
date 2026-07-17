@@ -1,0 +1,25 @@
+{
+  "phase": "phase4_chi2",
+  "timestamp": "20260717_185947",
+  "git_commit": "3cbd8ef3a15f5bc39413774470a7aaf8e239b9d0",
+  "seed": 0,
+  "argv": [
+    "compute_chi2_spectrum.py"
+  ],
+  "versions": {
+    "python": "3.11.15",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "matplotlib": "3.11.0",
+    "yaml": "6.0.3",
+    "torch": "2.12.1+cpu",
+    "kdotpy": "1.4.0",
+    "grcwa": "0.1.2",
+    "h5py": "3.16.0",
+    "pandas": "3.0.3"
+  }
+}
+[19:00:31] aestimo_ideal: coherent peak 0.061 nm/V @ 1490 nm; e-channel 2.80; cancel 97.8%
+[19:00:32] aestimo_graded: coherent peak 0.167 nm/V @ 1475 nm; e-channel 2.34; cancel 92.5%
+[19:00:33] kdotpy_graded: coherent peak 0.162 nm/V @ 1438 nm; e-channel 2.28; cancel 92.4%

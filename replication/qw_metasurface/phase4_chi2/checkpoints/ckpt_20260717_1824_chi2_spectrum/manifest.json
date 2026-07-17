@@ -1,0 +1,48 @@
+{
+  "created": "2026-07-17T18:24:58",
+  "git_commit": "3cbd8ef3a15f5bc39413774470a7aaf8e239b9d0",
+  "config_path": "C:\\code\\nonlinear_photonics\\replication\\qw_metasurface\\config\\paper_params.yaml",
+  "config_sha256": "ac75a0e45fb7ecaeae678aa6209215ed58c4fdb4a2f9bd9aa9a53267d8ffd174",
+  "inputs": {
+    "pump_scan_nm": [
+      700,
+      1700
+    ],
+    "gamma_meV": 5,
+    "kane_Ep_eV": 28.8,
+    "kdotpy_override": {
+      "E11_eV": 1.5070710200000001,
+      "E22_eV": 1.66940325
+    }
+  },
+  "key_outputs": {
+    "aestimo_ideal": {
+      "peak_nm_per_V": 0.016839368092340965,
+      "peak_pump_nm": 1531.0,
+      "film_avg_at_1570nm_nm_per_V": 0.005420757085524358
+    },
+    "aestimo_graded": {
+      "peak_nm_per_V": 0.01825576864208521,
+      "peak_pump_nm": 1520.0,
+      "film_avg_at_1570nm_nm_per_V": 0.005193635120720748
+    },
+    "kdotpy_graded": {
+      "peak_nm_per_V": 0.01896480237974216,
+      "peak_pump_nm": 1481.0,
+      "film_avg_at_1570nm_nm_per_V": 0.0038678485517908354
+    }
+  },
+  "versions": {
+    "python": "3.11.15",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "matplotlib": "3.11.0",
+    "yaml": "6.0.3",
+    "torch": "2.12.1+cpu",
+    "kdotpy": "1.4.0",
+    "grcwa": "0.1.2",
+    "h5py": "3.16.0",
+    "pandas": "3.0.3"
+  }
+}

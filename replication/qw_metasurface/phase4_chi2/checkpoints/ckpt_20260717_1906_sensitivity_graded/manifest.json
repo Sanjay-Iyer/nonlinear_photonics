@@ -1,0 +1,38 @@
+{
+  "created": "2026-07-17T19:06:10",
+  "git_commit": "3cbd8ef3a15f5bc39413774470a7aaf8e239b9d0",
+  "config_path": "C:\\code\\nonlinear_photonics\\replication\\qw_metasurface\\config\\paper_params.yaml",
+  "config_sha256": "ac75a0e45fb7ecaeae678aa6209215ed58c4fdb4a2f9bd9aa9a53267d8ffd174",
+  "inputs": {
+    "variant": "graded",
+    "draws": 4000,
+    "sigmas": {
+      "S_rel": 0.08,
+      "z_diag_nm": 0.2,
+      "z_off_rel": 0.08,
+      "E_eV": 0.01
+    }
+  },
+  "key_outputs": {
+    "baseline_peak_nm_per_V": 0.17722088880926687,
+    "median_nm_per_V": 0.17684052494563368,
+    "p5_p95": [
+      0.1269943433650947,
+      0.23493194596287104
+    ],
+    "P_ge_1p2": 0.0
+  },
+  "versions": {
+    "python": "3.11.15",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "matplotlib": "3.11.0",
+    "yaml": "6.0.3",
+    "torch": "2.12.1+cpu",
+    "kdotpy": "1.4.0",
+    "grcwa": "0.1.2",
+    "h5py": "3.16.0",
+    "pandas": "3.0.3"
+  }
+}

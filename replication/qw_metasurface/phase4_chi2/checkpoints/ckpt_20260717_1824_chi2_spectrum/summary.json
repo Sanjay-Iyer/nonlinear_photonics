@@ -1,0 +1,40 @@
+{
+  "aestimo_ideal": {
+    "peak_pump_nm": 1531.0,
+    "peak_chi_xzx_pmV": 16.839368092340965,
+    "peak_chi_xzx_nm_per_V": 0.016839368092340965,
+    "chi_xzx_at_1570nm_pmV": 9.136107447512961,
+    "chi_eff_sum_at_1570nm_nm_per_V": 0.018272214895025923,
+    "film_avg_peak_nm_per_V": 0.00999135840145564,
+    "film_avg_at_1570nm_nm_per_V": 0.005420757085524358,
+    "fill_factor": 0.5933333333333334
+  },
+  "aestimo_graded": {
+    "peak_pump_nm": 1520.0,
+    "peak_chi_xzx_pmV": 18.25576864208521,
+    "peak_chi_xzx_nm_per_V": 0.01825576864208521,
+    "chi_xzx_at_1570nm_pmV": 8.75331761919227,
+    "chi_eff_sum_at_1570nm_nm_per_V": 0.01750663523838454,
+    "film_avg_peak_nm_per_V": 0.010831756060970558,
+    "film_avg_at_1570nm_nm_per_V": 0.005193635120720748,
+    "fill_factor": 0.5933333333333334
+  },
+  "kdotpy_graded": {
+    "peak_pump_nm": 1481.0,
+    "peak_chi_xzx_pmV": 18.96480237974216,
+    "peak_chi_xzx_nm_per_V": 0.01896480237974216,
+    "chi_xzx_at_1570nm_pmV": 6.518845873804778,
+    "chi_eff_sum_at_1570nm_nm_per_V": 0.013037691747609555,
+    "film_avg_peak_nm_per_V": 0.011252449411980349,
+    "film_avg_at_1570nm_nm_per_V": 0.0038678485517908354,
+    "fill_factor": 0.5933333333333334
+  },
+  "sign_structure": {
+    "chi_xzx": "+",
+    "chi_xxz": "+",
+    "chi_yzy": "-",
+    "chi_yyz": "-",
+    "basis": "HH interband dipole <u_e|r|u_hh>: x and y legs equal in magnitude; the y-polarized loop carries an odd number of the m_j=+/-3/2 raising/lowering factors, flipping the sign relative to x. Intersubband z-leg is polarization-independent. Hence chi_xzx=chi_xxz=-chi_yzy=-chi_yyz."
+  },
+  "r_ehh_nm": 0.7356101666719684
+}

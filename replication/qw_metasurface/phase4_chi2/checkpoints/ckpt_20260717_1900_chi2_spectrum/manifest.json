@@ -1,0 +1,52 @@
+{
+  "created": "2026-07-17T19:00:34",
+  "git_commit": "3cbd8ef3a15f5bc39413774470a7aaf8e239b9d0",
+  "config_path": "C:\\code\\nonlinear_photonics\\replication\\qw_metasurface\\config\\paper_params.yaml",
+  "config_sha256": "ac75a0e45fb7ecaeae678aa6209215ed58c4fdb4a2f9bd9aa9a53267d8ffd174",
+  "inputs": {
+    "pump_scan_nm": [
+      700,
+      1700
+    ],
+    "gamma_meV": 5,
+    "kane_Ep_eV": 28.8,
+    "basis": "2 HH + 2 electron states",
+    "kdotpy_override": {
+      "E11_eV": 1.5070710200000001,
+      "E22_eV": 1.66940325
+    }
+  },
+  "key_outputs": {
+    "aestimo_ideal": {
+      "coherent_peak_nm_per_V": 0.06077845357644455,
+      "peak_pump_nm": 1490.0,
+      "electron_channel_peak_nm_per_V": 2.8023293262430045,
+      "cancellation_fraction": 0.9782258066101545
+    },
+    "aestimo_graded": {
+      "coherent_peak_nm_per_V": 0.16654058534032157,
+      "peak_pump_nm": 1475.0,
+      "electron_channel_peak_nm_per_V": 2.33774953621033,
+      "cancellation_fraction": 0.925277424130063
+    },
+    "kdotpy_graded": {
+      "coherent_peak_nm_per_V": 0.1623443523342587,
+      "peak_pump_nm": 1438.0,
+      "electron_channel_peak_nm_per_V": 2.276883561773104,
+      "cancellation_fraction": 0.9237355043450279
+    }
+  },
+  "versions": {
+    "python": "3.11.15",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "matplotlib": "3.11.0",
+    "yaml": "6.0.3",
+    "torch": "2.12.1+cpu",
+    "kdotpy": "1.4.0",
+    "grcwa": "0.1.2",
+    "h5py": "3.16.0",
+    "pandas": "3.0.3"
+  }
+}
