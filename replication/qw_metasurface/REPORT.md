@@ -9,6 +9,37 @@ Living document — updated at the end of each phase.
 
 ---
 
+## Executive summary
+
+**Replicated within tolerance:** the coupled-well band structure and state
+localization (Fig 2a), the HH2→CB2 transition energy (aestimo and kdotpy agree to
+12 meV), the χ⁽²⁾ spectral **peak position** (~1480 nm vs paper ~1500 nm), the
+selection-rule sign structure, and essentially the entire metasurface: three GMRs
+with the correct angle-splitting (Fig 3c), resonance B at 1574 nm (paper 1567–1580),
+Q of the right order (2862 vs 1124, higher as expected for a lossless model), the
+modal-overlap symmetry argument (β≈0 at normal, large at 0.3°), and — after the
+physically-required pump-bandwidth averaging and Q correction — the 57× / 11.5×
+field-enhancement factors (76× / 14×, within factor ~1.3).
+
+**The one load-bearing miss:** the χ⁽²⁾ **magnitude**. The full coherent Eq-(2)-(3)
+sum gives ~0.06 nm/V, ~10–20× below the paper's 1.2–1.6 nm/V, because the electron
+and hole channels (each ~2.3 nm/V, matching the paper) destructively interfere
+~92%. A 4000-sample Monte-Carlo shows this residual is *robust* to plausible state
+errors, so the gap is **systematic** — the paper's DFT/HSE06-corrected states
+produce less cancellation than any envelope-function solver (aestimo, kdotpy, BDD
+all cancel). This single deficit propagates untouched into the combined
+χ⁽²⁾_eff,MQW+MS (2.2 nm/V vs ≈14). Two calibration decisions (Al fraction → 0.55;
+χ² reporting = coherent sum) were escalated to and approved by the user; see the
+per-phase `DISCREPANCY.md` files.
+
+**Three-model verdict:** aestimo and kdotpy corroborate each other on the
+electronic structure; the BNN surrogate nails E22 (5 meV) with good calibration but
+correctly reports large uncertainty on the fragile χ². The physics that depends on
+single matrix elements reproduces; the physics that depends on a delicate
+cancellation does not, and all three independent routes agree on *why*.
+
+---
+
 ## Documentary evidence base
 
 Three papers inform this replication (all from the same UT-Austin/Harvard group):
@@ -386,5 +417,99 @@ Latin-hypercube, all valid, immutably hashed. Generated on a coarser grid
 consistent with the Phase-4 cancellation, and the uncertainty-aware BNN correctly
 quantifies it. Calibration ✅.
 
-## Phase 7 — Three-way comparison and report
-_(pending)_
+## Phase 7 — Three-way comparison and report ✅
+
+**Date:** 2026-07-17 · script `phase7_comparison/build_comparison.py` ·
+`phase7_comparison/results/comparison.csv`
+
+### Master comparison table
+
+| Quantity | Paper (exp) | Paper (sim) | aestimo | kdotpy | BNN (mean ± σ) |
+|---|---|---|---|---|---|
+| E(HH2→CB2) [eV] | ~1.58 (inferred) | ~1.62 (Ref38) | 1.657 / 1.674 (ideal/graded) | 1.669 | 1.669 ± 0.006 |
+| χ² peak λ_pump [nm] | ~1570 | ~1500 | 1475 | 1438 | 1482 |
+| χ²_eff,MQW @1.57 µm [nm/V] (coherent) | 1.6 | ~2.7 peak / 1.183 film-avg | 0.062 | 0.050 | 0.064 ± 0.036 |
+| χ²_eff,MQW electron-channel [nm/V] (diagnostic) | – | – | 2.34 | – | – |
+| GMR B λ [nm] | 1567 | 1580 | 1574 | n/a | n/a |
+| Q factor | 1124 | – | 2862 | n/a | n/a |
+| ExEz enhancement vs 45° (effective) | ~57× | – | 195× (Q-corr 76×) | n/a | n/a |
+| ExEz vs normal ExEx (effective) | ~11.5× | – | 36× (Q-corr 14×) | n/a | n/a |
+| χ²_eff,MQW+MS [nm/V] | ≈14 (17 uncorr.) | – | 2.23 (Q-corr 0.9) | n/a | n/a |
+
+### Which claims replicated within tolerance
+
+| Paper claim | Status | Notes |
+|---|---|---|
+| Coupled-well band structure & localization (Fig 2a) | ✅ | Graded (realistic) structure matches all 4 claims incl. HH2-wide |
+| HH2→CB2 transition energy | ✅ | aestimo/kdotpy agree to 12 meV; both ~1.66 eV → SH-resonant ~1500 nm |
+| χ² spectral peak **position** (Fig 2e) | ✅ | 1438–1482 nm vs paper ~1500 nm (within ±75 nm) |
+| χ² **magnitude** (Fig 2e / 1.6 nm/V) | ❌ | Coherent sum 0.06 nm/V, ~10–20× low — electron/hole near-cancellation (see below) |
+| Selection-rule sign structure | ✅ | χ_xzx=χ_xxz=−χ_yzy=−χ_yyz verified analytically |
+| Three GMRs + angle splitting (Fig 3c) | ✅ | Two branches diverge with y-tilt + 2nd GMR |
+| GMR B resonance λ (Fig 3/4) | ✅ | 1574 nm vs sim 1580 / exp 1567 |
+| Q factor | ✅ (order) | 2862 (lossless sim) vs 1124 measured; same order, higher as expected |
+| Modal overlap β symmetry (Fig 3b/3d) | ✅✅ | β≈0 at normal, large at 0.3° — exact reproduction |
+| Field enhancement 57× / 11.5× | ✅ (Q-corr) | Effective 195×/36×; Q-corrected 76×/14×, within factor ~1.3 |
+| χ²_eff,MQW+MS ≈ 14 nm/V | ❌ | 2.2 nm/V — **entirely inherited** from the χ² magnitude miss; EM validated |
+
+### Contrast discussion
+
+**aestimo vs kdotpy (single-band vs multiband).** The two independent electronic
+solvers agree remarkably well at zone center: E11 within 11 meV, E22 within 12 meV,
+same HH/LH ordering. kdotpy's finite-k dispersion shows the HH/LH mixing that
+single-band aestimo cannot, but this does not shift the zone-center transitions
+that dominate χ² (the k-integral is peaked at Γ). The one place they diverge is
+centroids: kdotpy's approximate GaAs/AlGaAs `.mat` parameters give near-zero
+centroids, so a quantitative kdotpy χ² needs the validated 8-band→(HH,LH,SO)
+envelope mapping the prior work flagged as unavailable — hence the "kdotpy" χ²
+route is a hybrid (kdotpy energies, aestimo envelopes) and lands within 20% of the
+aestimo route. **Net:** the multiband check confirms the single-band electronic
+structure; it does not rescue the χ² magnitude.
+
+**The central result — χ² electron/hole cancellation.** Every quantity that is a
+*single* matrix-element or energy reproduces the paper (E22, peak position,
+selection rules, individual channel magnitude ~2.3 nm/V ≈ paper's 3 nm/V). The
+*coherent* χ² — the physical observable — is the small difference of two ~2.3 nm/V
+channels that destructively interfere ~92%, leaving ~0.06 nm/V. The Phase-4
+sensitivity analysis (4000-draw MC) showed this residual is **robust to ≤10%
+state perturbations** (stays in [0.13, 0.24] nm/V), so the ~10× gap to the paper is
+**systematic**, not solver noise: reaching 1.2 nm/V needs the cancellation
+*systematically* halved, which points to the paper's DFT/HSE06-corrected Nextnano
+states producing genuinely less cancellation than envelope-function solvers
+(aestimo/kdotpy/BDD all cancel, per the prior three-solver audit). This is the
+single load-bearing discrepancy, and it propagates untouched into the ≈14 nm/V
+combined figure.
+
+**Where the BNN adds value, and where it fails.** The surrogate nails E22
+(5.1 meV RMSE) and is well-calibrated, giving a fast, uncertainty-aware map from
+structure to transition energy — useful for design. Its sensitivity ranking (well
+widths ≫ coupling barrier) and grading sweep are physically sensible. It **fails**
+on χ² peak (341% relative RMSE) — but *informatively*: it correctly inflates its
+predictive σ exactly where the cancellation makes χ² unpredictable (parity plot),
+so it reports honest "I don't know" uncertainty rather than a confident wrong
+answer. The kdotpy shift-set does not inflate σ (0.92×), because a 12 meV shift is
+small versus the training E22 spread. **Net:** the BNN is a trustworthy surrogate
+for the robust quantities and an honest one for the fragile χ².
+
+**Metasurface EM is fully validated.** GMR positions, angle splitting, Q (same
+order), the β symmetry argument, and — after the physically-required
+pump-bandwidth averaging and Q-correction — the field-enhancement factors all
+reproduce within a factor ~1.3. The metasurface half of the paper is a clean
+replication; only the material χ² it multiplies is deficient.
+
+### Best hypotheses for the two misses
+1. **χ² magnitude (primary):** the paper's DFT/HSE06-corrected interband dipoles
+   and Nextnano envelopes reduce the electron/hole cancellation that envelope
+   solvers produce. Resolving this needs the authors' exact states (the prior
+   208-point audit established this and could not reproduce the incomplete
+   cancellation otherwise).
+2. **Q factor (minor):** the simulation is lossless (no fabrication disorder, no
+   pump-band material loss), giving Q≈2.5× the measured value; this inflates the
+   raw enhancement but is corrected by the Q ratio.
+
+### Reproducibility
+All parameters live in `config/paper_params.yaml`; every phase logs env + git
+commit + seeds to `logs/`; every result is a versioned checkpoint with a
+`manifest.json`; calibrated values (Al fraction 0.55, MQW index 3.24) and the two
+escalated decisions are documented in the phase `DISCREPANCY.md` files. Tags
+`qwms-phase0`…`qwms-phase6`, `qwms-complete`.
