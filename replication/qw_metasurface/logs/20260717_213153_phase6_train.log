@@ -1,0 +1,53 @@
+{
+  "phase": "phase6_train",
+  "timestamp": "20260717_213153",
+  "git_commit": "f848c7d52daeef346997926ee97193cda00e8698",
+  "seed": 0,
+  "argv": [
+    "train_bnn.py",
+    "--epochs",
+    "500",
+    "--members",
+    "5"
+  ],
+  "versions": {
+    "python": "3.11.15",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "matplotlib": "3.11.0",
+    "yaml": "6.0.3",
+    "torch": "2.12.1+cpu",
+    "kdotpy": "1.4.0",
+    "grcwa": "0.1.2",
+    "h5py": "3.16.0",
+    "pandas": "3.0.3"
+  },
+  "epochs": 500
+}
+[21:31:56] member0 ep100 train -1.438 val -0.397
+[21:31:56] member0 ep200 train -1.689 val -0.166
+[21:31:57] member0 ep300 train -1.785 val 0.162
+[21:31:57] member0 ep400 train -1.856 val 0.605
+[21:31:57] member0 ep500 train -1.925 val 0.449
+[21:31:58] member1 ep100 train -1.397 val -0.315
+[21:31:58] member1 ep200 train -1.706 val -0.318
+[21:31:59] member1 ep300 train -1.754 val -0.179
+[21:31:59] member1 ep400 train -1.864 val -0.002
+[21:31:59] member1 ep500 train -1.935 val -0.072
+[21:32:00] member2 ep100 train -1.393 val -0.056
+[21:32:00] member2 ep200 train -1.665 val -0.004
+[21:32:01] member2 ep300 train -1.777 val 0.426
+[21:32:01] member2 ep400 train -1.865 val 0.534
+[21:32:01] member2 ep500 train -1.802 val 0.355
+[21:32:02] member3 ep100 train -1.413 val -0.358
+[21:32:02] member3 ep200 train -1.722 val 0.002
+[21:32:03] member3 ep300 train -1.814 val 1.045
+[21:32:03] member3 ep400 train -1.878 val 1.850
+[21:32:03] member3 ep500 train -1.932 val 2.359
+[21:32:04] member4 ep100 train -1.205 val -0.191
+[21:32:04] member4 ep200 train -1.649 val -0.307
+[21:32:05] member4 ep300 train -1.752 val 0.043
+[21:32:05] member4 ep400 train -1.751 val 0.208
+[21:32:06] member4 ep500 train -1.873 val 0.334
+[21:32:06] val RMSE E22=5.10 meV chi2 rel 341.1%

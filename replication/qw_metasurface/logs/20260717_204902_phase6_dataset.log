@@ -1,0 +1,28 @@
+{
+  "phase": "phase6_dataset",
+  "timestamp": "20260717_204902",
+  "git_commit": "f848c7d52daeef346997926ee97193cda00e8698",
+  "seed": 7,
+  "argv": [
+    "generate_dataset.py",
+    "--n",
+    "8",
+    "--nk",
+    "3"
+  ],
+  "versions": {
+    "python": "3.11.15",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "matplotlib": "3.11.0",
+    "yaml": "6.0.3",
+    "torch": "2.12.1+cpu",
+    "kdotpy": "1.4.0",
+    "grcwa": "0.1.2",
+    "h5py": "3.16.0",
+    "pandas": "3.0.3"
+  },
+  "n": 8,
+  "nk": 3
+}

@@ -1,0 +1,47 @@
+{
+  "n_aestimo": 500,
+  "n_kdotpy": 50,
+  "seed": 7,
+  "kdotpy_shift_meV": 12.278525675839091,
+  "param_names": [
+    "wide_well_nm",
+    "narrow_well_nm",
+    "coupling_barrier_nm",
+    "al_fraction",
+    "grading_nm"
+  ],
+  "target_names": [
+    "E22_eV",
+    "delta_z22_nm",
+    "chi2_peak_nm_per_V",
+    "chi2_peak_wavelength_nm"
+  ],
+  "bounds": {
+    "wide_well_nm": [
+      5.0,
+      9.0
+    ],
+    "narrow_well_nm": [
+      2.0,
+      4.0
+    ],
+    "coupling_barrier_nm": [
+      1.0,
+      3.0
+    ],
+    "al_fraction": [
+      0.45000000000000007,
+      0.65
+    ],
+    "grading_nm": [
+      0.0,
+      1.0
+    ]
+  },
+  "sha256": "53d1921784cc4a1d48288d7275cab7c66394a5edc6dee87ed269b97df53ae639",
+  "pump_grid_nm": [
+    1350.0,
+    1650.0,
+    121
+  ]
+}

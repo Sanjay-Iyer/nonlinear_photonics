@@ -1,0 +1,41 @@
+{
+  "phase": "phase6_dataset",
+  "timestamp": "20260717_210541",
+  "git_commit": "f848c7d52daeef346997926ee97193cda00e8698",
+  "seed": 7,
+  "argv": [
+    "generate_dataset.py",
+    "--n",
+    "500",
+    "--nk",
+    "50",
+    "--seed",
+    "7"
+  ],
+  "versions": {
+    "python": "3.11.15",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "matplotlib": "3.11.0",
+    "yaml": "6.0.3",
+    "torch": "2.12.1+cpu",
+    "kdotpy": "1.4.0",
+    "grcwa": "0.1.2",
+    "h5py": "3.16.0",
+    "pandas": "3.0.3"
+  },
+  "n": 500,
+  "nk": 50
+}
+[21:08:02] aestimo 50/500 (50 valid) elapsed 140s
+[21:10:21] aestimo 100/500 (100 valid) elapsed 278s
+[21:12:42] aestimo 150/500 (150 valid) elapsed 420s
+[21:15:00] aestimo 200/500 (200 valid) elapsed 558s
+[21:17:21] aestimo 250/500 (250 valid) elapsed 698s
+[21:19:40] aestimo 300/500 (300 valid) elapsed 837s
+[21:21:58] aestimo 350/500 (350 valid) elapsed 975s
+[21:24:18] aestimo 400/500 (400 valid) elapsed 1115s
+[21:26:34] aestimo 450/500 (450 valid) elapsed 1252s
+[21:28:54] aestimo 500/500 (500 valid) elapsed 1391s
+[21:31:11] kdotpy 50/50 (50 valid) elapsed 137s
