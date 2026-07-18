@@ -1,0 +1,31 @@
+{
+  "phase": "phase5_metasurface_full",
+  "timestamp": "20260717_200648",
+  "git_commit": "3c0bcea0e11498cea1162378cc00ea18dd6d5a3f",
+  "seed": 0,
+  "argv": [
+    "run_metasurface.py",
+    "--mode",
+    "full"
+  ],
+  "versions": {
+    "python": "3.11.15",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "matplotlib": "3.11.0",
+    "yaml": "6.0.3",
+    "torch": "2.12.1+cpu",
+    "kdotpy": "1.4.0",
+    "grcwa": "0.1.2",
+    "h5py": "3.16.0",
+    "pandas": "3.0.3"
+  },
+  "nG": 101
+}
+[20:27:05] resonance B lambda0=1574.10 FWHM=0.550 Q=2862
+[20:27:25] beta(0.0)=8.0983e-11
+[20:27:44] beta(0.3)=9.0543e+04
+[20:28:02] beta(1.0)=1.5812e+03
+[20:28:23] beta(2.0)=7.1666e+02
+[20:28:47] beta(4.0)=4.6512e+02

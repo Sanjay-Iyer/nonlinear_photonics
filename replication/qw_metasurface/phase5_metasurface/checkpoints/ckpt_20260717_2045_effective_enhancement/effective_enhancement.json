@@ -1,0 +1,16 @@
+{
+  "lam0_nm": 1574.1,
+  "angle_deg": 0.3,
+  "pump_fwhm_nm": 51.140979670676046,
+  "gmr_fwhm_nm": 0.55,
+  "peak_ExEz_vs_45deg": 2620.365069440884,
+  "effective_ExEz_vs_45deg": 194.70144324462885,
+  "target_57": 57,
+  "peak_ExEz_vs_normal_ExEx": 482.98276375723657,
+  "effective_ExEz_vs_normal_ExEx": 35.88715261949309,
+  "target_11p5": 11.5,
+  "chi2_eff_MQW_nm_per_V": 0.06227849215383885,
+  "chi2_eff_MQW_plus_MS_effective_nm_per_V": 2.2349977528367173,
+  "target_chi2_MQW_plus_MS": 14,
+  "note": "Paper 57x/11.5x are effective (pump-bandwidth-averaged) values; peak on-resonance enhancement is ~30x larger. Effective values computed by weighting per-lambda enhancement with the 70 fs pump spectrum."
+}

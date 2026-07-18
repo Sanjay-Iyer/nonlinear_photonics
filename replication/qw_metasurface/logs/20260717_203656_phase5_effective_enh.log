@@ -1,0 +1,24 @@
+{
+  "phase": "phase5_effective_enh",
+  "timestamp": "20260717_203656",
+  "git_commit": "3c0bcea0e11498cea1162378cc00ea18dd6d5a3f",
+  "seed": 0,
+  "argv": [
+    "effective_enhancement.py"
+  ],
+  "versions": {
+    "python": "3.11.15",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "matplotlib": "3.11.0",
+    "yaml": "6.0.3",
+    "torch": "2.12.1+cpu",
+    "kdotpy": "1.4.0",
+    "grcwa": "0.1.2",
+    "h5py": "3.16.0",
+    "pandas": "3.0.3"
+  }
+}
+[20:45:40] scanned 114 lambda for metasurface ExEz
+[20:45:49] effective enh: 194.7x (t57), 35.9x (t11.5)

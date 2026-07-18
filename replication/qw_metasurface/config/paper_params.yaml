@@ -108,8 +108,10 @@ metasurface:
   period_nm: {x: 891, y: 650}
   polarization: "x (p-pol)"
   mqw_index_780nm: [3.39, 0.11]     # n + ik from ellipsometry (paper Methods)
-  mqw_index_1550nm_est: 3.30        # literature-weighted GaAs/AlGaAs estimate;
-                                    # repo has no ellipsometry file (documented)
+  mqw_index_1550nm_est: 3.24        # CALIBRATED (Phase 5) so GMR resonance B lands
+                                    # at ~1577 nm (paper sim 1580). Repo has no
+                                    # ellipsometry file; value is within the plan's
+                                    # 3.2-3.4 literature band. Was 3.30 pre-calibration.
   tio2_index_est: {n_1550: 2.28, n_780: 2.42}   # amorphous ALD TiO2 literature
   al2o3_index_est: {n_1550: 1.746, n_780: 1.760}
   scan:
