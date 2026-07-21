@@ -1,14 +1,23 @@
-"""Run one or more nextnano++ input decks via nextnanopy.
+"""Run, dry-run, or preflight nextnano++ input decks.
 
-Usage (on the work laptop, with nextnano Standard installed and
-config/paths.local.yaml filled in):
+Examples (paths are relative to the repo root; run from anywhere):
 
-    python run_input.py ../inputs/hello_01_bulk_gaas.in
-    python run_input.py ../inputs/hello_*.in
+    python nextnano/scripts/run_input.py --help
+    python nextnano/scripts/run_input.py --check-config
+    python nextnano/scripts/run_input.py --dry-run nextnano/inputs/hello_01_bulk_gaas.in
+    python nextnano/scripts/run_input.py nextnano/inputs/hello_01_bulk_gaas.in
+    python nextnano/scripts/run_input.py "nextnano/inputs/hello_*.in"
 
-Applies per-machine config, executes each deck, times it, and prints a
-pass/fail summary. Exits nonzero if any run fails, so it is CI/script safe.
+Exit codes:
+    0  success
+    1  a solver run failed, or a required preflight check failed
+    2  bad invocation: no/unmatched inputs, or invalid configuration
+    3  execution requested but nextnanopy could not be imported
+
+The runner never reads or prints license-file contents; only paths are shown.
 """
+
+from __future__ import annotations
 
 import argparse
 import glob
@@ -17,91 +26,78 @@ import time
 import traceback
 from pathlib import Path
 
-from nn_config import load_config
+# This file is imported directly (its own directory is on sys.path[0] when run
+# as a script). Tests add the scripts dir to sys.path via conftest.
+from nn_config import ConfigError, resolve_config, preflight
+
+_WILDCARD_CHARS = "*?["
 
 
-def _expand(patterns):
-    """Expand each argument as a glob.
+def expand_inputs(patterns) -> list[Path]:
+    """Resolve input arguments into an ordered, de-duplicated list of files.
 
-    Windows shells (cmd.exe and PowerShell) do NOT expand wildcards for
-    native executables, so `run_input.py ../inputs/hello_*.in` would arrive
-    as the literal string. Expand here so the documented multi-deck form
-    works identically on every platform. A pattern with no magic characters
-    is passed through unchanged (so a genuinely-missing plain path still
-    reports as not-found rather than vanishing).
+    Wildcards are expanded internally (not left to the shell) so behavior is
+    identical in PowerShell, cmd.exe, and POSIX shells -- Windows shells do
+    not glob for native executables. An argument that matches nothing (a
+    missing plain path OR an unmatched wildcard) is an explicit error.
+
+    Ordering is preserved: matches within one wildcard are sorted; arguments
+    keep their given order. Duplicates (by resolved absolute path) are removed.
     """
-    expanded = []
+    resolved: list[Path] = []
     for pat in patterns:
         pat = str(pat)
-        if any(ch in pat for ch in "*?[") and (matches := sorted(glob.glob(pat))):
-            expanded.extend(Path(m) for m in matches)
+        if any(ch in pat for ch in _WILDCARD_CHARS):
+            matches = sorted(Path(m) for m in glob.glob(pat))
+            if not matches:
+                raise FileNotFoundError(f"no files match pattern: {pat}")
+            resolved.extend(matches)
         else:
-            expanded.append(Path(pat))
-    return expanded
+            path = Path(pat)
+            if not path.is_file():
+                raise FileNotFoundError(f"input file not found: {pat}")
+            resolved.append(path)
+
+    seen: set[Path] = set()
+    unique: list[Path] = []
+    for path in resolved:
+        key = path.resolve()
+        if key not in seen:
+            seen.add(key)
+            unique.append(path)
+    return unique
 
 
-def _run_one(path: Path):
-    """Execute a single deck. Returns (ok, seconds, message)."""
-    import nextnanopy as nn
+def build_plan(cfg, inputs: list[Path]) -> list[tuple[Path, Path]]:
+    """Assign each deck its own output subdirectory (base/<deck stem>).
 
-    start = time.perf_counter()
-    try:
-        input_file = nn.InputFile(str(path))
-        input_file.execute()
-    except Exception as exc:  # noqa: BLE001 - we want the summary to survive
-        elapsed = time.perf_counter() - start
-        traceback.print_exc()
-        return False, elapsed, f"{type(exc).__name__}: {exc}"
-    elapsed = time.perf_counter() - start
-    return True, elapsed, "ok"
+    Distinct subdirectories guarantee two decks cannot overwrite each other's
+    results even when run together.
+    """
+    return [(deck, cfg.outputdirectory / deck.stem) for deck in inputs]
 
 
 def _fmt_runtime(seconds: float) -> str:
     if seconds < 60:
         return f"{seconds:6.2f} s"
-    m, s = divmod(seconds, 60)
-    return f"{int(m):d}m{s:04.1f}s"
+    minutes, secs = divmod(seconds, 60)
+    return f"{int(minutes):d}m{secs:04.1f}s"
 
 
-def main(argv=None) -> int:
-    parser = argparse.ArgumentParser(
-        description="Run nextnano++ input decks and report pass/fail."
-    )
-    parser.add_argument(
-        "inputs",
-        nargs="+",
-        help="One or more .in deck paths. Globs (e.g. hello_*.in) are "
-        "expanded by this script, so they work even on Windows shells "
-        "that don't expand wildcards themselves.",
-    )
-    args = parser.parse_args(argv)
-    inputs = _expand(args.inputs)
-
-    # Fail fast with an actionable message if paths.local.yaml is missing.
-    applied = load_config()
-    print("nextnano++ config:")
-    for k, v in applied.items():
-        print(f"  {k:16s} = {v}")
+def _print_plan(plan: list[tuple[Path, Path]]) -> None:
+    print("Resolved input files (in execution order):")
+    for deck, out_dir in plan:
+        print(f"  {deck}")
+        print(f"      -> output: {out_dir}")
     print()
 
-    results = []
-    for path in inputs:
-        if not path.is_file():
-            print(f"[skip] not found: {path}")
-            results.append((path, False, 0.0, "file not found"))
-            continue
-        print(f"[run ] {path}")
-        ok, elapsed, message = _run_one(path)
-        status = "PASS" if ok else "FAIL"
-        print(f"[{status}] {path}  ({_fmt_runtime(elapsed)})\n")
-        results.append((path, ok, elapsed, message))
 
-    # Summary table.
-    name_w = max((len(p.name) for p, *_ in results), default=4)
-    name_w = max(name_w, len("input"))
-    print("=" * (name_w + 30))
+def _print_summary(results: list[tuple[Path, bool, float, str]]) -> int:
+    name_w = max([len(p.name) for p, *_ in results] + [len("input")])
+    line = "=" * (name_w + 34)
+    print(line)
     print(f"{'input':<{name_w}}  {'result':<6}  {'runtime':>9}  notes")
-    print("-" * (name_w + 30))
+    print("-" * (name_w + 34))
     n_fail = 0
     for path, ok, elapsed, message in results:
         if not ok:
@@ -109,11 +105,142 @@ def main(argv=None) -> int:
         status = "PASS" if ok else "FAIL"
         note = "" if ok else message
         print(f"{path.name:<{name_w}}  {status:<6}  {_fmt_runtime(elapsed):>9}  {note}")
-    print("=" * (name_w + 30))
-    total = len(results)
-    print(f"{total - n_fail}/{total} passed")
+    print(line)
+    print(f"{len(results) - n_fail}/{len(results)} passed")
+    return n_fail
 
+
+def _do_check_config(config_path, inputs: list[Path]) -> int:
+    checks, ok = preflight(config_path, inputs)
+    name_w = max(len(c.name) for c in checks)
+    print("Preflight (--check-config): no solver is executed.\n")
+    for c in checks:
+        if not c.required and c.ok:
+            mark = "info"
+        else:
+            mark = "PASS" if c.ok else "FAIL"
+        print(f"  [{mark:<4}] {c.name:<{name_w}}  {c.detail}")
+    print()
+    print(f"RESULT: {'PASS' if ok else 'FAIL'}")
+    return 0 if ok else 1
+
+
+def _do_dry_run(plan: list[tuple[Path, Path]]) -> int:
+    """Print the plan and validate each deck loads, without executing."""
+    print("Dry run (--dry-run): decks are loaded/validated but NOT executed.\n")
+    try:
+        import nextnanopy as nn
+    except Exception as exc:  # noqa: BLE001
+        print(
+            f"  note: nextnanopy not importable ({exc}); skipping load validation. "
+            "Planning only."
+        )
+        return 0
+
+    n_fail = 0
+    for deck, _out_dir in plan:
+        try:
+            inp = nn.InputFile(str(deck))
+            print(f"  [OK  ] loaded {deck.name}  (product={inp.product})")
+        except Exception as exc:  # noqa: BLE001
+            n_fail += 1
+            print(f"  [FAIL] could not load {deck.name}: {type(exc).__name__}: {exc}")
+    print()
+    print(f"RESULT: {'PASS' if n_fail == 0 else 'FAIL'} (no execution performed)")
     return 1 if n_fail else 0
+
+
+def _do_execute(cfg, plan: list[tuple[Path, Path]]) -> int:
+    try:
+        import nextnanopy as nn
+    except Exception as exc:  # noqa: BLE001
+        print(
+            f"ERROR: execution requires nextnanopy, which could not be imported: {exc}",
+            file=sys.stderr,
+        )
+        return 3
+
+    results: list[tuple[Path, bool, float, str]] = []
+    for deck, out_dir in plan:
+        out_dir.mkdir(parents=True, exist_ok=True)
+        print(f"[run ] {deck}  -> {out_dir}")
+        start = time.perf_counter()
+        try:
+            inp = nn.InputFile(str(deck))
+            # Pass all paths as execute kwargs so nextnanopy's global config is
+            # never consulted or written; each deck gets its own output dir.
+            inp.execute(**cfg.execute_kwargs(outputdirectory=out_dir))
+            ok, message = True, "ok"
+        except Exception as exc:  # noqa: BLE001 - keep summary alive
+            traceback.print_exc()
+            ok, message = False, f"{type(exc).__name__}: {exc}"
+        elapsed = time.perf_counter() - start
+        print(f"[{'PASS' if ok else 'FAIL'}] {deck.name}  ({_fmt_runtime(elapsed)})\n")
+        results.append((deck, ok, elapsed, message))
+
+    n_fail = _print_summary(results)
+    return 1 if n_fail else 0
+
+
+def main(argv=None) -> int:
+    parser = argparse.ArgumentParser(
+        description="Run, dry-run, or preflight nextnano++ input decks.",
+    )
+    parser.add_argument(
+        "inputs",
+        nargs="*",
+        help="One or more .in deck paths. Wildcards (e.g. hello_*.in) are "
+        "expanded by this script, so they work in PowerShell and cmd.exe too.",
+    )
+    parser.add_argument(
+        "--check-config",
+        action="store_true",
+        help="Run preflight checks only; execute nothing. Nonzero exit if any "
+        "required check fails.",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Resolve config and inputs, print the execution plan, and load "
+        "(but do not execute) each deck.",
+    )
+    parser.add_argument(
+        "--config",
+        default=None,
+        help="Override the path to paths.local.yaml (default: "
+        "nextnano/config/paths.local.yaml). Mainly for testing.",
+    )
+    args = parser.parse_args(argv)
+
+    # Expand inputs first; an unmatched path/wildcard is always an error.
+    try:
+        inputs = expand_inputs(args.inputs) if args.inputs else []
+    except FileNotFoundError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 2
+
+    if args.check_config:
+        return _do_check_config(args.config, inputs)
+
+    # dry-run and real execution both need a structurally valid config.
+    try:
+        cfg = resolve_config(args.config)
+    except ConfigError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 2
+
+    if not inputs:
+        print("ERROR: no input files given. Pass one or more .in decks, or use "
+              "--check-config.", file=sys.stderr)
+        return 2
+
+    plan = build_plan(cfg, inputs)
+    _print_plan(plan)
+
+    if args.dry_run:
+        return _do_dry_run(plan)
+
+    return _do_execute(cfg, plan)
 
 
 if __name__ == "__main__":

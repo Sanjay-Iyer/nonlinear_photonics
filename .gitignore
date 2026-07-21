@@ -20,22 +20,27 @@ mpl-cache/
 *.log.lock
 
 # ─── nextnano++ split-machine workflow ──────────────────────────────────────
-# Runtime results are regenerated on the work laptop; never commit them.
-# The dir is kept in git via output/.gitkeep, but everything else is ignored.
-nextnano/output/*
+# Machine-specific local config: created by hand on each machine, never tracked.
+nextnano/config/paths.local.yaml
+# Runtime solver results: ignore everything under output/, but keep the empty
+# directory in git via its .gitkeep (the /** + negation pattern re-includes it).
+nextnano/output/**
 !nextnano/output/.gitkeep
-# nextnano simulation artifacts, scoped to nextnano/ so these broad patterns
-# don't clobber .log/.dat files elsewhere in the repo. nextnano emits them
-# into output/, but sweeps and stray runs can drop them anywhere under here.
+# Any nextnano license file, anywhere -- licensed asset, must never be committed.
+*.lic
+# nextnano-generated solver artifacts (log / field / mesh / data), scoped to
+# nextnano/ so these broad extensions don't hide valid scientific files
+# elsewhere in the repo. Outputs normally land under output/ (already ignored);
+# these catch stray files from a misconfigured run.
 nextnano/**/*.log
 nextnano/**/*.vtr
 nextnano/**/*.fld
 nextnano/**/*.dat
+nextnano/**/*.coord
 nextnano/**/*.avs*
-# Per-machine local paths (executable / database / license / outputdirectory).
-# Copy paths.local.yaml.example -> paths.local.yaml and fill in by hand.
-nextnano/config/paths.local.yaml
-# Python / notebook caches (also covered repo-wide above; repeated here so the
-# nextnano/ block is self-documenting).
+# Python / test caches (also covered repo-wide above; repeated so this block is
+# self-documenting for anyone reading only the nextnano workflow rules).
 __pycache__/
+*.pyc
+.pytest_cache/
 .ipynb_checkpoints/

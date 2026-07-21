@@ -7,3 +7,11 @@ matplotlib>=3.5.0
 
 # Schrödinger-Poisson Solver Platform
 aestimo>=0.9.0
+
+# nextnano++ split-machine workflow (see nextnano/README.md)
+# nextnanopy is pinned to the version tested on the home laptop (NMIP env).
+# Installing it does NOT require a solver license.
+nextnanopy==1.2.0
+PyYAML>=6.0
+# Test runner for the nextnano workflow's non-licensed test suite.
+pytest>=7.0
