@@ -19,25 +19,19 @@ mpl-cache/
 *.tmp
 *.log.lock
 
-# ─── nextnano++ split-machine workflow ──────────────────────────────────────
+# ─── nextnano++ home-to-work workflow ───────────────────────────────────────
 # Machine-specific local config: created by hand on each machine, never tracked.
+# A `git pull` will never overwrite it.
 nextnano/config/paths.local.yaml
-# Runtime solver results: ignore everything under output/, but keep the empty
-# directory in git via its .gitkeep (the /** + negation pattern re-includes it).
+# Raw solver output: ignore EVERYTHING under output/ (fields, meshes, logs, data,
+# temp files all land here), but keep the empty dir in git via its .gitkeep.
+# Scoping solver artifacts to output/ this way avoids broad repo-wide *.dat /
+# *.log rules that would hide legitimate scientific files elsewhere -- e.g. the
+# curated results under nextnano/results/ stay fully tracked.
 nextnano/output/**
 !nextnano/output/.gitkeep
 # Any nextnano license file, anywhere -- licensed asset, must never be committed.
 *.lic
-# nextnano-generated solver artifacts (log / field / mesh / data), scoped to
-# nextnano/ so these broad extensions don't hide valid scientific files
-# elsewhere in the repo. Outputs normally land under output/ (already ignored);
-# these catch stray files from a misconfigured run.
-nextnano/**/*.log
-nextnano/**/*.vtr
-nextnano/**/*.fld
-nextnano/**/*.dat
-nextnano/**/*.coord
-nextnano/**/*.avs*
 # Python / test caches (also covered repo-wide above; repeated so this block is
 # self-documenting for anyone reading only the nextnano workflow rules).
 __pycache__/

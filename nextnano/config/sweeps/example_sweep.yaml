@@ -1,0 +1,23 @@
+# Example parameter sweep for generate_inputs.py.
+#
+#   python nextnano/scripts/generate_inputs.py --config nextnano/config/sweeps/example_sweep.yaml
+#
+# Paths are resolved relative to the nextnano/ root, so this is portable across
+# machines. Generation is pure text substitution -- no nextnano/license needed --
+# and deterministic: the same config always produces byte-identical decks.
+
+# Template to fill in (relative to nextnano/). Its {{placeholders}} are replaced
+# by the parameter values below.
+template: inputs/templates/qw_composition_sweep_template.in
+
+# Model family name. Decks are written to inputs/<output_subdir>/<model_name>/.
+model_name: qw_composition_sweep
+output_subdir: inputs/03_parameter_sweeps
+
+# Applied to every generated deck.
+constants:
+  temperature: 300
+
+# Swept parameters. The cartesian product of these lists defines one deck each.
+grid:
+  al_fraction: [0.20, 0.30, 0.40]

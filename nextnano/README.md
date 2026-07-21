@@ -1,225 +1,94 @@
-# nextnano++ split-machine workflow
+# nextnano++ workflow
 
 A self-contained, **portable** corner of this repo for nextnano++
 semiconductor simulations, built around a two-laptop split:
 
-- **Home laptop** — no nextnano license. Author input decks, Python
-  automation, and analysis; run the non-licensed test suite; commit and push.
-- **Work laptop** — nextnano Standard, portable install. Pull, create one
-  local config file, and execute.
+- **Home laptop = development** — author input decks, generate sweeps, write
+  Python and analysis, commit and push. No license or solver needed.
+- **Work laptop = execution** — pull, run the nextnano++ Standard solver,
+  inspect results and errors.
 
-The tracked code is location-independent: every resource is resolved relative
-to the script file (`Path(__file__).resolve().parents[1]`), so the two
-laptops can keep the repository in **completely different directories** and
-nothing needs to move. The only per-machine data is one gitignored YAML file.
+Tracked code is location-independent: every resource resolves relative to the
+script file (`Path(__file__).resolve().parents[1]`), so the two laptops can
+keep the repository at **different absolute paths** and nothing moves. The only
+per-machine data is one gitignored YAML file.
+
+**→ The full cycle, commands, and error-correction loop are in
+[docs/WORKFLOW.md](docs/WORKFLOW.md). Start there.**
 
 ```
 nextnano/
-  inputs/                 # hand-authored .in decks
-    hello_01_bulk_gaas.in
-    hello_02_algaas_qw.in
-    templates/            # parameterized decks for sweeps
+  inputs/
+    01_smoke_tests/       hello_01_bulk_gaas.in, hello_02_algaas_qw.in
+    02_reference_models/  trusted baselines
+    03_parameter_sweeps/  generated decks (tracked), per model family
+    04_paper_replications/
+    templates/            {{placeholder}} templates for generate_inputs.py
   scripts/
-    nn_config.py          # portable config: load + validate + preflight
-    run_input.py          # CLI: --check-config / --dry-run / run
-  analysis/notebooks/     # exploratory analysis
+    nn_config.py          portable config: load + validate + preflight
+    run_input.py          runner: --check-config / run decks
+    generate_inputs.py    template + sweep YAML -> input decks
+  analysis/
+    scripts/  notebooks/   output parsing + analysis
   config/
-    paths.local.yaml.example   # tracked template (placeholders only)
-    paths.local.yaml           # per-machine, GITIGNORED, hand-authored
-  docs/runlog.md          # ledger tying commits to runs
-  output/                 # runtime results, GITIGNORED (.gitkeep tracked)
-  tests/                  # non-licensed pytest suite
+    paths.local.yaml.example   tracked template (placeholders only)
+    paths.local.yaml           per-machine, GITIGNORED, hand-authored
+    models/  sweeps/           model + sweep definitions (sweeps/example_sweep.yaml)
+  docs/
+    WORKFLOW.md  runlog.md
+  results/                 curated, TRACKED outputs you deliberately keep
+    processed/  figures/  run_manifests/
+  output/                  raw solver output, GITIGNORED (.gitkeep tracked)
+  tests/                   non-licensed pytest suite
   README.md
 ```
 
-Nothing about the license, the solver binary, the database, or run outputs is
-ever tracked. Only text you author is.
+Nothing about the license, the solver binary, the database, or raw output is
+ever tracked. Only text you author (and the small results you curate) is.
 
 ---
 
-## Home laptop (authoring + non-licensed validation)
+## Quick reference
 
-No license required. `pip install nextnanopy` works without one, so you can
-import nextnanopy, load decks, and run the full test suite here.
-
+**Home (author + generate + push):**
 ```powershell
-git pull
-conda activate NMIP
-python -m pip install -r requirements.txt
-python -m pytest
-python .\nextnano\scripts\run_input.py --help
+git pull ; conda activate NMIP ; python -m pip install -r requirements.txt
+python .\nextnano\scripts\generate_inputs.py --config .\nextnano\config\sweeps\example_sweep.yaml
+python -m pytest                       # optional non-licensed checks
+git add nextnano ; git commit -m "..." ; git push
 ```
 
-Home development covers: input authoring, Python automation, validation,
-output parsing, analysis, documentation, the non-licensed test suite, and
-(optionally) Free-edition smoke tests. You **cannot** run the licensed solver
-here — that is what the work laptop is for.
-
-To sanity-check a deck loads and to preview where it would write, without any
-solver:
-
+**Work (pull + run):**
 ```powershell
-# (needs a local config; see "Per-machine setup". A Free/no-license config is
-#  enough for --dry-run, which only loads decks and prints the plan.)
-python .\nextnano\scripts\run_input.py --dry-run .\nextnano\inputs\hello_01_bulk_gaas.in
-```
-
----
-
-## Work laptop (licensed execution)
-
-**The repository does NOT need to be moved.** Leave it where it is:
-
-```
-C:\Code\optics\nextnano\nonlinear_photonics
-```
-
-### 1. Pull and install deps
-
-```powershell
-cd C:\Code\optics\nextnano\nonlinear_photonics
-git pull
-conda activate NMIP
-python -m pip install -r requirements.txt
-```
-
-### 2. Create the local config (once per machine)
-
-`nextnano\config\paths.local.yaml` is gitignored, so it does **not** arrive
-with the pull — create it by hand:
-
-```powershell
-copy nextnano\config\paths.local.yaml.example nextnano\config\paths.local.yaml
-notepad nextnano\config\paths.local.yaml
-```
-
-Fill in the **local-only** values for this work laptop:
-
-```yaml
-nextnano++:
-  exe: "C:/Code/optics/nextnano/2026_07_03/nextnano++/bin/nextnano++_Intel_64bit.exe"
-  database: "C:/Code/optics/nextnano/2026_07_03/nextnano++/database/database.nnp"
-  license: "C:/Code/optics/nextnano/2026_07_03/License/License_nnp.lic"
-  outputdirectory: "C:/Code/optics/nextnano/nonlinear_photonics/nextnano/output"
-  threads: 4
-```
-
-These values live only in this gitignored file. They are **never** embedded in
-tracked Python code or used as runtime defaults.
-
-### 3. Preflight
-
-Verify every path resolves before running the solver (executes nothing):
-
-```powershell
+git pull ; conda activate NMIP ; python -m pip install -r requirements.txt
+# one-time: copy paths.local.yaml.example -> paths.local.yaml and fill in real paths
 python .\nextnano\scripts\run_input.py --check-config
+python .\nextnano\scripts\run_input.py .\nextnano\inputs\01_smoke_tests\hello_01_bulk_gaas.in ; $LASTEXITCODE
 ```
-
-Every required line must read `PASS` and the final `RESULT: PASS`. If not, the
-failing line names exactly what to fix (usually a wrong path in
-`paths.local.yaml`).
-
-### 4. Run the Hello World tests, one at a time
-
-Run the first deck alone and check the exit code:
-
-```powershell
-python .\nextnano\scripts\run_input.py `
-    .\nextnano\inputs\hello_01_bulk_gaas.in
-
-$LASTEXITCODE
-```
-
-`hello_01` is a bulk GaAs slab — no self-consistency, no quantum. It exists
-purely to prove the executable launches, the license validates, the database
-resolves, and output lands where you expect. It should finish in seconds.
-
-**Only after it returns `0`**, run the second deck:
-
-```powershell
-python .\nextnano\scripts\run_input.py `
-    .\nextnano\inputs\hello_02_algaas_qw.in
-
-$LASTEXITCODE
-```
-
-`hello_02` is a 10 nm GaAs / Al(0.3)Ga(0.7)As quantum well; expect 4 confined
-electron states with e1 ~30–40 meV above the GaAs conduction band edge.
-
-**Only after both individual tests pass**, run them together via wildcard (the
-script expands the pattern itself, so it works in PowerShell):
-
-```powershell
-python .\nextnano\scripts\run_input.py `
-    ".\nextnano\inputs\hello_*.in"
-
-$LASTEXITCODE
-```
-
-Each deck writes to its own subdirectory (`output\hello_01_bulk_gaas\`,
-`output\hello_02_algaas_qw\`), so running them together cannot let one
-overwrite the other.
-
-### 5. Inspect outputs and confirm git stays clean
-
-```powershell
-# newest output files
-Get-ChildItem -Recurse .\nextnano\output | Sort-Object LastWriteTime -Descending | Select-Object -First 15 FullName, LastWriteTime
-
-# git must show nothing to commit: outputs and paths.local.yaml are ignored
-git status --short
-```
-
-`git status --short` should be empty (or show only files you intentionally
-edited). If it lists anything under `nextnano\output\` or
-`paths.local.yaml`, the ignore rules are being bypassed — stop and check.
-
-Then record the run in [`docs/runlog.md`](docs/runlog.md) (get the SHA with
-`git rev-parse --short HEAD`), commit that, and push.
-
----
 
 ## The runner CLI
 
 ```
-python nextnano/scripts/run_input.py [--check-config] [--dry-run] [--config PATH] [inputs ...]
+python nextnano/scripts/run_input.py [--check-config] [--config PATH] [inputs ...]
 ```
 
-| mode | executes solver? | purpose |
-|------|:---:|---------|
-| `--check-config` | no | Preflight: Python, nextnanopy, config, path existence, output writability, threads, inputs. |
-| `--dry-run` | no | Resolve config + inputs, print the plan and per-input output dir, load each deck. |
-| *(default)* | yes | Run each deck, time it, print a PASS/FAIL table. |
+- `--check-config` — verify Python, nextnanopy, and the machine paths
+  (exe/database/license exist, output writable). Runs no solver.
+- *(default)* — run each deck, timing it, with a PASS/FAIL summary. Validates
+  exe/database/license exist first and fails clearly if not. Wildcards are
+  expanded inside the script (quote them in PowerShell); an unmatched pattern
+  is an error. Each deck gets its own output subdirectory.
 
-Exit codes: `0` success · `1` a run or required check failed · `2` bad
-invocation (no/unmatched inputs, or invalid config) · `3` execution requested
-but nextnanopy not importable.
-
-Wildcards are expanded **inside** the script, so `"hello_*.in"` behaves the
-same in PowerShell, cmd.exe, and POSIX shells. An unmatched path or wildcard is
-always an explicit error.
-
-### Editions / profiles
-
-The `license` value selects the profile:
-
-- **Standard** — a real `license:` path. `--check-config` verifies the license
-  file exists; execution uses it.
-- **Free / non-execution** — leave `license: ""` empty (or set `profile: free`).
-  No license is required. Useful on the home laptop for `--dry-run` and, if you
-  install the Free edition, small smoke tests.
-
----
+Exit codes: `0` ok · `1` a run failed · `2` bad invocation / invalid config ·
+`3` nextnanopy not importable when execution was requested.
 
 ## Never commit
 
-- **The license file** — licensed to you; its path lives only in the
-  gitignored `paths.local.yaml`, and `*.lic` is ignored repo-wide.
-- **The `output/` directory contents** — regenerated on demand; committing
-  binary `.vtr`/`.fld`/`.dat` artifacts bloats history. The empty dir is kept
-  via `output/.gitkeep`.
-- The nextnano binaries and material database — they ship with the install,
-  not with this repo.
+- **The license file** — `*.lic` is gitignored repo-wide; its path lives only
+  in the gitignored `paths.local.yaml`.
+- **Raw `output/` contents** — regenerated on demand; the empty dir is kept via
+  `output/.gitkeep`.
+- The nextnano binaries and database — they ship with the install.
 
-The root `.gitignore` enforces all of the above; `git check-ignore <path>`
-confirms any specific file.
+`git check-ignore <path>` confirms any specific file. See
+[docs/WORKFLOW.md](docs/WORKFLOW.md) for everything else.

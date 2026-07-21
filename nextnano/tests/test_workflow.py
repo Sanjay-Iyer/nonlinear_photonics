@@ -28,8 +28,10 @@ from pathlib import Path
 
 import pytest
 
+import generate_inputs
 import nn_config
 import run_input
+from generate_inputs import GenerateError, expand_grid, generate, render
 from nn_config import ConfigError, NextnanoConfig, resolve_config
 
 
@@ -74,7 +76,8 @@ def _write_config(
     return cfg
 
 
-REAL_DECK = nn_config.INPUT_DIR / "hello_01_bulk_gaas.in"
+REAL_DECK = nn_config.INPUT_DIR / "01_smoke_tests" / "hello_01_bulk_gaas.in"
+REAL_SWEEP = nn_config.NEXTNANO_ROOT / "config" / "sweeps" / "example_sweep.yaml"
 
 
 # --- 1. repo-relative path resolution ---------------------------------------
@@ -90,7 +93,7 @@ def test_paths_are_repo_relative_to_module():
 
 def test_no_hardcoded_drive_paths_in_scripts():
     # Guard against absolute Windows paths creeping into tracked code.
-    for mod in (nn_config, run_input):
+    for mod in (nn_config, run_input, generate_inputs):
         text = Path(mod.__file__).read_text(encoding="utf-8")
         assert "C:\\" not in text and "C:/" not in text
 
@@ -346,11 +349,16 @@ def test_gitignore_rules():
     assert _check_ignore(repo_root, "nextnano/config/paths.local.yaml")
     assert _check_ignore(repo_root, "nextnano/output/run_result.vtr")
     assert _check_ignore(repo_root, "nextnano/output/hello_01/bandedges.dat")
+    assert _check_ignore(repo_root, "nextnano/output/sim.log")
     assert _check_ignore(repo_root, "nextnano/inputs/some.lic")
     # Tracked (NOT ignored):
     assert not _check_ignore(repo_root, "nextnano/config/paths.local.yaml.example")
-    assert not _check_ignore(repo_root, "nextnano/inputs/hello_01_bulk_gaas.in")
+    assert not _check_ignore(repo_root, "nextnano/inputs/01_smoke_tests/hello_01_bulk_gaas.in")
     assert not _check_ignore(repo_root, "nextnano/output/.gitkeep")
+    # Curated results are a TRACKED location -- broad *.dat/*.log rules must not
+    # reach here (that's why solver-artifact ignores are scoped to output/).
+    assert not _check_ignore(repo_root, "nextnano/results/processed/spectrum.dat")
+    assert not _check_ignore(repo_root, "nextnano/results/run_manifests/run01.log")
 
 
 # --- bonus: real decks load without execution (home-laptop non-licensed) ----
@@ -359,6 +367,73 @@ def test_gitignore_rules():
 def test_real_decks_load_without_execution():
     nn = pytest.importorskip("nextnanopy")
     for deck in ("hello_01_bulk_gaas.in", "hello_02_algaas_qw.in"):
-        path = nn_config.INPUT_DIR / deck
+        path = nn_config.INPUT_DIR / "01_smoke_tests" / deck
         inp = nn.InputFile(str(path))  # loads/parses; does not execute
         assert inp.product == "nextnano++"
+
+
+# --- input generation (generate_inputs.py) ----------------------------------
+
+
+def test_render_substitutes_and_ignores_nextnano_braces():
+    # Double-brace placeholders resolve; nextnano's single braces are untouched.
+    text = "global{ temperature = {{temp}} }  x = {{a}}"
+    assert render(text, {"temp": 300, "a": 0.3}) == "global{ temperature = 300 }  x = 0.3"
+
+
+def test_render_missing_placeholder_raises():
+    with pytest.raises(GenerateError, match="undefined placeholder"):
+        render("alloy_x = {{missing}}", {})
+
+
+def test_expand_grid_is_sorted_cartesian_product():
+    combos = expand_grid({"grid": {"b": [1, 2], "a": [9]}})
+    assert combos == [{"a": 9, "b": 1}, {"a": 9, "b": 2}]
+
+
+def test_generate_writes_expected_decks(tmp_path):
+    results = generate(REAL_SWEEP, output_root=tmp_path)
+    names = sorted(p.name for p, _ in results)
+    assert names == [
+        "01_al_fraction-0.2.in",
+        "02_al_fraction-0.3.in",
+        "03_al_fraction-0.4.in",
+    ]
+    for dest, params in results:
+        assert dest.is_file()
+        assert dest.parent == tmp_path / "inputs" / "03_parameter_sweeps" / "qw_composition_sweep"
+        assert f"alloy_x = {params['al_fraction']}" in dest.read_text(encoding="utf-8")
+
+
+def test_generate_is_deterministic(tmp_path):
+    a = generate(REAL_SWEEP, output_root=tmp_path / "a")
+    b = generate(REAL_SWEEP, output_root=tmp_path / "b")
+    for (da, _), (db, _) in zip(a, b):
+        assert da.read_bytes() == db.read_bytes()
+
+
+def test_generate_dry_run_writes_nothing(tmp_path):
+    results = generate(REAL_SWEEP, output_root=tmp_path, dry_run=True)
+    assert len(results) == 3
+    assert not any(dest.exists() for dest, _ in results)
+
+
+# --- minimal home-laptop hygiene: everything compiles / parses --------------
+
+
+def test_all_scripts_compile():
+    import py_compile
+
+    scripts = (nn_config.NEXTNANO_ROOT / "scripts").glob("*.py")
+    for script in scripts:
+        py_compile.compile(str(script), doraise=True)
+
+
+def test_all_tracked_yaml_parses():
+    import yaml as _yaml
+
+    root = nn_config.NEXTNANO_ROOT / "config"
+    yamls = list(root.rglob("*.yaml")) + list(root.rglob("*.yml"))
+    assert yamls, "expected at least the example config + sweep"
+    for path in yamls:
+        _yaml.safe_load(path.read_text(encoding="utf-8"))

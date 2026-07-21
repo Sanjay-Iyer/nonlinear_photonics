@@ -4,9 +4,8 @@ Examples (paths are relative to the repo root; run from anywhere):
 
     python nextnano/scripts/run_input.py --help
     python nextnano/scripts/run_input.py --check-config
-    python nextnano/scripts/run_input.py --dry-run nextnano/inputs/hello_01_bulk_gaas.in
-    python nextnano/scripts/run_input.py nextnano/inputs/hello_01_bulk_gaas.in
-    python nextnano/scripts/run_input.py "nextnano/inputs/hello_*.in"
+    python nextnano/scripts/run_input.py nextnano/inputs/01_smoke_tests/hello_01_bulk_gaas.in
+    python nextnano/scripts/run_input.py "nextnano/inputs/01_smoke_tests/hello_*.in"
 
 Exit codes:
     0  success
@@ -150,7 +149,29 @@ def _do_dry_run(plan: list[tuple[Path, Path]]) -> int:
     return 1 if n_fail else 0
 
 
+def _validate_runtime_paths(cfg) -> list[str]:
+    """Existence checks required before a real run (exe/database/license)."""
+    errors = []
+    if not cfg.exe.is_file():
+        errors.append(f"executable not found: {cfg.exe}")
+    if not cfg.database.is_file():
+        errors.append(f"database not found: {cfg.database}")
+    if cfg.license is not None and not cfg.license.is_file():
+        errors.append(f"license not found: {cfg.license}")
+    return errors
+
+
 def _do_execute(cfg, plan: list[tuple[Path, Path]]) -> int:
+    # Fail fast with a clear message if the machine paths are wrong, before
+    # touching nextnanopy or the solver.
+    path_errors = _validate_runtime_paths(cfg)
+    if path_errors:
+        print("ERROR: cannot execute -- fix paths.local.yaml:", file=sys.stderr)
+        for err in path_errors:
+            print(f"  - {err}", file=sys.stderr)
+        print("Run --check-config to re-verify.", file=sys.stderr)
+        return 2
+
     try:
         import nextnanopy as nn
     except Exception as exc:  # noqa: BLE001

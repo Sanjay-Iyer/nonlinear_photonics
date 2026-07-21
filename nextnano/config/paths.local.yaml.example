@@ -2,25 +2,21 @@
 # nextnano++ per-machine paths  --  EXAMPLE / TEMPLATE (safe to commit)
 #
 # Copy this file to  paths.local.yaml  (same directory) on EACH machine and
-# replace the placeholders with real paths for THAT machine. paths.local.yaml
-# is gitignored and must never be committed -- it is machine-specific and the
-# license points at a licensed asset.
+# replace the placeholders with the real paths for THAT machine:
 #
 #   Windows:  copy config\paths.local.yaml.example config\paths.local.yaml
 #
-# Use forward slashes (they work fine on Windows). Environment variables
-# (e.g. %USERPROFILE% as ${USERPROFILE}) and a leading ~ are expanded.
+# paths.local.yaml is gitignored and must never be committed -- it is
+# machine-specific and the license points at a licensed asset. A `git pull`
+# will never touch or overwrite it.
 #
-# Profile:
-#   * Set a real  license:  path for the nextnano Standard edition.
-#   * Leave  license: ""  (empty) to select the Free / non-execution profile,
-#     where no license is required. You may also set  profile: free  or
-#     profile: standard  explicitly to remove any ambiguity.
+# Use forward slashes (they work on Windows). Environment variables
+# (e.g. ${USERPROFILE}) and a leading ~ are expanded.
 # ---------------------------------------------------------------------------
 
 nextnano++:
   exe: "PATH_TO_NEXTNANO_EXECUTABLE"
   database: "PATH_TO_NEXTNANO_DATABASE"
-  license: "PATH_TO_NEXTNANO_LICENSE_OR_EMPTY_FOR_FREE_EDITION"
+  license: "PATH_TO_NEXTNANO_LICENSE"
   outputdirectory: "PATH_TO_LOCAL_OUTPUT_DIRECTORY"
   threads: 4
