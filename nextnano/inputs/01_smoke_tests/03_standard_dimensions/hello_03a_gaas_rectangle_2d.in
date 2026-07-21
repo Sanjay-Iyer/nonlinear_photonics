@@ -1,0 +1,71 @@
+# Smoke test 3A: 2D GaAs rectangle -- Standard-dimensionality check.
+#
+# Purpose: prove that the licensed nextnano++ (Evaluation or Standard) can
+# execute a TWO-dimensional domain. The Free edition supports only 1D, so a
+# successful 2D run confirms a licensed dimensional capability. It does not by
+# itself distinguish Evaluation from Standard -- but since the work laptop uses
+# License_nnp.lic from the Standard install, a pass validates the Standard
+# workflow. Coarse grid on purpose: this is an execution + dimensionality
+# check, not a converged physical model.
+#
+# Calculation: one confined Gamma electron state (single-band effective mass) --
+# the lightest solve that unambiguously exercises the 2D Schroedinger machinery
+# and writes normal output. Homogeneous GaAs: no alloy interfaces, no doping,
+# no bias, no strain, no piezoelectricity, no optics, no current, no k.p, no
+# self-consistency.
+#
+# SYNTAX NOTE (home laptop): the 2D-specific keywords here -- simulate2D{},
+# ygrid{}, and rectangle{} -- cannot be validated on the home laptop, because
+# the Free executable rejects 2D by license. Authoritative parse + execution
+# validation happens on the work laptop (Standard). The 1D constructs reused
+# from hello_01/hello_02 (global/grid/classical/quantum/run) are already known
+# to load.
+
+global{
+    simulate2D{}
+    crystal_zb{ x_hkl = [1, 0, 0]  y_hkl = [0, 1, 0] }
+    substrate{ name = "GaAs" }
+    temperature = 300
+}
+
+grid{
+    xgrid{
+        line{ pos = 0.0   spacing = 2.0 }
+        line{ pos = 10.0  spacing = 2.0 }
+    }
+    ygrid{
+        line{ pos = 0.0   spacing = 2.0 }
+        line{ pos = 10.0  spacing = 2.0 }
+    }
+}
+
+structure{
+    # Homogeneous GaAs filling the 2D rectangle.
+    region{
+        rectangle{ x = [0.0, 10.0]  y = [0.0, 10.0] }
+        binary{ name = "GaAs" }
+    }
+}
+
+classical{
+    Gamma{}
+    output_bandedges{ averaged = no }
+}
+
+quantum{
+    region{
+        name = "box_2d"
+        x = [0.0, 10.0]
+        y = [0.0, 10.0]
+        boundary{ x = dirichlet  y = dirichlet }
+        Gamma{ num_ev = 1 }
+        output_wavefunctions{
+            max_num       = 1
+            probabilities = yes
+        }
+    }
+}
+
+run{
+    quantum{}
+}

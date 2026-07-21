@@ -154,6 +154,106 @@ one sweep never overwrite each other. Raw output stays local (gitignored).
 
 ---
 
+## Test 3 — Standard-dimensionality check (2D + 3D)
+
+**Purpose.** Prove the licensed nextnano++ can execute **2D and 3D** domains.
+Per nextnano's product comparison, the **Free** edition supports **only 1D**,
+while **Evaluation** and **Standard** support 1D/2D/3D. So a successful 2D and
+3D run confirms a licensed (Evaluation/Standard) dimensional capability — it
+does **not** distinguish Evaluation from Standard by dimensionality alone.
+Because this work laptop uses `License_nnp.lic` from the Standard install, a
+pass validates the **Standard** workflow.
+
+The two decks live in `nextnano/inputs/01_smoke_tests/03_standard_dimensions/`
+and are intentionally tiny (coarse ~2 nm grid, homogeneous GaAs, one confined
+Γ electron state) so they run in well under a second.
+
+```powershell
+cd C:\Code\optics\nextnano\nonlinear_photonics
+git pull
+conda activate NMIP
+python .\nextnano\scripts\run_input.py --check-config
+```
+
+Run 2D first:
+
+```powershell
+python .\nextnano\scripts\run_input.py `
+    .\nextnano\inputs\01_smoke_tests\03_standard_dimensions\hello_03a_gaas_rectangle_2d.in
+$LASTEXITCODE
+```
+
+Then 3D:
+
+```powershell
+python .\nextnano\scripts\run_input.py `
+    .\nextnano\inputs\01_smoke_tests\03_standard_dimensions\hello_03b_gaas_cuboid_3d.in
+$LASTEXITCODE
+```
+
+Then both together (quote the wildcard — the script expands it):
+
+```powershell
+python .\nextnano\scripts\run_input.py `
+    ".\nextnano\inputs\01_smoke_tests\03_standard_dimensions\hello_03*.in"
+$LASTEXITCODE
+```
+
+Or use the convenience wrapper (runs 3A then 3B, stops on failure):
+
+```powershell
+python .\nextnano\scripts\run_smoke_tests.py --test 3
+$LASTEXITCODE
+```
+
+### Inspect the newest logs and confirm dimensionality
+
+Each deck writes to its own subdirectory under `nextnano\output\`
+(`hello_03a_gaas_rectangle_2d\`, `hello_03b_gaas_cuboid_3d\`). Find the newest
+output and log files:
+
+```powershell
+Get-ChildItem -Recurse .\nextnano\output\hello_03a_gaas_rectangle_2d, `
+                       .\nextnano\output\hello_03b_gaas_cuboid_3d |
+    Sort-Object LastWriteTime -Descending | Select-Object -First 20 FullName, LastWriteTime
+```
+
+Open the newest `*.log` and confirm the dimensionality nextnano++ reports:
+
+```powershell
+# 2D run should report a two-dimensional simulation; 3D run, three-dimensional.
+Get-ChildItem -Recurse .\nextnano\output\hello_03a_gaas_rectangle_2d -Filter *.log |
+    Sort-Object LastWriteTime -Descending | Select-Object -First 1 |
+    Get-Content | Select-String -Pattern "2D|two-dimensional|dimension"
+
+Get-ChildItem -Recurse .\nextnano\output\hello_03b_gaas_cuboid_3d -Filter *.log |
+    Sort-Object LastWriteTime -Descending | Select-Object -First 1 |
+    Get-Content | Select-String -Pattern "3D|three-dimensional|dimension"
+```
+
+### Test 3 passes only when — for **each** deck
+
+- the runner exit code (`$LASTEXITCODE`) is `0`;
+- nextnano++ recognizes the domain as 2D (3A) / 3D (3B);
+- normal solver output is generated in the deck's output subdirectory;
+- the log contains **no** fatal error and **no** license-restriction error.
+
+**Interpretation on success:** both the 2D rectangle and the 3D cuboid executed
+using the licensed nextnano++ configuration. Because the Free edition supports
+only 1D, this confirms access to licensed Evaluation/Standard dimensional
+capabilities; and since this machine uses `License_nnp.lic` from the Standard
+install, the runs validate the work-laptop Standard workflow.
+
+> **Home-laptop caveat.** The 2D/3D-specific syntax (`simulate2D{}` /
+> `simulate3D{}`, `ygrid`/`zgrid`, `rectangle{}` / `cuboid{}`) is *not*
+> validated at home — the Free executable rejects 2D/3D by license, and
+> nextnanopy only confirms the files are nextnano++ inputs. Authoritative
+> parse + execution validation happens here, on the work laptop. If the Free
+> solver ever refuses these files specifically due to the 1D restriction, that
+> is expected — do not rewrite them back to 1D.
+
+---
+
 ## The error-correction cycle
 
 1. Run the deck on the **work laptop**.

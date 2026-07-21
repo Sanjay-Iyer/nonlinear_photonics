@@ -1,0 +1,75 @@
+# Smoke test 3B: 3D GaAs cuboid -- Standard-dimensionality check.
+#
+# Purpose: prove that the licensed nextnano++ (Evaluation or Standard) can
+# execute a THREE-dimensional domain. The Free edition supports only 1D, so a
+# successful 3D run confirms a licensed dimensional capability. It does not by
+# itself distinguish Evaluation from Standard -- but since the work laptop uses
+# License_nnp.lic from the Standard install, a pass validates the Standard
+# workflow. Coarse grid on purpose: this is an execution + dimensionality
+# check, not a converged physical model.
+#
+# Calculation: one confined Gamma electron state (single-band effective mass) --
+# the lightest solve that unambiguously exercises the 3D Schroedinger machinery
+# and writes normal output. Homogeneous GaAs: no alloy interfaces, no doping,
+# no bias, no strain, no piezoelectricity, no optics, no current, no k.p, no
+# self-consistency.
+#
+# SYNTAX NOTE (home laptop): the 3D-specific keywords here -- simulate3D{},
+# ygrid{}, zgrid{}, and cuboid{} -- cannot be validated on the home laptop,
+# because the Free executable rejects 3D by license. Authoritative parse +
+# execution validation happens on the work laptop (Standard). The constructs
+# reused from hello_01/hello_02 are already known to load.
+
+global{
+    simulate3D{}
+    crystal_zb{ x_hkl = [1, 0, 0]  y_hkl = [0, 1, 0] }
+    substrate{ name = "GaAs" }
+    temperature = 300
+}
+
+grid{
+    xgrid{
+        line{ pos = 0.0  spacing = 2.0 }
+        line{ pos = 8.0  spacing = 2.0 }
+    }
+    ygrid{
+        line{ pos = 0.0  spacing = 2.0 }
+        line{ pos = 8.0  spacing = 2.0 }
+    }
+    zgrid{
+        line{ pos = 0.0  spacing = 2.0 }
+        line{ pos = 8.0  spacing = 2.0 }
+    }
+}
+
+structure{
+    # Homogeneous GaAs filling the 3D cuboid.
+    region{
+        cuboid{ x = [0.0, 8.0]  y = [0.0, 8.0]  z = [0.0, 8.0] }
+        binary{ name = "GaAs" }
+    }
+}
+
+classical{
+    Gamma{}
+    output_bandedges{ averaged = no }
+}
+
+quantum{
+    region{
+        name = "box_3d"
+        x = [0.0, 8.0]
+        y = [0.0, 8.0]
+        z = [0.0, 8.0]
+        boundary{ x = dirichlet  y = dirichlet  z = dirichlet }
+        Gamma{ num_ev = 1 }
+        output_wavefunctions{
+            max_num       = 1
+            probabilities = yes
+        }
+    }
+}
+
+run{
+    quantum{}
+}

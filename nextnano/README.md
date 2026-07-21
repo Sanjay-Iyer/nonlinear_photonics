@@ -20,6 +20,7 @@ per-machine data is one gitignored YAML file.
 nextnano/
   inputs/
     01_smoke_tests/       hello_01_bulk_gaas.in, hello_02_algaas_qw.in
+      03_standard_dimensions/   hello_03a (2D rectangle), hello_03b (3D cuboid)
     02_reference_models/  trusted baselines
     03_parameter_sweeps/  generated decks (tracked), per model family
     04_paper_replications/
@@ -28,6 +29,7 @@ nextnano/
     nn_config.py          portable config: load + validate + preflight
     run_input.py          runner: --check-config / run decks
     generate_inputs.py    template + sweep YAML -> input decks
+    run_smoke_tests.py    run a smoke stage by number (--test 1|2|3|all)
   analysis/
     scripts/  notebooks/   output parsing + analysis
   config/
@@ -65,6 +67,21 @@ git pull ; conda activate NMIP ; python -m pip install -r requirements.txt
 python .\nextnano\scripts\run_input.py --check-config
 python .\nextnano\scripts\run_input.py .\nextnano\inputs\01_smoke_tests\hello_01_bulk_gaas.in ; $LASTEXITCODE
 ```
+
+### Smoke tests
+
+| stage | decks | proves |
+|-------|-------|--------|
+| 1 | `hello_01_bulk_gaas.in` | 1D executable/license/database wiring |
+| 2 | `hello_02_algaas_qw.in` | 1D quantum well (4 confined states) |
+| 3 | `03_standard_dimensions/hello_03a` (2D), `hello_03b` (3D) | **licensed 2D + 3D** execution — Free is 1D-only, so a pass confirms Evaluation/Standard; with `License_nnp.lic`, the Standard workflow |
+
+Run a stage with the wrapper (stops on first failure, nonzero exit if any deck fails):
+```powershell
+python .\nextnano\scripts\run_smoke_tests.py --test 3 ; $LASTEXITCODE
+```
+Full Test 3 commands, log inspection, and pass criteria are in
+[docs/WORKFLOW.md](docs/WORKFLOW.md#test-3--standard-dimensionality-check-2d--3d).
 
 ## The runner CLI
 

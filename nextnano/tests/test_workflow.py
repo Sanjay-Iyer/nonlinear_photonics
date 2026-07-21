@@ -31,8 +31,13 @@ import pytest
 import generate_inputs
 import nn_config
 import run_input
+import run_smoke_tests
 from generate_inputs import GenerateError, expand_grid, generate, render
 from nn_config import ConfigError, NextnanoConfig, resolve_config
+
+DIM_DIR = nn_config.INPUT_DIR / "01_smoke_tests" / "03_standard_dimensions"
+DECK_2D = DIM_DIR / "hello_03a_gaas_rectangle_2d.in"
+DECK_3D = DIM_DIR / "hello_03b_gaas_cuboid_3d.in"
 
 
 # --- helpers ----------------------------------------------------------------
@@ -93,7 +98,7 @@ def test_paths_are_repo_relative_to_module():
 
 def test_no_hardcoded_drive_paths_in_scripts():
     # Guard against absolute Windows paths creeping into tracked code.
-    for mod in (nn_config, run_input, generate_inputs):
+    for mod in (nn_config, run_input, generate_inputs, run_smoke_tests):
         text = Path(mod.__file__).read_text(encoding="utf-8")
         assert "C:\\" not in text and "C:/" not in text
 
@@ -370,6 +375,57 @@ def test_real_decks_load_without_execution():
         path = nn_config.INPUT_DIR / "01_smoke_tests" / deck
         inp = nn.InputFile(str(path))  # loads/parses; does not execute
         assert inp.product == "nextnano++"
+
+
+# --- Test 3: 2D / 3D Standard-dimensionality smoke decks --------------------
+
+
+def test_test3_decks_present_and_utf8():
+    for deck in (DECK_2D, DECK_3D):
+        assert deck.is_file(), f"missing Test 3 deck: {deck}"
+        deck.read_text(encoding="utf-8")  # raises if not valid UTF-8
+
+
+def test_test3_decks_load_as_nextnanopp():
+    # Home-laptop non-licensed check: nextnanopy identifies them as nextnano++
+    # inputs. This does NOT prove 2D/3D syntax is valid -- only the Standard
+    # solver on the work laptop can do that.
+    nn = pytest.importorskip("nextnanopy")
+    for deck in (DECK_2D, DECK_3D):
+        assert nn.InputFile(str(deck)).product == "nextnano++"
+
+
+def test_test3_decks_declare_expected_dimensionality():
+    assert "simulate2D{" in DECK_2D.read_text(encoding="utf-8")
+    assert "rectangle{" in DECK_2D.read_text(encoding="utf-8")
+    assert "simulate3D{" in DECK_3D.read_text(encoding="utf-8")
+    assert "cuboid{" in DECK_3D.read_text(encoding="utf-8")
+
+
+def test_test3_wildcard_matches_both_in_order():
+    pattern = str(DIM_DIR / "hello_03*.in")
+    result = run_input.expand_inputs([pattern])
+    assert [p.name for p in result] == [
+        "hello_03a_gaas_rectangle_2d.in",
+        "hello_03b_gaas_cuboid_3d.in",
+    ]
+
+
+def test_smoke_stage_mapping():
+    # Stage 3 = 2D first, then 3D.
+    assert [p.name for p in run_smoke_tests.decks_for("3")] == [
+        "hello_03a_gaas_rectangle_2d.in",
+        "hello_03b_gaas_cuboid_3d.in",
+    ]
+    # 'all' includes every stage's decks, in stage order, and all exist.
+    all_decks = run_smoke_tests.decks_for("all")
+    assert [p.name for p in all_decks] == [
+        "hello_01_bulk_gaas.in",
+        "hello_02_algaas_qw.in",
+        "hello_03a_gaas_rectangle_2d.in",
+        "hello_03b_gaas_cuboid_3d.in",
+    ]
+    assert all(p.is_file() for p in all_decks)
 
 
 # --- input generation (generate_inputs.py) ----------------------------------
