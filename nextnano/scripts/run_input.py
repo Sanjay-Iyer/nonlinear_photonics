@@ -19,11 +19,18 @@ The runner never reads or prints license-file contents; only paths are shown.
 from __future__ import annotations
 
 import argparse
+import datetime
 import glob
+import json
 import sys
 import time
 import traceback
 from pathlib import Path
+
+# Name of the per-run manifest written into each deck's output directory. The
+# verifier reads it to get the ACTUAL process return code / completion status
+# rather than inferring success from log text.
+MANIFEST_NAME = "nn_run_manifest.json"
 
 # This file is imported directly (its own directory is on sys.path[0] when run
 # as a script). Tests add the scripts dir to sys.path via conftest.
@@ -186,21 +193,69 @@ def _do_execute(cfg, plan: list[tuple[Path, Path]]) -> int:
         out_dir.mkdir(parents=True, exist_ok=True)
         print(f"[run ] {deck}  -> {out_dir}")
         start = time.perf_counter()
+        return_code = None
         try:
             inp = nn.InputFile(str(deck))
             # Pass all paths as execute kwargs so nextnanopy's global config is
             # never consulted or written; each deck gets its own output dir.
-            inp.execute(**cfg.execute_kwargs(outputdirectory=out_dir))
-            ok, message = True, "ok"
+            info = inp.execute(**cfg.execute_kwargs(outputdirectory=out_dir))
+            return_code = _return_code(info)
+            # A run "succeeds" only if execute() returned AND the solver process
+            # did not report a nonzero exit code (None = unknown -> trust it).
+            ok = return_code in (0, None)
+            message = "ok" if ok else f"solver exit code {return_code}"
         except Exception as exc:  # noqa: BLE001 - keep summary alive
             traceback.print_exc()
             ok, message = False, f"{type(exc).__name__}: {exc}"
         elapsed = time.perf_counter() - start
+        _write_manifest(out_dir, deck, ok=ok, return_code=return_code,
+                        elapsed=elapsed, message=message)
         print(f"[{'PASS' if ok else 'FAIL'}] {deck.name}  ({_fmt_runtime(elapsed)})\n")
         results.append((deck, ok, elapsed, message))
 
     n_fail = _print_summary(results)
     return 1 if n_fail else 0
+
+
+def _return_code(info) -> int | None:
+    """Best-effort extraction of the solver process exit code from nextnanopy's
+    execute_info. Returns None if it cannot be determined."""
+    if not isinstance(info, dict):
+        return None
+    proc = info.get("process")
+    if proc is None:
+        return None
+    try:
+        code = proc.poll()
+        if code is None:
+            code = proc.wait(timeout=5)
+        return int(code) if code is not None else None
+    except Exception:  # noqa: BLE001 - return code is best-effort only
+        return None
+
+
+def _write_manifest(out_dir: Path, deck: Path, *, ok: bool, return_code,
+                    elapsed: float, message: str) -> None:
+    """Write a small JSON run manifest into the deck's output directory so the
+    verifier can read the ACTUAL process return code and completion status
+    instead of inferring them from log text. Best-effort; never raises."""
+    manifest = {
+        "schema": 1,
+        "runner": "run_input.py",
+        "deck": deck.name,
+        "timestamp_utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        "status": "completed" if ok else "failed",
+        "return_code": return_code,  # solver process exit code, or null if unknown
+        "python_execute_ok": bool(ok),
+        "elapsed_seconds": round(elapsed, 3),
+        "message": message,
+    }
+    try:
+        (out_dir / MANIFEST_NAME).write_text(
+            json.dumps(manifest, indent=2), encoding="utf-8"
+        )
+    except OSError:
+        pass
 
 
 def main(argv=None) -> int:

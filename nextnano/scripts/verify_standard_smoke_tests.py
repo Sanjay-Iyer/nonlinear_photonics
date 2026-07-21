@@ -30,13 +30,54 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
+import json
+
 from nn_config import ConfigError, resolve_config
+from run_input import MANIFEST_NAME
 from run_smoke_tests import STAGES, parse_stages
 
 PASS, FAIL, INCONCLUSIVE = "PASS", "FAIL", "INCONCLUSIVE"
 
-# Words in a log that indicate a hard failure regardless of feature.
-_FATAL_MARKERS = ("terminating program", "does not allow", "license", "fatal error")
+# Phrases in a log that indicate a genuine fatal / solver failure.
+#
+# IMPORTANT: the bare word "license" is deliberately NOT here. Every SUCCESSFUL
+# run's log contains normal license text -- the "--license ...License_nnp.lic"
+# command line and routine license-check / license-information output -- so
+# matching "license" flagged every passing Test 1-6 run as a false failure.
+# Genuine license *failures* are matched by the specific phrases below instead.
+_FATAL_MARKERS = (
+    "terminating program",
+    "fatal error",
+    "does not allow",          # Free feature / dimensionality gate (wrong edition)
+)
+_LICENSE_FAILURE_MARKERS = (
+    "license error",
+    "invalid license",
+    "license is invalid",
+    "license is not valid",
+    "no valid license",
+    "no license found",
+    "license not found",
+    "could not find a license",
+    "license expired",
+    "license has expired",
+    "license check failed",
+    "license violation",
+    "not licensed",
+    "unable to obtain license",
+)
+
+
+def _fatal_reason(log_lower: str) -> str | None:
+    """Return a short reason if the log shows a genuine fatal/license failure,
+    else None. Normal license initialization text does NOT match."""
+    for m in _LICENSE_FAILURE_MARKERS:
+        if m in log_lower:
+            return f"license failure in log ({m!r})"
+    for m in _FATAL_MARKERS:
+        if m in log_lower:
+            return f"fatal marker in log ({m!r})"
+    return None
 
 
 # --- generic file/number helpers -------------------------------------------
@@ -190,11 +231,27 @@ def _build_specs(root_stages) -> list[Spec]:
 # --- reporting --------------------------------------------------------------
 
 
+def _read_manifest(out_dir: Path) -> dict | None:
+    """Read the run manifest written by run_input, if present (searched at the
+    top of the deck's output dir and recursively, since nextnanopy nests one
+    more level). Returns None if there is no manifest (older run)."""
+    if not out_dir.is_dir():
+        return None
+    candidates = [out_dir / MANIFEST_NAME, *sorted(out_dir.rglob(MANIFEST_NAME))]
+    for mf in candidates:
+        if mf.is_file():
+            try:
+                return json.loads(mf.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                continue
+    return None
+
+
 @dataclass
 class Result:
     spec: Spec
     out_dir: Path
-    exit_note: str = "n/a (see run_smoke_tests / $LASTEXITCODE)"
+    exit_note: str = "log-based assessment (no run manifest)"
     marker_found: bool = False
     files: list = field(default_factory=list)
     sanity_ok: object = None
@@ -202,16 +259,12 @@ class Result:
     verdict: str = INCONCLUSIVE
 
 
-def _evaluate(spec: Spec) -> Result:
-    try:
-        cfg = resolve_config()
-    except ConfigError as exc:
-        r = Result(spec, Path("<no config>"))
-        r.sanity_detail = f"config error: {str(exc).splitlines()[0]}"
-        r.verdict = INCONCLUSIVE
-        return r
+def evaluate_spec(spec: Spec, out_base: Path) -> Result:
+    """Evaluate one subtest against the output under ``out_base/<deck stem>``.
 
-    out_dir = cfg.outputdirectory / spec.deck.stem
+    Decoupled from config loading so it is unit-testable with fixture dirs.
+    """
+    out_dir = Path(out_base) / spec.deck.stem
     r = Result(spec, out_dir)
 
     if not out_dir.is_dir():
@@ -219,17 +272,34 @@ def _evaluate(spec: Spec) -> Result:
         r.verdict = INCONCLUSIVE
         return r
 
-    log = _read_logs(out_dir).lower()
-    if any(m in log for m in _FATAL_MARKERS):
-        r.exit_note = "log contains fatal / license marker"
-        r.marker_found = any(m.lower() in log for m in spec.log_markers)
-        r.files = _glob_any(out_dir, spec.output_globs)
+    # Prefer the ACTUAL process return code from the run manifest; fall back to
+    # a log-based assessment for older runs that predate the manifest.
+    manifest = _read_manifest(out_dir)
+    manifest_failed = False
+    if manifest is not None:
+        rc = manifest.get("return_code")
+        status = manifest.get("status")
+        r.exit_note = f"return_code={rc}, status={status} (run manifest)"
+        manifest_failed = (status == "failed") or (rc not in (0, None))
+    else:
+        r.exit_note = "log-based assessment (no run manifest; older run)"
+
+    log = _read_logs(out_dir)
+    log_lower = log.lower()
+    r.marker_found = any(m.lower() in log_lower for m in spec.log_markers)
+    r.files = _glob_any(out_dir, spec.output_globs)
+
+    fatal = _fatal_reason(log_lower)
+    if fatal or manifest_failed:
         r.verdict = FAIL
-        r.sanity_detail = "fatal or license-restriction marker in log"
+        r.sanity_detail = fatal or f"run manifest reports failure ({r.exit_note})"
+        # still run the sanity check for reporting completeness, but keep FAIL
+        try:
+            r.sanity_ok, _ = spec.sanity(out_dir, r.files)
+        except Exception:  # noqa: BLE001
+            r.sanity_ok = None
         return r
 
-    r.marker_found = any(m.lower() in log for m in spec.log_markers)
-    r.files = _glob_any(out_dir, spec.output_globs)
     ok, detail = spec.sanity(out_dir, r.files)
     r.sanity_ok, r.sanity_detail = ok, detail
 
@@ -277,8 +347,16 @@ def main(argv=None) -> int:
               "(Stages 1-3 are covered by run_smoke_tests exit codes.)")
         return 0
 
-    print(f"Verifying Standard smoke-test outputs for stage(s): {sorted(stages)}\n")
-    results = [_evaluate(sp) for sp in specs]
+    try:
+        out_base = resolve_config().outputdirectory
+    except ConfigError as exc:
+        print(f"ERROR: cannot locate output directory: {str(exc).splitlines()[0]}",
+              file=sys.stderr)
+        return 2
+
+    print(f"Verifying Standard smoke-test outputs for stage(s): {sorted(stages)}")
+    print(f"(output base: {out_base})\n")
+    results = [evaluate_spec(sp, out_base) for sp in specs]
     for r in results:
         _print_result(r)
 

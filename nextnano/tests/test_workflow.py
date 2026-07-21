@@ -21,6 +21,7 @@ Test index (maps to the task's required test list):
 from __future__ import annotations
 
 import importlib.util
+import json
 import shutil
 import subprocess
 import sys
@@ -605,3 +606,187 @@ def test_verifier_specs_cover_all_stage456_decks():
     # every spec names a concrete requested feature and a sanity label
     for s in specs:
         assert s.feature and s.sanity_label and s.log_markers and s.output_globs
+
+
+# --- verifier: license/fatal handling via representative log fixtures --------
+#
+# Regression for the false-positive bug: every successful Test 1-6 run's log
+# contains normal license text (the "--license ...License_nnp.lic" command line
+# on ~line 31 and routine license-check output on ~lines 56/58/59). The old
+# verifier matched the bare substring "license" as fatal, failing every passing
+# run. These fixtures reproduce that text and prove it no longer fails, while
+# genuine license failures and fatal solver errors still fail.
+
+_V = verify_standard_smoke_tests
+
+# Normal license text that appears in EVERY successful run's log.
+_LICENSE_CMDLINE = (
+    r"nextnano++ --license C:\Code\optics\nextnano\2026_07_03\License\License_nnp.lic "
+    r"-d database.nnp -o out input.in"
+)
+_LICENSE_INIT = (
+    "Checking license ...\n"
+    r"License file: C:\Code\optics\nextnano\2026_07_03\License\License_nnp.lic" "\n"
+    "License information: licensed to Test User; license is valid.\n"
+)
+
+_SUCCESS_LOG = (
+    "PROCESSING INPUT FILE: input.in\n"
+    + _LICENSE_CMDLINE + "\n"
+    + _LICENSE_INIT
+    + "Calculating strain tensor ...\n"
+    + "polarization density computed.\n"
+    + "*** Simulation done ***\nDONE.\n"
+)
+# Genuine license failure -- normal command line present, but a real failure too.
+_LICENSE_FAIL_LOG = (
+    _LICENSE_CMDLINE + "\n"
+    + "Checking license ...\n"
+    + "ERROR: license expired. No valid license found.\n"
+)
+# Genuine fatal solver failure.
+_FATAL_LOG = (
+    "PROCESSING INPUT FILE: input.in\n"
+    + _LICENSE_CMDLINE + "\n"
+    + _LICENSE_INIT
+    + "ERROR: linear solver diverged.\nTerminating program !!\n"
+)
+
+
+def _spec5a():
+    (s,) = [sp for sp in _V._build_specs({"5"}) if "05a" in sp.deck.name]
+    return s
+
+
+def _make_run_dir(out_base, stem, log, *, files=None, manifest=None):
+    d = out_base / stem
+    d.mkdir(parents=True, exist_ok=True)
+    (d / f"{stem}.log").write_text(log, encoding="utf-8")
+    for name, content in (files or {}).items():
+        (d / name).write_text(content, encoding="utf-8")
+    if manifest is not None:
+        (d / "nn_run_manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+    return d
+
+
+_NONZERO_STRAIN = "# exx eyy ezz\n-0.011 -0.011 0.0105\n"
+
+
+def test_verifier_success_log_with_license_text_passes(tmp_path):
+    # THE regression: normal license text present -> must PASS, not FAIL.
+    spec = _spec5a()
+    _make_run_dir(tmp_path, spec.deck.stem, _SUCCESS_LOG,
+                  files={"strain_tensor.dat": _NONZERO_STRAIN},
+                  manifest={"schema": 1, "status": "completed", "return_code": 0})
+    r = _V.evaluate_spec(spec, tmp_path)
+    assert r.verdict == _V.PASS, (r.verdict, r.sanity_detail)
+    assert "return_code=0" in r.exit_note
+
+
+def test_verifier_genuine_license_failure_fails(tmp_path):
+    spec = _spec5a()
+    # no manifest -> must be caught from the log alone
+    _make_run_dir(tmp_path, spec.deck.stem, _LICENSE_FAIL_LOG,
+                  files={"strain_tensor.dat": _NONZERO_STRAIN})
+    r = _V.evaluate_spec(spec, tmp_path)
+    assert r.verdict == _V.FAIL
+    assert "license" in r.sanity_detail.lower()
+
+
+def test_verifier_fatal_solver_failure_fails(tmp_path):
+    spec = _spec5a()
+    _make_run_dir(tmp_path, spec.deck.stem, _FATAL_LOG,
+                  files={"strain_tensor.dat": _NONZERO_STRAIN})
+    r = _V.evaluate_spec(spec, tmp_path)
+    assert r.verdict == _V.FAIL
+    assert "terminating program" in r.sanity_detail.lower()
+
+
+def test_verifier_manifest_nonzero_return_code_fails(tmp_path):
+    # A clean-looking log but the manifest records a nonzero solver exit -> FAIL.
+    spec = _spec5a()
+    _make_run_dir(tmp_path, spec.deck.stem, _SUCCESS_LOG,
+                  files={"strain_tensor.dat": _NONZERO_STRAIN},
+                  manifest={"schema": 1, "status": "failed", "return_code": 2})
+    r = _V.evaluate_spec(spec, tmp_path)
+    assert r.verdict == _V.FAIL
+
+
+def test_verifier_labels_missing_manifest_as_log_based(tmp_path):
+    spec = _spec5a()
+    _make_run_dir(tmp_path, spec.deck.stem, _SUCCESS_LOG,
+                  files={"strain_tensor.dat": _NONZERO_STRAIN})
+    r = _V.evaluate_spec(spec, tmp_path)
+    assert "log-based" in r.exit_note
+    assert r.verdict == _V.PASS  # still passes; just no actual exit code
+
+
+def test_verifier_missing_output_is_inconclusive(tmp_path):
+    spec = _spec5a()
+    r = _V.evaluate_spec(spec, tmp_path)  # nothing created
+    assert r.verdict == _V.INCONCLUSIVE
+
+
+def test_verifier_temperature_sanity_77_vs_300(tmp_path):
+    (spec4a,) = [sp for sp in _V._build_specs({"4"}) if "04a" in sp.deck.name]
+    ok_log = _SUCCESS_LOG + "temperature = 77 K\n"
+    _make_run_dir(tmp_path, spec4a.deck.stem, ok_log,
+                  files={"bandedges.dat": "# x Ec\n0 1.42\n"},
+                  manifest={"status": "completed", "return_code": 0})
+    r = _V.evaluate_spec(spec4a, tmp_path)
+    assert r.verdict == _V.PASS
+    # a 300 K log must NOT pass the 77 K sanity check
+    other = tmp_path / "other"
+    _make_run_dir(other, spec4a.deck.stem, _SUCCESS_LOG + "temperature = 300 K\n",
+                  files={"bandedges.dat": "# x Ec\n0 1.42\n"},
+                  manifest={"status": "completed", "return_code": 0})
+    r2 = _V.evaluate_spec(spec4a, other)
+    assert r2.verdict == _V.FAIL
+
+
+class _FakeProc:
+    def __init__(self, code=0):
+        self.returncode = code
+    def poll(self):
+        return self.returncode
+
+
+class _FakeInputFile:
+    """Stand-in for nextnanopy.InputFile that runs no real solver."""
+    _code = 0
+    def __init__(self, path):
+        self.fullpath = path
+    def execute(self, **kwargs):
+        return {"process": _FakeProc(type(self)._code)}
+
+
+def _patch_fake_nextnanopy(monkeypatch, code=0):
+    nn = pytest.importorskip("nextnanopy")
+    cls = type("_FakeInputFile", (_FakeInputFile,), {"_code": code})
+    monkeypatch.setattr(nn, "InputFile", cls)
+    return nn
+
+
+def test_run_input_writes_manifest_on_success(tmp_path, monkeypatch):
+    # run_input._do_execute writes a manifest with the real return code.
+    _patch_fake_nextnanopy(monkeypatch, code=0)
+    cfg = resolve_config(_write_config(tmp_path))
+    plan = run_input.build_plan(cfg, [REAL_DECK])
+    rc = run_input._do_execute(cfg, plan)
+    assert rc == 0
+    manifest_path = cfg.outputdirectory / REAL_DECK.stem / run_input.MANIFEST_NAME
+    data = json.loads(manifest_path.read_text(encoding="utf-8"))
+    assert data["return_code"] == 0 and data["status"] == "completed"
+
+
+def test_run_input_manifest_records_nonzero_exit(tmp_path, monkeypatch):
+    # A nonzero solver exit code -> run fails AND the manifest records it.
+    _patch_fake_nextnanopy(monkeypatch, code=1)
+    cfg = resolve_config(_write_config(tmp_path))
+    plan = run_input.build_plan(cfg, [REAL_DECK])
+    rc = run_input._do_execute(cfg, plan)
+    assert rc == 1
+    data = json.loads(
+        (cfg.outputdirectory / REAL_DECK.stem / run_input.MANIFEST_NAME).read_text("utf-8")
+    )
+    assert data["return_code"] == 1 and data["status"] == "failed"
