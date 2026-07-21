@@ -1,0 +1,81 @@
+# Smoke test 4B: 1D GaAs/AlGaAs QW, 6-band k.p valence-band solver at 300 K.
+#
+# Standard-only feature isolated: the 6-band k.p Hamiltonian for the valence
+# band. Unstrained, 300 K, no current / polarization / optics. Same QW geometry
+# as Test 4A; only the quantum model changes (Gamma one-band -> kp_6band).
+#
+# Syntax basis:
+#   - repo Test 4A skeleton (validated)
+#   - grammar keywords_nnp.xml: quantum/region/kp_6band{ num_ev } (nextnano++
+#     3.0.0, 2026.7 package)
+#
+# VALIDATION: parses cleanly under the Free nextnano++ 3.0.0 --parse runmode.
+# The 6-band k.p *execution* is Standard-only and is confirmed on the work
+# laptop.
+#
+# Pass (work laptop): exit 0; log identifies the 6-band model; a nonempty
+# 6-band hole energy spectrum + wavefunctions exist.
+
+global{
+    simulate1D{}
+    temperature = 300
+    substrate{ name = "GaAs" }
+    crystal_zb{ x_hkl = [1, 0, 0]  y_hkl = [0, 1, 0] }
+}
+
+contacts{
+    fermi{ name = qw_contact  bias = 0.0 }
+}
+
+grid{
+    xgrid{
+        line{ pos = 0.0   spacing = 0.5  }
+        line{ pos = 20.0  spacing = 0.25 }
+        line{ pos = 30.0  spacing = 0.25 }
+        line{ pos = 50.0  spacing = 0.5  }
+    }
+}
+
+structure{
+    region{
+        everywhere{}
+        ternary_constant{ name = "Al(x)Ga(1-x)As"  alloy_x = 0.30 }
+        contact{ name = qw_contact }
+    }
+    region{
+        line{ x = [20.0, 30.0] }
+        binary{ name = "GaAs" }
+    }
+}
+
+classical{
+    Gamma{}
+    HH{}
+    LH{}
+    SO{}
+    output_bandedges{ averaged = no }
+}
+
+quantum{
+    region{
+        name = "qw"
+        x = [10.0, 40.0]
+        no_density = yes
+        boundary{ x = dirichlet }
+        # 6-band k.p valence-band Hamiltonian (Standard-only). Confined hole
+        # states at in-plane k = 0 (k-integration disabled -> fast smoke test).
+        kp_6band{
+            num_ev = 4
+            k_integration_disabled{}
+        }
+        output_states{
+            max_num       = 4
+            envelopes     = yes
+            probabilities = yes
+        }
+    }
+}
+
+run{
+    quantum{}
+}

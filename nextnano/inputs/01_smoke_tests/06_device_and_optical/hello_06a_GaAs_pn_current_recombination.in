@@ -1,0 +1,111 @@
+# Smoke test 6A: 1D GaAs p-n diode -- drift-diffusion current + recombination.
+#
+# Standard-only features isolated: the drift-diffusion CURRENT solver
+# (current_poisson) and all three recombination models -- radiative, Shockley-
+# Read-Hall (SRH), and Auger -- enabled explicitly. Two bias points are solved:
+# 0 V (equilibrium) and one small forward bias, so the forward current can be
+# compared against the zero-bias current.
+#
+# Syntax basis:
+#   - installed example examples/demo/pn_junction_GaAs_1D_demo.nnp (impurities{},
+#     ohmic contacts, doping{ constant{} }, structure, grid) -- the equilibrium
+#     Poisson version; here extended to drift-diffusion current.
+#   - grammar keywords_nnp.xml: top-level currents{ recombination_model{ SRH
+#     Auger radiative } output_currents{} output_recombination{} }, contact
+#     bias = [v0,v1] steps sweep, run{ current_poisson{} } (nextnano++ 3.0.0).
+#
+# VALIDATION: parses cleanly under the Free nextnano++ 3.0.0 --parse runmode.
+# The drift-diffusion + recombination *execution* is Standard-only; confirmed
+# on the work laptop.
+#
+# Pass (work laptop): both bias points converge; exit 0; current-density output
+# exists; forward current differs from zero-bias current; radiative, SRH, and
+# Auger recombination outputs present. An equilibrium Poisson-only result does
+# NOT count.
+
+run{
+    current_poisson{}                    # <-- Standard-only drift-diffusion
+}
+
+global{
+    simulate1D{}
+    temperature = 300
+    substrate{ name = "GaAs" }
+    crystal_zb{ x_hkl = [1, 0, 0]  y_hkl = [0, 1, 0] }
+}
+
+impurities{
+    donor{    name = "n-type" degeneracy = 2 fully_ionized{} }
+    acceptor{ name = "p-type" degeneracy = 4 fully_ionized{} }
+}
+
+contacts{
+    # Forward bias swept on the p-side: 0.0 V and 0.6 V (steps = 1 -> 2 points).
+    ohmic{ name = "p_side"  bias = [0.0, 0.6]  steps = 1 }
+    ohmic{ name = "n_side"  bias = 0.0 }
+}
+
+structure{
+    output_region_index{ boxes = no }
+    output_material_index{ boxes = no }
+    output_impurities{ boxes = no }
+
+    region{
+        everywhere{}
+        binary{ name = "GaAs" }
+    }
+    # Ohmic contact regions at the two ends.
+    region{
+        line{ x = [0.0, 10.0] }
+        binary{ name = "GaAs" }
+        contact{ name = p_side }
+    }
+    region{
+        line{ x = [190.0, 200.0] }
+        binary{ name = "GaAs" }
+        contact{ name = n_side }
+    }
+    # p-type half then n-type half (modest doping).
+    region{
+        line{ x = [0.0, 100.0] }
+        doping{ constant{ name = "p-type"  conc = 1.0e18 } }
+    }
+    region{
+        line{ x = [100.0, 200.0] }
+        doping{ constant{ name = "n-type"  conc = 1.0e18 } }
+    }
+}
+
+grid{
+    xgrid{
+        line{ pos = 0.0    spacing = 10.0 }
+        line{ pos = 80.0   spacing = 4.0  }
+        line{ pos = 120.0  spacing = 4.0  }
+        line{ pos = 200.0  spacing = 10.0 }
+    }
+}
+
+classical{
+    Gamma{}
+    HH{}
+    LH{}
+    SO{}
+    output_bandedges{ averaged = no }
+    output_carrier_densities{}
+}
+
+poisson{
+    output_potential{}
+    output_electric_field{}
+}
+
+currents{
+    recombination_model{
+        SRH       = yes                  # <-- Standard-only recombination
+        Auger     = yes
+        radiative = yes
+    }
+    output_currents{}
+    output_recombination{}
+    output_fermi_levels{}
+}

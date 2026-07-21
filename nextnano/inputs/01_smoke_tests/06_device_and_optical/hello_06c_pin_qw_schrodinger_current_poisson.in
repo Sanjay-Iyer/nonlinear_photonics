@@ -1,0 +1,137 @@
+# Smoke test 6C: 1D p-i-n GaAs/AlGaAs QW -- self-consistent
+# Schroedinger-Current-Poisson coupling.  (The final, hardest smoke test.)
+#
+# Standard-only feature isolated: the coupled self-consistent quantum + drift-
+# diffusion current + Poisson solver (run{ quantum_current_poisson{} }). A GaAs
+# quantum well sits in the intrinsic region of a p-i-n diode; the quantum
+# electron density is solved self-consistently with the current continuity and
+# electrostatics at a single low forward-bias operating point.
+#
+# Syntax basis:
+#   - repo Test 6A (pn diode + currents{} + recombination_model, validated) and
+#     Test 4A (quantum region)
+#   - grammar keywords_nnp.xml: run{ quantum_current_poisson{ iterations ... } }
+#     (nextnano++ 3.0.0, 2026.7 package)
+#
+# CONVERGENCE: only 'iterations' is raised to give the coupled loop room to
+# converge; the residual criterion is left at the solver default. Do NOT loosen
+# the residual to force a pass -- if it fails, report the residual/iteration.
+#
+# VALIDATION: parses cleanly under the Free nextnano++ 3.0.0 --parse runmode.
+# The self-consistent Schroedinger-Current-Poisson *execution* is Standard-only;
+# confirmed on the work laptop.
+#
+# Pass (work laptop): exit 0; log shows Schroedinger + current + Poisson
+# participating in the coupled iteration; convergence reached; both quantum-
+# state and current outputs exist.
+
+run{
+    quantum_current_poisson{
+        iterations = 1000            # room to converge; residual left at default
+    }
+}
+
+global{
+    simulate1D{}
+    temperature = 300
+    substrate{ name = "GaAs" }
+    crystal_zb{ x_hkl = [1, 0, 0]  y_hkl = [0, 1, 0] }
+}
+
+impurities{
+    donor{    name = "n-type" degeneracy = 2 fully_ionized{} }
+    acceptor{ name = "p-type" degeneracy = 4 fully_ionized{} }
+}
+
+contacts{
+    ohmic{ name = "p_side"  bias = 0.1 }   # single low forward-bias point
+    ohmic{ name = "n_side"  bias = 0.0 }
+}
+
+structure{
+    output_region_index{ boxes = no }
+    output_material_index{ boxes = no }
+
+    # Al(0.3)Ga(0.7)As fills the domain...
+    region{
+        everywhere{}
+        ternary_constant{ name = "Al(x)Ga(1-x)As"  alloy_x = 0.30 }
+    }
+    # ohmic contact regions at the two ends
+    region{
+        line{ x = [0.0, 10.0] }
+        ternary_constant{ name = "Al(x)Ga(1-x)As"  alloy_x = 0.30 }
+        contact{ name = p_side }
+    }
+    region{
+        line{ x = [190.0, 200.0] }
+        ternary_constant{ name = "Al(x)Ga(1-x)As"  alloy_x = 0.30 }
+        contact{ name = n_side }
+    }
+    # 10 nm GaAs quantum well in the intrinsic region
+    region{
+        line{ x = [95.0, 105.0] }
+        binary{ name = "GaAs" }
+    }
+    # p-i-n doping: p [0,80], intrinsic [80,120], n [120,200]
+    region{
+        line{ x = [0.0, 80.0] }
+        doping{ constant{ name = "p-type"  conc = 1.0e18 } }
+    }
+    region{
+        line{ x = [120.0, 200.0] }
+        doping{ constant{ name = "n-type"  conc = 1.0e18 } }
+    }
+}
+
+grid{
+    xgrid{
+        line{ pos = 0.0    spacing = 10.0 }
+        line{ pos = 80.0   spacing = 3.0  }
+        line{ pos = 95.0   spacing = 1.0  }
+        line{ pos = 105.0  spacing = 1.0  }
+        line{ pos = 120.0  spacing = 3.0  }
+        line{ pos = 200.0  spacing = 10.0 }
+    }
+}
+
+classical{
+    Gamma{}
+    HH{}
+    LH{}
+    SO{}
+    output_bandedges{ averaged = no }
+    output_carrier_densities{}
+}
+
+poisson{
+    output_potential{}
+    output_electric_field{}
+}
+
+currents{
+    recombination_model{
+        SRH       = yes
+        Auger     = yes
+        radiative = yes
+    }
+    output_currents{}
+    output_recombination{}
+    output_fermi_levels{}
+}
+
+quantum{
+    region{
+        name = "qw"
+        x = [70.0, 130.0]
+        boundary{ x = dirichlet }
+        # quantum electron density couples into the self-consistent loop
+        # (no 'no_density' here, unlike the isolated Schroedinger smoke tests).
+        Gamma{ num_ev = 3 }
+        output_states{
+            max_num       = 3
+            envelopes     = yes
+            probabilities = yes
+        }
+    }
+}

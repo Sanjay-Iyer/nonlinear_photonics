@@ -1,0 +1,117 @@
+# Smoke test 5B: 1D wurtzite GaN/AlN QW -- strain + piezo + pyro polarization.
+#
+# Standard-only features isolated: the STRAIN solver PLUS piezoelectric and
+# spontaneous (pyroelectric) polarization in a wurtzite nitride, and the
+# polarization-induced electrostatic potential via Poisson. A 6 nm GaN well
+# between AlN barriers, grown pseudomorphically on a GaN substrate along the
+# polar c-axis, develops large interface polarization charges and an internal
+# field. 300 K, no current, minimal one-band quantum calc.
+#
+# CONTROL: to obtain the polarization-OFF reference for comparison, set both
+#   piezo_density = no
+#   pyro_density  = no
+# and re-run; the band profile / potential tilt collapses toward flat. (Shipped
+# here polarization-ON; the control is a one-line edit to keep this a single
+# minimal smoke deck.)
+#
+# Syntax basis:
+#   - repo Test 5A (strain skeleton, validated) + pn_junction demo (poisson{})
+#   - grammar keywords_nnp.xml: global/crystal_wz{}, strain{ piezo_density
+#     pyro_density output_polarization_charge{} output_polarization_vector{} },
+#     poisson{} (nextnano++ 3.0.0, 2026.7 package)
+#   - official tutorial "GaN/AlN wurtzite structure: Strain, piezo and
+#     pyroelectric charges in wurtzite" (nextnano++ docs) for the c-axis polar
+#     QW convention.
+#
+# ORIENTATION NOTE: growth / 1D-simulation axis is the wurtzite c-axis
+# (x_hkl = [0,0,1]) so the spontaneous + piezoelectric polarization point
+# along the simulation direction and produce interface charge. This physical
+# orientation is confirmed by the Standard run on the work laptop; --parse only
+# checks syntax.
+#
+# VALIDATION: parses cleanly under the Free nextnano++ 3.0.0 --parse runmode.
+# strain + polarization *execution* is Standard-only; confirmed on work laptop.
+#
+# Pass (work laptop): exit 0; logs confirm strain + polarization; nonzero
+# polarization / interface charge; potential or electric-field output exists;
+# polarization-ON differs from the control.
+
+global{
+    simulate1D{}
+    temperature = 300
+    substrate{ name = "GaN" }
+    crystal_wz{
+        x_hkl = [0, 0, 1]     # simulation / growth direction = polar c-axis
+        y_hkl = [1, 0, 0]
+    }
+}
+
+strain{
+    pseudomorphic_strain{}
+    piezo_density = yes       # <-- Standard-only piezoelectric polarization
+    pyro_density  = yes       # <-- Standard-only spontaneous/pyro polarization
+    output_strain_tensor{}
+    output_polarization_charge{}
+    output_polarization_vector{}
+}
+
+contacts{
+    fermi{ name = c_top  bias = 0.0 }
+}
+
+grid{
+    xgrid{
+        line{ pos = 0.0   spacing = 0.5  }
+        line{ pos = 10.0  spacing = 0.25 }
+        line{ pos = 16.0  spacing = 0.25 }
+        line{ pos = 26.0  spacing = 0.5  }
+    }
+}
+
+structure{
+    # AlN barriers fill the domain...
+    region{
+        everywhere{}
+        binary{ name = "AlN" }
+        contact{ name = c_top }
+    }
+    # ...with a 6 nm GaN well in the middle.
+    region{
+        line{ x = [10.0, 16.0] }
+        binary{ name = "GaN" }
+    }
+}
+
+classical{
+    Gamma{}
+    HH{}
+    LH{}
+    SO{}
+    output_bandedges{ averaged = no }
+}
+
+poisson{
+    output_potential{}
+    output_electric_field{}
+}
+
+quantum{
+    region{
+        name = "qw"
+        x = [5.0, 21.0]
+        no_density = yes
+        boundary{ x = dirichlet }
+        Gamma{ num_ev = 2 }
+        output_states{
+            max_num       = 2
+            envelopes     = yes
+            probabilities = yes
+        }
+    }
+}
+
+run{
+    strain{}
+    poisson{}
+    quantum{}
+}

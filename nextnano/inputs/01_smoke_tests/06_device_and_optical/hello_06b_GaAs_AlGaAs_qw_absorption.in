@@ -1,0 +1,96 @@
+# Smoke test 6B: 1D GaAs/AlGaAs QW -- interband optical transitions/spectrum.
+#
+# Standard-only feature isolated: the optical-transition / absorption
+# calculation. The simplest electronic model that yields a real spectrum is
+# used: single-band electron (Gamma) and hole (HH, LH) states, with interband
+# transition energies and momentum matrix elements / oscillator strengths. No
+# current coupling; a narrow set of states keeps it fast.
+#
+# Syntax basis:
+#   - repo Test 4A skeleton (validated QW)
+#   - grammar keywords_nnp.xml: quantum/region/transition_energies{ Gamma_HH{}
+#     Gamma_LH{} } and momentum_matrix_elements{ polarization{} ...
+#     output_oscillator_strengths } (nextnano++ 3.0.0, 2026.7 package)
+#
+# VALIDATION: parses cleanly under the Free nextnano++ 3.0.0 --parse runmode.
+# The optical *execution* is Standard-only; confirmed on the work laptop.
+#
+# Pass (work laptop): exit 0; optical solver initializes; a nonempty spectral
+# file (transition energies + oscillator strengths) with a photon-energy axis
+# and nonzero optical response exists.
+
+global{
+    simulate1D{}
+    temperature = 300
+    substrate{ name = "GaAs" }
+    crystal_zb{ x_hkl = [1, 0, 0]  y_hkl = [0, 1, 0] }
+}
+
+contacts{
+    fermi{ name = qw_contact  bias = 0.0 }
+}
+
+grid{
+    xgrid{
+        line{ pos = 0.0   spacing = 0.5  }
+        line{ pos = 20.0  spacing = 0.25 }
+        line{ pos = 30.0  spacing = 0.25 }
+        line{ pos = 50.0  spacing = 0.5  }
+    }
+}
+
+structure{
+    region{
+        everywhere{}
+        ternary_constant{ name = "Al(x)Ga(1-x)As"  alloy_x = 0.30 }
+        contact{ name = qw_contact }
+    }
+    region{
+        line{ x = [20.0, 30.0] }
+        binary{ name = "GaAs" }
+    }
+}
+
+classical{
+    Gamma{}
+    HH{}
+    LH{}
+    SO{}
+    output_bandedges{ averaged = no }
+}
+
+quantum{
+    region{
+        name = "qw"
+        x = [10.0, 40.0]
+        no_density = yes
+        boundary{ x = dirichlet }
+        Gamma{ num_ev = 3 }
+        HH{    num_ev = 3 }
+        LH{    num_ev = 2 }
+        output_states{
+            max_num       = 3
+            envelopes     = yes
+            probabilities = yes
+        }
+        # Interband transition energies (electron<->hole).
+        transition_energies{
+            Gamma_HH{}
+            Gamma_LH{}
+        }
+        # Momentum matrix elements + oscillator strengths for in-plane (TE)
+        # polarization -> the optical response.
+        momentum_matrix_elements{
+            polarization{ name = "TE_inplane"  re = [0, 1, 0] }
+            Gamma{}
+            HH{}
+            LH{}
+            output_matrix_elements      = yes
+            output_oscillator_strengths = yes
+        }
+    }
+}
+
+run{
+    quantum{}
+}

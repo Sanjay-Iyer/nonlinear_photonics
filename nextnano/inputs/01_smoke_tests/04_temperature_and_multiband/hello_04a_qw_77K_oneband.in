@@ -1,0 +1,80 @@
+# Smoke test 4A: 1D GaAs/AlGaAs QW, one-band electrons at T = 77 K.
+#
+# Standard-only feature isolated: material calculation at a temperature OTHER
+# than 300 K (the Free edition is limited to 300 K). Everything else is kept
+# identical to the already-passing Hello Test 2 pattern: one-band electron
+# Schrodinger, coarse 1D grid, no strain / polarization / current / optics /
+# multiband. Only 'temperature = 77' differs from a 300 K run.
+#
+# Syntax basis:
+#   - repo Hello Test 2/3 (global/grid/structure/classical/quantum/run skeleton)
+#   - installed example examples/demo/DoubleQuantumWell_6nm_demo.nnp (quantum
+#     region + output_states)
+#   - installed example examples/basics/basics_1D_hello_world.nnp (contacts{})
+#   - grammar keywords_nnp.xml (nextnano++ 3.0.0, 2026.7 package)
+#
+# VALIDATION: parses cleanly under the Free nextnano++ 3.0.0 --parse runmode on
+# the home laptop. The 77 K *execution* is Standard-only and is confirmed on
+# the work laptop.
+#
+# Pass (work laptop): exit 0; log reports temperature 77 K (not 300 K); normal
+# band-edge + quantum-state output exists.
+
+global{
+    simulate1D{}
+    temperature = 77                    # <-- Standard-only: T != 300 K
+    substrate{ name = "GaAs" }
+    crystal_zb{ x_hkl = [1, 0, 0]  y_hkl = [0, 1, 0] }
+}
+
+contacts{
+    fermi{ name = qw_contact  bias = 0.0 }
+}
+
+grid{
+    xgrid{
+        line{ pos = 0.0   spacing = 0.5  }
+        line{ pos = 20.0  spacing = 0.25 }
+        line{ pos = 30.0  spacing = 0.25 }
+        line{ pos = 50.0  spacing = 0.5  }
+    }
+}
+
+structure{
+    region{
+        everywhere{}
+        ternary_constant{ name = "Al(x)Ga(1-x)As"  alloy_x = 0.30 }
+        contact{ name = qw_contact }
+    }
+    region{
+        line{ x = [20.0, 30.0] }
+        binary{ name = "GaAs" }
+    }
+}
+
+classical{
+    Gamma{}
+    HH{}
+    LH{}
+    SO{}
+    output_bandedges{ averaged = no }
+}
+
+quantum{
+    region{
+        name = "qw"
+        x = [10.0, 40.0]
+        no_density = yes
+        boundary{ x = dirichlet }
+        Gamma{ num_ev = 2 }
+        output_states{
+            max_num       = 2
+            envelopes     = yes
+            probabilities = yes
+        }
+    }
+}
+
+run{
+    quantum{}
+}

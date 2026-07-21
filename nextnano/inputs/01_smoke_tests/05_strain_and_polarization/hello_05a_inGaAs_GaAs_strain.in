@@ -1,0 +1,87 @@
+# Smoke test 5A: 1D pseudomorphic In(0.15)Ga(0.85)As / GaAs QW on GaAs.
+#
+# Standard-only feature isolated: the STRAIN solver. A thin InGaAs well grown
+# coherently (pseudomorphically) on a GaAs substrate is biaxially strained by
+# the lattice mismatch; the barrier GaAs is lattice-matched and unstrained.
+# 300 K, no piezoelectricity, no pyroelectricity, no current, no optics. A
+# simple one-band electron quantum calc rides on the strained band edges.
+#
+# Syntax basis:
+#   - repo Test 4A skeleton (validated)
+#   - grammar keywords_nnp.xml: top-level strain{ pseudomorphic_strain{}
+#     output_strain_tensor{} output_hydrostatic_strain{} } and run{ strain{} }
+#     (nextnano++ 3.0.0, 2026.7 package)
+#
+# VALIDATION: parses cleanly under the Free nextnano++ 3.0.0 --parse runmode.
+# The strain *execution* is Standard-only and is confirmed on the work laptop.
+#
+# Pass (work laptop): exit 0; strain solver initializes; nonzero strain in the
+# InGaAs layer; strain-tensor output files exist; strained band edges produced.
+
+global{
+    simulate1D{}
+    temperature = 300
+    substrate{ name = "GaAs" }           # coherent growth reference
+    crystal_zb{ x_hkl = [1, 0, 0]  y_hkl = [0, 1, 0] }
+}
+
+strain{
+    pseudomorphic_strain{}               # <-- Standard-only strain solver
+    output_strain_tensor{}
+    output_hydrostatic_strain{}
+}
+
+contacts{
+    fermi{ name = qw_contact  bias = 0.0 }
+}
+
+grid{
+    xgrid{
+        line{ pos = 0.0   spacing = 0.5  }
+        line{ pos = 20.0  spacing = 0.25 }
+        line{ pos = 27.0  spacing = 0.25 }
+        line{ pos = 50.0  spacing = 0.5  }
+    }
+}
+
+structure{
+    # Lattice-matched GaAs barrier fills the domain...
+    region{
+        everywhere{}
+        binary{ name = "GaAs" }
+        contact{ name = qw_contact }
+    }
+    # ...then a thin, compressively strained InGaAs well (7 nm).
+    region{
+        line{ x = [20.0, 27.0] }
+        ternary_constant{ name = "In(x)Ga(1-x)As"  alloy_x = 0.15 }
+    }
+}
+
+classical{
+    Gamma{}
+    HH{}
+    LH{}
+    SO{}
+    output_bandedges{ averaged = no }    # strained band edges
+}
+
+quantum{
+    region{
+        name = "qw"
+        x = [10.0, 40.0]
+        no_density = yes
+        boundary{ x = dirichlet }
+        Gamma{ num_ev = 2 }
+        output_states{
+            max_num       = 2
+            envelopes     = yes
+            probabilities = yes
+        }
+    }
+}
+
+run{
+    strain{}
+    quantum{}
+}

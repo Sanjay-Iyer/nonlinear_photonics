@@ -32,12 +32,15 @@ import generate_inputs
 import nn_config
 import run_input
 import run_smoke_tests
+import verify_standard_smoke_tests
 from generate_inputs import GenerateError, expand_grid, generate, render
 from nn_config import ConfigError, NextnanoConfig, resolve_config
 
 DIM_DIR = nn_config.INPUT_DIR / "01_smoke_tests" / "03_standard_dimensions"
 DECK_2D = DIM_DIR / "hello_03a_gaas_rectangle_2d.in"
 DECK_3D = DIM_DIR / "hello_03b_gaas_cuboid_3d.in"
+
+SMOKE_DIR = nn_config.INPUT_DIR / "01_smoke_tests"
 
 
 # --- helpers ----------------------------------------------------------------
@@ -98,7 +101,8 @@ def test_paths_are_repo_relative_to_module():
 
 def test_no_hardcoded_drive_paths_in_scripts():
     # Guard against absolute Windows paths creeping into tracked code.
-    for mod in (nn_config, run_input, generate_inputs, run_smoke_tests):
+    for mod in (nn_config, run_input, generate_inputs, run_smoke_tests,
+                verify_standard_smoke_tests):
         text = Path(mod.__file__).read_text(encoding="utf-8")
         assert "C:\\" not in text and "C:/" not in text
 
@@ -417,9 +421,10 @@ def test_smoke_stage_mapping():
         "hello_03a_gaas_rectangle_2d.in",
         "hello_03b_gaas_cuboid_3d.in",
     ]
-    # 'all' includes every stage's decks, in stage order, and all exist.
+    # 'all' begins with the stage 1-3 decks in order; full coverage of all
+    # stages is asserted in test_smoke_stage_ranges_and_all.
     all_decks = run_smoke_tests.decks_for("all")
-    assert [p.name for p in all_decks] == [
+    assert [p.name for p in all_decks[:4]] == [
         "hello_01_bulk_gaas.in",
         "hello_02_algaas_qw.in",
         "hello_03a_gaas_rectangle_2d.in",
@@ -493,3 +498,110 @@ def test_all_tracked_yaml_parses():
     assert yamls, "expected at least the example config + sweep"
     for path in yamls:
         _yaml.safe_load(path.read_text(encoding="utf-8"))
+
+
+# --- Tests 4-6: Standard-only feature smoke decks ---------------------------
+
+# (deck relative path under 01_smoke_tests, required feature keyword that must
+#  appear in the deck as evidence the intended capability is exercised)
+STAGE_456_DECKS = {
+    "4": [
+        ("04_temperature_and_multiband/hello_04a_qw_77K_oneband.in", "temperature = 77"),
+        ("04_temperature_and_multiband/hello_04b_qw_6band_kp.in", "kp_6band"),
+        ("04_temperature_and_multiband/hello_04c_qw_8band_kp.in", "kp_8band"),
+    ],
+    "5": [
+        ("05_strain_and_polarization/hello_05a_inGaAs_GaAs_strain.in", "pseudomorphic_strain"),
+        ("05_strain_and_polarization/hello_05b_GaN_AlN_piezo_pyro.in", "piezo_density"),
+    ],
+    "6": [
+        ("06_device_and_optical/hello_06a_GaAs_pn_current_recombination.in", "recombination_model"),
+        ("06_device_and_optical/hello_06b_GaAs_AlGaAs_qw_absorption.in", "momentum_matrix_elements"),
+        ("06_device_and_optical/hello_06c_pin_qw_schrodinger_current_poisson.in", "quantum_current_poisson"),
+    ],
+}
+ALL_456 = [rel for decks in STAGE_456_DECKS.values() for rel, _ in decks]
+
+
+def test_stage456_decks_present_and_utf8():
+    for rel in ALL_456:
+        deck = SMOKE_DIR / rel
+        assert deck.is_file(), f"missing deck: {deck}"
+        deck.read_text(encoding="utf-8")  # raises if not valid UTF-8
+
+
+def test_stage456_decks_declare_their_feature():
+    for rel, keyword in [d for decks in STAGE_456_DECKS.values() for d in decks]:
+        text = (SMOKE_DIR / rel).read_text(encoding="utf-8")
+        assert keyword in text, f"{rel} should exercise '{keyword}'"
+
+
+def test_stage456_extra_feature_markers():
+    # A few cross-checks that the intended physics is actually configured.
+    p5b = (SMOKE_DIR / "05_strain_and_polarization/hello_05b_GaN_AlN_piezo_pyro.in").read_text("utf-8")
+    assert "pyro_density" in p5b and "crystal_wz" in p5b  # piezo+pyro, wurtzite
+    p6a = (SMOKE_DIR / "06_device_and_optical/hello_06a_GaAs_pn_current_recombination.in").read_text("utf-8")
+    for kw in ("SRH", "Auger", "radiative", "current_poisson"):
+        assert kw in p6a, f"6A must enable {kw}"
+    p6c = (SMOKE_DIR / "06_device_and_optical/hello_06c_pin_qw_schrodinger_current_poisson.in").read_text("utf-8")
+    assert "quantum_current_poisson" in p6c
+
+
+def test_stage456_decks_load_as_nextnanopp():
+    nn = pytest.importorskip("nextnanopy")
+    for rel in ALL_456:
+        assert nn.InputFile(str(SMOKE_DIR / rel)).product == "nextnano++"
+
+
+def test_smoke_stage_ranges_and_all():
+    assert [p.name for p in run_smoke_tests.decks_for("4")] == [
+        "hello_04a_qw_77K_oneband.in", "hello_04b_qw_6band_kp.in", "hello_04c_qw_8band_kp.in"]
+    assert [p.name for p in run_smoke_tests.decks_for("5")] == [
+        "hello_05a_inGaAs_GaAs_strain.in", "hello_05b_GaN_AlN_piezo_pyro.in"]
+    assert len(run_smoke_tests.decks_for("6")) == 3
+    # range 4-6 = 8 decks, in stage/filename order
+    assert len(run_smoke_tests.decks_for("4-6")) == 8
+    # all = stages 1..6 = 12 decks; every one exists
+    all_decks = run_smoke_tests.decks_for("all")
+    assert len(all_decks) == 12
+    assert all(p.is_file() for p in all_decks)
+
+
+def test_smoke_stage_parse_errors():
+    import pytest as _pt
+    for bad in ("7", "0", "6-4", "x", "2-9"):
+        with _pt.raises(ValueError):
+            run_smoke_tests.parse_stages(bad)
+
+
+def test_stage456_wildcards_match_each_dir():
+    for stage, subdir in (("4", "04_temperature_and_multiband"),
+                          ("5", "05_strain_and_polarization"),
+                          ("6", "06_device_and_optical")):
+        pattern = str(SMOKE_DIR / subdir / "hello_*.in")
+        matched = run_input.expand_inputs([pattern])
+        assert len(matched) == len(STAGE_456_DECKS[stage])
+
+
+# --- verifier helper unit tests (pure, no solver output needed) -------------
+
+
+def test_verifier_numeric_helpers(tmp_path):
+    v = verify_standard_smoke_tests
+    f = tmp_path / "data.dat"
+    f.write_text("# header col1 col2\n0.0 0.0\n1.0 2.5e-3\n", encoding="utf-8")
+    vals = list(v._numeric_values(f))
+    assert 2.5e-3 in vals and 1.0 in vals
+    assert v._any_nonzero([f]) is True
+    zero = tmp_path / "zero.dat"
+    zero.write_text("# x y\n0 0\n0.0 0.0\n", encoding="utf-8")
+    assert v._any_nonzero([zero]) is False
+
+
+def test_verifier_specs_cover_all_stage456_decks():
+    specs = verify_standard_smoke_tests._build_specs({"4", "5", "6"})
+    names = {s.deck.name for s in specs}
+    assert names == {Path(rel).name for rel in ALL_456}
+    # every spec names a concrete requested feature and a sanity label
+    for s in specs:
+        assert s.feature and s.sanity_label and s.log_markers and s.output_globs

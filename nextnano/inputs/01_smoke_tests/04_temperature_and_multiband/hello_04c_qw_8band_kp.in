@@ -1,0 +1,85 @@
+# Smoke test 4C: 1D GaAs/AlGaAs QW, 8-band k.p solver at 300 K.
+#
+# Standard-only feature isolated: the 8-band k.p Hamiltonian (coupled
+# conduction + valence bands). Unstrained, 300 K, no current / polarization /
+# optics. Same QW geometry as Tests 4A/4B; only the quantum model changes to
+# kp_8band with a minimal number of electron and hole states.
+#
+# Syntax basis:
+#   - repo Test 4A/4B skeleton (validated)
+#   - grammar keywords_nnp.xml: quantum/region/kp_8band{ num_electrons
+#     num_holes } and classify_by_energy (nextnano++ 3.0.0, 2026.7 package)
+#
+# VALIDATION: parses cleanly under the Free nextnano++ 3.0.0 --parse runmode.
+# The 8-band k.p *execution* is Standard-only and is confirmed on the work
+# laptop.
+#
+# Pass (work laptop): exit 0; log identifies the 8-band model; a nonempty
+# 8-band energy spectrum (with electron/hole classification) + wavefunctions
+# exist.
+
+global{
+    simulate1D{}
+    temperature = 300
+    substrate{ name = "GaAs" }
+    crystal_zb{ x_hkl = [1, 0, 0]  y_hkl = [0, 1, 0] }
+}
+
+contacts{
+    fermi{ name = qw_contact  bias = 0.0 }
+}
+
+grid{
+    xgrid{
+        line{ pos = 0.0   spacing = 0.5  }
+        line{ pos = 20.0  spacing = 0.25 }
+        line{ pos = 30.0  spacing = 0.25 }
+        line{ pos = 50.0  spacing = 0.5  }
+    }
+}
+
+structure{
+    region{
+        everywhere{}
+        ternary_constant{ name = "Al(x)Ga(1-x)As"  alloy_x = 0.30 }
+        contact{ name = qw_contact }
+    }
+    region{
+        line{ x = [20.0, 30.0] }
+        binary{ name = "GaAs" }
+    }
+}
+
+classical{
+    Gamma{}
+    HH{}
+    LH{}
+    SO{}
+    output_bandedges{ averaged = no }
+}
+
+quantum{
+    region{
+        name = "qw"
+        x = [10.0, 40.0]
+        no_density = yes
+        boundary{ x = dirichlet }
+        # 8-band k.p Hamiltonian (Standard-only): coupled CB+VB. Minimal state
+        # counts; classify_by_energy separates electron- vs hole-like states.
+        kp_8band{
+            num_electrons = 2
+            num_holes     = 2
+            k_integration_disabled{}
+            classify_by_energy{}
+        }
+        output_states{
+            max_num       = 4
+            envelopes     = yes
+            probabilities = yes
+        }
+    }
+}
+
+run{
+    quantum{}
+}
