@@ -1,0 +1,28 @@
+# ---------------------------------------------------------------------------
+# nextnano++ per-machine paths  --  EXAMPLE / TEMPLATE
+#
+# Copy this file to  paths.local.yaml  (same directory) on EACH machine and
+# fill in the real paths for that machine. paths.local.yaml is gitignored and
+# must never be committed -- it is machine-specific and the license path in
+# particular points at a licensed asset.
+#
+# Paths below are commented-out Windows placeholders. Uncomment and edit.
+# Use either forward slashes or doubled backslashes in YAML; forward slashes
+# are simplest and work fine on Windows.
+# ---------------------------------------------------------------------------
+
+nextnano++:
+  # The nextnano++ solver executable (portable Standard install).
+  # exe: "C:/nextnano/nextnano++/bin/nextnano++_Intel_64bit.exe"
+
+  # The material database shipped with the install.
+  # database: "C:/nextnano/nextnano++/Syntax/database_nn++.in"
+
+  # Your license file. NEVER commit this or its path is not sensitive but the
+  # file itself is licensed -- keep it outside the repo.
+  # license: "C:/Users/YOU/Documents/nextnano/License/License_nnp.lic"
+
+  # Where nextnanopy writes results. Keep this pointed inside the repo's
+  # gitignored output/ dir so runs land where the workflow expects them, or
+  # point it anywhere off-repo if you prefer.
+  # outputdirectory: "C:/code/nonlinear_photonics/nextnano/output"

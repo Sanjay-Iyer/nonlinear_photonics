@@ -18,3 +18,24 @@ mpl-cache/
 # keep them, but drop stray temp files
 *.tmp
 *.log.lock
+
+# ─── nextnano++ split-machine workflow ──────────────────────────────────────
+# Runtime results are regenerated on the work laptop; never commit them.
+# The dir is kept in git via output/.gitkeep, but everything else is ignored.
+nextnano/output/*
+!nextnano/output/.gitkeep
+# nextnano simulation artifacts, scoped to nextnano/ so these broad patterns
+# don't clobber .log/.dat files elsewhere in the repo. nextnano emits them
+# into output/, but sweeps and stray runs can drop them anywhere under here.
+nextnano/**/*.log
+nextnano/**/*.vtr
+nextnano/**/*.fld
+nextnano/**/*.dat
+nextnano/**/*.avs*
+# Per-machine local paths (executable / database / license / outputdirectory).
+# Copy paths.local.yaml.example -> paths.local.yaml and fill in by hand.
+nextnano/config/paths.local.yaml
+# Python / notebook caches (also covered repo-wide above; repeated here so the
+# nextnano/ block is self-documenting).
+__pycache__/
+.ipynb_checkpoints/

@@ -1,0 +1,57 @@
+# Smoke test 2: 10 nm GaAs / Al(0.3)Ga(0.7)As single quantum well.
+# Success = 4 confined electron states, e1 roughly 30-40 meV
+# above the GaAs conduction band edge.
+
+global{
+    simulate1D{}
+    crystal_zb{ x_hkl = [1, 0, 0]  y_hkl = [0, 1, 0] }
+    substrate{ name = "GaAs" }
+    temperature = 300
+}
+
+grid{
+    xgrid{
+        line{ pos = 0.0   spacing = 0.5  }
+        line{ pos = 20.0  spacing = 0.25 }
+        line{ pos = 30.0  spacing = 0.25 }
+        line{ pos = 50.0  spacing = 0.5  }
+    }
+}
+
+structure{
+    # Barrier fills the domain...
+    region{
+        everywhere{}
+        ternary_constant{ name = "Al(x)Ga(1-x)As"  alloy_x = 0.30 }
+    }
+    # ...then the well overwrites the middle 10 nm.
+    region{
+        line{ x = [20.0, 30.0] }
+        binary{ name = "GaAs" }
+    }
+}
+
+classical{
+    Gamma{}
+    HH{}
+    output_bandedges{ averaged = no }
+}
+
+quantum{
+    region{
+        name = "qw_region"
+        x = [10.0, 40.0]
+        boundary{ x = dirichlet }
+        Gamma{ num_ev = 4 }
+        HH{   num_ev = 4 }
+        output_wavefunctions{
+            max_num       = 4
+            probabilities = yes
+            energy_shift  = yes
+        }
+    }
+}
+
+run{
+    quantum{}
+}

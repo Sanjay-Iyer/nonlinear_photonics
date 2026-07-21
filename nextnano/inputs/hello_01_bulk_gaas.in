@@ -1,0 +1,35 @@
+# Smoke test 1: bulk GaAs band edges at 300 K.
+# Success = runs without error, produces bandedges output.
+
+global{
+    simulate1D{}
+    crystal_zb{ x_hkl = [1, 0, 0]  y_hkl = [0, 1, 0] }
+    substrate{ name = "GaAs" }
+    temperature = 300
+}
+
+grid{
+    xgrid{
+        line{ pos = 0.0    spacing = 1.0 }
+        line{ pos = 100.0  spacing = 1.0 }
+    }
+}
+
+structure{
+    region{
+        everywhere{}
+        binary{ name = "GaAs" }
+    }
+}
+
+classical{
+    Gamma{}
+    HH{}
+    LH{}
+    SO{}
+    output_bandedges{ averaged = no }
+}
+
+run{
+    strain{}
+}
