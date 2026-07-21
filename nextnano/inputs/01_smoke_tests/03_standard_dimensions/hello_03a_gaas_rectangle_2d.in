@@ -14,12 +14,13 @@
 # no bias, no strain, no piezoelectricity, no optics, no current, no k.p, no
 # self-consistency.
 #
-# SYNTAX NOTE (home laptop): the 2D-specific keywords here -- simulate2D{},
-# ygrid{}, and rectangle{} -- cannot be validated on the home laptop, because
-# the Free executable rejects 2D by license. Authoritative parse + execution
-# validation happens on the work laptop (Standard). The 1D constructs reused
-# from hello_01/hello_02 (global/grid/classical/quantum/run) are already known
-# to load.
+# VALIDATION: the FULL syntax of this deck was checked at home against the Free
+# nextnano++ 3.0.0 parser (2026.7 package) with --parse and --structure. It
+# parses cleanly and the solver builds the 2D grid (6 x 6 = 36 points, x,y in
+# [0,10]) before stopping with "This version of nextnano++ does not allow
+# running 2D simulations" -- the expected Free 1D-only gate. So the 2D-specific
+# syntax (simulate2D{}, ygrid{}, rectangle{}) is confirmed valid; only the
+# licensed 2D *execution* remains to be confirmed on the work laptop (Standard).
 
 global{
     simulate2D{}
@@ -39,16 +40,28 @@ grid{
     }
 }
 
+# A charge-neutral fermi contact at zero bias. Required in every nextnano++
+# deck; bias = 0.0 means NO applied bias -- it only supplies the electrostatic
+# boundary reference, and run{} below invokes only the quantum solver.
+contacts{
+    fermi{
+        name = box_contact
+        bias = 0.0
+    }
+}
+
 structure{
     # Homogeneous GaAs filling the 2D rectangle.
     region{
         rectangle{ x = [0.0, 10.0]  y = [0.0, 10.0] }
         binary{ name = "GaAs" }
+        contact{ name = box_contact }
     }
 }
 
 classical{
     Gamma{}
+    HH{}
     output_bandedges{ averaged = no }
 }
 
@@ -57,10 +70,12 @@ quantum{
         name = "box_2d"
         x = [0.0, 10.0]
         y = [0.0, 10.0]
+        no_density = yes
         boundary{ x = dirichlet  y = dirichlet }
         Gamma{ num_ev = 1 }
-        output_wavefunctions{
+        output_states{
             max_num       = 1
+            envelopes     = yes
             probabilities = yes
         }
     }

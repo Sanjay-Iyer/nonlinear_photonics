@@ -244,13 +244,15 @@ only 1D, this confirms access to licensed Evaluation/Standard dimensional
 capabilities; and since this machine uses `License_nnp.lic` from the Standard
 install, the runs validate the work-laptop Standard workflow.
 
-> **Home-laptop caveat.** The 2D/3D-specific syntax (`simulate2D{}` /
-> `simulate3D{}`, `ygrid`/`zgrid`, `rectangle{}` / `cuboid{}`) is *not*
-> validated at home — the Free executable rejects 2D/3D by license, and
-> nextnanopy only confirms the files are nextnano++ inputs. Authoritative
-> parse + execution validation happens here, on the work laptop. If the Free
-> solver ever refuses these files specifically due to the 1D restriction, that
-> is expected — do not rewrite them back to 1D.
+> **Validation status.** The full syntax of both decks was checked at home
+> against the **Free** nextnano++ 3.0.0 parser (`--parse` and `--structure`):
+> both parse cleanly and the solver builds the 2D (6×6) / 3D (5×5×5) grids
+> before stopping on the Free 1D-only gate (*"does not allow running 2D
+> simulations"*). So the 2D/3D syntax — `simulate2D{}`/`simulate3D{}`,
+> `ygrid`/`zgrid`, `rectangle{}`/`cuboid{}`, `contacts{}`, `output_states{}` —
+> is **confirmed valid**. Only the licensed 2D/3D *execution* remains to be
+> confirmed here, on the work laptop (Standard). Hitting that 1D gate on a
+> Free machine is expected — do not rewrite the decks back to 1D.
 
 ---
 

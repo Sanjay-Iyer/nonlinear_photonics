@@ -14,11 +14,13 @@
 # no bias, no strain, no piezoelectricity, no optics, no current, no k.p, no
 # self-consistency.
 #
-# SYNTAX NOTE (home laptop): the 3D-specific keywords here -- simulate3D{},
-# ygrid{}, zgrid{}, and cuboid{} -- cannot be validated on the home laptop,
-# because the Free executable rejects 3D by license. Authoritative parse +
-# execution validation happens on the work laptop (Standard). The constructs
-# reused from hello_01/hello_02 are already known to load.
+# VALIDATION: the FULL syntax of this deck was checked at home against the Free
+# nextnano++ 3.0.0 parser (2026.7 package) with --parse and --structure. It
+# parses cleanly and the solver builds the 3D grid (5 x 5 x 5 = 125 points,
+# x,y,z in [0,8]) before stopping on the Free 1D-only gate ("This version of
+# nextnano++ does not allow running 2D simulations" -- generic message). So the
+# 3D-specific syntax (simulate3D{}, ygrid{}, zgrid{}, cuboid{}) is confirmed
+# valid; only the licensed 3D *execution* remains for the work laptop (Standard).
 
 global{
     simulate3D{}
@@ -42,16 +44,28 @@ grid{
     }
 }
 
+# A charge-neutral fermi contact at zero bias. Required in every nextnano++
+# deck; bias = 0.0 means NO applied bias -- it only supplies the electrostatic
+# boundary reference, and run{} below invokes only the quantum solver.
+contacts{
+    fermi{
+        name = box_contact
+        bias = 0.0
+    }
+}
+
 structure{
     # Homogeneous GaAs filling the 3D cuboid.
     region{
         cuboid{ x = [0.0, 8.0]  y = [0.0, 8.0]  z = [0.0, 8.0] }
         binary{ name = "GaAs" }
+        contact{ name = box_contact }
     }
 }
 
 classical{
     Gamma{}
+    HH{}
     output_bandedges{ averaged = no }
 }
 
@@ -61,10 +75,12 @@ quantum{
         x = [0.0, 8.0]
         y = [0.0, 8.0]
         z = [0.0, 8.0]
+        no_density = yes
         boundary{ x = dirichlet  y = dirichlet  z = dirichlet }
         Gamma{ num_ev = 1 }
-        output_wavefunctions{
+        output_states{
             max_num       = 1
+            envelopes     = yes
             probabilities = yes
         }
     }
