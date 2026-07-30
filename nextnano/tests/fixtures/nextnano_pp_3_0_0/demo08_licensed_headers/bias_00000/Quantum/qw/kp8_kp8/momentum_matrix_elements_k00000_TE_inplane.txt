@@ -1,0 +1,3 @@
+|kp8_i>     |kp8_j>     |<kp8_i|eps.p|kp8_j>|[hbar/nm]     |<kp8_i|eps.p|kp8_j>|^2[hbar^2/nm^2]     Re<kp8_i|eps.p|kp8_j>[hbar/nm]     Im<kp8_i|eps.p|kp8_j>[hbar/nm]
+1           7           0                                  0                                        0                                  0
+7           1           0                                  0                                        0                                  0

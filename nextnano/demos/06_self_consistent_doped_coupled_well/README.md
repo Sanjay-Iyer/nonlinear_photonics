@@ -67,7 +67,8 @@ Physical: geometry as in Demo 5, plus `donor_density_cm3`,
 `donor_degeneracy`, `spacer_thickness_nm`, `contact_bias_V`, `temperature_K`.
 
 Numerical: grid spacings, `number_of_states`, `quantum_region_padding_nm`,
-`poisson_tolerance`, `maximum_iterations`, `potential_mixing_alpha`.
+`solver_residual_density_cm2`, `convergence_relative_tolerance`,
+`maximum_iterations`, `potential_mixing_alpha`.
 
 ## Expected qualitative behaviour
 
@@ -116,10 +117,25 @@ Three facts, in decreasing authority:
    overrides it.
 2. **The iteration cap.** Stopping at `maximum_iterations` is reported as
    `max_iterations_reached` — *never* as convergence.
-3. **The residuals.** Compared against `poisson_tolerance`, each first divided
-   by its own scale. `Residual_EDensity` is an absolute sheet density in cm⁻²
-   sitting near 1e12; testing it directly against a 1e−6 potential tolerance
-   would be a unit error, not a criterion.
+3. **The residuals.** Compared against `convergence_relative_tolerance`, each
+   first divided by its own scale. `Residual_EDensity` is an absolute sheet
+   density in cm⁻² sitting near 1e12; testing it directly against a 1e−6
+   potential tolerance would be a unit error, not a criterion.
+
+### Two tolerances, deliberately not one
+
+| key | what it is |
+|---|---|
+| `solver_residual_density_cm2` | goes into the deck's `quantum_poisson{ residual }`. nextnano++ compares an **absolute** density residual in 1/cm² against it. |
+| `convergence_relative_tolerance` | this repository's own check: each residual divided by its own scale. |
+
+The first licensed run used one key for both and set it to 1e−6. That is
+unreachable in principle: with a sheet density near 1e12 cm⁻² the density
+residual bottoms out around 0.1–1 cm⁻² in double precision. Every case ran the
+full 300 iterations and the solver warned — while the potential residual had
+already fallen to 2e−13 V and the relative density residual to 6.6e−13. Setting
+a reachable absolute criterion is a correctness fix; loosening the relative one
+would not be.
 
 ## Units
 
@@ -148,8 +164,8 @@ density is genuinely in cm⁻².
   species.
 - **`max_iterations_reached`.** Check the *physics* first — donor placement,
   spacer thickness, contact, quantum-region size. Only after that consider
-  `potential_mixing_alpha`. Loosening `poisson_tolerance` to obtain a
-  "converged" label is not a fix.
+  `potential_mixing_alpha`. Loosening `convergence_relative_tolerance` to
+  obtain a "converged" label is not a fix.
 - **Charge does not balance.** The quantum region is smaller than the region
   where electrons actually are, so part of the density is outside the integral.
 - **Bound-state boundary probability high.** Strong bending has pushed a state
@@ -167,6 +183,50 @@ density is genuinely in cm⁻².
 ## Licensed-validation status
 
 `licensed_run_pending` — see `nextnano/demos/demo_registry.yaml`.
+
+### First licensed run, 2026-07-30 — physics good, two configuration bugs
+
+All 11 cases executed; nothing failed. The staged progression worked exactly as
+intended:
+
+| stage | band bending | E1 | note |
+|---|---|---|---|
+| A undoped | 265.5 meV | 2.9246 eV | just the AlGaAs/GaAs offset |
+| B doped + Poisson | 332.0 meV | — | **+66.5 meV of bending from the donors** |
+| C quantum on B's potential | 332.0 meV | +0.00667 eV | no feedback, so bending is unchanged |
+| D self-consistent | 322.6 meV | −0.01207 eV | **feedback shifts E1 by 18.7 meV and relaxes the bending by 9.4 meV** |
+
+The doping sweep was textbook: sheet density 2.9e11 → 1.67e12 cm⁻² across
+5e17 → 1e19 cm⁻³, E21 rising 45.5 → 67.2 meV, occupied subbands 2 → 3, and
+charge balancing to between 1e−14 and 2e−12 relative at every point.
+
+Two things were wrong, both fixed here:
+
+1. **The unreachable tolerance** described above — every self-consistent case
+   was reported `solver_reported_not_converged` despite converged physics.
+2. **The third state is only marginally bound at high doping.** Its boundary
+   probability was 1.1e−2 at 1e19 cm⁻³ against a 1e−3 limit — and it got
+   *worse* (6.2e−3) with **larger** quantum-region padding. That direction is
+   the tell: a genuinely confined state gets better with a bigger box, and a
+   marginally bound one spreads to fill whatever box it is given. E1 and E2 were
+   unaffected throughout.
+
+   This is a physical finding about the third state, not a domain artifact, so
+   the threshold was **not** loosened and the box was **not** enlarged to hide
+   it. The run now reports `boundary_probability_limiting_state` and the
+   per-state boundary probabilities, so the flag names its own cause. The next
+   licensed run should decide whether the third state belongs in the analysis at
+   all at 1e19 cm⁻³.
+
+   The outer barriers *were* widened 20 → 30 nm (donor layer moved to 16–22 nm
+   to keep the 8 nm spacer), but for a different and unrelated reason: with
+   Poisson running, it keeps the contact slab's Dirichlet condition further from
+   the wells. It does not change the quantum-region boundary probability, which
+   is set by `quantum_region_padding_nm`.
+
+A third, cosmetic bug: `max_iteration_case_count` reported 0 while every case
+ran 300/300, because the solver's warning outranked the cap for the status
+label. The cap is now recorded as its own flag.
 
 - **Home, syntax:** all 11 generated decks (4 stages + 5 doping + 2 padding)
   parse cleanly under Free nextnano++ 3.0.0 `--parse`.
@@ -208,5 +268,8 @@ python nextnano/demos/06_self_consistent_doped_coupled_well/run.py
 - [ ] Quantum cases contain `fermi_levels.csv`, `states.csv`, and, where
       populated, `occupations.csv`.
 - [ ] `plots/iteration_residuals.png` shows residuals falling, not stalling.
+- [ ] `boundary_probability_limiting_state` — if it is state 3 at high doping,
+      that state is only marginally bound. Decide whether it belongs in the
+      analysis rather than enlarging the box or relaxing the threshold.
 - [ ] If a case fails to converge, keep its directory and report the residual
       and iteration count. Do not retune the tolerance to make it pass.

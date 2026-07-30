@@ -435,10 +435,10 @@ def matrix_element_units(path: Path) -> dict[str, str]:
 def first_value_column(
     elements: Mapping[tuple[int, int], Mapping[str, float]],
     *,
-    contains: str,
+    contains: str | None = None,
     excludes: Sequence[str] = (),
 ) -> str:
-    """Pick the single value column whose name contains ``contains``.
+    """Pick one unambiguous value column, optionally matching ``contains``.
 
     ``excludes`` removes near-duplicates such as the squared column or the
     separate real and imaginary parts. Ambiguity is an error: silently taking
@@ -451,16 +451,44 @@ def first_value_column(
     matches = [
         name
         for name in sample
-        if contains in name and not any(token in name for token in excludes)
+        if (contains is None or contains in name)
+        and not any(token in name for token in excludes)
     ]
     if not matches:
+        criterion = (
+            "no matrix-element value column"
+            if contains is None
+            else f"no matrix-element column contains {contains!r}"
+        )
         raise ParserError(
-            f"no matrix-element column contains {contains!r} "
-            f"(excluding {list(excludes)}); have: {sorted(sample)}"
+            f"{criterion} (excluding {list(excludes)}); have: {sorted(sample)}"
+        )
+    if len(matches) > 1:
+        criterion = "value column" if contains is None else f"column {contains!r}"
+        raise ParserError(
+            f"matrix-element {criterion} is ambiguous: {sorted(matches)}"
+        )
+    return matches[0]
+
+
+def value_column_with_unit(path: Path, *, unit: str) -> str:
+    """Name of the sole value column carrying an exact header unit.
+
+    Header parsing intentionally separates ``Gamma_i-HH_j[eV]`` into the name
+    ``Gamma_i-HH_j`` and unit ``eV``. Callers must therefore select physical
+    quantities by the unit metadata, not search the stripped name for
+    ``"[eV]"``.
+    """
+
+    units = matrix_element_units(path)
+    matches = [name for name, declared in units.items() if declared == unit]
+    if not matches:
+        raise ParserError(
+            f"{path}: no value column with unit {unit!r}; header declares {units}"
         )
     if len(matches) > 1:
         raise ParserError(
-            f"matrix-element column {contains!r} is ambiguous: {sorted(matches)}"
+            f"{path}: several value columns carry unit {unit!r}: {sorted(matches)}"
         )
     return matches[0]
 

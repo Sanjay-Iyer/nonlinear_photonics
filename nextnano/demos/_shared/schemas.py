@@ -264,7 +264,13 @@ DEMO5_SCHEMA = DemoSchema(
         }
     ),
     numerical=_COMMON_NUMERICAL,
-    sweeps=frozenset({"electric_field_kV_cm", "quantum_region_padding_nm"}),
+    sweeps=frozenset(
+        {
+            "electric_field_kV_cm",
+            "quantum_region_padding_nm",
+            "active_region_grid_spacing_nm",
+        }
+    ),
     outputs=EXTENDED_OUTPUTS,
     validation=EXTENDED_VALIDATION,
     positive=frozenset(
@@ -314,7 +320,14 @@ DEMO6_SCHEMA = DemoSchema(
         }
     ),
     numerical=_COMMON_NUMERICAL
-    | frozenset({"poisson_tolerance", "maximum_iterations", "potential_mixing_alpha"}),
+    | frozenset(
+        {
+            "solver_residual_density_cm2",
+            "convergence_relative_tolerance",
+            "maximum_iterations",
+            "potential_mixing_alpha",
+        }
+    ),
     sweeps=frozenset({"donor_density_cm3", "quantum_region_padding_nm"}),
     outputs=EXTENDED_OUTPUTS,
     validation=EXTENDED_VALIDATION,
@@ -335,7 +348,8 @@ DEMO6_SCHEMA = DemoSchema(
             "exterior_grid_spacing_nm",
             "number_of_states",
             "quantum_region_padding_nm",
-            "poisson_tolerance",
+            "solver_residual_density_cm2",
+            "convergence_relative_tolerance",
             "maximum_iterations",
             "potential_mixing_alpha",
         }

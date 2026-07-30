@@ -13,7 +13,9 @@ scientific:
   right_outer_barrier_nm: 20.0
   aluminum_fraction: 0.30
   temperature_K: 300
-  electric_field_kV_cm: 0.0
+  # Non-sweep numerical controls inherit this value and therefore recheck the
+  # licensed run's candidate avoided crossing rather than the zero-field case.
+  electric_field_kV_cm: -35.0
   # "+x" gives direction = [1, 0, 0]. Reversing this and reversing the sign of
   # electric_field_kV_cm are equivalent; both are exercised by the sweep.
   field_direction: "+x"
@@ -34,6 +36,7 @@ sweeps:
     [-100.0, -75.0, -50.0, -35.0, -25.0, -15.0, -10.0, -5.0, 0.0,
      5.0, 10.0, 15.0, 25.0, 35.0, 50.0, 75.0, 100.0]
   quantum_region_padding_nm: [10.0, 20.0]
+  active_region_grid_spacing_nm: [0.25, 0.125]
 
 analysis:
   quantum_region_name: cqw

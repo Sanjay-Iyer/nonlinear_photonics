@@ -762,10 +762,14 @@ def classify_convergence(
         relatives[name] = abs(series[-1]) / (abs(scale) if scale else 1.0)
     within = bool(relatives) and all(value <= tolerance for value in relatives.values())
     last = max(steps)
+    # Recorded independently of `status`. The solver's own verdict outranks the
+    # iteration count when both apply, so a run that hit the cap AND warned would
+    # otherwise be invisible in any tally of capped runs.
+    cap_reached = last >= int(maximum_iterations)
 
     if solver_reported_failure:
         status = "solver_reported_not_converged"
-    elif last >= int(maximum_iterations):
+    elif cap_reached:
         status = "max_iterations_reached"
     elif within:
         status = "converged"
@@ -781,6 +785,7 @@ def classify_convergence(
         "converged": status == "converged",
         "iterations_run": last,
         "maximum_iterations": int(maximum_iterations),
+        "iteration_cap_reached": bool(cap_reached),
         "tolerance": float(tolerance),
         "reference_scales": scales,
         "final_residuals": finals,

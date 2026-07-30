@@ -17,9 +17,14 @@ Measured at home on nextnano++ 3.0.0 (Free edition, 2026-07-30):
 > all.**
 
 That is not a configuration mistake; it is structural. Two independent
-eigenproblems have no operator connecting them. Only the coupled 8-band
-Hamiltonian puts conduction and valence states in the same problem, which is
-where an interband momentum matrix element can come from.
+eigenproblems have no operator connecting them.
+
+Licensed nextnano++ 3.0.0 testing added a second, crucial distinction:
+`quantum{ momentum_matrix_elements{ KP8{} } }` writes the **envelope-momentum**
+operator in ħ/nm. In a 1D deck its in-plane component is identically zero. It is
+useful as a diagnostic, but it is not the full interband optical response.
+Demo 8 therefore obtains physical TE/TM absorption from the dedicated
+`optics{ quantum_spectra{} }` solver, which includes the Bloch/Kane terms.
 
 The same run also confirmed the intersubband selection rule directly: for
 Γ→Γ intersubband transitions the growth-polarised f₁₂ was 0.065 and the
@@ -37,8 +42,8 @@ variant adds a 1.5 nm higher-indium step at one side of the well.
 |---|---|---|---|
 | M1 `M1_oneband_e_h` | Γ + HH + LH, one-band | – | transition energies, overlaps |
 | M2 `M2_sixband_valence` | Γ + `kp_6band` | – | transition energies, overlaps |
-| M3 `M3_eightband_zone_centre` | `kp_8band` | – | + momentum matrix elements |
-| M4 `M4_eightband_k_resolved` | `kp_8band` | ✓ | + momentum matrix elements |
+| M3 `M3_eightband_zone_centre` | `kp_8band` | – | envelope diagnostics + solver absorption |
+| M4 `M4_eightband_k_resolved` | `kp_8band` | ✓ | envelope diagnostics + solver absorption |
 
 Plus: a symmetry-broken twin of M4, well-width and field sweeps, and two
 convergence reruns (more k points, finer spectral grid).
@@ -53,24 +58,17 @@ Growth is along **x** in a 1D nextnano++ deck, so:
 Both are named in `analysis.polarizations` and the name is what appears in the
 output file name. This was confirmed at home for the one-band intersubband case.
 
-## The spectrum is post-processed — read this before quoting it
+## Which spectrum is physical
 
-`spectrum.json` and `spectrum.png` are built **in this repository**, not by an
-absorption solver:
+`absorption_spectrum.csv`, `absorption_spectrum.json`, and `spectrum.png` come
+from nextnano++ `optics{ quantum_spectra{} }`. Their absorption coefficient is
+in **cm⁻¹** and may be compared with a paper after matching the structure,
+temperature, broadening, polarization, normalization volume, and exciton model.
 
-```
-S(E) = Σ_t  f_t · γ² / [ (E − E_t)² + γ² ],    γ = broadening_meV / 1000
-```
-
-- Units: **arbitrary**, declared as such in the JSON and on every axis label.
-- It is **not** an absorption coefficient and has no cm⁻¹ value. No carrier
-  density, refractive index, confinement factor, or normalisation enters.
-- `broadening_meV` is the HWHM of each line and stands in for every mechanism
-  the calculation omits — dephasing, phonons, interface roughness, well-width
-  fluctuation. It is an **input**, not a result.
-
-Two spectra from the same run may be compared. A spectrum from this demo may not
-be compared with a measured absorption spectrum.
+`diagnostic_envelope_momentum_lineshape.json` is deliberately separate. It is a
+repository-built Lorentzian view of the envelope-momentum table in arbitrary
+units. It is not an absorption coefficient and must not be used for paper
+comparison.
 
 ## Units discipline
 
@@ -98,7 +96,8 @@ python nextnano/demos/08_eight_band_interband_optics/run.py
 ## Expected outputs
 
 Per case: `extracted/band_edges.csv`, `transitions.csv`,
-`state_composition.json` for KP8, `spectrum.json`,
+`state_composition.json` for KP8, `absorption_spectrum.csv`,
+`absorption_spectrum.json`, `diagnostic_envelope_momentum_lineshape.json`,
 `plots/spectrum.png`, `plots/transition_energy_map.png`, log, manifest.
 Parent: `sweep_manifest.json`, `validation_report.md`,
 `tables/model_comparison.csv`, `tables/symmetry_comparison.csv`,
@@ -109,7 +108,7 @@ Parent: `sweep_manifest.json`, `validation_report.md`,
 `model_comparison_transitions.png`, `state_composition.png`,
 `electron_hole_overlap.png`, `matrix_element_heatmap.png`,
 `polarization_resolved_strengths.png`, `spectrum.png`,
-`spectrum_symmetry_broken.png`, `oscillator_strength_vs_field.png`,
+`spectrum_symmetry_broken.png`, `absorption_vs_field.png`,
 `k_convergence.png`, `spectral_resolution_check.png`.
 
 ## Scientific tests
@@ -129,15 +128,16 @@ Parent: `sweep_manifest.json`, `validation_report.md`,
 
 1. All four models produced a generated input; nothing was discarded.
 2. Transition energies are present and finite.
-3. Interband matrix elements exist in the 8-band model.
+3. Solver TE/TM absorption exists, is finite, and is nonzero in the 8-band model.
 4. Matrix-element units are read from the file headers and recorded.
 
 ## Common failures
 
 - **No interband elements in M1/M2.** Expected — that is the demo's finding, not
   a bug.
-- **8-band output not found.** The `kp8` sub-directory name in the parser
-  profile is unconfirmed; the run fails with a listing of what was written.
+- **Absorption output not found.** The matrix and transition paths are now
+  confirmed. The new `quantum_spectra` absorption filename is the one remaining
+  licensed-output path to confirm; a failure lists every file the solver wrote.
 - **Spurious states in the gap.** The 8-band Hamiltonian is prone to spurious
   solutions; `classify_by_energy{}` is enabled, and `avoid_spurious` is
   available in the grammar if it turns out to be needed on the licensed run.
@@ -155,19 +155,21 @@ Parent: `sweep_manifest.json`, `validation_report.md`,
 
 ## Licensed-validation status
 
-`licensed_run_pending`, with **unvalidated output syntax** — see
-`nextnano/demos/demo_registry.yaml`.
+`licensed_parser_fix_complete`; the corrected `quantum_spectra` run is pending.
 
 - **Home, syntax:** all 13 generated decks parse cleanly under Free
   nextnano++ 3.0.0 `--parse`.
-- **Home, execution: impossible.** The Free edition refuses every k·p model.
-  There is **no real-output fixture for this demo**.
+- **Licensed run received:** all 13 solver cases completed. The original
+  post-processor failed because it searched a unit-stripped column name for
+  `[eV]`; exact licensed headers are now regression fixtures.
 - **Confirmed at home anyway** (one-band probe deck, committed reasoning in the
   parser profile): the `Gamma_Gamma`/`HH_HH`-only behaviour, the intersubband
   selection rule, the `e·nm` dipole unit, and the `ħ/nm` momentum unit.
-- **Unconfirmed:** the `kp8` output sub-directory name, the KP8 matrix-element
-  and transition-energy file names, and which named polarisation vector ends up
-  in which file name.
+- **Confirmed:** `Gamma_kp6`, `kp8`, `kp8_kp8`, transition, overlap, spinor,
+  momentum, oscillator-strength filenames, units, and named polarization files.
+- **Scientifically corrected:** the licensed TE envelope-momentum table was
+  exactly zero, proving it cannot stand in for interband TE absorption. The next
+  run now requests `optics{ quantum_spectra{} }`.
 
 ## Work-laptop checklist
 
@@ -177,8 +179,11 @@ conda activate llm
 python nextnano/demos/08_eight_band_interband_optics/run.py
 ```
 
-- [ ] Record the exact 8-band output paths and reconcile the parser profile.
-- [ ] Confirm M1 and M2 write **no** interband matrix elements while M3/M4 do.
+- [x] Record the exact 8-band output paths and reconcile the parser profile.
+- [x] Confirm M1 and M2 write transition/overlap data and no interband optical
+      response from their separate eigenproblems.
+- [ ] Confirm `absorption_spectrum.csv` exists for every KP8 case and contains
+      nonzero TE and TM absorption in cm⁻¹.
 - [ ] `tables/model_comparison.csv`: 8-band transition energies differ from the
       one-band ones by more than the grid tolerance.
 - [ ] TE and TM strengths differ; confirm which vector produced which file.
@@ -187,7 +192,7 @@ python nextnano/demos/08_eight_band_interband_optics/run.py
       contain real data rather than licensed-run placeholders.
 - [ ] `tables/symmetry_comparison.csv`: at least one transition that is
       suppressed in the symmetric well gains strength in the stepped well.
-- [ ] `oscillator_strength_vs_field.png` falls with field.
+- [ ] `absorption_vs_field.png` shows how solver TE/TM peaks change with field.
 - [ ] `k_convergence.png`: the `kconv` spectrum overlays the reference.
 - [ ] `spectral_resolution_check.png`: doubling only the post-processing grid
       does not change the resolved lineshape.

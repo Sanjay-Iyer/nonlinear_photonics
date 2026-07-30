@@ -212,6 +212,7 @@ def test_only_work_laptop_validated_demos_are_declared_physically_validated():
         "01_classical_single_quantum_well",
         "02_one_band_finite_quantum_well",
         "03_quantum_well_convergence",
+        "04_symmetric_double_quantum_well",
     ]
 
 
@@ -251,10 +252,14 @@ def test_parser_profile_loads_and_declares_its_confirmation_state():
     profile = outputs.load_profile()
     assert profile.solver_version.startswith("nextnano++ 3.0.0")
     assert profile.spec("bandedges").confirmed is True
-    # Strain and k.p patterns must stay unconfirmed until a licensed run.
-    assert profile.spec("strain_tensor").confirmed is False
+    # Strain and Demo 8 k.p layouts are confirmed by licensed runs; the new
+    # quantum-spectra absorption filename remains pending.
+    assert profile.spec("strain_tensor").confirmed is True
+    assert profile.spec("transition_energies_kp8").confirmed is True
+    assert profile.spec("absorption_coefficient_quantum_spectra").confirmed is False
     assert profile.spec("energy_spectrum_kp8").confirmed is False
-    assert "strain_tensor" in profile.unconfirmed_keys()
+    assert "strain_tensor" not in profile.unconfirmed_keys()
+    assert "absorption_coefficient_quantum_spectra" in profile.unconfirmed_keys()
 
 
 def test_parser_profile_rejects_an_unknown_artifact_key():
@@ -762,4 +767,51 @@ def test_path_budget_warns_before_windows_would_refuse(tmp_path):
     assert sweeps.check_path_budget(tmp_path) is None
     long = Path("C:/" + "a" * 200)
     warning = sweeps.check_path_budget(long)
-    assert warning is not None and "260" in warning
+    assert warning is not None
+    assert str(sweeps.WINDOWS_MAX_PATH) in warning
+    assert "results_root" in warning
+
+
+def test_path_budget_matches_the_measured_solver_output_tail():
+    # Calibrated on the licensed run of 2026-07-30, where Demo 9's
+    # Gamma_Gamma dipole file was the artifact that crossed the limit.
+    tail = "/raw_output/case/bias_00000/Quantum/cqw/Gamma_Gamma/"
+    filename = "dipole_moment_matrix_elements_k00000_growth_x.txt"
+    assert sweeps.SOLVER_OUTPUT_TAIL_LENGTH >= len(tail) + len(filename)
+    # Demo 8 uses a longer polarization name against a shorter region name.
+    longest = "/raw_output/case/bias_00000/Quantum/qw/Gamma_Gamma/"
+    assert sweeps.SOLVER_OUTPUT_TAIL_LENGTH >= len(longest) + len(
+        "momentum_matrix_elements_k00000_TE_inplane.txt"
+    )
+    assert (
+        sweeps.MAX_RUN_DIR_LENGTH + sweeps.SOLVER_OUTPUT_TAIL_LENGTH
+        == sweeps.WINDOWS_MAX_PATH
+    )
+
+
+def test_the_case_that_actually_failed_on_the_work_laptop_is_now_flagged():
+    # The real failing path, verbatim from the licensed run.
+    failed = Path(
+        r"C:\Code\optics\nextnano\nonlinear_photonics\nextnano\results\demo_runs"
+        r"\09_three_level_nonlinear_optics_sweep\20260730T210612Z_52893f32\runs"
+        r"\design_02_wide_pair_"
+    )
+    assert sweeps.check_path_budget(failed) is not None
+    # ... and the shortened identifier the generator now produces fits.
+    fixed = failed.parent / "d02"
+    assert sweeps.check_path_budget(fixed) is None
+
+
+def test_grid_and_design_case_ids_stay_short():
+    config = _minimal_config()
+    grid = sweeps.grid_cases(
+        config,
+        {"center_barrier_nm": [2.0, 4.0], "aluminum_fraction": [0.2, 0.3, 0.4]},
+    )
+    designs = sweeps.design_list_cases(
+        config, [{"name": "a_very_long_descriptive_design_name", "center_barrier_nm": 3.0}]
+    )
+    for case in [*grid, *designs]:
+        assert len(case.case_id) <= 6, case.case_id
+    # The descriptive name is not lost, only moved off the filesystem.
+    assert designs[0].label == "a_very_long_descriptive_design_name"

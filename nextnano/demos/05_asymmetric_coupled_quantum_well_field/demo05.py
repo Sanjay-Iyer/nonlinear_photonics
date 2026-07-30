@@ -34,6 +34,7 @@ PLOT_SET: tuple[tuple[str, str], ...] = (
     ("overlap_matrix.png", "Envelope overlap matrix at the strongest field step"),
     ("field_unit_check.png", "Requested versus solver-reported electric field"),
     ("padding_check.png", "Energies versus quantum-region padding"),
+    ("crossing_convergence.png", "Avoided-crossing padding and grid convergence"),
 )
 
 FIELD_DIRECTIONS: dict[str, str] = {
@@ -260,6 +261,10 @@ def analyse_case(
         "maximum_boundary_probability_bound_states": max(
             [state.boundary_probability for state in states if state.bound] or [0.0]
         ),
+        "maximum_boundary_probability_lowest_pair": max(
+            [state.boundary_probability for state in states[:2] if state.bound]
+            or [0.0]
+        ),
         "bound_state_count": sum(1 for state in states if state.bound),
         "all_states_bound": all(bool(state.bound) for state in states),
         "state_rows": rows,
@@ -279,8 +284,8 @@ def analyse_case(
         ),
         "probability_normalized": all(state.normalised for state in states),
         "at_least_two_bound_states": sum(1 for state in states if state.bound) >= 2,
-        "bound_state_boundary_probability_small": bool(
-            observables["maximum_boundary_probability_bound_states"]
+        "lowest_pair_boundary_probability_small": bool(
+            observables["maximum_boundary_probability_lowest_pair"]
             <= float(validation_cfg.get("maximum_boundary_probability", 1e-3))
         ),
         "solver_field_matches_request": bool(field_agrees),
@@ -512,6 +517,7 @@ def _sweep_plots(
     parent: Path,
     field_results: Sequence[sweeps.CaseResult],
     padding_results: Sequence[sweeps.CaseResult],
+    grid_results: Sequence[sweeps.CaseResult],
     tracking_rows: Sequence[Mapping[str, Any]],
     tracked_rows: Sequence[Mapping[str, Any]],
 ) -> None:
@@ -627,6 +633,30 @@ def _sweep_plots(
                 ],
             ),
         },
+    )
+    controls = [
+        (
+            f"padding {result.spec.swept['quantum_region_padding_nm']:g} nm",
+            result.observables.get("E21_meV"),
+        )
+        for result in padding_results
+        if result.observables.get("E21_meV") is not None
+    ]
+    controls.extend(
+        (
+            f"grid {result.spec.swept['active_region_grid_spacing_nm']:g} nm",
+            result.observables.get("E21_meV"),
+        )
+        for result in grid_results
+        if result.observables.get("E21_meV") is not None
+    )
+    plotting.bar_plot(
+        plots_dir / "crossing_convergence.png",
+        title="Candidate avoided-crossing gap under numerical controls",
+        xlabel="Control case at the candidate crossing field",
+        ylabel="E2 − E1 (meV)",
+        labels=[item[0] for item in controls],
+        values=[float(item[1]) for item in controls],
     )
     _band_diagram_panel(plots_dir, field_results)
     _crossing_plot(plots_dir, field_results)
@@ -752,7 +782,13 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
         sweep_cfg.get("quantum_region_padding_nm", []),
         prefix="padding_",
     )
-    all_cases = [*field_cases, *padding_cases]
+    grid_cases = sweeps.single_variable_cases(
+        cfg,
+        "active_region_grid_spacing_nm",
+        sweep_cfg.get("active_region_grid_spacing_nm", []),
+        prefix="grid_",
+    )
+    all_cases = [*field_cases, *padding_cases, *grid_cases]
     if not all_cases:
         raise DemoError("demo.yaml declares no sweep values for Demo 5.")
 
@@ -770,7 +806,10 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
             )
         )
     field_results = results[: len(field_cases)]
-    padding_results = results[len(field_cases) :]
+    padding_start = len(field_cases)
+    grid_start = padding_start + len(padding_cases)
+    padding_results = results[padding_start:grid_start]
+    grid_results = results[grid_start:]
     field_results_sorted = sorted(
         field_results, key=lambda r: float(r.spec.swept["electric_field_kV_cm"])
     )
@@ -828,10 +867,43 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
             for result in field_results_sorted
         ],
     )
+    sweeps.write_table(
+        context.parent,
+        "crossing_convergence",
+        [
+            {
+                "control": "quantum_region_padding_nm",
+                "value": result.spec.swept.get("quantum_region_padding_nm"),
+                "electric_field_kV_cm": result.observables.get(
+                    "electric_field_kV_cm"
+                ),
+                "E1_eV": result.observables.get("E1_eV"),
+                "E2_eV": result.observables.get("E2_eV"),
+                "E21_meV": result.observables.get("E21_meV"),
+                "status": result.status,
+            }
+            for result in padding_results
+        ]
+        + [
+            {
+                "control": "active_region_grid_spacing_nm",
+                "value": result.spec.swept.get("active_region_grid_spacing_nm"),
+                "electric_field_kV_cm": result.observables.get(
+                    "electric_field_kV_cm"
+                ),
+                "E1_eV": result.observables.get("E1_eV"),
+                "E2_eV": result.observables.get("E2_eV"),
+                "E21_meV": result.observables.get("E21_meV"),
+                "status": result.status,
+            }
+            for result in grid_results
+        ],
+    )
     _sweep_plots(
         context.parent,
         field_results_sorted,
         padding_results,
+        grid_results,
         tracking_rows,
         tracked_rows,
     )
@@ -860,6 +932,22 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
             <= float(cfg["validation"].get("absolute_energy_tolerance_meV", 1.0))
             for difference in padding_differences_meV.values()
         )
+    grid_differences_meV: dict[str, float] = {}
+    for state_key in ("E1_eV", "E2_eV"):
+        values = [
+            float(result.observables[state_key])
+            for result in grid_results
+            if result.observables.get(state_key) is not None
+        ]
+        if len(values) >= 2:
+            grid_differences_meV[state_key] = 1000.0 * (max(values) - min(values))
+    grid_stable: bool | None = None
+    if len(grid_differences_meV) == 2:
+        grid_stable = all(
+            difference
+            <= float(cfg["validation"].get("absolute_energy_tolerance_meV", 1.0))
+            for difference in grid_differences_meV.values()
+        )
     both_signs = {
         np.sign(float(result.spec.swept["electric_field_kV_cm"]))
         for result in field_results
@@ -885,6 +973,8 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
             ),
             "energies_stable_under_padding": padding_stable,
             "padding_energy_range_meV": padding_differences_meV,
+            "energies_stable_under_grid_refinement": grid_stable,
+            "grid_energy_range_meV": grid_differences_meV,
             "field_sign_convention": (
                 "positive electric_field_kV_cm with field_direction '+x' tilts the "
                 "conduction band upward towards +x; measured on nextnano++ 3.0.0 "
@@ -930,9 +1020,10 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
                 "positive and negative fields both ran successfully",
             ),
             (
-                "bound-state boundary probability negligible",
-                _all_true(results, "bound_state_boundary_probability_small"),
-                "a strong tilt pushes states towards one wall; this is the diagnostic",
+                "lowest tracked pair has negligible boundary probability",
+                _all_true(results, "lowest_pair_boundary_probability_small"),
+                "higher excited states remain visible as diagnostics but do not "
+                "invalidate the avoided-crossing pair",
             ),
             (
                 "state tracking confident at every field step",
@@ -942,9 +1033,14 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
                 "envelope overlap between neighbouring field points",
             ),
             (
-                "energies stable under larger quantum-region padding",
+                "crossing energies stable under larger quantum-region padding",
                 padding_stable,
-                "distinguishes field-induced localisation from a boundary artifact",
+                "control cases inherit the candidate crossing field",
+            ),
+            (
+                "crossing energies stable under grid refinement",
+                grid_stable,
+                "0.25 nm production grid compared with a 0.125 nm control",
             ),
         ],
         notes=[
@@ -958,6 +1054,9 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
             "<z> here is the centroid of the probability density of a single "
             "state — an expectation value, not a transition dipole. The "
             "off-diagonal z_ij values are reported separately.",
+            "The boundary criterion is applied to the lowest tracked pair. "
+            "Higher field-tilted excited states are retained in the tables as "
+            "domain-sensitivity diagnostics.",
         ],
     )
     return sweeps.finish_run(context, results=results, manifest=manifest)

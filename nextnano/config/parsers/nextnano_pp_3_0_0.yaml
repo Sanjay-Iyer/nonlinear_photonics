@@ -174,36 +174,54 @@ artifacts:
   energy_spectrum_lh:
     pattern: "**/bias_*/Quantum/{region}/LH/energy_spectrum_k*.dat"
     required: false
-    confirmed: false
-    description: Light-hole one-band states; Free edition refuses LH, Standard-only.
+    confirmed: true
+    description: >-
+      Light-hole one-band states. Confirmed on the licensed laptop 2026-07-30
+      (Demo 7 model M3); the Free edition refuses LH.
 
   probabilities_lh:
     pattern: "**/bias_*/Quantum/{region}/LH/probabilities_k00000.dat"
     required: false
-    confirmed: false
+    confirmed: true
 
   energy_spectrum_kp6:
     pattern: "**/bias_*/Quantum/{region}/kp6/energy_spectrum_k*.dat"
     required: false
-    confirmed: false
+    confirmed: true
     description: >-
-      UNCONFIRMED. 6-band k.p spectrum. The band sub-directory name is the one
-      remaining unknown; the licensed run must confirm it (candidates seen in
-      nextnano documentation include kp6 and KP6).
+      6-band k.p spectrum. Sub-directory name `kp6` confirmed on the licensed
+      laptop 2026-07-30 (Demo 7 model M4).
 
   probabilities_kp6:
     pattern: "**/bias_*/Quantum/{region}/kp6/probabilities_k00000.dat"
     required: false
-    confirmed: false
+    confirmed: true
+
+  envelopes_kp6:
+    pattern: "**/bias_*/Quantum/{region}/kp6/envelopes_k00000_SXYZ.dat"
+    required: false
+    confirmed: true
+    description: >-
+      Multiband envelopes, resolved onto the S/X/Y/Z orbital basis. Note the
+      `_SXYZ` suffix: unlike the one-band case there is no plain
+      `envelopes_k00000.dat` for a k.p model.
 
   spinor_composition_kp6:
-    pattern: "**/bias_*/Quantum/{region}/kp6/spinor_composition_k00000*.dat"
+    pattern: "**/bias_*/Quantum/{region}/kp6/spinor_composition_k00000_CbHhLhSo.dat"
     required: false
-    confirmed: false
+    confirmed: true
     description: >-
-      UNCONFIRMED. Per-state HH/LH/SO weights from
-      output_states{ spinor_composition = yes }. Required to classify a hole
-      state as HH-like or LH-like instead of trusting its index.
+      Per-state CB/HH/LH/SO weights from output_states{ spinor_composition }.
+      This is the file that lets a hole state be classified by character rather
+      than by index. The solver writes TWO compositions -- this band-resolved
+      one and a `_SXYZ` orbital-resolved twin -- so a wildcard here would be
+      ambiguous and the band basis is named explicitly.
+
+  spinor_composition_kp6_orbital:
+    pattern: "**/bias_*/Quantum/{region}/kp6/spinor_composition_k00000_SXYZ.dat"
+    required: false
+    confirmed: true
+    description: S/X/Y/Z orbital-basis composition; the twin of the file above.
 
   energy_spectrum_kp8:
     pattern: "**/bias_*/Quantum/{region}/kp8/energy_spectrum_k*.dat"
@@ -218,7 +236,8 @@ artifacts:
   spinor_composition_kp8:
     pattern: "**/bias_*/Quantum/{region}/kp8/spinor_composition_k00000*.dat"
     required: false
-    confirmed: false
+    confirmed: true
+    description: "Licensed nextnano++ 3.0.0: no., s1, s2, x1, y1, z1, x2, y2, z2."
 
   occupation_gamma:
     pattern: "**/bias_*/Quantum/{region}/Gamma/occupation.dat"
@@ -284,15 +303,16 @@ artifacts:
     description: "Columns: i, j, |<i|j>|, |<i|j>|^2, <i|j>."
 
   transition_energies_gamma_kp6:
-    pattern: "**/bias_*/Quantum/{region}/Gamma_KP6/transition_energies_k00000.txt"
+    pattern: "**/bias_*/Quantum/{region}/Gamma_kp6/transition_energies_k00000.txt"
     required: false
-    confirmed: false
-    description: UNCONFIRMED. One-band Gamma to 6-band-valence transition energies.
+    confirmed: true
+    description: "Licensed nextnano++ 3.0.0: Gamma_i, kp6_j, Gamma_i-kp6_j[eV]."
 
   overlap_integrals_gamma_kp6:
-    pattern: "**/bias_*/Quantum/{region}/Gamma_KP6/overlap_integrals_k00000.txt"
+    pattern: "**/bias_*/Quantum/{region}/Gamma_kp6/overlap_integrals_k00000.txt"
     required: false
-    confirmed: false
+    confirmed: true
+    description: "Licensed nextnano++ 3.0.0 Gamma-to-kp6 envelope-overlap table."
 
   transition_energies_gamma_lh:
     pattern: "**/bias_*/Quantum/{region}/Gamma_LH/transition_energies_k00000.txt"
@@ -302,37 +322,76 @@ artifacts:
   transition_energies_kp8:
     pattern: "**/bias_*/Quantum/{region}/kp8_kp8/transition_energies_k00000.txt"
     required: false
-    confirmed: false
+    confirmed: true
     description: >-
-      UNCONFIRMED. Interband transitions inside the 8-band Hamiltonian. Note the
-      home measurement that momentum_matrix_elements over SEPARATE one-band
-      Gamma and HH solutions writes only Gamma_Gamma and HH_HH -- genuine
-      interband optical matrix elements require the coupled 8-band model.
+      Licensed nextnano++ 3.0.0. Contains every ordered kp8 state pair as
+      E_i-E_j, including zero diagonal entries and negative reverse entries.
 
   momentum_matrix_elements_kp8:
     pattern: "**/bias_*/Quantum/{region}/kp8_kp8/momentum_matrix_elements_k00000_{polarization}.txt"
     required: false
-    confirmed: false
+    confirmed: true
+    description: >-
+      Licensed nextnano++ 3.0.0 envelope-momentum table in hbar/nm. This is not
+      a substitute for the interband optical response from optics{quantum_spectra{}}.
 
   oscillator_strengths_kp8:
     pattern: "**/bias_*/Quantum/{region}/kp8_kp8/oscillator_strengths_k00000_{polarization}.txt"
     required: false
+    confirmed: true
+    description: >-
+      Licensed nextnano++ 3.0.0 oscillator-strength table paired with the
+      envelope-momentum request.
+
+  absorption_coefficient_quantum_spectra:
+    pattern: "**/bias_*/Quantum/**/absorption_coeff_*_{polarization}_eV.dat"
+    required: false
     confirmed: false
+    description: >-
+      Solver optical absorption from optics{quantum_spectra{}}. Official
+      nextnano++ examples use absorption_coeff_<region>_<polarization>_eV.dat
+      with energy in eV and absorption coefficient in cm^-1.
 
   # --- strain --------------------------------------------------------------
   hydrostatic_strain:
     pattern: "**/Strain/hydrostatic_strain.dat"
     required: false
-    confirmed: false
-    description: UNCONFIRMED. Written by strain{ output_hydrostatic_strain{} }.
+    confirmed: true
+    description: >-
+      Written by strain{ output_hydrostatic_strain{} }. Confirmed on the
+      licensed laptop 2026-07-30 (Demo 7 model M2).
 
   strain_tensor:
-    pattern: "**/Strain/strain_simulation_system.dat"
+    pattern: "**/Strain/strain_simulation.dat"
     required: false
-    confirmed: false
+    confirmed: true
     description: >-
-      UNCONFIRMED. Written by strain{ output_strain_tensor{ simulation_system = yes } }.
-      Confirm the file name and the component column order on the licensed laptop.
+      Strain tensor in the SIMULATION coordinate system, from
+      strain{ output_strain_tensor{ simulation_system = yes } }. Confirmed on
+      the licensed laptop 2026-07-30. The earlier guessed name
+      `strain_simulation_system.dat` was wrong and made Demo 7 fail loudly,
+      which is how the real name was obtained.
+
+  strain_tensor_crystal:
+    pattern: "**/Strain/strain_crystal.dat"
+    required: false
+    confirmed: true
+    description: >-
+      Strain tensor in the CRYSTAL coordinate system. For growth along a cube
+      axis the two systems coincide; they differ for a tilted growth direction,
+      which is why both are kept and named separately.
+
+  lattice_constants:
+    pattern: "**/Structure/lattice_constants.dat"
+    required: false
+    confirmed: true
+    description: Written by strain{ output_lattice_constants{} }.
+
+  bandgap:
+    pattern: "**/bias_*/bandgap.dat"
+    required: false
+    confirmed: true
+    description: Written by classical{ output_bandgap{} }.
 
   # --- 2D ------------------------------------------------------------------
   bandedges_2d:

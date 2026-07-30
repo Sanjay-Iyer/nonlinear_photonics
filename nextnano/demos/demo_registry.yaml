@@ -86,7 +86,7 @@ demos:
 
   04_symmetric_double_quantum_well:
     title: Symmetric double quantum well and tunnelling
-    status: licensed_run_pending
+    status: physically_validated
     depends_on: [02_one_band_finite_quantum_well, 03_quantum_well_convergence]
     introduces:
       - two coupled identical wells and a tunnelling barrier
@@ -94,16 +94,23 @@ demos:
       - per-well localisation and overlap-based state tracking
     home_syntax_check: parsed_free_3_0_0
     home_solver_check: executed_free_3_0_0_reduced_grid
-    licensed_validation: {}
-    pending_licensed_checks:
-      - Execute the full centre-barrier sweep at production grid spacing.
-      - Confirm E2-E1 decreases monotonically with centre-barrier thickness.
-      - Confirm the two lowest states are balanced between identical wells.
+    licensed_validation:
+      date: "2026-07-30"
+      solver: "nextnano++ 3.0.0"
+      run_id: "20260730T205056Z_56b2b6c0"
+      evidence: >-
+        All 11 production-grid cases completed with no solver failures.
+        The symmetric/antisymmetric splitting decreased monotonically from
+        35.2928 meV at a 1 nm centre barrier to 6.1312e-5 meV at 20 nm.
+        The lowest pair retained symmetric/antisymmetric parity with left/right
+        imbalance below 2.1e-9, while E1 and E2 changed by only 3.28e-5 and
+        4.21e-5 meV when the quantum-region padding doubled.
+    pending_licensed_checks: []
     unvalidated_syntax: []
 
   05_asymmetric_coupled_quantum_well_field:
     title: Asymmetric coupled quantum well with electric-field tuning
-    status: licensed_run_pending
+    status: parser_passed
     depends_on: [04_symmetric_double_quantum_well]
     introduces:
       - structural asymmetry between the two wells
@@ -111,7 +118,19 @@ demos:
       - field-driven localisation, avoided crossings, dipole <z>
     home_syntax_check: parsed_free_3_0_0
     home_solver_check: executed_free_3_0_0_reduced_grid
-    licensed_validation: {}
+    licensed_validation:
+      date: "2026-07-30"
+      solver: "nextnano++ 3.0.0"
+      run_id: "20260730T205153Z_6523ef84"
+      evidence: >-
+        All 19 cases completed and real Standard output parsed successfully.
+        The requested field, electric_field.dat, potential slope, and band-edge
+        tilt agreed across both polarities. Envelope-overlap state tracking was
+        confident and one candidate avoided crossing was found near -35 kV/cm.
+        At -75 and -100 kV/cm a higher excited state exceeded the boundary
+        threshold, while the lowest tracked pair remained below 8e-6. The core
+        crossing still requires the newly added padding/grid controls before
+        physical validation.
     pending_licensed_checks:
       - Re-confirm on Standard that poisson{ electric_field{ strength } } is V/m.
       - Re-confirm the sign convention (positive strength along +x raises Ec with x).
@@ -128,11 +147,23 @@ demos:
       - staged A-E progression to self-consistent quantum-Poisson
     home_syntax_check: parsed_free_3_0_0
     home_solver_check: executed_free_3_0_0_reduced_grid
-    licensed_validation: {}
+    licensed_validation:
+      date: "2026-07-30"
+      solver: "nextnano++ 3.0.0"
+      evidence: >-
+        all 11 cases executed, none failed. Stage B bent the conduction band
+        66.5 meV more than the undoped Stage A; self-consistency (D) shifted E1
+        by 18.7 meV relative to the non-self-consistent D->C comparison; the
+        doping sweep raised the sheet density 2.9e11 -> 1.67e12 cm^-2 and the
+        occupied subband count 2 -> 3, with charge balancing to better than
+        2e-12 relative at every point. Two configuration bugs were found and
+        fixed: an unreachable solver residual criterion, and outer barriers too
+        thin for the third state at high doping.
     pending_licensed_checks:
-      - Confirm the coupled loop converges below tolerance without hitting the cap.
-      - Confirm integrated charge balance between electrons and ionized donors.
-      - Confirm band bending is attributable to doping and not to the contact.
+      - Re-run with solver_residual_density_cm2 = 1e3 and confirm the coupled
+        loop now reports convergence before the iteration cap.
+      - Re-run with 30 nm outer barriers and confirm the third bound state's
+        boundary probability drops below 1e-3 at 1e19 cm^-3.
     unvalidated_syntax: []
 
   07_strained_ingaas_gaas_6band:
@@ -145,19 +176,29 @@ demos:
       - 6-band valence k.p and component-weight state classification
     home_syntax_check: parsed_free_3_0_0
     home_solver_check: refused_free_edition_no_strain_no_kp
-    licensed_validation: {}
+    licensed_validation:
+      date: "2026-07-30"
+      solver: "nextnano++ 3.0.0"
+      evidence: >-
+        every deck was accepted and executed (all wrote job_done.txt), but 13 of
+        14 cases then failed in this repository's parser because the guessed
+        strain filename was wrong. The error listing established the real names:
+        Strain/strain_simulation.dat and strain_crystal.dat, kp6/ as the 6-band
+        sub-directory, spinor_composition_k00000_CbHhLhSo.dat alongside an
+        _SXYZ twin, and envelopes_k00000_SXYZ.dat. Those are now confirmed in
+        the parser profile. No physics has been checked yet.
     pending_licensed_checks:
-      - Confirm the strain output file names and component column order.
-      - Confirm the 6-band output sub-directory name and spinor-composition file.
-      - Confirm strain is genuinely disabled in the no-strain baseline model.
+      - Re-run with the corrected parser profile and confirm all 14 cases parse.
+      - Confirm the component column order inside strain_simulation.dat.
+      - Confirm the column layout of spinor_composition_k00000_CbHhLhSo.dat.
+      - Confirm HH and LH are degenerate in M1 and split in M2.
     unvalidated_syntax:
-      - strain{ output_strain_tensor{} } output file names and column order
-      - quantum{ region{ kp_6band{} } } output sub-directory name
-      - output_states{ spinor_composition = yes } file name and column order
+      - the component column order inside Strain/strain_simulation.dat
+      - the column layout inside spinor_composition_k00000_CbHhLhSo.dat
 
   08_eight_band_interband_optics:
     title: Eight-band k.p interband optical transitions
-    status: licensed_run_pending
+    status: solver_passed
     depends_on: [07_strained_ingaas_gaas_6band]
     introduces:
       - 8-band k.p with coupled conduction and valence bands
@@ -165,16 +206,28 @@ demos:
       - selection rules and symmetry-suppressed transitions
     home_syntax_check: parsed_free_3_0_0
     home_solver_check: refused_free_edition_no_kp
-    licensed_validation: {}
+    licensed_validation:
+      date: "2026-07-30"
+      solver_version: "nextnano++ 3.0.0"
+      solver_cases_completed: 13
+      parser_result: >-
+        Original parser failed after solver completion because [eV] was
+        separated from the transition column name as unit metadata.
+      confirmed_paths:
+        - Quantum/qw/Gamma_HH
+        - Quantum/qw/Gamma_kp6
+        - Quantum/qw/kp8
+        - Quantum/qw/kp8_kp8
+      scientific_finding: >-
+        KP8 momentum_matrix_elements are envelope-momentum diagnostics; the
+        TE_inplane component was identically zero and cannot substitute for
+        the interband optical response.
     pending_licensed_checks:
-      - Confirm the 8-band output sub-directory and matrix-element file names.
-      - Confirm which polarisation vector corresponds to TE and to TM.
+      - Rerun with optics{ quantum_spectra{} } and confirm absorption output paths.
+      - Confirm nonzero TE/TM solver absorption in cm^-1.
       - Confirm k-parallel sampling converges the spectrum.
     unvalidated_syntax:
-      - transition_energies{ Gamma_KP6{} } and overlap_integrals{ Gamma_KP6{} } output directory names
-      - quantum{ region{ kp_8band{} } } output sub-directory name
-      - momentum_matrix_elements{ KP8{} } output file names
-      - transition_energies{ KP8{} } output file names
+      - optics{ quantum_spectra{} } absorption output filename in nextnano++ 3.0.0
 
   09_three_level_nonlinear_optics_sweep:
     title: Automated three-level nonlinear-optics design sweep
@@ -188,11 +241,23 @@ demos:
       - a documented RELATIVE design metric that is explicitly not chi(2)
     home_syntax_check: parsed_free_3_0_0
     home_solver_check: executed_free_3_0_0_reduced_grid
-    licensed_validation: {}
+    licensed_validation:
+      date: "2026-07-30"
+      solver: "nextnano++ 3.0.0"
+      evidence: >-
+        12 of 24 cases completed and every validation criterion passed on them,
+        including the solver-dipole versus envelope-integral cross-check and the
+        refined-mesh reruns (E21 moved 0.06 meV; the relative metric moved 0.2%
+        and 1.5%). The other 12 died with exit code 4294967295 purely because
+        their case directory names pushed the output path past the 259-character
+        Windows limit -- one failing case had parameters identical to a case
+        that succeeded. Case identifiers have been shortened and the path-budget
+        constant recalibrated against the measured 104-character output tail.
     pending_licensed_checks:
-      - Confirm solver dipole matrix elements agree with the envelope-derived z_ij.
-      - Confirm top candidates survive their high-resolution convergence reruns.
+      - Re-run with the shortened case identifiers and confirm all 24 complete.
       - Confirm no ranked candidate carries an exclusion reason.
+      - Investigate why 8 of the 12 successful candidates were excluded from the
+        ranking (likely the E21/E32 constraint window).
     unvalidated_syntax: []
 
   10_first_2d_quantum_confinement:

@@ -131,6 +131,29 @@ see `nextnano/demos/demo_registry.yaml`.
 
 - **Home, syntax:** all 14 generated decks parse cleanly under Free
   nextnano++ 3.0.0 `--parse`.
+### First licensed run, 2026-07-30 — 13 of 14 cases failed on a filename
+
+Every deck was **accepted and executed** by the solver (all wrote
+`job_done.txt`). All but the unstrained baseline then failed in *this
+repository's parser*, because the guessed strain filename was wrong. The failure
+message listed the files that were actually written, which is how the real
+names were obtained:
+
+| guessed | actual |
+|---|---|
+| `Strain/strain_simulation_system.dat` | **`Strain/strain_simulation.dat`** (plus `strain_crystal.dat`) |
+| `kp6/spinor_composition_k00000*.dat` | **`kp6/spinor_composition_k00000_CbHhLhSo.dat`** (plus an `_SXYZ` twin — the wildcard would have been ambiguous) |
+| `kp6/` sub-directory | `kp6/` — correct |
+| `kp6/envelopes_k00000.dat` | **`kp6/envelopes_k00000_SXYZ.dat`** |
+
+`Quantum/qw/LH/`, `Structure/lattice_constants.dat`, and `bias_00000/bandgap.dat`
+were also confirmed. All of these are now `confirmed: true` in the parser
+profile, and the 8-band patterns have been re-based on the observed `kp6`
+convention (still unconfirmed until Demo 8 runs).
+
+This is the designed failure mode working: a wrong guess produced a loud,
+actionable error rather than a wrong number, and the fix was one YAML file.
+
 - **Home, execution: impossible.** The Free edition refuses both strain
   (`does not allow importing or computing strain`) and every k·p model
   (`does not allow running k.p quantum mechanics`). There is therefore **no

@@ -156,6 +156,34 @@ Parent: `sweep_manifest.json`, `validation_report.md`,
   production mesh, the convergence reruns, and confirmation that no ranked
   candidate carries an exclusion reason.
 
+### First licensed run, 2026-07-30 — 12 of 24 cases killed by Windows path length
+
+The 10 single-variable cases, both convergence reruns, ran perfectly. All 9 grid
+cases and all 3 design cases died with exit code 4294967295, leaving
+`job_running.txt` behind and no matrix-element files.
+
+It was not physics: `grid_005` had *identical* parameters to `f_03`, which
+succeeded. It was the case directory name. `grid_007_www10p0_efm20p0` pushed
+
+```
+.../runs/<case>/raw_output/case/bias_00000/Quantum/cqw/Gamma_Gamma/dipole_moment_matrix_elements_k00000_growth_x.txt
+```
+
+past the 259-character Windows limit, and the solver died precisely while
+writing that file. The path-budget guard *did* warn beforehand; it just did not
+prevent the run. Fixed by:
+
+- grid and design case directories are now `g001…`, `d01…` (values live in
+  `parameters.csv`, the manifest, and the label, not in the filesystem);
+- the budget constant is calibrated against the measured 104-character tail
+  instead of a guessed 90;
+- a solver failure that follows a budget warning now says so in the failure
+  reason instead of only reporting an opaque exit code.
+
+What did run was healthy. The refined-mesh reruns moved E21 by 0.06 meV and the
+metric by 0.2 % and 1.5 %, and every validation criterion passed — including the
+dipole/envelope cross-check.
+
 ## Work-laptop checklist
 
 ```bash

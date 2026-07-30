@@ -14,10 +14,13 @@ eigenproblems.  Only the coupled 8-band Hamiltonian puts conduction and valence
 states in the same problem, which is where an interband momentum matrix element
 can come from at all.
 
-The spectrum produced here is **post-processed** from transition energies and
-oscillator strengths with a Lorentzian lineshape.  It is a relative lineshape in
-arbitrary units, not an absorption coefficient: no carrier density, no
-confinement factor, no refractive index, and no absolute normalisation enters.
+Licensed testing established that ``quantum{momentum_matrix_elements{KP8{}}}``
+writes the *envelope* momentum operator in hbar/nm. For a 1D structure its
+in-plane component is identically zero, so it is not the interband optical
+response. The actual absorption spectrum must come from
+``optics{quantum_spectra{}}``, which includes the Bloch/Kane contribution and
+reports an absorption coefficient in cm^-1. The envelope-momentum tables are
+retained only as diagnostics.
 """
 
 from __future__ import annotations
@@ -42,19 +45,15 @@ PLOT_SET: tuple[tuple[str, str], ...] = (
     ("electron_hole_overlap.png", "Electron–hole wavefunction overlap"),
     ("matrix_element_heatmap.png", "Transition matrix-element map"),
     ("polarization_resolved_strengths.png", "Polarisation-resolved strengths"),
-    ("spectrum.png", "Post-processed relative transition spectrum"),
+    ("spectrum.png", "Solver interband absorption spectrum"),
     ("spectrum_symmetry_broken.png", "Symmetric versus symmetry-broken spectrum"),
-    ("oscillator_strength_vs_field.png", "Oscillator strength versus field"),
+    ("absorption_vs_field.png", "Peak solver absorption versus field"),
     ("k_convergence.png", "Spectral convergence with in-plane k sampling"),
     ("spectral_resolution_check.png", "Spectrum under two spectral resolutions"),
 )
 
 UNVALIDATED_SYNTAX: tuple[str, ...] = (
-    "Gamma_KP6 transition/overlap output directory name",
-    "quantum{ region{ kp_8band{} } } output sub-directory name",
-    "momentum_matrix_elements{ KP8{} } output file names",
-    "transition_energies{ KP8{} } output file names",
-    "the mapping from a named polarization vector to TE/TM in the output file name",
+    "optics{ quantum_spectra{} } absorption output file location in nextnano++ 3.0.0",
 )
 
 SPECTRUM_UNITS = "arbitrary (relative lineshape; NOT an absorption coefficient)"
@@ -211,6 +210,57 @@ def render_values(cfg: Mapping[str, Any]) -> dict[str, Any]:
         )
     optical_block = "\n".join(lines) + "\n" if lines else ""
 
+    # The quantum-region matrix-element request above is diagnostic. For kp8,
+    # the physical interband response is computed by the dedicated optical
+    # solver, which includes the Bloch/Kane contribution.
+    if band_model == "kp8" and optics == "matrix_elements":
+        polarization_lines = "\n".join(
+            f'        polarization{{ name = "{name}"  re = {vector} }}'
+            for name, vector in polarizations(cfg).items()
+        )
+        energy_min = float(numerical["spectral_energy_min_eV"])
+        energy_max = float(numerical["spectral_energy_max_eV"])
+        spectral_points = int(numerical["spectral_points"])
+        energy_resolution = (energy_max - energy_min) / (spectral_points - 1)
+        broadening_eV = float(numerical["broadening_meV"]) / 1000.0
+        quantum_spectra_block = (
+            "\noptics{\n"
+            "    quantum_spectra{\n"
+            f'        name = "{region_name(cfg)}"\n'
+            "        interband = yes\n"
+            "        intraband = no\n"
+            "        enable_hole_hole = no\n"
+            "        enable_electron_hole = yes\n"
+            "        enable_electron_electron = no\n"
+            "        occupation_ignore = yes\n"
+            "        classify_states = yes\n"
+            "        k_integration{\n"
+            f"            num_points = {int(numerical['k_parallel_num_points'])}\n"
+            f"            relative_size = {float(numerical['k_parallel_relative_size']):.9g}\n"
+            "        }\n"
+            f"{polarization_lines}\n"
+            f"        min_energy = {energy_min:.9g}\n"
+            f"        max_energy = {energy_max:.9g}\n"
+            f"        energy_resolution = {energy_resolution:.9g}\n"
+            f"        energy_broadening_lorentzian = {broadening_eV:.9g}\n"
+            "        absorption = yes\n"
+            "        spontaneous_emission = no\n"
+            "        output_energies = yes\n"
+            "        output_transitions = yes\n"
+            "        output_spinor_components = yes\n"
+            "        output_spectra{\n"
+            "            im_epsilon = yes\n"
+            "            absorption_coeff = yes\n"
+            "            spectra_over_energy = yes\n"
+            "        }\n"
+            "    }\n"
+            "}\n"
+        )
+        run_optics_block = "    optics{}\n"
+    else:
+        quantum_spectra_block = ""
+        run_optics_block = ""
+
     field_kV_cm = float(scientific["electric_field_kV_cm"])
     if abs(field_kV_cm) > 0:
         poisson_block = (
@@ -241,6 +291,8 @@ def render_values(cfg: Mapping[str, Any]) -> dict[str, Any]:
         "optical_block": optical_block,
         "output_state_count": max(electrons, holes),
         "poisson_block": poisson_block,
+        "quantum_spectra_block": quantum_spectra_block,
+        "run_optics_block": run_optics_block,
     }
 
 
@@ -260,7 +312,7 @@ def lorentzian_spectrum(
 ) -> tuple[np.ndarray, np.ndarray]:
     """Sum of Lorentzians, one per transition, in arbitrary relative units.
 
-    ``broadening_meV`` is the half width at half maximum of each line. It stands
+    ``broadening_meV`` is the full width at half maximum of each line. It stands
     in for every homogeneous and inhomogeneous broadening mechanism the
     calculation does not contain -- dephasing, phonons, interface roughness,
     well-width fluctuation -- lumped into a single phenomenological number. It is
@@ -274,7 +326,7 @@ def lorentzian_spectrum(
     if broadening_meV <= 0:
         raise DemoError("broadening_meV must be positive.")
     grid = np.linspace(float(minimum_eV), float(maximum_eV), int(points))
-    gamma = float(broadening_meV) / 1000.0
+    gamma = 0.5 * float(broadening_meV) / 1000.0
     spectrum = np.zeros_like(grid)
     for energy, strength in zip(energies_eV, strengths):
         if not (math.isfinite(float(energy)) and math.isfinite(float(strength))):
@@ -409,20 +461,78 @@ def analyse_case(
         "kp6": "transition_energies_gamma_kp6",
         "kp8": "transition_energies_kp8",
     }[band_model]
-    transitions = _matrix_table(profile, raw, region, transition_key)
+    resolved = outputs.resolve_outputs(
+        profile, raw, [transition_key], substitutions={"region": region}
+    )
+    transition_paths = resolved.many(transition_key)
+    transitions = (
+        outputs.read_matrix_elements(transition_paths[0])
+        if transition_paths
+        else None
+    )
     if transitions is None:
-        resolved = outputs.resolve_outputs(
-            profile, raw, [transition_key], substitutions={"region": region}
-        )
         outputs.require_or_diagnose(
             resolved, raw, [transition_key], why="transition_energies{} was requested"
         )
     assert transitions is not None
-    energy_column = outputs.first_value_column(transitions, contains="[eV]")
-    transition_rows = [
-        {"electron": i, "hole": j, "transition_energy_eV": values[energy_column]}
-        for (i, j), values in sorted(transitions.items())
-    ]
+    energy_column = outputs.value_column_with_unit(transition_paths[0], unit="eV")
+    if band_model == "kp8":
+        spectrum_resolved = outputs.resolve_outputs(
+            profile,
+            raw,
+            ["energy_spectrum_kp8"],
+            substitutions={"region": region},
+        )
+        spectrum_path = spectrum_resolved.one("energy_spectrum_kp8")
+        state_numbers, state_energies = outputs.read_state_table(spectrum_path)
+        # Match the solver's documented classify_states rule: states above the
+        # midpoint between the minimum conduction edge and maximum valence edge
+        # are electron-like. This removes diagonal, reverse, electron-electron,
+        # and hole-hole rows from the all-pairs KP8 table.
+        midpoint_eV = 0.5 * (
+            float(np.min(band["conduction_eV"]))
+            + float(
+                max(
+                    np.max(band["heavy_hole_eV"]),
+                    np.max(band["light_hole_eV"]),
+                    np.max(band["split_off_eV"]),
+                )
+            )
+        )
+        electron_states = {
+            int(round(number))
+            for number, energy in zip(state_numbers, state_energies)
+            if float(energy) > midpoint_eV
+        }
+        hole_states = {
+            int(round(number))
+            for number, energy in zip(state_numbers, state_energies)
+            if float(energy) <= midpoint_eV
+        }
+        transition_rows = [
+            {
+                "electron": i,
+                "hole": j,
+                "transition_energy_eV": float(values[energy_column]),
+            }
+            for (i, j), values in sorted(transitions.items())
+            if i in electron_states
+            and j in hole_states
+            and float(values[energy_column]) > 0.0
+        ]
+        observables["kp8_classification_midpoint_eV"] = midpoint_eV
+        observables["kp8_electron_states"] = sorted(electron_states)
+        observables["kp8_hole_states"] = sorted(hole_states)
+    else:
+        transition_rows = [
+            {
+                "electron": i,
+                "hole": j,
+                "transition_energy_eV": float(values[energy_column]),
+            }
+            for (i, j), values in sorted(transitions.items())
+            if float(values[energy_column]) > 0.0
+        ]
     observables["transition_count"] = len(transition_rows)
     observables["transition_energies_eV"] = [
         row["transition_energy_eV"] for row in transition_rows
@@ -478,16 +588,6 @@ def analyse_case(
             }
         momentum = _matrix_table(profile, raw, region, momentum_key, polarization=name)
         if momentum:
-            try:
-                momentum_column = outputs.first_value_column(
-                    momentum, contains="hbar/nm"
-                )
-            except outputs.ParserError:
-                momentum_column = outputs.first_value_column(momentum)
-            momentum_by_polarization[name] = {
-                key: abs(float(values[momentum_column]))
-                for key, values in momentum.items()
-            }
             resolved = outputs.resolve_outputs(
                 profile,
                 raw,
@@ -496,6 +596,11 @@ def analyse_case(
             )
             paths = resolved.many(momentum_key)
             if paths:
+                momentum_column = outputs.magnitude_column(paths[0], unit="hbar/nm")
+                momentum_by_polarization[name] = {
+                    key: abs(float(values[momentum_column]))
+                    for key, values in momentum.items()
+                }
                 momentum_units[name] = ";".join(
                     f"{column}={unit}"
                     for column, unit in outputs.matrix_element_units(paths[0]).items()
@@ -510,14 +615,18 @@ def analyse_case(
 
     for name, table in strengths_by_polarization.items():
         for row in transition_rows:
-            row[f"oscillator_strength_{name}"] = table.get(
-                (int(row["electron"]), int(row["hole"]))
-            )
+            electron = int(row["electron"])
+            hole = int(row["hole"])
+            # nextnano writes f(i,j) with the sign of E_j-E_i. Absorption is
+            # the positive valence->conduction orientation (hole, electron).
+            key = (hole, electron) if band_model == "kp8" else (electron, hole)
+            row[f"oscillator_strength_{name}"] = table.get(key)
     for name, table in momentum_by_polarization.items():
         for row in transition_rows:
-            row[f"momentum_magnitude_{name}"] = table.get(
-                (int(row["electron"]), int(row["hole"]))
-            )
+            electron = int(row["electron"])
+            hole = int(row["hole"])
+            key = (hole, electron) if band_model == "kp8" else (electron, hole)
+            row[f"momentum_magnitude_{name}"] = table.get(key)
 
     observables["transition_rows"] = transition_rows
     observables["overlap_rows"] = [
@@ -539,8 +648,8 @@ def analyse_case(
             },
         )
 
-    # --- post-processed spectrum ---------------------------------------------
-    spectra: dict[str, list[float]] = {}
+    # --- diagnostic lineshape and solver optical spectrum --------------------
+    diagnostic_spectra: dict[str, list[float]] = {}
     fraction = float(analysis_cfg.get("strong_transition_fraction", 0.10))
     for name in strengths_by_polarization:
         pairs = [
@@ -558,8 +667,8 @@ def analyse_case(
             points=int(numerical["spectral_points"]),
             broadening_meV=float(numerical["broadening_meV"]),
         )
-        spectra[name] = spectrum.tolist()
-        spectra.setdefault("photon_energy_eV", grid.tolist())
+        diagnostic_spectra[name] = spectrum.tolist()
+        diagnostic_spectra.setdefault("photon_energy_eV", grid.tolist())
         strongest = max(abs(float(pair[1])) for pair in pairs)
         observables[f"strong_transition_count_{name}"] = sum(
             1 for pair in pairs if abs(float(pair[1])) >= fraction * strongest
@@ -568,23 +677,87 @@ def analyse_case(
         observables[f"suppressed_transition_count_{name}"] = sum(
             1 for pair in pairs if abs(float(pair[1])) < fraction * strongest
         )
-    if spectra:
+    if diagnostic_spectra:
         write_json_atomically(
-            extracted / "spectrum.json",
+            extracted / "diagnostic_envelope_momentum_lineshape.json",
             {
                 "units": SPECTRUM_UNITS,
                 "broadening_meV": float(numerical["broadening_meV"]),
-                "lineshape": "Lorentzian, HWHM = broadening_meV",
+                "lineshape": "Lorentzian, FWHM = broadening_meV",
                 "caveat": (
-                    "Post-processed from transition energies and oscillator "
-                    "strengths. No carrier density, refractive index, confinement "
-                    "factor, or absolute normalisation. Not an absorption "
-                    "coefficient and not in cm^-1."
+                    "Diagnostic only. The quantum-region KP8 momentum output is "
+                    "the envelope momentum operator, not the full interband "
+                    "Bloch/Kane optical response. Do not compare this curve to "
+                    "an absorption spectrum."
                 ),
-                **spectra,
+                **diagnostic_spectra,
             },
         )
-        observables["spectrum_units"] = SPECTRUM_UNITS
+
+    solver_spectra: dict[str, list[float]] = {}
+    absorption_paths: dict[str, str] = {}
+    if band_model == "kp8":
+        for name in polarizations(cfg):
+            resolved_absorption = outputs.resolve_outputs(
+                profile,
+                raw,
+                ["absorption_coefficient_quantum_spectra"],
+                substitutions={"region": region, "polarization": name},
+            )
+            paths = resolved_absorption.many(
+                "absorption_coefficient_quantum_spectra"
+            )
+            if not paths:
+                continue
+            table = outputs.read_table(paths[0])
+            if table.n_columns < 2:
+                raise outputs.ParserError(
+                    f"{paths[0]}: expected photon energy and absorption coefficient."
+                )
+            energy = table.column(0)
+            absorption = table.column(1)
+            if "photon_energy_eV" in solver_spectra and not np.allclose(
+                np.asarray(solver_spectra["photon_energy_eV"]),
+                energy,
+                rtol=0.0,
+                atol=1e-12,
+            ):
+                raise outputs.ParserError(
+                    "polarization-resolved absorption files use different energy grids."
+                )
+            solver_spectra.setdefault("photon_energy_eV", energy.tolist())
+            solver_spectra[name] = absorption.tolist()
+            absorption_paths[name] = str(paths[0])
+            write_csv(
+                extracted / f"absorption_{name}.csv",
+                {
+                    "photon_energy_eV": energy,
+                    "absorption_coefficient_cm-1": absorption,
+                },
+            )
+            observables[f"peak_absorption_cm-1_{name}"] = float(
+                np.max(absorption)
+            )
+        if solver_spectra:
+            write_csv(
+                extracted / "absorption_spectrum.csv",
+                {
+                    name: np.asarray(values)
+                    for name, values in solver_spectra.items()
+                },
+            )
+            write_json_atomically(
+                extracted / "absorption_spectrum.json",
+                {
+                    "units": "cm^-1",
+                    "source": "nextnano++ optics{quantum_spectra{}}",
+                    **solver_spectra,
+                },
+            )
+            observables["spectrum_units"] = "cm^-1 (nextnano++ quantum_spectra)"
+            observables["absorption_source_files"] = absorption_paths
+
+    spectra = solver_spectra or diagnostic_spectra
 
     log_checks = outputs.scan_log_markers(
         outputs.solver_log_text(raw),
@@ -601,9 +774,33 @@ def analyse_case(
         math.isfinite(float(row["transition_energy_eV"])) for row in transition_rows
     )
     if band_model == "kp8":
-        validation["interband_matrix_elements_present"] = bool(strengths_by_polarization)
+        validation["envelope_momentum_diagnostics_present"] = bool(
+            strengths_by_polarization
+        )
+        expected_polarizations = set(polarizations(cfg))
+        found_polarizations = set(solver_spectra) - {"photon_energy_eV"}
+        validation["solver_absorption_present"] = (
+            found_polarizations == expected_polarizations
+        )
+        validation["solver_absorption_finite"] = bool(solver_spectra) and all(
+            np.isfinite(np.asarray(values, dtype=float)).all()
+            for name, values in solver_spectra.items()
+            if name != "photon_energy_eV"
+        )
+        validation["solver_absorption_nonzero"] = bool(solver_spectra) and any(
+            float(np.max(np.abs(np.asarray(values, dtype=float)))) > 0.0
+            for name, values in solver_spectra.items()
+            if name != "photon_energy_eV"
+        )
 
-    _per_case_plots(cfg, model, transition_rows, spectra, plots_dir)
+    _per_case_plots(
+        cfg,
+        model,
+        transition_rows,
+        spectra,
+        plots_dir,
+        solver_absorption=bool(solver_spectra),
+    )
     return observables, validation
 
 
@@ -613,6 +810,8 @@ def _per_case_plots(
     transition_rows: Sequence[Mapping[str, Any]],
     spectra: Mapping[str, Sequence[float]],
     plots_dir: Path,
+    *,
+    solver_absorption: bool = False,
 ) -> None:
     if not cfg["outputs"].get("write_plots", True):
         return
@@ -625,9 +824,17 @@ def _per_case_plots(
         }
         plotting.line_plot(
             plots_dir / "spectrum.png",
-            title=f"Relative transition spectrum ({label}) — arbitrary units",
+            title=(
+                f"Solver interband absorption ({label})"
+                if solver_absorption
+                else f"Diagnostic envelope-momentum lineshape ({label})"
+            ),
             xlabel="Photon energy (eV)",
-            ylabel="Relative strength (arb. u., NOT an absorption coefficient)",
+            ylabel=(
+                "Absorption coefficient (cm$^{-1}$)"
+                if solver_absorption
+                else "Diagnostic strength (arb. u.; not absorption)"
+            ),
             series=series,
             markers=False,
         )
@@ -753,6 +960,12 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
                 "suppressed_TE": result.observables.get(
                     "suppressed_transition_count_TE_inplane"
                 ),
+                "peak_absorption_TM_cm-1": result.observables.get(
+                    "peak_absorption_cm-1_TM_growth"
+                ),
+                "peak_absorption_TE_cm-1": result.observables.get(
+                    "peak_absorption_cm-1_TE_inplane"
+                ),
                 "status": result.status,
             }
             for result in results[:model_count]
@@ -772,8 +985,11 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
                 "suppressed_TM": result.observables.get(
                     "suppressed_transition_count_TM_growth"
                 ),
-                "strongest_TE": result.observables.get(
-                    "strongest_oscillator_strength_TE_inplane"
+                "peak_absorption_TE_cm-1": result.observables.get(
+                    "peak_absorption_cm-1_TE_inplane"
+                ),
+                "peak_absorption_TM_cm-1": result.observables.get(
+                    "peak_absorption_cm-1_TM_growth"
                 ),
                 "status": result.status,
             }
@@ -806,10 +1022,11 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
         },
         extra={
             "model_count": model_count,
-            "spectrum_units": SPECTRUM_UNITS,
+            "spectrum_units": "cm^-1",
             "spectrum_method": (
-                "post-processed Lorentzian sum over transition energies weighted "
-                "by oscillator strength; not a solver absorption calculation"
+                "nextnano++ optics{quantum_spectra{}} Fermi-golden-rule "
+                "interband absorption; envelope-momentum lineshape retained "
+                "separately as a diagnostic only"
             ),
             "interband_requires_eight_bands": (
                 "measured at home: momentum_matrix_elements over separate one-band "
@@ -841,9 +1058,14 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
                 "energy alone never establishes that a transition is strong",
             ),
             (
-                "interband matrix elements exist in the 8-band model",
-                _all_true(results, "interband_matrix_elements_present"),
-                "separate one-band solves cannot produce them at all",
+                "solver interband absorption exists and is nonzero in the 8-band model",
+                (
+                    _all_true(results, "solver_absorption_present")
+                    and _all_true(results, "solver_absorption_finite")
+                    and _all_true(results, "solver_absorption_nonzero")
+                ),
+                "physical interband optics comes from optics{quantum_spectra{}}, "
+                "not the envelope-momentum table",
             ),
             (
                 "matrix-element units recorded from the file headers",
@@ -910,17 +1132,17 @@ def _sweep_plots(
         ys: list[float] = []
         for result in results:
             field = result.spec.swept.get("electric_field_kV_cm")
-            value = result.observables.get(f"strongest_oscillator_strength_{name}")
+            value = result.observables.get(f"peak_absorption_cm-1_{name}")
             if field is None or value is None:
                 continue
             xs.append(float(field))
             ys.append(float(value))
         field_series[name] = (xs, ys)
     plotting.line_plot(
-        plots_dir / "oscillator_strength_vs_field.png",
-        title="Strongest oscillator strength versus electric field",
+        plots_dir / "absorption_vs_field.png",
+        title="Peak solver absorption versus electric field",
         xlabel="Electric field (kV/cm)",
-        ylabel="Oscillator strength (dimensionless)",
+        ylabel="Peak absorption coefficient (cm$^{-1}$)",
         series=field_series,
     )
     reference = next(
@@ -1095,10 +1317,15 @@ def _spectrum_plots(
     import json
 
     def spectrum(result: sweeps.CaseResult) -> dict[str, Any] | None:
-        path = result.run_dir / "extracted" / "spectrum.json"
-        if not path.is_file():
-            return None
-        return json.loads(path.read_text(encoding="utf-8"))
+        extracted = result.run_dir / "extracted"
+        for filename in (
+            "absorption_spectrum.json",
+            "diagnostic_envelope_momentum_lineshape.json",
+        ):
+            path = extracted / filename
+            if path.is_file():
+                return json.loads(path.read_text(encoding="utf-8"))
+        return None
 
     symmetric = reference if reference is not None and spectrum(reference) else None
     broken = next(
@@ -1114,14 +1341,21 @@ def _spectrum_plots(
             continue
         grid = data.get("photon_energy_eV") or []
         for name, values in data.items():
-            if name in {"photon_energy_eV", "units", "broadening_meV", "lineshape", "caveat"}:
+            if name in {
+                "photon_energy_eV",
+                "units",
+                "source",
+                "broadening_meV",
+                "lineshape",
+                "caveat",
+            }:
                 continue
             series[f"{label}: {name}"] = (grid, values)
     plotting.line_plot(
         plots_dir / "spectrum_symmetry_broken.png",
-        title="Relative transition spectrum: symmetric versus symmetry-broken",
+        title="Interband absorption: symmetric versus symmetry-broken",
         xlabel="Photon energy (eV)",
-        ylabel="Relative strength (arb. u., NOT an absorption coefficient)",
+        ylabel="Absorption coefficient (cm$^{-1}$)",
         series=series,
         markers=False,
     )
@@ -1130,14 +1364,21 @@ def _spectrum_plots(
     if reference_data:
         grid = reference_data.get("photon_energy_eV") or []
         for name, values in reference_data.items():
-            if name in {"photon_energy_eV", "units", "broadening_meV", "lineshape", "caveat"}:
+            if name in {
+                "photon_energy_eV",
+                "units",
+                "source",
+                "broadening_meV",
+                "lineshape",
+                "caveat",
+            }:
                 continue
             reference_series[name] = (grid, values)
     plotting.line_plot(
         plots_dir / "spectrum.png",
-        title="Reference post-processed relative transition spectrum",
+        title="Reference nextnano++ interband absorption spectrum",
         xlabel="Photon energy (eV)",
-        ylabel="Relative strength (arb. u., NOT an absorption coefficient)",
+        ylabel="Absorption coefficient (cm$^{-1}$)",
         series=reference_series,
         markers=False,
     )
@@ -1151,14 +1392,21 @@ def _spectrum_plots(
             continue
         grid = data.get("photon_energy_eV") or []
         for name, values in data.items():
-            if name in {"photon_energy_eV", "units", "broadening_meV", "lineshape", "caveat"}:
+            if name in {
+                "photon_energy_eV",
+                "units",
+                "source",
+                "broadening_meV",
+                "lineshape",
+                "caveat",
+            }:
                 continue
             conv_series[f"{result.spec.case_id}: {name}"] = (grid, values)
     plotting.line_plot(
         plots_dir / "k_convergence.png",
         title="Spectral convergence with in-plane k sampling",
         xlabel="Photon energy (eV)",
-        ylabel="Relative strength (arb. u.)",
+        ylabel="Absorption coefficient (cm$^{-1}$)",
         series=conv_series,
         markers=False,
     )
@@ -1173,14 +1421,21 @@ def _spectrum_plots(
             continue
         grid = data.get("photon_energy_eV") or []
         for name, values in data.items():
-            if name in {"photon_energy_eV", "units", "broadening_meV", "lineshape", "caveat"}:
+            if name in {
+                "photon_energy_eV",
+                "units",
+                "source",
+                "broadening_meV",
+                "lineshape",
+                "caveat",
+            }:
                 continue
             resolution_series[f"double resolution: {name}"] = (grid, values)
     plotting.line_plot(
         plots_dir / "spectral_resolution_check.png",
-        title="Post-processed spectrum under two photon-energy resolutions",
+        title="Solver absorption under two photon-energy resolutions",
         xlabel="Photon energy (eV)",
-        ylabel="Relative strength (arb. u.)",
+        ylabel="Absorption coefficient (cm$^{-1}$)",
         series=resolution_series,
         markers=False,
     )

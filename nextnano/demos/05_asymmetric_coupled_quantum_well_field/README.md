@@ -62,7 +62,12 @@ That is harmless here and essential in Demo 6.
 ## Sweeps
 
 - `electric_field_kV_cm` from −100 to +100 kV/cm, 17 points, denser near zero.
-- `quantum_region_padding_nm`: 10 and 20 nm — the artifact control.
+- `quantum_region_padding_nm`: 10 and 20 nm at −35 kV/cm.
+- `active_region_grid_spacing_nm`: 0.25 and 0.125 nm at −35 kV/cm.
+
+The four numerical-control cases recheck the candidate avoided crossing found
+by the first licensed run; they do not silently test the unrelated zero-field
+structure.
 
 ## Expected qualitative behaviour
 
@@ -91,7 +96,8 @@ log, manifest. Parent: `sweep_manifest.json`, `validation_report.md`,
 `extracted/sweep_summary.*`, `failed_runs.csv`, `suspicious_runs.csv`,
 `state_tracking.csv`, `extracted/state_overlap_matrices.json`,
 `tables/tracked_states.csv`, `tables/avoided_crossings.csv`,
-`tables/field_convention.csv`, `console_logs/`, `plots/`.
+`tables/field_convention.csv`, `tables/crossing_convergence.csv`,
+`console_logs/`, `plots/`.
 
 ## Plots
 
@@ -99,8 +105,9 @@ log, manifest. Parent: `sweep_manifest.json`, `validation_report.md`,
 `centroid_vs_field.png`, `well_probability_vs_field.png`,
 `spacings_vs_field.png`, `wavefunctions_near_crossing.png`,
 `state_tracking_confidence.png`, `overlap_matrix.png`,
-`field_unit_check.png`, `padding_check.png`. Full band profiles and envelopes
-for each individual field are in `runs/<case>/plots/`.
+`field_unit_check.png`, `padding_check.png`, `crossing_convergence.png`. Full
+band profiles and envelopes for each individual field are in
+`runs/<case>/plots/`.
 
 The energy, centroid, and well-probability curves use physical branches followed
 by envelope overlap. `overlap_matrix.png` is the adjacent-field state-overlap
@@ -160,9 +167,10 @@ arbitrary solver-side sign flip is never mistaken for a physical change.
 
 ## Licensed-validation status
 
-`licensed_run_pending` — see `nextnano/demos/demo_registry.yaml`.
+`parser_passed` — the licensed solver and parser passed; focused numerical
+validation remains. See `nextnano/demos/demo_registry.yaml`.
 
-- **Home, syntax:** all 19 generated decks parse cleanly under Free
+- **Home, syntax:** all 21 generated decks parse cleanly under Free
   nextnano++ 3.0.0 `--parse`.
 - **Home, execution:** a reduced-grid version at +50 kV/cm was executed by the
   Free edition; its real output is committed under
@@ -170,9 +178,13 @@ arbitrary solver-side sign flip is never mistaken for a physical change.
   requested field, `electric_field.dat`, and `−dφ/dx` all agreed at 50.0 kV/cm,
   the band tilt was `+0.00508 eV/nm` (= eF), and state 1 sat 94 % in the wide
   well while state 2 sat 82 % in the narrow well.
-- **Still owed on the licensed laptop:** the full ±100 kV/cm sweep at production
-  grid spacing, re-confirmation of the V/m unit and sign on the Standard
-  edition, and that avoided-crossing flags survive a padding and grid recheck.
+- **Licensed result:** all 19 cases completed. The requested field,
+  `electric_field.dat`, `−dφ/dx`, and the band tilt agreed for both polarities;
+  state tracking was confident and a candidate avoided crossing was detected
+  near −35 kV/cm with an 8.554 meV minimum sampled gap.
+- **Still owed:** run the newly added −35 kV/cm padding and grid controls.
+  The previous endpoint warnings came from higher excited states; the lowest
+  pair itself stayed below the boundary threshold even at ±100 kV/cm.
 
 ## Work-laptop checklist
 
@@ -182,7 +194,7 @@ conda activate llm
 python nextnano/demos/05_asymmetric_coupled_quantum_well_field/run.py
 ```
 
-- [ ] `sweep_manifest.json` reports `status: completed` and 19 cases.
+- [ ] `sweep_manifest.json` reports `status: completed` and 21 cases.
 - [ ] `extracted/failed_runs.csv` and `suspicious_runs.csv` contain only `none`.
 - [ ] `tables/field_convention.csv`: requested = measured = `−dφ/dx` at every point.
 - [ ] Band tilt is positive for positive field with `field_direction: "+x"`.
@@ -195,5 +207,5 @@ python nextnano/demos/05_asymmetric_coupled_quantum_well_field/run.py
       of solver eigenvalue index.
 - [ ] `plots/overlap_matrix.png` shows adjacent-field overlaps, and
       `band_diagrams_selected_fields.png` shows actual band profiles.
-- [ ] Both E1 and E2 change by less than `absolute_energy_tolerance_meV`
-      between padding cases.
+- [ ] `tables/crossing_convergence.csv`: E1 and E2 change by less than
+      `absolute_energy_tolerance_meV` under both padding and grid refinement.

@@ -210,21 +210,46 @@ def abbreviate(name: str) -> str:
     return "".join(word[0] for word in words)
 
 
-#: Beyond this, a run directory leaves too little room for nextnano++'s own
-#: nested output tree on Windows.
-MAX_RUN_DIR_LENGTH = 150
+#: Longest relative path nextnano++ appends below a run directory, measured on
+#: the licensed laptop on 2026-07-30. The worst artifact is the dipole
+#: matrix-element table:
+#:
+#:   /raw_output/case/bias_00000/Quantum/<region>/Gamma_Gamma/   36 + region + 13
+#:   dipole_moment_matrix_elements_k00000_<polarization>.txt     37 + pol + 4
+#:
+#: With a three-character region name and a ten-character polarization name that
+#: is 103 characters; one is kept in hand.
+SOLVER_OUTPUT_TAIL_LENGTH = 104
+
+#: Windows refuses paths at 260 characters *including* the terminating NUL, so
+#: the last usable length is 259.
+WINDOWS_MAX_PATH = 259
+
+#: Beyond this, a run directory leaves too little room for that tree.
+MAX_RUN_DIR_LENGTH = WINDOWS_MAX_PATH - SOLVER_OUTPUT_TAIL_LENGTH  # 160
 
 
 def check_path_budget(run_dir: Path) -> str | None:
-    """Warn before a path that Windows will later refuse mid-run."""
+    """Warn before a path that Windows will later refuse mid-run.
+
+    This is not hypothetical. On 2026-07-30 twelve of Demo 9's twenty-four
+    licensed cases died with exit code 4294967295 partway through writing their
+    output: the Gamma_Gamma dipole file crossed 259 characters while the shorter
+    single-variable case names stayed under it. The solver left ``job_running.txt``
+    behind and wrote no matrix elements. Nothing about the physics differed --
+    one of the failing cases had parameters identical to a case that succeeded.
+    """
 
     length = len(str(run_dir))
-    if length <= MAX_RUN_DIR_LENGTH:
+    if length < MAX_RUN_DIR_LENGTH:
         return None
     return (
         f"run directory path is {length} characters ({run_dir}); nextnano++ appends "
-        f"roughly 90 more for its output tree and Windows refuses paths beyond 260. "
-        "Shorten results_root, or move the repository closer to the drive root."
+        f"up to {SOLVER_OUTPUT_TAIL_LENGTH} more for its own output tree and Windows "
+        f"refuses paths beyond {WINDOWS_MAX_PATH}. The solver will fail partway "
+        "through writing results. Set a short results_root (for example "
+        "'C:/nn_results') in nextnano_machine.local.yaml, or move the repository "
+        "closer to the drive root."
     )
 
 
@@ -290,7 +315,7 @@ def single_variable_cases(
 
 
 def grid_cases(
-    config: Mapping[str, Any], axes: Mapping[str, Sequence[Any]], *, prefix: str = "grid_"
+    config: Mapping[str, Any], axes: Mapping[str, Sequence[Any]], *, prefix: str = "g"
 ) -> list[CaseSpec]:
     """Full Cartesian product of two or more parameter axes."""
 
@@ -302,12 +327,14 @@ def grid_cases(
         itertools.product(*(list(axes[name]) for name in names)), start=1
     ):
         overrides = dict(zip(names, combination))
-        token = "_".join(
-            f"{abbreviate(name)}{safe_token(value)}" for name, value in overrides.items()
-        )
+        # Only the index goes in the directory name. A grid over two parameters
+        # produced names like `grid_007_www10p0_efm20p0`, which pushed the
+        # licensed run past the Windows path limit and killed the solver
+        # mid-write. The swept values are in every manifest, in parameters.csv,
+        # and in the label.
         cases.append(
             CaseSpec(
-                case_id=f"{prefix}{index:03d}_{token}",
+                case_id=f"{prefix}{index:03d}",
                 label=", ".join(f"{name} = {value}" for name, value in overrides.items()),
                 swept=overrides,
                 config=apply_overrides(config, overrides),
@@ -321,7 +348,7 @@ def design_list_cases(
     config: Mapping[str, Any],
     designs: Sequence[Mapping[str, Any]],
     *,
-    prefix: str = "design_",
+    prefix: str = "d",
 ) -> list[CaseSpec]:
     """Explicit multi-variable candidates that are not a product grid."""
 
@@ -329,11 +356,12 @@ def design_list_cases(
     for index, design in enumerate(designs, start=1):
         overrides = {str(name): value for name, value in design.items() if name != "name"}
         name = str(design.get("name", f"design_{index}"))
-        # The directory name is truncated for the Windows path budget; the full
-        # design name survives in the label and in every table.
+        # Index only, for the Windows path budget. `design_02_wide_pair_` was
+        # long enough to kill the solver on the licensed laptop; the full design
+        # name survives in the label, the manifest, and every table.
         cases.append(
             CaseSpec(
-                case_id=f"{prefix}{index:02d}_{name[:10]}",
+                case_id=f"{prefix}{index:02d}",
                 label=name,
                 swept=overrides,
                 config=apply_overrides(config, overrides),
@@ -445,7 +473,27 @@ def execute_case(
                         redacted,
                     )
             if return_code not in (0, None):
-                raise DemoError(f"nextnano++ returned nonzero exit code {return_code}")
+                # A run that was already over the path budget and then died is
+                # almost certainly a path-length failure, not a physics one.
+                # Saying so here saves re-deriving it from an opaque exit code.
+                hint = ""
+                if budget_warning:
+                    stalled = list(layout["raw"].rglob("job_running.txt"))
+                    hint = (
+                        " This case exceeded the Windows path budget before it "
+                        "started"
+                        + (
+                            " and the solver left job_running.txt behind, so it "
+                            "died partway through writing output."
+                            if stalled
+                            else "."
+                        )
+                        + " Treat the path length as the primary suspect: "
+                        + budget_warning
+                    )
+                raise DemoError(
+                    f"nextnano++ returned nonzero exit code {return_code}.{hint}"
+                )
             parsed_observables, parsed_validation = analyse(
                 cfg, layout["raw"], layout["extracted"], layout["plots"]
             )

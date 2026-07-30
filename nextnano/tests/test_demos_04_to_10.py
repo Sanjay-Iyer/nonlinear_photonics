@@ -205,6 +205,7 @@ def test_demo4_analysis_on_real_solver_output(tmp_path):
     assert abs(observables["overlap_state1_state2"]) < 1e-6
     assert validation["lowest_pair_is_symmetric_then_antisymmetric"] is True
     assert validation["lowest_pair_balanced_between_identical_wells"] is True
+    assert validation["lowest_pair_boundary_probability_small"] is True
     assert validation["completion_marker_found"] is True
     assert (extracted / "states.csv").is_file()
     assert (extracted / "band_profile.csv").is_file()
@@ -310,6 +311,7 @@ def test_demo5_analysis_on_real_solver_output(tmp_path):
     assert validation["solver_field_matches_request"] is True
     assert validation["potential_slope_matches_request"] is True
     assert validation["band_tilt_sign_matches_convention"] is True
+    assert validation["lowest_pair_boundary_probability_small"] is True
     # Field-induced localisation: the two states sit in different wells.
     assert observables["probability_wide_well_state1"] > 0.8
     assert observables["probability_narrow_well_state2"] > 0.6
@@ -440,7 +442,7 @@ def test_demo6_doping_region_reaches_the_deck_with_the_right_species():
 
 def test_demo6_rejects_a_donor_layer_that_overlaps_a_well():
     cfg = workflow.load_demo_config(DEMO_DIRS["06"])
-    cfg["scientific"]["donor_region_end_nm"] = 25.0  # past the first well edge
+    cfg["scientific"]["donor_region_end_nm"] = 31.0  # first well starts at 30 nm
     with pytest.raises(workflow.DemoError, match="overlaps the first well"):
         demo06.check_doping_geometry(cfg)
 
@@ -607,6 +609,76 @@ def test_demo8_polarizations_are_named_and_labelled():
     assert 'polarization{ name = "TM_growth"  re = [1, 0, 0] }' in deck
     assert 'polarization{ name = "TE_inplane"  re = [0, 1, 0] }' in deck
     assert "output_oscillator_strengths = yes" in deck
+    assert "optics{" in deck
+    assert "quantum_spectra{" in deck
+    assert "enable_electron_hole = yes" in deck
+    assert "absorption_coeff = yes" in deck
+    assert "energy_broadening_lorentzian = 0.008" in deck
+    assert "run{\n    strain{}\n    quantum{}\n    optics{}" in deck
+
+
+def test_demo8_non_kp8_stages_do_not_request_quantum_spectra():
+    one_band = _active_deck(_demo8_deck("M1_oneband_e_h"))
+    six_band = _active_deck(_demo8_deck("M2_sixband_valence"))
+    assert "quantum_spectra" not in one_band
+    assert "quantum_spectra" not in six_band
+    assert "\n    optics{}\n" not in one_band
+    assert "\n    optics{}\n" not in six_band
+
+
+def test_demo8_licensed_300_headers_resolve_units_and_real_directory_case():
+    root = FIXTURES / "demo08_licensed_headers"
+    profile = outputs.load_profile("nextnano_pp_3_0_0")
+    resolved = outputs.resolve_outputs(
+        profile,
+        root,
+        [
+            "transition_energies_gamma_hh",
+            "transition_energies_gamma_kp6",
+            "overlap_integrals_gamma_kp6",
+            "transition_energies_kp8",
+            "momentum_matrix_elements_kp8",
+        ],
+        substitutions={"region": "qw", "polarization": "TM_growth"},
+    )
+    kp6_path = resolved.one("transition_energies_gamma_kp6")
+    assert kp6_path.parent.name == "Gamma_kp6"
+    for key in (
+        "transition_energies_gamma_hh",
+        "transition_energies_gamma_kp6",
+        "transition_energies_kp8",
+    ):
+        path = resolved.one(key)
+        elements = outputs.read_matrix_elements(path)
+        energy_column = outputs.value_column_with_unit(path, unit="eV")
+        assert energy_column in next(iter(elements.values()))
+        assert "[eV]" not in energy_column
+    momentum_path = resolved.one("momentum_matrix_elements_kp8")
+    assert outputs.magnitude_column(momentum_path, unit="hbar/nm").startswith("|<")
+
+
+def test_demo8_licensed_kp8_all_pairs_require_absorption_orientation():
+    root = (
+        FIXTURES
+        / "demo08_licensed_headers"
+        / "bias_00000"
+        / "Quantum"
+        / "qw"
+        / "kp8_kp8"
+    )
+    transitions_path = root / "transition_energies_k00000.txt"
+    transitions = outputs.read_matrix_elements(transitions_path)
+    energy_column = outputs.value_column_with_unit(transitions_path, unit="eV")
+    strengths = outputs.read_matrix_elements(
+        root / "oscillator_strengths_k00000_TM_growth.txt"
+    )
+    strength_column = outputs.first_value_column(strengths, contains="f(")
+    assert transitions[(7, 1)][energy_column] == pytest.approx(1.29471)
+    assert transitions[(1, 7)][energy_column] == pytest.approx(-1.29471)
+    # For absorption the initial valence state is first. The reverse row has
+    # the opposite sign and must not be used as a positive absorption strength.
+    assert strengths[(1, 7)][strength_column] > 0.0
+    assert strengths[(7, 1)][strength_column] < 0.0
 
 
 def test_demo8_symmetry_breaking_adds_a_higher_indium_step():
@@ -646,9 +718,9 @@ def test_demo8_spectrum_is_a_lorentzian_sum_with_the_configured_broadening():
     )
     peak_index = int(np.argmax(spectrum))
     assert grid[peak_index] == pytest.approx(1.40, abs=2e-3)
-    # HWHM: the value 5 meV away from the line centre is half the peak.
+    # FWHM is 5 meV, so the half-maximum lies 2.5 meV from line centre.
     at_centre = float(np.interp(1.40, grid, spectrum))
-    at_hwhm = float(np.interp(1.405, grid, spectrum))
+    at_hwhm = float(np.interp(1.4025, grid, spectrum))
     assert at_hwhm == pytest.approx(0.5 * at_centre, rel=0.05)
     # Strength ratio survives.
     assert float(np.interp(1.50, grid, spectrum)) == pytest.approx(
@@ -957,7 +1029,7 @@ def test_dry_run_produces_every_promised_artifact(tmp_path, key):
     assert manifest["status"] == "dry_run_complete"
     expected_counts = {
         "04": 11,
-        "05": 19,
+        "05": 21,
         "06": 11,
         "07": 14,
         "08": 13,
@@ -970,7 +1042,10 @@ def test_dry_run_produces_every_promised_artifact(tmp_path, key):
     if key in {"04", "05"}:
         assert manifest["state_tracking_confident"] is None
     # Dependency status travels with every run.
-    assert manifest["dependency_status"]["declared_status"] != "physically_validated"
+    if key == "04":
+        assert manifest["dependency_status"]["declared_status"] == "physically_validated"
+    else:
+        assert manifest["dependency_status"]["declared_status"] != "physically_validated"
 
     generated = list(parent.glob("runs/*/generated_input/*.in"))
     assert len(generated) == manifest["case_count"]
@@ -985,7 +1060,8 @@ def test_dry_run_produces_every_promised_artifact(tmp_path, key):
 
     # Nothing may claim a physical result without a solver.
     report = (parent / "validation_report.md").read_text(encoding="utf-8")
-    assert "Physically validated: **False**" in report
+    expected_physical = "True" if key == "04" else "False"
+    assert f"Physically validated: **{expected_physical}**" in report
     assert "PASS" not in report.split("## Criteria")[1].split("|---|")[1].replace(
         "not evaluated", ""
     ) or "not evaluated" in report

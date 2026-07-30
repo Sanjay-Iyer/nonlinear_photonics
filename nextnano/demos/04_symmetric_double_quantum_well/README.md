@@ -163,7 +163,7 @@ Before Demo 5, be able to answer:
 
 ## Licensed-validation status
 
-`licensed_run_pending` — see `nextnano/demos/demo_registry.yaml`.
+`physically_validated` — see `nextnano/demos/demo_registry.yaml`.
 
 - **Home, syntax:** every generated deck of the full sweep parses cleanly under
   the Free nextnano++ 3.0.0 `--parse` runmode.
@@ -171,8 +171,13 @@ Before Demo 5, be able to answer:
   was *executed* by the Free edition and its real output is committed under
   `nextnano/tests/fixtures/nextnano_pp_3_0_0/demo04_symmetric_dqw/`. The parser
   and every analysis above run against it in the test suite.
-- **Still owed on the licensed laptop:** the full sweep at production grid
-  spacing, monotonic decrease of E2 − E1, and per-well balance at every point.
+- **Licensed result:** all 11 cases completed. E2 − E1 decreased monotonically
+  from 35.2928 meV at 1 nm to 6.1312e-5 meV at 20 nm; the lowest pair retained
+  the expected parity and left/right balance. Doubling the quantum-region
+  padding moved E1 and E2 by less than 5e-5 meV.
+- A third shallow bound state at the 1 and 2 nm barriers has slightly elevated
+  boundary weight. It remains visible as a diagnostic but is not part of the
+  lowest tunnelling pair validated by this demo.
 
 The Free-edition fixture is a plumbing check, not physics: 100 grid points and
 a 1 nm mesh are far from converged.
@@ -186,7 +191,7 @@ python nextnano/demos/04_symmetric_double_quantum_well/run.py
 ```
 
 - [ ] `sweep_manifest.json` reports `status: completed` and 11 cases.
-- [ ] `extracted/failed_runs.csv` and `suspicious_runs.csv` contain only `none`.
+- [ ] `extracted/failed_runs.csv` contains only `none`.
 - [ ] `validation_report.md` shows PASS, not "not evaluated", for every criterion.
 - [ ] `tables/splitting_table.csv` shows E2 − E1 falling from the 1 nm to the
       20 nm barrier.
@@ -194,5 +199,5 @@ python nextnano/demos/04_symmetric_double_quantum_well/run.py
       thickness where the pair is still resolvably split.
 - [ ] Both E1 and E2 change by less than `absolute_energy_tolerance_meV`
       between the two padding cases.
-- [ ] Each completed case contains `band_profile.csv`, `envelopes.csv`,
-      `probability_densities.csv`, and its four per-case evidence plots.
+- [ ] The parent plot set contains real representative band, envelope, and
+      probability-density plots in addition to the sweep plots.

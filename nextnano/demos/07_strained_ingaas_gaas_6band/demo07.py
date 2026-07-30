@@ -42,10 +42,14 @@ PLOT_SET: tuple[tuple[str, str], ...] = (
     ("grid_sensitivity.png", "Multiband grid sensitivity"),
 )
 
+# Confirmed on the licensed laptop on 2026-07-30: the strain outputs are
+# Strain/strain_simulation.dat and Strain/strain_crystal.dat (the earlier
+# guess `strain_simulation_system.dat` was wrong), the 6-band model writes to
+# Quantum/<region>/kp6/, and the composition file is
+# spinor_composition_k00000_CbHhLhSo.dat alongside an _SXYZ orbital twin.
 UNVALIDATED_SYNTAX: tuple[str, ...] = (
-    "strain{ output_strain_tensor{} } output file name and component column order",
-    "quantum{ region{ kp_6band{} } } output sub-directory name",
-    "output_states{ spinor_composition = yes } file name and column order",
+    "the column layout inside Strain/strain_simulation.dat (component order)",
+    "the column layout inside spinor_composition_k00000_CbHhLhSo.dat",
 )
 
 
@@ -197,13 +201,38 @@ def _component_weights(
     if not paths:
         return None
     table = outputs.read_table(paths[0])
-    names = [name for name, _ in table.header][1:] or [
-        f"component_{index}" for index in range(table.n_columns - 1)
-    ]
+    names = [name for name, _ in table.header]
+    if not names:
+        raise outputs.ParserError(
+            f"{paths[0]} has no header, so its component columns cannot be named. "
+            "Refusing to classify hole states from unlabelled numbers."
+        )
+    first = names[0].strip().lower().rstrip(".")
+    if first in {"no", "num", "index", "state"}:
+        # One row per state: index, then one weight per band.
+        component_names = names[1:]
+        rows = table.data
+    elif first in {"x", "y", "z", "position"}:
+        # Position-resolved composition. Integrating over position is not the
+        # same quantity and would need the grid weights, so this is refused
+        # rather than silently averaged.
+        raise outputs.ParserError(
+            f"{paths[0]} is position-resolved (first column {names[0]!r}), but the "
+            "state classification needs one row per state. Record the real layout "
+            "and update _component_weights before trusting any character label."
+        )
+    else:
+        raise outputs.ParserError(
+            f"{paths[0]}: unrecognised first column {names[0]!r}; expected a state "
+            f"index. Header is {names}."
+        )
     weights: list[dict[str, float]] = []
-    for row in table.data:
+    for row in rows:
         weights.append(
-            {names[index]: float(row[index + 1]) for index in range(len(names))}
+            {
+                component_names[index]: float(row[index + 1])
+                for index in range(min(len(component_names), table.n_columns - 1))
+            }
         )
     return weights
 

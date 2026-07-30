@@ -177,7 +177,7 @@ def render_values(cfg: Mapping[str, Any]) -> dict[str, Any]:
             "run{\n"
             "    quantum_poisson{\n"
             f"        iterations      = {int(numerical['maximum_iterations'])}\n"
-            f"        residual        = {float(numerical['poisson_tolerance']):.6g}\n"
+            f"        residual        = {float(numerical['solver_residual_density_cm2']):.6g}\n"
             f"        alpha_potential = {float(numerical['potential_mixing_alpha']):.6g}\n"
             "        output_log      = yes\n"
             "    }\n"
@@ -398,6 +398,23 @@ def analyse_case(
                 "maximum_boundary_probability_bound_states": max(
                     [state.boundary_probability for state in states if state.bound] or [0.0]
                 ),
+                # Which state is responsible, and how far each bound state sits
+                # below the enclosing barrier. On the 2026-07-30 licensed run the
+                # boundary flag came entirely from the THIRD state at high
+                # doping: it is only marginally bound, so it spreads to fill the
+                # quantum box. Naming the culprit and its binding margin turns
+                # that from a bare FAIL into a diagnosis.
+                "boundary_probability_limiting_state": (
+                    max(
+                        (state for state in states if state.bound),
+                        key=lambda state: state.boundary_probability,
+                    ).index
+                    if any(state.bound for state in states)
+                    else None
+                ),
+                "bound_state_boundary_probabilities": [
+                    state.boundary_probability for state in states if state.bound
+                ],
                 "state_rows": rows,
             }
         )
@@ -480,7 +497,7 @@ def analyse_case(
         convergence = analysis.classify_convergence(
             table.data[:, 0],
             residual_columns,
-            tolerance=float(cfg["numerical"]["poisson_tolerance"]),
+            tolerance=float(cfg["numerical"]["convergence_relative_tolerance"]),
             maximum_iterations=int(cfg["numerical"]["maximum_iterations"]),
             reference_scales=scales,
             solver_reported_failure=bool(log_checks.get("warning_markers_found")),
@@ -493,10 +510,12 @@ def analyse_case(
             "Residual_Potential"
         )
         observables["final_relative_residuals"] = convergence["final_relative_residuals"]
+        observables["iteration_cap_reached"] = convergence["iteration_cap_reached"]
         validation["self_consistent_loop_converged"] = bool(convergence["converged"])
-        validation["iteration_cap_not_reached"] = bool(
-            convergence["status"] != "max_iterations_reached"
-        )
+        # Read from the dedicated flag, not from the status label: when the
+        # solver also warns, its verdict wins the label and a status-based test
+        # would report "cap not reached" for a run that used every iteration.
+        validation["iteration_cap_not_reached"] = not convergence["iteration_cap_reached"]
 
     observables["solver_warnings"] = log_checks.get("warning_markers_found", [])
     validation.update(
@@ -719,7 +738,10 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
         ],
         commentary=[
             "`converged` requires the final residuals to be at or below "
-            "numerical.poisson_tolerance BEFORE the iteration cap.",
+            "numerical.convergence_relative_tolerance BEFORE the iteration cap. "
+            "That check is relative and independent of the solver's own absolute "
+            "criterion, numerical.solver_residual_density_cm2, which is what the "
+            "deck passes to quantum_poisson{ residual }.",
             "`max_iterations_reached` is reported separately and is never counted "
             "as convergence, even though nextnano++ still exits successfully and "
             "writes job_done.txt.",
@@ -788,7 +810,7 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
             "max_iteration_case_count": sum(
                 1
                 for result in results
-                if result.observables.get("convergence_state") == "max_iterations_reached"
+                if result.observables.get("iteration_cap_reached") is True
             ),
             "doping_bends_bands": doping_bends_bands,
             "energies_stable_under_padding": padding_stable,
@@ -820,7 +842,7 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
             (
                 "self-consistent loop converged below tolerance",
                 _all_true(results, "self_consistent_loop_converged"),
-                "final residuals at or below numerical.poisson_tolerance",
+                "relative residuals at or below numerical.convergence_relative_tolerance",
             ),
             (
                 "no case merely hit the iteration cap",
