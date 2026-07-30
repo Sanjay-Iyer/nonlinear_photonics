@@ -693,9 +693,9 @@ def _analyse_bandedges(
         {
             "position_nm": 0,
             "conduction_eV": 1,
-            "heavy_hole_eV": 4,
-            "light_hole_eV": 5,
-            "split_off_eV": 6,
+            "heavy_hole_eV": 2,
+            "light_hole_eV": 3,
+            "split_off_eV": 4,
         },
     )
     data = parse_numeric_table(source, columns)
@@ -781,7 +781,7 @@ def _analyse_quantum(
     outputs = cfg["outputs"]
     spectrum_path = _single_glob(
         raw,
-        outputs.get("energy_spectrum_glob", "**/*energy*spectrum*Gamma*.dat"),
+        outputs.get("energy_spectrum_glob", "**/energy_spectrum_k*.dat"),
         "electron energy-spectrum",
     )
     energy_columns = outputs.get("energy_columns", {"state_index": 0, "energy_eV": 1})
@@ -795,7 +795,7 @@ def _analyse_quantum(
     well_start = float(params["well_start_nm"])
     well_end = float(params["well_end_nm"])
     probability_paths = _probability_files(
-        raw, outputs.get("probability_glob", "**/*probabilit*Gamma*.dat")
+        raw, outputs.get("probability_glob", "**/probabilities_k*.dat")
     )
     if not probability_paths:
         raise DemoError("no electron probability-density outputs were found.")
@@ -803,12 +803,35 @@ def _analyse_quantum(
     probabilities: list[dict[str, Any]] = []
     probability_csv: dict[str, np.ndarray] = {}
     common_x: np.ndarray | None = None
-    for index, path in enumerate(probability_paths[: len(energies)], start=1):
+    state_densities: list[tuple[Path, np.ndarray, np.ndarray]] = []
+    if len(probability_paths) == 1:
+        # nextnano++ 3.0.0 writes one table:
+        # x[nm], Psi^2_1[nm^-1], ..., Psi^2_N[nm^-1].
+        path = probability_paths[0]
         table = _numeric_rows(path)
         if table.shape[1] < 2:
             raise DemoError(f"probability file needs at least two columns: {path}")
-        x = table[:, 0]
-        density = np.maximum(table[:, -1], 0.0)
+        for column in range(1, min(table.shape[1], len(energies) + 1)):
+            state_densities.append((path, table[:, 0], table[:, column]))
+    else:
+        # Compatibility with versions that write one probability file per
+        # state; the last numeric column is the density in those files.
+        for path in probability_paths[: len(energies)]:
+            table = _numeric_rows(path)
+            if table.shape[1] < 2:
+                raise DemoError(
+                    f"probability file needs at least two columns: {path}"
+                )
+            state_densities.append((path, table[:, 0], table[:, -1]))
+
+    if len(state_densities) < min(2, len(energies)):
+        raise DemoError(
+            f"parsed {len(state_densities)} probability state(s) for "
+            f"{len(energies)} eigenenergies."
+        )
+
+    for index, (path, x, raw_density) in enumerate(state_densities, start=1):
+        density = np.maximum(raw_density, 0.0)
         norm = float(np.trapezoid(density, x))
         if not math.isfinite(norm) or norm <= 0:
             raise DemoError(f"invalid probability normalization in {path}: {norm}")
@@ -826,6 +849,7 @@ def _analyse_quantum(
             {
                 "state": index,
                 "source": str(path),
+                "source_column": index,
                 "raw_integral": norm,
                 "well_probability": well_probability,
                 "barrier_probability": max(0.0, 1.0 - well_probability),

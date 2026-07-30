@@ -267,13 +267,14 @@ def test_solver_log_sanitizer_redacts_identity_and_key(tmp_path):
 def test_numeric_output_parser_fixture(tmp_path):
     path = tmp_path / "bandedges.dat"
     path.write_text(
-        "# x Ec L X HH LH SO\n"
-        "0 1.65 1.8 1.9 0.0 -0.01 -0.34\n"
-        "1 1.42 1.7 1.8 0.0 -0.02 -0.35\n",
+        "x[nm] Gamma[eV] HH[eV] LH[eV] SO[eV] electron_Fermi_level[eV] "
+        "hole_Fermi_level[eV]\n"
+        "0 1.65 0.0 -0.01 -0.34 0 0\n"
+        "1 1.42 0.0 -0.02 -0.35 0 0\n",
         encoding="utf-8",
     )
     parsed = workflow.parse_numeric_table(
-        path, {"position_nm": 0, "conduction_eV": 1, "split_off_eV": 6}
+        path, {"position_nm": 0, "conduction_eV": 1, "split_off_eV": 4}
     )
     assert parsed["position_nm"].tolist() == [0.0, 1.0]
     assert parsed["conduction_eV"].tolist() == [1.65, 1.42]
@@ -296,16 +297,18 @@ def test_quantum_output_parser_and_plots_with_small_fixture(tmp_path):
     )
     np.savetxt(raw / "bandedges.dat", bandedges)
     np.savetxt(
-        raw / "energy_spectrum_Gamma.dat",
+        raw / "energy_spectrum_k00000.dat",
         np.asarray([[1, 1.46], [2, 1.55]]),
     )
-    for index, center in enumerate((25.0, 23.5), start=1):
+    densities = []
+    for center in (25.0, 23.5):
         density = np.exp(-((x - center) / 2.0) ** 2)
         density /= np.trapezoid(density, x)
-        np.savetxt(
-            raw / f"probabilities_Gamma_{index:03d}.dat",
-            np.column_stack([x, density]),
-        )
+        densities.append(density)
+    np.savetxt(
+        raw / "probabilities_k00000.dat",
+        np.column_stack([x, *densities]),
+    )
     cfg = workflow.load_demo_config(DEMO2)
     observables, validation = workflow._analyse_quantum(
         cfg, raw, extracted, plots

@@ -42,3 +42,7 @@ continuum-like states. Before Demo 3, understand why a wider well lowers the
 ground-state confinement energy and why wavefunctions penetrate finite
 barriers.
 
+The nextnano++ 3.0.0 licensed run on 2026-07-30 established the installed
+output layout used by this parser: `energy_spectrum_k00000.dat`, a combined
+`probabilities_k00000.dat` table, and `bandedges.dat` columns ordered as
+position, Γ, HH, LH, SO, and the two Fermi levels.

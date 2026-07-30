@@ -23,14 +23,14 @@ sweeps:
 
 outputs:
   bandedges_glob: "**/*bandedge*.dat"
-  energy_spectrum_glob: "**/*energy*spectrum*Gamma*.dat"
-  probability_glob: "**/*probabilit*Gamma*.dat"
+  energy_spectrum_glob: "**/energy_spectrum_k*.dat"
+  probability_glob: "**/probabilities_k*.dat"
   bandedge_columns:
     position_nm: 0
     conduction_eV: 1
-    heavy_hole_eV: 4
-    light_hole_eV: 5
-    split_off_eV: 6
+    heavy_hole_eV: 2
+    light_hole_eV: 3
+    split_off_eV: 4
   energy_columns:
     state_index: 0
     energy_eV: 1

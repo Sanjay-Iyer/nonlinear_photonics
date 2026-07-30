@@ -18,13 +18,12 @@ outputs:
   bandedge_columns:
     position_nm: 0
     conduction_eV: 1
-    heavy_hole_eV: 4
-    light_hole_eV: 5
-    split_off_eV: 6
+    heavy_hole_eV: 2
+    light_hole_eV: 3
+    split_off_eV: 4
   write_csv: true
   write_plots: true
 
 validation:
   completion_markers: ["simulation done", "done."]
   fatal_markers: ["terminating program", "fatal error", "license expired"]
-
