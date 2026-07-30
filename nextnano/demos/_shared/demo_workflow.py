@@ -620,7 +620,12 @@ def _sanitize_solver_logs(raw_output: Path) -> int:
         for pattern in _SENSITIVE_SOLVER_LOG_LINES:
             sanitized = pattern.sub(r"\1 <redacted>", sanitized)
         if sanitized != text:
-            _atomic_text(path, sanitized)
+            # Solver output paths can approach Windows' legacy MAX_PATH. The
+            # general atomic writer's UUID suffix is intentionally long, so use
+            # one short sibling name here and atomically replace the log.
+            temporary = path.with_name("~redact.tmp")
+            temporary.write_text(sanitized, encoding="utf-8", newline="\n")
+            os.replace(temporary, path)
             redacted_files += 1
     return redacted_files
 
@@ -1041,7 +1046,10 @@ def run_case(
         raise DemoError(f"input template not found: {template}")
     values = _parameters(cfg)
     rendered = render_template(template.read_text(encoding="utf-8"), values)
-    generated = layout["generated"] / f"{cfg['demo_id']}.in"
+    # Convergence cases are deeply nested on Windows. A short input stem also
+    # shortens nextnanopy's automatically-created raw-output subdirectory.
+    deck_stem = "case" if cfg["demo_id"].startswith("03") else cfg["demo_id"]
+    generated = layout["generated"] / f"{deck_stem}.in"
     _atomic_text(generated, rendered)
     _atomic_text(run_dir / "demo_resolved.yaml", yaml.safe_dump(cfg, sort_keys=True))
     _atomic_json(run_dir / "machine_summary.json", machine_summary(machine))
@@ -1421,7 +1429,13 @@ def run_demo(demo_dir: Path, machine_path: Path | None = None) -> int:
             for index, value in enumerate(values, start=1):
                 case_cfg = _case_cfg(cfg, sweep, value)
                 safe = str(value).replace(".", "p")
-                case_dir = parent / "runs" / sweep / f"{index:02d}_{safe}"
+                sweep_slug = {
+                    "grid_spacing_nm": "grid",
+                    "domain_padding_nm": "domain",
+                    "quantum_region_padding_nm": "qregion",
+                    "number_of_states": "states",
+                }[sweep]
+                case_dir = parent / "cases" / sweep_slug / f"{index:02d}_{safe}"
                 outcome = run_case(demo_dir, case_cfg, machine, case_dir)
                 rows.append(_summary_row(sweep, value, outcome))
         recommendation = _write_convergence_artifacts(parent, cfg, rows)

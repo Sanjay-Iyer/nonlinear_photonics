@@ -417,7 +417,7 @@ def test_demo3_home_run_preserves_all_sweep_points(tmp_path):
     machine_path = _machine_yaml(tmp_path / "machine.yaml")
     assert workflow.run_demo(DEMO3, machine_path) == 0
     parent = next((tmp_path / "results" / "03_quantum_well_convergence").iterdir())
-    generated = list((parent / "runs").glob("**/generated_input/*.in"))
+    generated = list((parent / "cases").glob("**/generated_input/case.in"))
     assert len(generated) == 16
     summary = json.loads(
         (parent / "extracted" / "convergence_summary.json").read_text(encoding="utf-8")
