@@ -1,0 +1,86 @@
+# Demo 9: asymmetric coupled quantum well screened as a three-level system.
+#
+# Syntax basis: repo Demo 5 (validated coupled-well geometry and the imposed
+# electrostatic tilt), plus dipole_moment_matrix_elements, which was executed
+# and its output inspected at home on nextnano++ 3.0.0 (Free edition,
+# 2026-07-30). That run confirmed the file layout and the unit:
+#   |<Gamma_i|eps.d|Gamma_j>|[e*nm]
+# i.e. with the polarization vector along growth this column IS |z_ij| in nm.
+#
+# The same values are recomputed independently from the envelopes and the two
+# are compared in every run; a disagreement is a defect, not a detail.
+#
+# Physics deliberately absent: doping, self-consistent charge, strain, k.p,
+# transport. Only conduction subbands are involved, so nothing here is an
+# interband quantity.
+
+global{
+    simulate1D{}
+    temperature = {{temperature_K}}
+    substrate{ name = "GaAs" }
+    crystal_zb{ x_hkl = [1, 0, 0]  y_hkl = [0, 1, 0] }
+}
+
+contacts{
+    fermi{ name = qw_contact  bias = 0.0 }
+}
+
+grid{
+    xgrid{
+{{grid_lines}}
+    }
+}
+
+structure{
+    output_region_index{ boxes = no }
+    output_material_index{ boxes = no }
+{{structure_regions}}
+}
+
+classical{
+    Gamma{}
+    HH{}
+    LH{}
+    SO{}
+    output_bandedges{ averaged = no }
+}
+
+poisson{
+    electric_field{
+        direction = [1, 0, 0]
+        strength  = {{field_strength_V_per_m}}   # V/m; {{electric_field_kV_cm}} kV/cm
+    }
+    output_potential{}
+    output_electric_field{}
+}
+
+quantum{
+    region{
+        name = "{{quantum_region_name}}"
+        x = [{{quantum_start_nm}}, {{quantum_end_nm}}]
+        no_density = yes
+        boundary{ x = dirichlet }
+        Gamma{ num_ev = {{number_of_states}} }
+        output_states{
+            max_num       = {{number_of_states}}
+            envelopes     = yes
+            probabilities = yes
+        }
+        # Intersubband position matrix elements along the growth axis.
+        dipole_moment_matrix_elements{
+            polarization{ name = "{{dipole_polarization_name}}"  re = [1, 0, 0] }
+            Gamma{}
+        }
+        # Growth-polarised oscillator strengths, for the selection-rule check.
+        momentum_matrix_elements{
+            polarization{ name = "{{dipole_polarization_name}}"  re = [1, 0, 0] }
+            Gamma{}
+            output_matrix_elements      = yes
+            output_oscillator_strengths = yes
+        }
+    }
+}
+
+run{
+    quantum{}
+}

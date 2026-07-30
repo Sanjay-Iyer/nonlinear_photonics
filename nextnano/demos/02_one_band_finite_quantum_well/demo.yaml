@@ -31,7 +31,10 @@ outputs:
   write_plots: true
 
 validation:
-  completion_markers: ["simulation done", "done."]
+  # nextnano++ 3.0.0 writes "Simulation completed." to summary.log and
+  # "Calculation successfully completed." to job_done.txt. The console-only
+  # "DONE." banner is not part of the preserved output tree.
+  completion_markers: ["simulation completed", "calculation successfully completed"]
   fatal_markers: ["terminating program", "fatal error", "license expired"]
   minimum_well_probability: 0.50
   maximum_boundary_probability: 0.0001

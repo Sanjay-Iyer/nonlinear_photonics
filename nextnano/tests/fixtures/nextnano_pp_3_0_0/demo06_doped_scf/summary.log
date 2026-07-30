@@ -1,0 +1,14 @@
+Start time: Thu 2026-07-30, 15:22:54 (-0400)
+Setup completed.
+
+Performing bias-independent calculations...
+
+Starting calculation for BIAS POINT = qw_contact  0.000000 V   
+   Solving QUANTUM-POISSON...
+       WARNING: QUANTUM-POISSON failed to converge.
+   Finished QUANTUM-POISSON.
+Completed calculation for BIAS POINT.
+
+End time: Thu 2026-07-30, 15:22:54 (-0400)
+
+Simulation completed.

@@ -1,0 +1,71 @@
+---
+demo_id: 05_asymmetric_coupled_quantum_well_field
+title: Asymmetric coupled quantum well with electric-field tuning
+template: asymmetric_cqw_field.in.j2
+
+scientific:
+  # The wide well is grown first, so it sits at LOW x. Keeping that explicit
+  # matters: every sign statement about the field depends on it.
+  wide_well_width_nm: 8.0
+  narrow_well_width_nm: 5.0
+  center_barrier_nm: 3.0
+  left_outer_barrier_nm: 20.0
+  right_outer_barrier_nm: 20.0
+  aluminum_fraction: 0.30
+  temperature_K: 300
+  electric_field_kV_cm: 0.0
+  # "+x" gives direction = [1, 0, 0]. Reversing this and reversing the sign of
+  # electric_field_kV_cm are equivalent; both are exercised by the sweep.
+  field_direction: "+x"
+  # The mandatory contact is confined to a thin slab instead of everywhere{}.
+  # Harmless here (no Poisson step runs) and mandatory in Demo 6.
+  contact_thickness_nm: 2.0
+
+numerical:
+  active_region_grid_spacing_nm: 0.25
+  exterior_grid_spacing_nm: 0.50
+  number_of_states: 5
+  quantum_region_padding_nm: 10.0
+
+sweeps:
+  # Symmetric about zero so the sign convention can be checked in both
+  # directions, and dense enough near zero to resolve an avoided crossing.
+  electric_field_kV_cm:
+    [-100.0, -75.0, -50.0, -35.0, -25.0, -15.0, -10.0, -5.0, 0.0,
+     5.0, 10.0, 15.0, 25.0, 35.0, 50.0, 75.0, 100.0]
+  quantum_region_padding_nm: [10.0, 20.0]
+
+analysis:
+  quantum_region_name: cqw
+  state_tracking_method: envelope_overlap
+  minimum_state_tracking_confidence: 0.60
+  boundary_edge_fraction: 0.05
+  avoided_crossing_minimum_gap_meV: 12.0
+  avoided_crossing_relative_curvature: 0.60
+  # Fields whose band diagrams are drawn individually in the parent plot set.
+  band_diagram_fields_kV_cm: [-100.0, -25.0, 0.0, 25.0, 100.0]
+  # Requested-versus-measured field agreement, as a fraction of the request.
+  field_unit_tolerance: 0.02
+
+outputs:
+  parser_profile: nextnano_pp_3_0_0
+  quantum_region_name: cqw
+  bandedge_columns:
+    position_nm: 0
+    conduction_eV: 1
+    heavy_hole_eV: 2
+    light_hole_eV: 3
+    split_off_eV: 4
+  write_csv: true
+  write_plots: true
+
+validation:
+  completion_markers: ["simulation completed", "calculation successfully completed"]
+  fatal_markers: ["terminating program", "fatal error", "license expired"]
+  convergence_warning_markers: ["failed to converge"]
+  minimum_confined_probability: 0.50
+  maximum_boundary_probability: 0.001
+  normalization_tolerance: 0.001
+  minimum_state_tracking_confidence: 0.60
+  absolute_energy_tolerance_meV: 1.0
+  require_all_states_bound: false

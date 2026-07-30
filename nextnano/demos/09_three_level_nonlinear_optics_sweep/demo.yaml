@@ -1,0 +1,96 @@
+---
+demo_id: 09_three_level_nonlinear_optics_sweep
+title: Automated three-level coupled-well design sweep
+template: three_level_cqw.in.j2
+
+scientific:
+  wide_well_width_nm: 8.0
+  narrow_well_width_nm: 5.0
+  center_barrier_nm: 3.0
+  left_outer_barrier_nm: 20.0
+  right_outer_barrier_nm: 20.0
+  aluminum_fraction: 0.30
+  temperature_K: 300
+  electric_field_kV_cm: 0.0
+  field_direction: "+x"
+  contact_thickness_nm: 2.0
+
+numerical:
+  active_region_grid_spacing_nm: 0.25
+  exterior_grid_spacing_nm: 0.50
+  number_of_states: 4
+  quantum_region_padding_nm: 10.0
+
+# A: single-variable sweep. B: two-variable grid (see analysis.grid_axes).
+# C: explicit design list (see analysis.designs).
+sweeps:
+  center_barrier_nm: [2.0, 3.0, 4.0, 5.0, 6.0]
+  electric_field_kV_cm: [-40.0, -20.0, 0.0, 20.0, 40.0]
+
+analysis:
+  quantum_region_name: cqw
+  dipole_polarization_name: growth_x
+  boundary_edge_fraction: 0.05
+  minimum_state_tracking_confidence: 0.60
+  # B: two-variable grid sweep.
+  grid_axes:
+    wide_well_width_nm: [6.0, 8.0, 10.0]
+    electric_field_kV_cm: [-20.0, 0.0, 20.0]
+  # C: explicit multi-variable candidates that are not a product grid.
+  designs:
+    - name: thin_barrier_detuned
+      center_barrier_nm: 2.0
+      narrow_well_width_nm: 4.5
+      electric_field_kV_cm: 15.0
+    - name: wide_pair_resonant
+      wide_well_width_nm: 9.0
+      narrow_well_width_nm: 6.0
+      center_barrier_nm: 3.5
+      electric_field_kV_cm: -10.0
+    - name: strong_field_localised
+      center_barrier_nm: 4.0
+      electric_field_kV_cm: 60.0
+  # D: how many top-ranked candidates get a refined-mesh rerun, and by how much.
+  convergence_rerun_count: 3
+  grid_refinement_factor: 0.5
+  maximum_metric_relative_change: 0.10
+  # Agreement required between the solver's dipole output and the envelope
+  # integral, in nm.
+  maximum_matrix_element_disagreement_nm: 0.05
+
+metric:
+  enabled: true
+  # Design target for the 1->2 intersubband spacing.
+  target_E21_meV: 120.0
+  detuning_floor_meV: 2.0
+  double_resonance: true
+  # A candidate outside these bounds is excluded from the ranking but kept in
+  # every table and plot.
+  constraints:
+    E21_meV: [40.0, 250.0]
+    E32_meV: [40.0, 250.0]
+
+outputs:
+  parser_profile: nextnano_pp_3_0_0
+  quantum_region_name: cqw
+  polarizations: ["growth_x"]
+  bandedge_columns:
+    position_nm: 0
+    conduction_eV: 1
+    heavy_hole_eV: 2
+    light_hole_eV: 3
+    split_off_eV: 4
+  write_csv: true
+  write_plots: true
+
+validation:
+  completion_markers: ["simulation completed", "calculation successfully completed"]
+  fatal_markers: ["terminating program", "fatal error", "license expired"]
+  convergence_warning_markers: ["failed to converge"]
+  minimum_confined_probability: 0.50
+  maximum_boundary_probability: 0.001
+  normalization_tolerance: 0.001
+  minimum_state_tracking_confidence: 0.60
+  maximum_matrix_element_disagreement_nm: 0.05
+  absolute_energy_tolerance_meV: 1.0
+  require_all_states_bound: false

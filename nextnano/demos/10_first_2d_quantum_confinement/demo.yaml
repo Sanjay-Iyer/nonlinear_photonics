@@ -1,0 +1,73 @@
+---
+demo_id: 10_first_2d_quantum_confinement
+title: First 2D quantum-confinement model — rectangular GaAs/AlGaAs wire
+template: rectangular_wire_2d.in.j2
+
+scientific:
+  # A GaAs core in an AlGaAs matrix. The vertical dimension plays the role of a
+  # quantum well; the lateral one is the new confinement direction.
+  wire_width_nm: 20.0
+  wire_height_nm: 8.0
+  lateral_barrier_nm: 15.0
+  vertical_barrier_nm: 15.0
+  aluminum_fraction: 0.30
+  temperature_K: 300
+
+numerical:
+  grid_spacing_x_nm: 1.0
+  grid_spacing_y_nm: 1.0
+  exterior_grid_spacing_nm: 2.0
+  number_of_states: 4
+  domain_padding_x_nm: 15.0
+  domain_padding_y_nm: 15.0
+  # Deliberate sub-cell shift of the geometry relative to the mesh. A symmetric
+  # structure that is not mesh-aligned must not acquire a large energy shift.
+  geometry_offset_x_nm: 0.0
+  geometry_offset_y_nm: 0.0
+
+sweeps:
+  wire_width_nm: [10.0, 15.0, 20.0, 30.0, 40.0]
+  grid_spacing_x_nm: [2.0, 1.0, 0.5]
+  grid_spacing_y_nm: [2.0, 1.0, 0.5]
+  domain_padding_x_nm: [10.0, 15.0, 25.0]
+  domain_padding_y_nm: [10.0, 15.0, 25.0]
+
+analysis:
+  quantum_region_name: wire
+  boundary_edge_fraction: 0.05
+  # Isotropic versus anisotropic mesh: (dx, dy) pairs run as explicit cases.
+  anisotropy_cases:
+    - [1.0, 1.0]
+    - [2.0, 0.5]
+    - [0.5, 2.0]
+  # Sub-cell translations of the geometry relative to the mesh.
+  alignment_offsets_nm: [0.25, 0.5]
+  # Reflection asymmetry allowed in a symmetric geometry, as a fraction of the
+  # peak probability density.
+  maximum_symmetry_error: 0.02
+  maximum_anisotropy_energy_shift_meV: 2.0
+  # 1D limit: a very wide wire should approach the plain quantum well of height
+  # wire_height_nm.
+  wide_limit_width_nm: 80.0
+  wide_limit_tolerance_meV: 2.0
+
+outputs:
+  parser_profile: nextnano_pp_3_0_0
+  quantum_region_name: wire
+  bandedge_columns:
+    position_nm: 0
+    conduction_eV: 1
+    heavy_hole_eV: 2
+  write_csv: true
+  write_plots: true
+
+validation:
+  completion_markers: ["simulation completed", "calculation successfully completed"]
+  fatal_markers: ["terminating program", "fatal error", "license expired"]
+  convergence_warning_markers: ["failed to converge"]
+  minimum_confined_probability: 0.50
+  maximum_boundary_probability: 0.001
+  normalization_tolerance: 0.001
+  maximum_symmetry_error: 0.02
+  absolute_energy_tolerance_meV: 1.0
+  require_all_states_bound: false

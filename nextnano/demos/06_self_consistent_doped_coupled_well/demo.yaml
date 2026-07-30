@@ -1,0 +1,125 @@
+---
+demo_id: 06_self_consistent_doped_coupled_well
+title: Doped coupled quantum well with self-consistent Schrödinger–Poisson
+template: doped_coupled_well.in.j2
+
+scientific:
+  # Geometry inherited from Demo 5, at zero applied field so that every change
+  # in this demo is attributable to charge rather than to an external tilt.
+  wide_well_width_nm: 8.0
+  narrow_well_width_nm: 5.0
+  center_barrier_nm: 3.0
+  left_outer_barrier_nm: 20.0
+  right_outer_barrier_nm: 20.0
+  aluminum_fraction: 0.30
+  temperature_K: 300
+  electric_field_kV_cm: 0.0
+  field_direction: "+x"
+  contact_thickness_nm: 2.0
+
+  # --- doping ---
+  # Modulation doping: donors sit in the AlGaAs barrier, separated from the
+  # wells by an undoped spacer, so the electrons transfer into the wells and
+  # leave their parent ions behind. That charge separation is what bends the
+  # bands.
+  #
+  # Basis for the range: the vendor examples shipped with nextnano++ 3.0.0 use
+  # 1e18-1e19 cm^-3 for GaAs/AlGaAs doped layers
+  # (examples/basics/basics_1D_doping_heterostructure.nnp uses 1e18-1e19 cm^-3,
+  # and the repository's own hello_06c p-i-n deck uses 1e18 cm^-3). The sweep
+  # below stays inside that established band.
+  donor_density_cm3: 2.0e+18
+  donor_region_start_nm: 6.0
+  donor_region_end_nm: 12.0
+  # Si donor in AlGaAs; the shallow-donor ionisation energy and the standard
+  # conduction-band degeneracy factor.
+  donor_ionization_energy_eV: 0.0058
+  donor_degeneracy: 2
+  spacer_thickness_nm: 8.0
+  contact_bias_V: 0.0
+
+numerical:
+  active_region_grid_spacing_nm: 0.25
+  exterior_grid_spacing_nm: 0.50
+  number_of_states: 5
+  quantum_region_padding_nm: 10.0
+  # Left at the solver defaults' order of magnitude; tightening these is a
+  # numerical decision and is recorded as such.
+  poisson_tolerance: 1.0e-6
+  maximum_iterations: 300
+  potential_mixing_alpha: 0.5
+
+# --- staged model progression ----------------------------------------------
+# Each stage turns on exactly one new mechanism. `run_mode` selects the run{}
+# block; the other flags select the impurities, poisson, and quantum blocks.
+models:
+  - name: A_undoped_no_poisson
+    description: Baseline — same geometry, no donors, no electrostatics.
+    doping: false
+    poisson: false
+    quantum: true
+    quantum_density: false
+    run_mode: quantum
+  - name: B_doped_classical_poisson
+    description: Donors plus classical Poisson only. No Schrödinger equation.
+    doping: true
+    poisson: true
+    quantum: false
+    quantum_density: false
+    run_mode: poisson
+  - name: C_quantum_on_poisson_potential
+    description: >-
+      Quantum states computed on Stage B's potential, with the quantum density
+      NOT fed back. Isolates "what the bent bands do to the levels".
+    doping: true
+    poisson: true
+    quantum: true
+    quantum_density: false
+    run_mode: poisson_quantum
+  - name: D_self_consistent
+    description: >-
+      Full self-consistent loop: the quantum electron density enters Poisson and
+      the resulting potential re-enters Schrödinger until both stop changing.
+    doping: true
+    poisson: true
+    quantum: true
+    quantum_density: true
+    run_mode: quantum_poisson
+
+# Stage E: the self-consistent stage repeated across doping.
+sweeps:
+  donor_density_cm3: [5.0e+17, 1.0e+18, 2.0e+18, 5.0e+18, 1.0e+19]
+  quantum_region_padding_nm: [10.0, 20.0]
+
+analysis:
+  quantum_region_name: cqw
+  sweep_model: D_self_consistent
+  boundary_edge_fraction: 0.05
+  # Sheet-charge imbalance allowed between electrons and ionized donors.
+  maximum_charge_imbalance: 0.05
+
+outputs:
+  parser_profile: nextnano_pp_3_0_0
+  quantum_region_name: cqw
+  bandedge_columns:
+    position_nm: 0
+    conduction_eV: 1
+    heavy_hole_eV: 2
+    light_hole_eV: 3
+    split_off_eV: 4
+  write_csv: true
+  write_plots: true
+
+validation:
+  completion_markers: ["simulation completed", "calculation successfully completed"]
+  fatal_markers: ["terminating program", "fatal error", "license expired"]
+  # Reaching the iteration cap is reported as max_iterations_reached, never as
+  # convergence, even though the solver still exits successfully.
+  convergence_warning_markers:
+    ["failed to converge", "did not converge", "maximum number of iterations"]
+  minimum_confined_probability: 0.40
+  maximum_boundary_probability: 0.001
+  normalization_tolerance: 0.001
+  maximum_charge_imbalance: 0.05
+  absolute_energy_tolerance_meV: 1.0
+  require_all_states_bound: false

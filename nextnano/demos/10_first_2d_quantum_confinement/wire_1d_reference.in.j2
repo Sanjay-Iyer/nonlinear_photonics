@@ -1,0 +1,53 @@
+# Demo 10 numerical reference: the same finite GaAs/AlGaAs confinement in one
+# direction only. The wide 2D wire must approach this subband edge as lateral
+# confinement vanishes.
+
+global{
+    simulate1D{}
+    temperature = {{temperature_K}}
+    substrate{ name = "GaAs" }
+    crystal_zb{ x_hkl = [1, 0, 0]  y_hkl = [0, 1, 0] }
+}
+
+contacts{
+    fermi{ name = well_contact  bias = 0.0 }
+}
+
+grid{
+    xgrid{
+{{grid_lines}}
+    }
+}
+
+structure{
+    output_region_index{ boxes = no }
+    output_material_index{ boxes = no }
+{{structure_regions}}
+}
+
+classical{
+    Gamma{}
+    HH{}
+    LH{}
+    SO{}
+    output_bandedges{ averaged = no }
+}
+
+quantum{
+    region{
+        name = "well1d"
+        x = [{{quantum_start_nm}}, {{quantum_end_nm}}]
+        no_density = yes
+        boundary{ x = dirichlet }
+        Gamma{ num_ev = {{number_of_states}} }
+        output_states{
+            max_num       = {{number_of_states}}
+            envelopes     = yes
+            probabilities = yes
+        }
+    }
+}
+
+run{
+    quantum{}
+}

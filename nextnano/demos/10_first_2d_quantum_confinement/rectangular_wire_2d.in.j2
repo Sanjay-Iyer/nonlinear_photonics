@@ -1,0 +1,73 @@
+# Demo 10: first 2D model — a rectangular GaAs quantum wire in an AlGaAs matrix.
+#
+# Syntax basis: the repository's validated hello_03a_gaas_rectangle_2d.in, whose
+# 2D-specific constructs (simulate2D{}, ygrid{}, rectangle{}, a quantum region
+# with both x and y and boundary{ x = dirichlet  y = dirichlet }) were confirmed
+# at home against the Free nextnano++ 3.0.0 parser with --parse and --structure.
+# The Free edition builds the 2D grid and then stops with "This version of
+# nextnano++ does not allow running 2D simulations" — the expected 1D-only gate,
+# not a syntax problem.
+#
+# The only change from hello_03a is the material map: an AlGaAs matrix rectangle
+# with a GaAs core rectangle inside it, so the wire is confined by a real
+# heterostructure barrier rather than only by the Dirichlet box.
+#
+# Deliberately minimal: one-band Gamma effective mass, no strain, no
+# polarization, no excitons, few states, modest grid. 2D is expensive because
+# the mesh cost is the product of two directions and the eigenproblem grows with
+# it; adding physics before the mesh is trusted wastes hours.
+#
+# UNVALIDATED OUTPUT: no 2D run has ever executed in this repository, so the 2D
+# field-output file names are marked confirmed: false in the parser profile.
+
+global{
+    simulate2D{}
+    temperature = {{temperature_K}}
+    substrate{ name = "GaAs" }
+    crystal_zb{ x_hkl = [1, 0, 0]  y_hkl = [0, 1, 0] }
+}
+
+contacts{
+    fermi{ name = wire_contact  bias = 0.0 }
+}
+
+grid{
+    xgrid{
+{{xgrid_lines}}
+    }
+    ygrid{
+{{ygrid_lines}}
+    }
+}
+
+structure{
+    output_region_index{ boxes = no }
+    output_material_index{ boxes = no }
+{{structure_regions}}
+}
+
+classical{
+    Gamma{}
+    HH{}
+    output_bandedges{ averaged = no }
+}
+
+quantum{
+    region{
+        name = "{{quantum_region_name}}"
+        x = [{{quantum_x_min_nm}}, {{quantum_x_max_nm}}]
+        y = [{{quantum_y_min_nm}}, {{quantum_y_max_nm}}]
+        no_density = yes
+        boundary{ x = dirichlet  y = dirichlet }
+        Gamma{ num_ev = {{number_of_states}} }
+        output_states{
+            max_num       = {{number_of_states}}
+            envelopes     = yes
+            probabilities = yes
+        }
+    }
+}
+
+run{
+    quantum{}
+}

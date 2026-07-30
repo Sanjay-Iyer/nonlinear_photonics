@@ -31,6 +31,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import yaml
 
+import schemas
+
 NEXTNANO_ROOT = Path(__file__).resolve().parents[2]
 REPOSITORY_ROOT = NEXTNANO_ROOT.parent
 MACHINE_CONFIG = NEXTNANO_ROOT / "config" / "machines" / "nextnano_machine.local.yaml"
@@ -164,89 +166,27 @@ def _finite_number(value: Any, label: str) -> float:
 
 
 def load_demo_config(demo_dir: Path) -> dict[str, Any]:
-    """Load and strictly validate a demo's scientific YAML."""
+    """Load and strictly validate a demo's scientific YAML.
+
+    The rules live in :mod:`schemas`, one schema per demo.  Demos 1-3 share the
+    schema transcribed from the key sets they were validated with, so their
+    behaviour is unchanged; later demos declare their own richer vocabulary
+    instead of widening everybody's.
+    """
 
     path = demo_dir / "demo.yaml"
-    cfg = _strict_keys(_read_yaml(path), TOP_LEVEL_KEYS, str(path))
-    for required in ("demo_id", "title", "template", "scientific", "numerical"):
-        if required not in cfg:
-            raise DemoError(f"{path}: missing required key '{required}'.")
+    raw = _read_yaml(path)
+    demo_id = str(raw.get("demo_id", ""))
     expected = demo_dir.name.split("_", 1)[0]
-    if not str(cfg["demo_id"]).startswith(expected):
+    if not demo_id.startswith(expected):
         raise DemoError(
-            f"{path}: demo_id {cfg['demo_id']!r} does not match directory {demo_dir.name!r}."
+            f"{path}: demo_id {demo_id!r} does not match directory {demo_dir.name!r}."
         )
-    scientific = _strict_keys(
-        cfg["scientific"], COMMON_SCIENTIFIC_KEYS, f"{path}: scientific"
-    )
-    numerical = _strict_keys(
-        cfg["numerical"], COMMON_NUMERICAL_KEYS, f"{path}: numerical"
-    )
-    cfg["outputs"] = _strict_keys(
-        cfg.get("outputs", {}), OUTPUT_KEYS, f"{path}: outputs"
-    )
-    cfg["validation"] = _strict_keys(
-        cfg.get("validation", {}), VALIDATION_KEYS, f"{path}: validation"
-    )
-    if "sweeps" in cfg:
-        cfg["sweeps"] = _strict_keys(
-            cfg["sweeps"], SWEEP_KEYS, f"{path}: sweeps"
-        )
-
-    for name in (
-        "well_width_nm",
-        "left_barrier_width_nm",
-        "right_barrier_width_nm",
-        "barrier_width_nm",
-        "temperature_K",
-        "aluminum_fraction",
-    ):
-        if name in scientific:
-            value = _finite_number(scientific[name], f"{path}: scientific.{name}")
-            if value <= 0:
-                raise DemoError(f"{path}: scientific.{name} must be finite and > 0.")
-    if float(scientific.get("aluminum_fraction", 0.3)) >= 1:
-        raise DemoError(f"{path}: aluminum_fraction must lie strictly between 0 and 1.")
-    for name, value in numerical.items():
-        numeric = _finite_number(value, f"{path}: numerical.{name}")
-        if numeric <= 0:
-            raise DemoError(f"{path}: numerical.{name} must be finite and > 0.")
-    if "number_of_states" in numerical and int(
-        float(numerical["number_of_states"])
-    ) != float(numerical["number_of_states"]):
-        raise DemoError(f"{path}: numerical.number_of_states must be an integer.")
-    for name in ("minimum_well_probability", "maximum_boundary_probability"):
-        if name in cfg["validation"]:
-            value = _finite_number(
-                cfg["validation"][name], f"{path}: validation.{name}"
-            )
-            if not 0 <= value <= 1:
-                raise DemoError(f"{path}: validation.{name} must lie in [0, 1].")
-    for name in (
-        "normalization_tolerance",
-        "absolute_energy_tolerance_meV",
-        "relative_energy_tolerance",
-    ):
-        if name in cfg["validation"]:
-            value = _finite_number(
-                cfg["validation"][name], f"{path}: validation.{name}"
-            )
-            if value < 0:
-                raise DemoError(f"{path}: validation.{name} must be >= 0.")
-    for sweep, values in cfg.get("sweeps", {}).items():
-        if not isinstance(values, list) or not values:
-            raise DemoError(f"{path}: sweeps.{sweep} must be a non-empty list.")
-        for value in values:
-            numeric = _finite_number(value, f"{path}: sweeps.{sweep}")
-            if numeric <= 0:
-                raise DemoError(
-                    f"{path}: every sweeps.{sweep} value must be finite and > 0."
-                )
-            if sweep == "number_of_states" and int(numeric) != numeric:
-                raise DemoError(
-                    f"{path}: every sweeps.number_of_states value must be an integer."
-                )
-    return cfg
+    try:
+        schema = schemas.schema_for(demo_id)
+        return schemas.validate_config(raw, schema, str(path))
+    except schemas.SchemaError as exc:
+        raise DemoError(str(exc)) from exc
 
 
 def repository_root(start: Path | None = None) -> Path:
@@ -472,9 +412,15 @@ def render_template(template_text: str, values: dict[str, Any]) -> str:
 
 
 def make_run_id() -> str:
-    """Create a sortable run ID with collision-resistant suffix."""
+    """Create a sortable run ID with a collision-resistant suffix.
 
-    stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%S.%fZ")
+    Kept deliberately short. nextnano++ writes its own nested output tree
+    (``raw_output/<deck>/bias_00000/Quantum/<region>/Gamma/...``) beneath each
+    run directory, and Windows still refuses paths beyond 260 characters for
+    ordinary file APIs, so every component of the prefix has to earn its length.
+    """
+
+    stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     return f"{stamp}_{uuid.uuid4().hex[:8]}"
 
 
@@ -1005,7 +951,12 @@ def _analyse_quantum(
 
 
 def _log_checks(raw: Path, cfg: dict[str, Any]) -> dict[str, Any]:
-    logs = sorted(raw.rglob("*.log"))
+    # nextnano++ 3.0.0 writes its completion evidence to summary.log
+    # ("Simulation completed.") and job_done.txt ("Calculation successfully
+    # completed."); the word "DONE." only ever reaches the console, which is not
+    # part of the preserved output tree. Both files are read here so a real
+    # successful run is recognised as one.
+    logs = sorted(raw.rglob("*.log")) + sorted(raw.rglob("job_*.txt"))
     text = "\n".join(
         path.read_text(encoding="utf-8", errors="replace") for path in logs
     ).lower()
@@ -1496,3 +1447,24 @@ def cli(demo_dir: Path) -> int:
     except DemoError as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2
+
+
+# ---------------------------------------------------------------------------
+# Public surface reused by the Demo 4-10 modules.
+#
+# Demos 4-10 need the same provenance, logging, solver-invocation, and atomic
+# write behaviour that Demos 1-3 were validated with. These aliases exist so
+# those modules can share one implementation without reaching into names that
+# look private, and so any future change to the mechanics happens in one place.
+# ---------------------------------------------------------------------------
+
+write_text_atomically = _atomic_text
+write_json_atomically = _atomic_json
+sha256_of = _sha256
+git_state = _git_state
+create_run_layout = _create_layout
+run_logger = _logger
+execute_solver = _execute_solver
+sanitize_solver_logs = _sanitize_solver_logs
+manifest_base = _manifest_base
+write_csv = _write_csv

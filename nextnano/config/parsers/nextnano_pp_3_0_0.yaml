@@ -1,0 +1,367 @@
+---
+# Output-file layout of nextnano++ 3.0.0 (2026_07_03 package).
+#
+# `confirmed: true` means the pattern was observed in a real run of this solver
+# version. Two independent sources contributed:
+#
+#   * work laptop, nextnano++ 3.0.0 Standard (2026-06-16 kernel), 2026-07-30 --
+#     Demos 1 and 2 (band edges, one-band spectrum and probabilities);
+#   * home laptop, nextnano++ 3.0.0 Free, 2026-07-30 -- small 300 K probe decks
+#     (<= 100 grid points, Gamma/HH only) covering the imposed electric field,
+#     the self-consistent quantum-Poisson loop, and the optical matrix-element
+#     and transition-energy tables.
+#
+# `confirmed: false` means the pattern follows the same directory convention but
+# has NOT been seen yet, because the Free edition refuses the feature (strain and
+# every k.p model are Standard-only). Those entries are the ones a licensed run
+# must confirm; when one is wrong the parser fails with a listing of the files
+# the run actually wrote, and only this file needs editing.
+#
+# Placeholders: {region} is the quantum{ region{ name = ... } } name.
+
+profile: nextnano_pp_3_0_0
+solver_version: "nextnano++ 3.0.0 (2026_07_03 package)"
+description: >-
+  Artifact patterns for nextnano++ 3.0.0. Paths are relative to the run's raw
+  output directory, which nextnano++ names after the input deck.
+
+artifacts:
+
+  # --- bias-point scalar/profile output -----------------------------------
+  bandedges:
+    pattern: "**/bias_*/bandedges.dat"
+    confirmed: true
+    description: >-
+      Classical band edges. Column order follows the classical{} block: x, then
+      each requested band in Gamma, HH, LH, SO order, then the electron and hole
+      Fermi levels. Requesting fewer bands removes columns, so every demo
+      declares its own explicit column map.
+    units:
+      position: nm
+      band_edge: eV
+
+  potential:
+    pattern: "**/bias_*/potential.dat"
+    confirmed: true
+    description: Electrostatic potential phi(x).
+    units:
+      position: nm
+      potential: V
+
+  electric_field:
+    pattern: "**/bias_*/electric_field.dat"
+    confirmed: true
+    description: >-
+      Electric field on the dual grid (cell centres, so one row fewer than the
+      potential). Reported in kV/cm regardless of the input unit.
+    units:
+      position: nm
+      field: kV/cm
+
+  total_charges:
+    pattern: "**/bias_*/total_charges.txt"
+    required: false
+    confirmed: true
+    description: Sheet densities of electrons, holes, ionized dopants, fixed charge.
+    units:
+      sheet_density: e/cm^2
+
+  electron_density:
+    pattern: "**/bias_*/density_electron.dat"
+    required: false
+    confirmed: true
+    units:
+      position: nm
+      density: 1e18 cm^-3
+
+  hole_density:
+    pattern: "**/bias_*/density_hole.dat"
+    required: false
+    confirmed: true
+    units:
+      position: nm
+      density: 1e18 cm^-3
+
+  ionized_donor_density:
+    pattern: "**/bias_*/density_donor_ionized.dat"
+    required: false
+    confirmed: true
+    units:
+      position: nm
+      density: 1e18 cm^-3
+
+  ionized_acceptor_density:
+    pattern: "**/bias_*/density_acceptor_ionized.dat"
+    required: false
+    confirmed: true
+    units:
+      position: nm
+      density: 1e18 cm^-3
+
+  designed_donor_density:
+    pattern: "**/Structure/density_donor.dat"
+    required: false
+    confirmed: true
+    description: As-designed (not ionized) donor profile written by output_impurities.
+    units:
+      position: nm
+      density: 1e18 cm^-3
+
+  # --- self-consistency ----------------------------------------------------
+  iteration_quantum_poisson:
+    pattern: "**/bias_*/iteration_quantum_poisson.dat"
+    required: false
+    confirmed: true
+    description: >-
+      Per-iteration history of run{ quantum_poisson{} }. Columns: Iteration,
+      ExactIteration, Residual_EDensity[1/cm^2], Residual_HDensity[1/cm^2],
+      Residual_Potential[V]. Reaching the iteration cap is NOT convergence; the
+      solver still exits DONE and only warns in summary.log.
+
+  iteration_current_poisson:
+    pattern: "**/bias_*/iteration_current_poisson.dat"
+    required: false
+    confirmed: false
+    description: Analogue for run{ current_poisson{} }; not exercised at home yet.
+
+  # --- one-band / k.p quantum states --------------------------------------
+  energy_spectrum_gamma:
+    pattern: "**/bias_*/Quantum/{region}/Gamma/energy_spectrum_k*.dat"
+    confirmed: true
+    description: "Columns: no., Energy[eV]. Electron states, increasing energy."
+    units:
+      energy: eV
+
+  probabilities_gamma:
+    pattern: "**/bias_*/Quantum/{region}/Gamma/probabilities_k00000.dat"
+    confirmed: true
+    description: "x[nm] then Psi^2_i[nm^-1] for each state, one column per state."
+    units:
+      position: nm
+      probability_density: nm^-1
+
+  envelopes_gamma:
+    pattern: "**/bias_*/Quantum/{region}/Gamma/envelopes_k00000.dat"
+    confirmed: true
+    description: >-
+      x[nm] then Psi_i[nm^-1/2]. Real-valued signed envelope amplitudes; needed
+      for parity, overlap-based state tracking, and position matrix elements.
+      This is an amplitude, never a probability and never an energy.
+    units:
+      position: nm
+      envelope: nm^-1/2
+
+  energy_spectrum_hh:
+    pattern: "**/bias_*/Quantum/{region}/HH/energy_spectrum_k*.dat"
+    required: false
+    confirmed: true
+    description: >-
+      Heavy-hole states. Listed with DECREASING electron-scale energy, so index
+      order is confinement order, not ascending eV.
+    units:
+      energy: eV
+
+  probabilities_hh:
+    pattern: "**/bias_*/Quantum/{region}/HH/probabilities_k00000.dat"
+    required: false
+    confirmed: true
+
+  envelopes_hh:
+    pattern: "**/bias_*/Quantum/{region}/HH/envelopes_k00000.dat"
+    required: false
+    confirmed: true
+
+  energy_spectrum_lh:
+    pattern: "**/bias_*/Quantum/{region}/LH/energy_spectrum_k*.dat"
+    required: false
+    confirmed: false
+    description: Light-hole one-band states; Free edition refuses LH, Standard-only.
+
+  probabilities_lh:
+    pattern: "**/bias_*/Quantum/{region}/LH/probabilities_k00000.dat"
+    required: false
+    confirmed: false
+
+  energy_spectrum_kp6:
+    pattern: "**/bias_*/Quantum/{region}/kp6/energy_spectrum_k*.dat"
+    required: false
+    confirmed: false
+    description: >-
+      UNCONFIRMED. 6-band k.p spectrum. The band sub-directory name is the one
+      remaining unknown; the licensed run must confirm it (candidates seen in
+      nextnano documentation include kp6 and KP6).
+
+  probabilities_kp6:
+    pattern: "**/bias_*/Quantum/{region}/kp6/probabilities_k00000.dat"
+    required: false
+    confirmed: false
+
+  spinor_composition_kp6:
+    pattern: "**/bias_*/Quantum/{region}/kp6/spinor_composition_k00000*.dat"
+    required: false
+    confirmed: false
+    description: >-
+      UNCONFIRMED. Per-state HH/LH/SO weights from
+      output_states{ spinor_composition = yes }. Required to classify a hole
+      state as HH-like or LH-like instead of trusting its index.
+
+  energy_spectrum_kp8:
+    pattern: "**/bias_*/Quantum/{region}/kp8/energy_spectrum_k*.dat"
+    required: false
+    confirmed: false
+
+  probabilities_kp8:
+    pattern: "**/bias_*/Quantum/{region}/kp8/probabilities_k00000.dat"
+    required: false
+    confirmed: false
+
+  spinor_composition_kp8:
+    pattern: "**/bias_*/Quantum/{region}/kp8/spinor_composition_k00000*.dat"
+    required: false
+    confirmed: false
+
+  occupation_gamma:
+    pattern: "**/bias_*/Quantum/{region}/Gamma/occupation.dat"
+    required: false
+    confirmed: true
+    description: "Columns: no., Occupation[electrons_cm^-2]. Sheet density per subband."
+    units:
+      occupation: cm^-2
+
+  subband_densities_gamma:
+    pattern: "**/bias_*/Quantum/{region}/Gamma/density_subbands.dat"
+    required: false
+    confirmed: true
+    units:
+      position: nm
+      density: 1e18 cm^-3
+
+  quantum_density_gamma:
+    pattern: "**/bias_*/Quantum/{region}/Gamma/density.dat"
+    required: false
+    confirmed: true
+
+  # --- optical output ------------------------------------------------------
+  dipole_matrix_elements_gamma:
+    pattern: "**/bias_*/Quantum/{region}/Gamma_Gamma/dipole_moment_matrix_elements_k00000_{polarization}.txt"
+    required: false
+    confirmed: true
+    description: >-
+      Intersubband position matrix elements within the conduction band. Columns:
+      i, j, |<i|eps.d|j>|[e*nm], |...|^2[e^2*nm^2], Re[e*nm], Im[e*nm]. With the
+      polarization vector along growth this is z_ij directly in e*nm.
+    units:
+      dipole: e*nm
+
+  momentum_matrix_elements_gamma:
+    pattern: "**/bias_*/Quantum/{region}/Gamma_Gamma/momentum_matrix_elements_k00000_{polarization}.txt"
+    required: false
+    confirmed: true
+    units:
+      momentum: hbar/nm
+
+  oscillator_strengths_gamma:
+    pattern: "**/bias_*/Quantum/{region}/Gamma_Gamma/oscillator_strengths_k00000_{polarization}.txt"
+    required: false
+    confirmed: true
+    description: >-
+      Dimensionless f(i,j). Confirmed at home: growth-polarised intersubband f12
+      is nonzero while in-plane f12 is exactly zero -- the intersubband selection
+      rule.
+
+  transition_energies_gamma_hh:
+    pattern: "**/bias_*/Quantum/{region}/Gamma_HH/transition_energies_k00000.txt"
+    required: false
+    confirmed: true
+    description: "Columns: Gamma_i, HH_j, Gamma_i-HH_j[eV]."
+    units:
+      energy: eV
+
+  overlap_integrals_gamma_hh:
+    pattern: "**/bias_*/Quantum/{region}/Gamma_HH/overlap_integrals_k00000.txt"
+    required: false
+    confirmed: true
+    description: "Columns: i, j, |<i|j>|, |<i|j>|^2, <i|j>."
+
+  transition_energies_gamma_kp6:
+    pattern: "**/bias_*/Quantum/{region}/Gamma_KP6/transition_energies_k00000.txt"
+    required: false
+    confirmed: false
+    description: UNCONFIRMED. One-band Gamma to 6-band-valence transition energies.
+
+  overlap_integrals_gamma_kp6:
+    pattern: "**/bias_*/Quantum/{region}/Gamma_KP6/overlap_integrals_k00000.txt"
+    required: false
+    confirmed: false
+
+  transition_energies_gamma_lh:
+    pattern: "**/bias_*/Quantum/{region}/Gamma_LH/transition_energies_k00000.txt"
+    required: false
+    confirmed: false
+
+  transition_energies_kp8:
+    pattern: "**/bias_*/Quantum/{region}/kp8_kp8/transition_energies_k00000.txt"
+    required: false
+    confirmed: false
+    description: >-
+      UNCONFIRMED. Interband transitions inside the 8-band Hamiltonian. Note the
+      home measurement that momentum_matrix_elements over SEPARATE one-band
+      Gamma and HH solutions writes only Gamma_Gamma and HH_HH -- genuine
+      interband optical matrix elements require the coupled 8-band model.
+
+  momentum_matrix_elements_kp8:
+    pattern: "**/bias_*/Quantum/{region}/kp8_kp8/momentum_matrix_elements_k00000_{polarization}.txt"
+    required: false
+    confirmed: false
+
+  oscillator_strengths_kp8:
+    pattern: "**/bias_*/Quantum/{region}/kp8_kp8/oscillator_strengths_k00000_{polarization}.txt"
+    required: false
+    confirmed: false
+
+  # --- strain --------------------------------------------------------------
+  hydrostatic_strain:
+    pattern: "**/Strain/hydrostatic_strain.dat"
+    required: false
+    confirmed: false
+    description: UNCONFIRMED. Written by strain{ output_hydrostatic_strain{} }.
+
+  strain_tensor:
+    pattern: "**/Strain/strain_simulation_system.dat"
+    required: false
+    confirmed: false
+    description: >-
+      UNCONFIRMED. Written by strain{ output_strain_tensor{ simulation_system = yes } }.
+      Confirm the file name and the component column order on the licensed laptop.
+
+  # --- 2D ------------------------------------------------------------------
+  bandedges_2d:
+    pattern: "**/bias_*/bandedges.*"
+    required: false
+    confirmed: false
+    description: UNCONFIRMED. 2D field output; the Free edition cannot run 2D.
+
+  probabilities_2d:
+    pattern: "**/bias_*/Quantum/{region}/Gamma/probabilities*.*"
+    required: false
+    confirmed: false
+
+  material_index_2d:
+    pattern: "**/Structure/material_index.*"
+    required: false
+    confirmed: false
+
+  region_index_2d:
+    pattern: "**/Structure/region_index.*"
+    required: false
+    confirmed: false
+
+  grid_x:
+    pattern: "**/grid_x.dat"
+    required: false
+    confirmed: true
+
+  grid_y:
+    pattern: "**/grid_y.dat"
+    required: false
+    confirmed: false

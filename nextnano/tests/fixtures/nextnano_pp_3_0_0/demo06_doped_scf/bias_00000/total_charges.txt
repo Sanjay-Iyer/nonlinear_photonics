@@ -1,0 +1,9 @@
+electrons:  -9.289252e+11  e/cm^2
+holes:       3.172713e-12  e/cm^2
+
+ionized donors:     9.289252e+11  e/cm^2
+ionized acceptors:  -0.000000e+00  e/cm^2
+
+fixed charges:      0.000000e+00  e/cm^2
+
+sum:       6.904199e-02  e/cm^2

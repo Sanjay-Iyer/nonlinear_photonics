@@ -1,0 +1,89 @@
+---
+demo_id: 07_strained_ingaas_gaas_6band
+title: Strained InGaAs/GaAs quantum well — one-band versus 6-band valence
+template: strained_ingaas_qw.in.j2
+
+scientific:
+  # In(0.15)Ga(0.85)As on GaAs: the composition of the repository's validated
+  # hello_05a strain deck. ~1.1 % compressive lattice mismatch, thin enough at
+  # 7 nm to stay pseudomorphic.
+  indium_fraction: 0.15
+  well_width_nm: 7.0
+  barrier_width_nm: 25.0
+  substrate_material: GaAs
+  # Growth along x, which is the simulation axis in a nextnano++ 1D deck.
+  growth_direction: "[1, 0, 0]"
+  temperature_K: 300
+
+numerical:
+  active_region_grid_spacing_nm: 0.20
+  exterior_grid_spacing_nm: 0.50
+  number_of_electron_states: 3
+  number_of_hole_states: 6
+  quantum_region_padding_nm: 10.0
+
+# --- controlled model progression ------------------------------------------
+# Never start from the 6-band model: every difference must be attributable to
+# exactly one newly enabled mechanism.
+models:
+  - name: M1_classical_unstrained
+    description: Classical band edges with the strain solver explicitly disabled.
+    strain: false
+    quantum: false
+    valence_model: none
+  - name: M2_classical_strained
+    description: Same deck with pseudomorphic strain enabled. Nothing else changes.
+    strain: true
+    quantum: false
+    valence_model: none
+  - name: M3_oneband_electron_hh
+    description: >-
+      One-band Gamma electrons and one-band heavy holes on the strained bands.
+      A one-band hole model cannot mix HH and LH at all.
+    strain: true
+    quantum: true
+    valence_model: one_band
+  - name: M4_sixband_valence
+    description: >-
+      One-band Gamma electrons plus a 6-band valence k.p Hamiltonian, which does
+      mix HH, LH, and SO.
+    strain: true
+    quantum: true
+    valence_model: kp6
+
+sweeps:
+  indium_fraction: [0.10, 0.15, 0.20, 0.25]
+  well_width_nm: [4.0, 6.0, 7.0, 9.0, 12.0]
+
+analysis:
+  quantum_region_name: qw
+  sweep_model: M4_sixband_valence
+  boundary_edge_fraction: 0.05
+  # A hole state is only labelled HH-like or LH-like when one component weight
+  # reaches this fraction; otherwise it is reported as mixed.
+  character_dominant_threshold: 0.60
+  # Grid refinement factor used to check the extra mesh sensitivity of a
+  # multiband Hamiltonian.
+  grid_refinement_factor: 0.5
+
+outputs:
+  parser_profile: nextnano_pp_3_0_0
+  quantum_region_name: qw
+  bandedge_columns:
+    position_nm: 0
+    conduction_eV: 1
+    heavy_hole_eV: 2
+    light_hole_eV: 3
+    split_off_eV: 4
+  write_csv: true
+  write_plots: true
+
+validation:
+  completion_markers: ["simulation completed", "calculation successfully completed"]
+  fatal_markers: ["terminating program", "fatal error", "license expired"]
+  convergence_warning_markers: ["failed to converge"]
+  minimum_confined_probability: 0.50
+  maximum_boundary_probability: 0.001
+  normalization_tolerance: 0.001
+  absolute_energy_tolerance_meV: 2.0
+  require_all_states_bound: false

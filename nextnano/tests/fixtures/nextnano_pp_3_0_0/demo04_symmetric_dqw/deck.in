@@ -1,0 +1,102 @@
+# Demo 4: symmetric GaAs/AlGaAs double quantum well, one-band Gamma electrons.
+#
+# Syntax basis (all previously accepted by nextnano++ 3.0.0):
+#   - repo Demo 2 (validated one-band quantum region, contacts, classical block);
+#   - the vendor example nextnano++/examples/demo/DoubleQuantumWell_6nm_demo.nnp
+#     for the two-well region layout and the single enclosing quantum region.
+#
+# The structure and grid blocks are generated in Python from the layer stack in
+# demo.yaml, so the well boundaries used by the analysis are by construction the
+# same numbers written here.
+#
+# Physics deliberately absent: doping, Poisson, self-consistency, strain,
+# polarization, k.p, transport, optics. The zero-bias fermi contact is the
+# mandatory electrostatic reference and enables none of those.
+
+global{
+    simulate1D{}
+    temperature = 300
+    substrate{ name = "GaAs" }
+    crystal_zb{ x_hkl = [1, 0, 0]  y_hkl = [0, 1, 0] }
+}
+
+contacts{
+    fermi{ name = qw_contact  bias = 0.0 }
+}
+
+grid{
+    xgrid{
+        line{ pos = 0  spacing = 1 }
+        line{ pos = 20  spacing = 1 }
+        line{ pos = 26  spacing = 1 }
+        line{ pos = 30  spacing = 1 }
+        line{ pos = 36  spacing = 1 }
+        line{ pos = 56  spacing = 1 }
+    }
+}
+
+structure{
+    output_region_index{ boxes = no }
+    output_material_index{ boxes = no }
+    region{
+        everywhere{}
+        ternary_constant{
+            name    = "Al(x)Ga(1-x)As"
+            alloy_x = 0.3
+        }
+        contact{ name = qw_contact }
+    }
+    # left_well
+    region{
+        line{ x = [20, 26] }
+        binary{ name = "GaAs" }
+    }
+    # centre_barrier
+    region{
+        line{ x = [26, 30] }
+        ternary_constant{
+            name    = "Al(x)Ga(1-x)As"
+            alloy_x = 0.3
+        }
+    }
+    # right_well
+    region{
+        line{ x = [30, 36] }
+        binary{ name = "GaAs" }
+    }
+    # right_outer_barrier
+    region{
+        line{ x = [36, 56] }
+        ternary_constant{
+            name    = "Al(x)Ga(1-x)As"
+            alloy_x = 0.3
+        }
+    }
+}
+
+classical{
+    Gamma{}
+    HH{}
+    LH{}
+    SO{}
+    output_bandedges{ averaged = no }
+}
+
+quantum{
+    region{
+        name = "dqw"
+        x = [10, 46]
+        no_density = yes
+        boundary{ x = dirichlet }
+        Gamma{ num_ev = 4 }
+        output_states{
+            max_num       = 4
+            envelopes     = yes
+            probabilities = yes
+        }
+    }
+}
+
+run{
+    quantum{}
+}

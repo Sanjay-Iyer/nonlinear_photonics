@@ -1,0 +1,85 @@
+# Demo 8: interband optical transitions of a strained InGaAs/GaAs quantum well,
+# stepped from one-band through 6-band to a full 8-band k.p model.
+#
+# Syntax basis:
+#   - repo Demo 7 (strained InGaAs/GaAs stack, strain block);
+#   - repo hello_04c_qw_8band_kp.in (kp_8band{ num_electrons num_holes
+#     classify_by_energy{} });
+#   - repo hello_06b_GaAs_AlGaAs_qw_absorption.in (transition_energies,
+#     momentum_matrix_elements with named polarizations, oscillator strengths).
+#
+# MEASURED AT HOME (Free nextnano++ 3.0.0, 2026-07-30), and it is the reason
+# this demo exists: momentum_matrix_elements over SEPARATE one-band Gamma and HH
+# solutions writes only Gamma_Gamma/ and HH_HH/ directories -- no interband
+# element is produced at all. Genuine interband optical matrix elements require
+# the coupled 8-band Hamiltonian, where conduction and valence states live in
+# the same eigenproblem.
+#
+# UNVALIDATED OUTPUT. The Free edition refuses every k.p model, so the 8-band
+# output sub-directory and file names are marked confirmed: false in
+# nextnano/config/parsers/nextnano_pp_3_0_0.yaml.
+#
+# Polarization convention: growth is along x, so [1,0,0] is TM (growth-axis)
+# and [0,1,0] is TE (in-plane). Confirmed at home for the one-band intersubband
+# case, where in-plane oscillator strength was exactly zero and growth-axis
+# f12 was 0.065 -- the intersubband selection rule.
+
+global{
+    simulate1D{}
+    temperature = {{temperature_K}}
+    substrate{ name = "{{substrate_material}}" }
+    crystal_zb{ x_hkl = {{growth_direction_vector}}  y_hkl = [0, 1, 0] }
+}
+
+strain{
+    pseudomorphic_strain{}
+    output_strain_tensor{ simulation_system = yes }
+    output_hydrostatic_strain{}
+}
+
+contacts{
+    fermi{ name = qw_contact  bias = 0.0 }
+}
+
+grid{
+    xgrid{
+{{grid_lines}}
+    }
+}
+
+structure{
+    output_region_index{ boxes = no }
+    output_material_index{ boxes = no }
+{{structure_regions}}
+}
+
+classical{
+    Gamma{}
+    HH{}
+    LH{}
+    SO{}
+    output_bandedges{ averaged = no }
+    output_bandgap{}
+}
+{{poisson_block}}
+quantum{
+    region{
+        name = "{{quantum_region_name}}"
+        x = [{{quantum_start_nm}}, {{quantum_end_nm}}]
+        no_density = yes
+        boundary{ x = dirichlet }
+{{model_block}}
+        output_states{
+            max_num       = {{output_state_count}}
+            envelopes     = yes
+            probabilities = yes
+{{spinor_output}}
+        }
+{{optical_block}}
+    }
+}
+
+run{
+    strain{}
+    quantum{}
+}

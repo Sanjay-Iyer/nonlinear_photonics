@@ -1,0 +1,130 @@
+# Demo 5: asymmetric coupled GaAs/AlGaAs quantum well under an imposed
+# electrostatic tilt, one-band Gamma electrons.
+#
+# Syntax basis:
+#   - repo Demo 4 (double-well geometry, one-band quantum region);
+#   - grammar keywords_nnp.xml: poisson{ electric_field{ direction strength } }.
+#
+# FIELD CONVENTION — measured on nextnano++ 3.0.0 (Free edition, home laptop,
+# 2026-07-30), not assumed:
+#   * `strength` is in V/m. strength = 1.0e7 produced exactly 100 kV/cm in
+#     electric_field.dat and a 0.400 V drop across a 40 nm domain.
+#   * With direction = [1,0,0] and positive strength, the potential DECREASES
+#     with x and the conduction band edge RISES with x, so electrons are pushed
+#     towards small x. That is consistent with Ec = -e*phi + const.
+#   * The imposed field only survives if run{} does NOT contain a Poisson step.
+#     With run{ poisson{} } the solver solves electrostatics instead and the
+#     imposed tilt is replaced by the contact-pinned solution. This deck
+#     therefore runs run{ quantum{} } alone; Demo 6 is where Poisson is solved.
+# Both facts are re-checked at runtime against the solver's own
+# electric_field.dat and potential.dat, so a Standard-edition difference is
+# reported rather than silently absorbed.
+#
+# Physics deliberately absent: doping, self-consistent charge, strain, k.p,
+# transport, optics.
+
+global{
+    simulate1D{}
+    temperature = 300
+    substrate{ name = "GaAs" }
+    crystal_zb{ x_hkl = [1, 0, 0]  y_hkl = [0, 1, 0] }
+}
+
+contacts{
+    fermi{ name = qw_contact  bias = 0.0 }
+}
+
+grid{
+    xgrid{
+        line{ pos = 0  spacing = 1 }
+        line{ pos = 20  spacing = 1 }
+        line{ pos = 28  spacing = 1 }
+        line{ pos = 31  spacing = 1 }
+        line{ pos = 36  spacing = 1 }
+        line{ pos = 56  spacing = 1 }
+    }
+}
+
+structure{
+    output_region_index{ boxes = no }
+    output_material_index{ boxes = no }
+    region{
+        everywhere{}
+        ternary_constant{
+            name    = "Al(x)Ga(1-x)As"
+            alloy_x = 0.3
+        }
+    }
+    # Mandatory contact confined to a thin slab at x = 0 so that it
+    # supplies the electrostatic reference without pinning the whole domain.
+    region{
+        line{ x = [0, 2] }
+        ternary_constant{
+            name    = "Al(x)Ga(1-x)As"
+            alloy_x = 0.3
+        }
+        contact{ name = qw_contact }
+    }
+    # left_well
+    region{
+        line{ x = [20, 28] }
+        binary{ name = "GaAs" }
+    }
+    # centre_barrier
+    region{
+        line{ x = [28, 31] }
+        ternary_constant{
+            name    = "Al(x)Ga(1-x)As"
+            alloy_x = 0.3
+        }
+    }
+    # right_well
+    region{
+        line{ x = [31, 36] }
+        binary{ name = "GaAs" }
+    }
+    # right_outer_barrier
+    region{
+        line{ x = [36, 56] }
+        ternary_constant{
+            name    = "Al(x)Ga(1-x)As"
+            alloy_x = 0.3
+        }
+    }
+}
+
+classical{
+    Gamma{}
+    HH{}
+    LH{}
+    SO{}
+    output_bandedges{ averaged = no }
+}
+
+poisson{
+    electric_field{
+        direction = [1, 0, 0]
+        strength  = 5000000   # V/m; 50 kV/cm
+    }
+    output_potential{}
+    output_electric_field{}
+}
+
+quantum{
+    region{
+        name = "cqw"
+        x = [10, 46]
+        no_density = yes
+        boundary{ x = dirichlet }
+        Gamma{ num_ev = 4 }
+        output_states{
+            max_num       = 4
+            envelopes     = yes
+            probabilities = yes
+        }
+    }
+}
+
+run{
+    quantum{}
+}

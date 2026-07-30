@@ -1,0 +1,53 @@
+# Demo 7: pseudomorphic In(x)Ga(1-x)As / GaAs quantum well on a GaAs substrate,
+# stepped from a classical unstrained baseline to a 6-band valence k.p model.
+#
+# Syntax basis:
+#   - repo hello_05a_inGaAs_GaAs_strain.in (top-level strain block,
+#     pseudomorphic_strain, output_strain_tensor, run{ strain{} });
+#   - repo hello_04b_qw_6band_kp.in (quantum/region/kp_6band{ num_ev }).
+#   Both parse cleanly under nextnano++ 3.0.0 and are recorded in this
+#   repository as Standard-only for execution.
+#
+# UNVALIDATED OUTPUT. The Free edition on the home laptop refuses both strain
+# and every k.p model, so this deck's *syntax* is confirmed but its *output file
+# names* are not. The strain and 6-band entries in
+# nextnano/config/parsers/nextnano_pp_3_0_0.yaml are marked confirmed: false.
+# If they are wrong, the run fails with a listing of the files that were
+# actually written and only that YAML needs editing.
+#
+# The strain, quantum, and run blocks are generated in Python from the `models:`
+# list in demo.yaml so that each stage is a complete, archived deck.
+
+global{
+    simulate1D{}
+    temperature = {{temperature_K}}
+    substrate{ name = "{{substrate_material}}" }
+    crystal_zb{ x_hkl = {{growth_direction_vector}}  y_hkl = [0, 1, 0] }
+}
+
+contacts{
+    fermi{ name = qw_contact  bias = 0.0 }
+}
+
+grid{
+    xgrid{
+{{grid_lines}}
+    }
+}
+
+structure{
+    output_region_index{ boxes = no }
+    output_material_index{ boxes = no }
+{{structure_regions}}
+}
+{{strain_block}}
+classical{
+    Gamma{}
+    HH{}
+    LH{}
+    SO{}
+    output_bandedges{ averaged = no }
+    output_bandgap{}
+}
+{{quantum_block}}
+{{run_block}}

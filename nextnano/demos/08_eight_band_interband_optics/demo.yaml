@@ -1,0 +1,105 @@
+---
+demo_id: 08_eight_band_interband_optics
+title: Eight-band k·p interband optical transitions
+template: eight_band_optics.in.j2
+
+scientific:
+  # Demo 7's validated structure, unchanged, so the only new variable is the
+  # electronic model and the optical request.
+  indium_fraction: 0.15
+  well_width_nm: 7.0
+  barrier_width_nm: 25.0
+  substrate_material: GaAs
+  growth_direction: "[1, 0, 0]"
+  temperature_K: 300
+  electric_field_kV_cm: 0.0
+  contact_thickness_nm: 2.0
+  # Symmetry breaking: a thin higher-indium step at one side of the well makes
+  # the confining potential asymmetric, so transitions that a symmetric well
+  # suppresses can gain strength.
+  symmetry_breaking_step_nm: 1.5
+  symmetry_breaking_indium_fraction: 0.25
+
+numerical:
+  active_region_grid_spacing_nm: 0.20
+  exterior_grid_spacing_nm: 0.50
+  number_of_electron_states: 3
+  number_of_hole_states: 4
+  quantum_region_padding_nm: 10.0
+  # In-plane k sampling for the 8-band model. num_points = 1 with
+  # k_integration_disabled is the fast zone-centre case; the convergence rerun
+  # raises it.
+  k_parallel_num_points: 6
+  k_parallel_relative_size: 0.2
+  # Post-processing only (see README): the spectrum is built from transition
+  # energies and oscillator strengths, not read from an absorption solver.
+  broadening_meV: 8.0
+  spectral_energy_min_eV: 1.0
+  spectral_energy_max_eV: 1.8
+  spectral_points: 801
+
+models:
+  - name: M1_oneband_e_h
+    description: One-band Γ electrons and one-band HH/LH holes. Overlaps only.
+    band_model: one_band
+    k_parallel: false
+    optics: overlaps
+  - name: M2_sixband_valence
+    description: One-band Γ electrons plus a 6-band valence Hamiltonian.
+    band_model: kp6
+    k_parallel: false
+    optics: overlaps
+  - name: M3_eightband_zone_centre
+    description: Full 8-band k·p at the zone centre. Coupled CB and VB.
+    band_model: kp8
+    k_parallel: false
+    optics: matrix_elements
+  - name: M4_eightband_k_resolved
+    description: >-
+      8-band k·p with in-plane k sampling enabled and polarization-resolved
+      momentum matrix elements — the model the spectrum is built from.
+    band_model: kp8
+    k_parallel: true
+    optics: matrix_elements
+
+sweeps:
+  well_width_nm: [5.0, 7.0, 9.0]
+  electric_field_kV_cm: [0.0, 25.0, 50.0]
+
+analysis:
+  quantum_region_name: qw
+  sweep_model: M4_eightband_k_resolved
+  boundary_edge_fraction: 0.05
+  character_dominant_threshold: 0.60
+  # Growth is along x in a 1D deck, so [1,0,0] is TM and [0,1,0] is TE.
+  polarizations:
+    TM_growth: "[1, 0, 0]"
+    TE_inplane: "[0, 1, 0]"
+  # A transition counts as "strong" only if BOTH its energy is in range and its
+  # strength clears this fraction of the strongest transition in the same run.
+  strong_transition_fraction: 0.10
+  # Extra k-sampling used for the spectral convergence rerun.
+  k_convergence_num_points: 12
+
+outputs:
+  parser_profile: nextnano_pp_3_0_0
+  quantum_region_name: qw
+  polarizations: ["TM_growth", "TE_inplane"]
+  bandedge_columns:
+    position_nm: 0
+    conduction_eV: 1
+    heavy_hole_eV: 2
+    light_hole_eV: 3
+    split_off_eV: 4
+  write_csv: true
+  write_plots: true
+
+validation:
+  completion_markers: ["simulation completed", "calculation successfully completed"]
+  fatal_markers: ["terminating program", "fatal error", "license expired"]
+  convergence_warning_markers: ["failed to converge"]
+  minimum_confined_probability: 0.50
+  maximum_boundary_probability: 0.001
+  normalization_tolerance: 0.001
+  absolute_energy_tolerance_meV: 2.0
+  require_all_states_bound: false

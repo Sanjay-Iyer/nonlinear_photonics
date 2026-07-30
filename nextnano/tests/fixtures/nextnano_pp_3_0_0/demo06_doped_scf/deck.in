@@ -1,0 +1,148 @@
+# Demo 6: doped asymmetric coupled quantum well, staged towards a
+# self-consistent Schroedinger-Poisson solution.
+#
+# One template serves all five stages. The impurities, poisson, quantum, and run
+# blocks are generated in Python from the `models:` list in demo.yaml, so the
+# deck for every stage is materialised and archived in full and the difference
+# between two stages is a diff of two real inputs.
+# (Placeholder names are deliberately not spelled out in this comment: the
+# renderer substitutes every double-brace placeholder it finds, comments
+# included, and an unknown one is a hard error.)
+#
+# Stage A  undoped, no Poisson              run{ quantum{} }
+# Stage B  donors + classical Poisson       run{ poisson{} }
+# Stage C  quantum states on the B potential run{ poisson{} quantum{} }, no_density
+# Stage D  self-consistent                  run{ quantum_poisson{} }
+# Stage E  Stage D repeated over doping
+#
+# CONTACT PLACEMENT MATTERS HERE. A contact attached to everywhere{} makes the
+# whole domain a Dirichlet region, so once Poisson actually runs the potential
+# is pinned everywhere and no band bending can appear. Measured on nextnano++
+# 3.0.0 at home. The contact is therefore a thin slab at x = 0.
+#
+# CONVERGENCE. run{ quantum_poisson{} } exits DONE and writes job_done.txt even
+# when it has NOT converged; the only in-file evidence is
+# "WARNING: QUANTUM-POISSON failed to converge." in summary.log plus the final
+# residuals in iteration_quantum_poisson.dat. Both are checked. Do not raise
+# `residual` or lower `iterations` to make a run "pass".
+
+global{
+    simulate1D{}
+    temperature = 300
+    substrate{ name = "GaAs" }
+    crystal_zb{ x_hkl = [1, 0, 0]  y_hkl = [0, 1, 0] }
+}
+
+impurities{
+    donor{ name = "si_donor"  degeneracy = 2  energy = 0.0058 }
+}
+
+contacts{
+    fermi{ name = qw_contact  bias = 0 }
+}
+
+grid{
+    xgrid{
+        line{ pos = 0  spacing = 1 }
+        line{ pos = 20  spacing = 1 }
+        line{ pos = 28  spacing = 1 }
+        line{ pos = 31  spacing = 1 }
+        line{ pos = 36  spacing = 1 }
+        line{ pos = 56  spacing = 1 }
+    }
+}
+
+structure{
+    output_region_index{ boxes = no }
+    output_material_index{ boxes = no }
+    output_impurities{ boxes = no }
+    region{
+        everywhere{}
+        ternary_constant{
+            name    = "Al(x)Ga(1-x)As"
+            alloy_x = 0.3
+        }
+    }
+    # Mandatory contact confined to a thin slab at x = 0 so that it
+    # supplies the electrostatic reference without pinning the whole domain.
+    region{
+        line{ x = [0, 2] }
+        ternary_constant{
+            name    = "Al(x)Ga(1-x)As"
+            alloy_x = 0.3
+        }
+        contact{ name = qw_contact }
+    }
+    # left_well
+    region{
+        line{ x = [20, 28] }
+        binary{ name = "GaAs" }
+    }
+    # centre_barrier
+    region{
+        line{ x = [28, 31] }
+        ternary_constant{
+            name    = "Al(x)Ga(1-x)As"
+            alloy_x = 0.3
+        }
+    }
+    # right_well
+    region{
+        line{ x = [31, 36] }
+        binary{ name = "GaAs" }
+    }
+    # right_outer_barrier
+    region{
+        line{ x = [36, 56] }
+        ternary_constant{
+            name    = "Al(x)Ga(1-x)As"
+            alloy_x = 0.3
+        }
+    }
+    region{
+        line{ x = [6, 12] }
+        doping{ constant{ name = "si_donor"  conc = 2e+18 } }
+    }
+}
+
+classical{
+    Gamma{}
+    HH{}
+    LH{}
+    SO{}
+    output_bandedges{ averaged = no }
+    output_carrier_densities{}
+    output_ionized_dopant_densities{}
+}
+
+poisson{
+    output_potential{}
+    output_electric_field{}
+}
+
+
+quantum{
+    region{
+        name = "cqw"
+        x = [10, 46]
+        boundary{ x = dirichlet }
+        Gamma{ num_ev = 4 }
+        output_states{
+            max_num       = 4
+            envelopes     = yes
+            probabilities = yes
+        }
+        output_subband_densities{}
+        output_quantum_densities{}
+    }
+}
+
+run{
+    quantum_poisson{
+        iterations      = 300
+        residual        = 1e-06
+        alpha_potential = 0.5
+        output_log      = yes
+    }
+}
+

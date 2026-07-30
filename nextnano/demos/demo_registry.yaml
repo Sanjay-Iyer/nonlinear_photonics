@@ -1,0 +1,216 @@
+---
+# Machine-readable state of the nextnano++ learning sequence.
+#
+# `status` vocabulary (see _shared/registry.py):
+#   failed               a run was attempted and did not succeed
+#   syntax_unverified    the deck has never been accepted by any nextnano++ parser
+#   implemented_dry_run  inputs generate and validate; no solver has seen them
+#   licensed_run_pending syntax accepted somewhere, licensed execution still owed
+#   solver_passed        the licensed solver ran the deck to completion
+#   parser_passed        ... and this repository parsed its real output
+#   physically_validated ... and every numerical/physical check in the demo passed
+#
+# Only `physically_validated` licenses describing a demo's PHYSICS as trustworthy.
+#
+# `home_syntax_check` / `home_solver_check` record what the home laptop's Free
+# nextnano++ 3.0.0 could establish. The Free edition parses the full grammar but
+# executes only small (<= 100 grid point) 1D decks at 300 K with Gamma/HH bands
+# and no strain and no k.p, so it can confirm plumbing but never Standard physics.
+
+schema: 1
+
+demos:
+
+  01_classical_single_quantum_well:
+    title: Classical GaAs/AlGaAs single quantum well
+    status: physically_validated
+    depends_on: []
+    introduces:
+      - 1D grid and layer regions
+      - alloy composition and interfaces
+      - classical Gamma/HH/LH/SO band edges
+    home_syntax_check: parsed_free_3_0_0
+    home_solver_check: not_attempted_grid_too_large_for_free
+    licensed_validation:
+      date: "2026-07-30"
+      solver: "nextnano++ 3.0.0 (2026-06-16 kernel)"
+      evidence: >-
+        deck accepted, Gamma/HH/LH/SO band edges written, finished with DONE,
+        and repository validation completed successfully after the mandatory
+        neutral-contact correction.
+    pending_licensed_checks: []
+    unvalidated_syntax: []
+
+  02_one_band_finite_quantum_well:
+    title: One-band finite GaAs/AlGaAs quantum well
+    status: physically_validated
+    depends_on: [01_classical_single_quantum_well]
+    introduces:
+      - one-band Gamma electron Schroedinger equation
+      - eigenenergies, envelopes, probability densities
+      - physical (not ordinal) bound-state classification
+    home_syntax_check: parsed_free_3_0_0
+    home_solver_check: refused_free_edition_grid_limit
+    licensed_validation:
+      date: "2026-07-30"
+      solver: "nextnano++ 3.0.0"
+      evidence: >-
+        licensed run established the installed output layout
+        (energy_spectrum_k00000.dat, combined probabilities_k00000.dat,
+        bandedges.dat columns x/Gamma/HH/LH/SO/Fermi levels), which fixed the
+        parser in commit c3804af. The rerun then reported solver and scientific
+        validation completed successfully.
+    pending_licensed_checks: []
+    unvalidated_syntax: []
+
+  03_quantum_well_convergence:
+    title: GaAs/AlGaAs finite-well numerical convergence
+    status: physically_validated
+    depends_on: [02_one_band_finite_quantum_well]
+    introduces:
+      - grid, domain, quantum-region and state-count sweeps
+      - coarsest-acceptable-grid recommendation logic
+    home_syntax_check: parsed_free_3_0_0
+    home_solver_check: refused_free_edition_grid_limit
+    licensed_validation:
+      date: "2026-07-30"
+      solver: "nextnano++ 3.0.0"
+      evidence: >-
+        All 16 grid/domain/quantum-region/state-count cases completed with
+        solver and scientific validation. The recommendation selected a
+        0.25 nm grid and 10 nm domain padding; E1 and E2 differed from their
+        reference cases by less than 0.05 meV, well probability was about
+        0.9695, and boundary probability was about 4.5e-8.
+    pending_licensed_checks: []
+    unvalidated_syntax: []
+
+  04_symmetric_double_quantum_well:
+    title: Symmetric double quantum well and tunnelling
+    status: licensed_run_pending
+    depends_on: [02_one_band_finite_quantum_well, 03_quantum_well_convergence]
+    introduces:
+      - two coupled identical wells and a tunnelling barrier
+      - symmetric/antisymmetric parity classification from envelopes
+      - per-well localisation and overlap-based state tracking
+    home_syntax_check: parsed_free_3_0_0
+    home_solver_check: executed_free_3_0_0_reduced_grid
+    licensed_validation: {}
+    pending_licensed_checks:
+      - Execute the full centre-barrier sweep at production grid spacing.
+      - Confirm E2-E1 decreases monotonically with centre-barrier thickness.
+      - Confirm the two lowest states are balanced between identical wells.
+    unvalidated_syntax: []
+
+  05_asymmetric_coupled_quantum_well_field:
+    title: Asymmetric coupled quantum well with electric-field tuning
+    status: licensed_run_pending
+    depends_on: [04_symmetric_double_quantum_well]
+    introduces:
+      - structural asymmetry between the two wells
+      - an imposed electrostatic tilt via poisson{ electric_field{} }
+      - field-driven localisation, avoided crossings, dipole <z>
+    home_syntax_check: parsed_free_3_0_0
+    home_solver_check: executed_free_3_0_0_reduced_grid
+    licensed_validation: {}
+    pending_licensed_checks:
+      - Re-confirm on Standard that poisson{ electric_field{ strength } } is V/m.
+      - Re-confirm the sign convention (positive strength along +x raises Ec with x).
+      - Confirm avoided-crossing flags survive a padding and grid recheck.
+    unvalidated_syntax: []
+
+  06_self_consistent_doped_coupled_well:
+    title: Doped coupled quantum well with self-consistent Schroedinger-Poisson
+    status: licensed_run_pending
+    depends_on: [05_asymmetric_coupled_quantum_well_field]
+    introduces:
+      - donors, ionized impurities, and classical Poisson
+      - electron occupation and the Fermi level
+      - staged A-E progression to self-consistent quantum-Poisson
+    home_syntax_check: parsed_free_3_0_0
+    home_solver_check: executed_free_3_0_0_reduced_grid
+    licensed_validation: {}
+    pending_licensed_checks:
+      - Confirm the coupled loop converges below tolerance without hitting the cap.
+      - Confirm integrated charge balance between electrons and ionized donors.
+      - Confirm band bending is attributable to doping and not to the contact.
+    unvalidated_syntax: []
+
+  07_strained_ingaas_gaas_6band:
+    title: Strained InGaAs/GaAs quantum well, one-band versus 6-band valence
+    status: licensed_run_pending
+    depends_on: [03_quantum_well_convergence]
+    introduces:
+      - pseudomorphic strain on a GaAs substrate
+      - HH/LH splitting from biaxial strain
+      - 6-band valence k.p and component-weight state classification
+    home_syntax_check: parsed_free_3_0_0
+    home_solver_check: refused_free_edition_no_strain_no_kp
+    licensed_validation: {}
+    pending_licensed_checks:
+      - Confirm the strain output file names and component column order.
+      - Confirm the 6-band output sub-directory name and spinor-composition file.
+      - Confirm strain is genuinely disabled in the no-strain baseline model.
+    unvalidated_syntax:
+      - strain{ output_strain_tensor{} } output file names and column order
+      - quantum{ region{ kp_6band{} } } output sub-directory name
+      - output_states{ spinor_composition = yes } file name and column order
+
+  08_eight_band_interband_optics:
+    title: Eight-band k.p interband optical transitions
+    status: licensed_run_pending
+    depends_on: [07_strained_ingaas_gaas_6band]
+    introduces:
+      - 8-band k.p with coupled conduction and valence bands
+      - interband transition energies and polarisation-resolved matrix elements
+      - selection rules and symmetry-suppressed transitions
+    home_syntax_check: parsed_free_3_0_0
+    home_solver_check: refused_free_edition_no_kp
+    licensed_validation: {}
+    pending_licensed_checks:
+      - Confirm the 8-band output sub-directory and matrix-element file names.
+      - Confirm which polarisation vector corresponds to TE and to TM.
+      - Confirm k-parallel sampling converges the spectrum.
+    unvalidated_syntax:
+      - transition_energies{ Gamma_KP6{} } and overlap_integrals{ Gamma_KP6{} } output directory names
+      - quantum{ region{ kp_8band{} } } output sub-directory name
+      - momentum_matrix_elements{ KP8{} } output file names
+      - transition_energies{ KP8{} } output file names
+
+  09_three_level_nonlinear_optics_sweep:
+    title: Automated three-level nonlinear-optics design sweep
+    status: licensed_run_pending
+    depends_on:
+      - 03_quantum_well_convergence
+      - 05_asymmetric_coupled_quantum_well_field
+    introduces:
+      - single-variable, two-variable, and design-list sweeps
+      - solver-reported and envelope-derived position matrix elements
+      - a documented RELATIVE design metric that is explicitly not chi(2)
+    home_syntax_check: parsed_free_3_0_0
+    home_solver_check: executed_free_3_0_0_reduced_grid
+    licensed_validation: {}
+    pending_licensed_checks:
+      - Confirm solver dipole matrix elements agree with the envelope-derived z_ij.
+      - Confirm top candidates survive their high-resolution convergence reruns.
+      - Confirm no ranked candidate carries an exclusion reason.
+    unvalidated_syntax: []
+
+  10_first_2d_quantum_confinement:
+    title: First 2D quantum-confinement model
+    status: licensed_run_pending
+    depends_on: [03_quantum_well_convergence, 04_symmetric_double_quantum_well]
+    introduces:
+      - simulate2D with an x-y mesh and rectangle regions
+      - 2D probability densities, slices, and symmetry diagnostics
+      - mesh-anisotropy, domain-padding, and grid-alignment tests
+    home_syntax_check: parsed_free_3_0_0
+    home_solver_check: refused_free_edition_1d_only
+    licensed_validation: {}
+    pending_licensed_checks:
+      - Confirm the 2D field-output file names and slice extraction.
+      - Confirm a symmetric geometry produces a symmetric ground state.
+      - Confirm the wide-wire limit approaches the 1D quantum-well result.
+    unvalidated_syntax:
+      - 2D field output file names (bandedges.fld, probabilities .fld)
+      - 2D material or region-index field name and integer encoding
+      - grid_y.dat presence and column layout
