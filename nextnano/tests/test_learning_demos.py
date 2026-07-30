@@ -178,6 +178,19 @@ def test_template_substitution_is_complete_and_reproducible():
     assert hashlib_sha(first) == hashlib_sha(second)
 
 
+def test_demo1_has_required_neutral_contact_without_forbidden_physics():
+    cfg = workflow.load_demo_config(DEMO1)
+    rendered = workflow.render_template(
+        (DEMO1 / cfg["template"]).read_text(encoding="utf-8"),
+        workflow._parameters(cfg),
+    )
+    assert "contacts{" in rendered
+    assert "fermi{ name = qw_contact  bias = 0.0 }" in rendered
+    assert "contact{ name = qw_contact }" in rendered
+    assert "poisson{" not in rendered
+    assert "quantum{" not in rendered
+
+
 @pytest.mark.parametrize("demo_dir", [DEMO1, DEMO2, DEMO3])
 def test_rendered_inputs_load_as_nextnanopp(tmp_path, demo_dir):
     nn = pytest.importorskip("nextnanopy")

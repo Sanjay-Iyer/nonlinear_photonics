@@ -14,7 +14,8 @@ barrier width and at that coordinate plus the well width.
 Enabled: material properties and classical Γ, heavy-hole, light-hole, and
 split-off band edges. Disabled: Schrödinger equation, Poisson,
 self-consistency, intentional strain calculation, polarization, transport, and
-optics.
+optics. A mandatory neutral zero-bias contact is present for nextnano++ input
+validation; it does not enable those disabled calculations.
 
 Edit physical widths, aluminum fraction, and temperature under `scientific` in
 `demo.yaml`. Grid spacings under `numerical` control discretization, not the
@@ -46,4 +47,3 @@ physical and which are numerical?
 The empty classical-only `run{}` trigger is the only syntax element not yet
 licensed-parser validated. A parser rejection is preserved as a failed run; do
 not advance until it is resolved without adding forbidden physics.
-

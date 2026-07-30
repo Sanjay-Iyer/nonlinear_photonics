@@ -1,5 +1,6 @@
 # Demo 1: classical GaAs/AlGaAs single quantum well.
-# Syntax basis: validated hello_02_algaas_qw.in structure and classical blocks.
+# Syntax basis: validated hello_02_algaas_qw.in global, contacts, structure,
+# and classical blocks.
 # IMPORTANT: the empty run{} block avoids enabling strain or quantum physics,
 # but still requires parser/execution validation on the licensed work laptop.
 
@@ -8,6 +9,12 @@ global{
     crystal_zb{ x_hkl = [1, 0, 0]  y_hkl = [0, 1, 0] }
     substrate{ name = "GaAs" }
     temperature = {{temperature_K}}
+}
+
+contacts{
+    # Required top-level nextnano++ object. This neutral contact supplies no
+    # bias and does not enable Poisson, transport, or quantum calculations.
+    fermi{ name = qw_contact  bias = 0.0 }
 }
 
 grid{
@@ -26,6 +33,7 @@ structure{
             name = "Al(x)Ga(1-x)As"
             alloy_x = {{aluminum_fraction}}
         }
+        contact{ name = qw_contact }
     }
     region{
         line{ x = [{{well_start_nm}}, {{well_end_nm}}] }
@@ -43,4 +51,3 @@ classical{
 
 run{
 }
-
