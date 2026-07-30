@@ -678,6 +678,18 @@ def _single_glob(root: Path, pattern: str, label: str) -> Path:
     return matches[0]
 
 
+def _solver_grid_points(raw_output: Path) -> int | None:
+    """Read nextnano++'s authoritative unique 1D grid dimension from its log."""
+
+    pattern = re.compile(r"Grid\s+dimension:\s*(\d+)\s*\*", re.IGNORECASE)
+    for path in sorted(raw_output.rglob("*.log")):
+        text = path.read_text(encoding="utf-8", errors="replace")
+        match = pattern.search(text)
+        if match:
+            return int(match.group(1))
+    return None
+
+
 def _write_csv(path: Path, columns: dict[str, np.ndarray]) -> None:
     names = list(columns)
     with path.open("w", newline="", encoding="utf-8") as handle:
@@ -755,7 +767,8 @@ def _analyse_bandedges(
 
     observables = {
         "bandedges_source": str(source),
-        "grid_points": int(x.size),
+        "grid_points": _solver_grid_points(raw) or int(x.size),
+        "bandedge_output_rows": int(x.size),
         "well_start_nm": well_start,
         "well_end_nm": well_end,
         "well_conduction_edge_eV": well_ec,

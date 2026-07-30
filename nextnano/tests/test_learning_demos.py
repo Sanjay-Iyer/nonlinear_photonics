@@ -281,6 +281,19 @@ def test_numeric_output_parser_fixture(tmp_path):
     assert np.isfinite(parsed["split_off_eV"]).all()
 
 
+def test_solver_grid_points_uses_log_dimension_not_bandedges_rows(tmp_path):
+    raw = tmp_path / "raw"
+    nested = raw / "case"
+    nested.mkdir(parents=True)
+    (nested / "case.log").write_text(
+        "Creating grid 1 using:\n"
+        "Grid dimension: 201 * 1 * 1\n"
+        "Number of unique grid points: 201\n",
+        encoding="utf-8",
+    )
+    assert workflow._solver_grid_points(raw) == 201
+
+
 def test_quantum_output_parser_and_plots_with_small_fixture(tmp_path):
     raw = tmp_path / "raw"
     extracted = tmp_path / "extracted"
