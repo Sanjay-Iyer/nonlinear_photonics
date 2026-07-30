@@ -1,0 +1,92 @@
+# Demo 10: first 2D model — a rectangular GaAs quantum wire in an AlGaAs matrix.
+#
+# Syntax basis: the repository's validated hello_03a_gaas_rectangle_2d.in, whose
+# 2D-specific constructs (simulate2D{}, ygrid{}, rectangle{}, a quantum region
+# with both x and y and boundary{ x = dirichlet  y = dirichlet }) were confirmed
+# at home against the Free nextnano++ 3.0.0 parser with --parse and --structure.
+# The Free edition builds the 2D grid and then stops with "This version of
+# nextnano++ does not allow running 2D simulations" — the expected 1D-only gate,
+# not a syntax problem.
+#
+# The only change from hello_03a is the material map: an AlGaAs matrix rectangle
+# with a GaAs core rectangle inside it, so the wire is confined by a real
+# heterostructure barrier rather than only by the Dirichlet box.
+#
+# Deliberately minimal: one-band Gamma effective mass, no strain, no
+# polarization, no excitons, few states, modest grid. 2D is expensive because
+# the mesh cost is the product of two directions and the eigenproblem grows with
+# it; adding physics before the mesh is trusted wastes hours.
+#
+# UNVALIDATED OUTPUT: no 2D run has ever executed in this repository, so the 2D
+# field-output file names are marked confirmed: false in the parser profile.
+
+global{
+    simulate2D{}
+    temperature = 300
+    substrate{ name = "GaAs" }
+    crystal_zb{ x_hkl = [1, 0, 0]  y_hkl = [0, 1, 0] }
+}
+
+contacts{
+    fermi{ name = wire_contact  bias = 0.0 }
+}
+
+grid{
+    xgrid{
+        line{ pos = 0  spacing = 2 }
+        line{ pos = 30  spacing = 1 }
+        line{ pos = 50  spacing = 1 }
+        line{ pos = 80  spacing = 2 }
+    }
+    ygrid{
+        line{ pos = 0  spacing = 2 }
+        line{ pos = 30  spacing = 1 }
+        line{ pos = 38  spacing = 1 }
+        line{ pos = 68  spacing = 2 }
+    }
+}
+
+structure{
+    output_region_index{ boxes = no }
+    output_material_index{ boxes = no }
+    # algaas_matrix
+    region{
+        rectangle{ x = [0, 80]  y = [0, 68] }
+        ternary_constant{
+            name    = "Al(x)Ga(1-x)As"
+            alloy_x = 0.3
+        }
+        contact{ name = wire_contact }
+    }
+    # gaas_core
+    region{
+        rectangle{ x = [30, 50]  y = [30, 38] }
+        binary{ name = "GaAs" }
+    }
+}
+
+classical{
+    Gamma{}
+    HH{}
+    output_bandedges{ averaged = no }
+}
+
+quantum{
+    region{
+        name = "wire"
+        x = [0, 80]
+        y = [0, 68]
+        no_density = yes
+        boundary{ x = dirichlet  y = dirichlet }
+        Gamma{ num_ev = 4 }
+        output_states{
+            max_num       = 4
+            envelopes     = yes
+            probabilities = yes
+        }
+    }
+}
+
+run{
+    quantum{}
+}

@@ -145,15 +145,64 @@ more than 250 000 grid points rather than letting a typo run for hours.
 - **Home, syntax:** the 24 2D decks plus one 1D reference deck generate
   deterministically; the 2D syntax parses cleanly under `--parse`, and
   `--structure` builds the real 2D grid before the expected 1D-only gate.
-- **Home, execution: impossible.** The Free edition is 1D only. There is **no
-  real-output fixture for this demo**; the 2D analysis functions
-  (`normalise_density_2d`, `centroid_2d`, `boundary_probability_2d`,
-  `symmetry_error`, `slice_2d`) are unit-tested against synthetic arrays
-  instead, which validates the logic but not the file format.
-- **Unconfirmed:** the 2D field-output file names, `grid_y.dat`, and the field
-  storage order.
+- **Home, execution: impossible.** The Free edition is 1D only. Real 2D output
+  from the licensed laptop is now committed under
+  `nextnano/tests/fixtures/nextnano_pp_3_0_0/demo10_wire_2d/`, so the `.fld`
+  reader and the full 2D analysis are exercised at home against genuine data.
+- **Confirmed:** the `.fld` format and storage order, `grid_y.dat`,
+  `probabilities_k00000.fld`, `bandedges.fld` and its doubled grid,
+  `Structure/materials.fld`, and `material_indices.txt`.
+- **Still unconfirmed:** the integer-to-material encoding is read from
+  `material_indices.txt` rather than assumed, but it has only been seen for one
+  structure (27 = GaAs, 43 = AlGaAs).
 
 Do **not** proceed to 3D in this task.
+
+### First licensed run, 2026-07-30 — 24 of 25 cases failed on an ambiguous glob
+
+2D **execution works**: every deck was accepted and ran to completion
+(`job_done.txt` everywhere). All but the 1D reference then failed in this
+repository's parser, on one line:
+
+```
+output 'probabilities_2d' matching '**/bias_*/Quantum/wire/Gamma/probabilities*.*' is ambiguous (2 matches)
+```
+
+The solver writes both `probabilities_k00000.fld` and
+`probabilities_shift_k00000.fld`. The pattern is now named exactly. Refusing an
+ambiguous match rather than taking the first one is what turned this into a
+one-line fix instead of a plot of the wrong array.
+
+Three further things the run established, none of which could be guessed:
+
+1. **2D output is binary, not text.** It is AVS/Express `.fld`: an ASCII header
+   (`ndim`, `dim1`, `dim2`, `veclen`, `data = double`, one `label` per variable)
+   followed by little-endian float64 blocks at byte offsets the header states.
+   The old text-table reader could never have read it. `outputs.read_avs_field`
+   now parses it and checks that the byte accounting closes exactly.
+
+2. **`dim1` varies fastest**, so each variable reshapes to `(ny, nx)`. This is
+   **not** assumed — it is the only ordering under which the probability density
+   integrates to 1 (1.0000000 against 1.337 for the transpose), and the x/y rms
+   width ratio of 2.005 matches the 20 × 8 nm core.
+
+3. **`bandedges.fld` is on a different grid**: 124 × 100 against the quantum
+   grid's 63 × 51, i.e. `2n − 2` in each direction — the doubled grid that draws
+   a piecewise-constant band edge with sharp interfaces. Forcing it onto the
+   quantum grid would have resampled a discontinuous quantity. Band-edge and
+   material maps now use their own axes.
+
+A fourth bug was mine alone: the symmetry diagnostic was fed the axes from
+`grid_x.dat`, which are rounded to about six significant figures. That 5e−5 nm
+rounding made a perfectly mirror-symmetric mesh look asymmetric, so the demo's
+headline check was silently skipped with `symmetry_error_reason` instead of
+being evaluated. All analysis now uses the full-precision axes from the `.fld`
+header, with the text grid kept as a cross-check.
+
+Re-analysed against the committed fixture, the baseline case is excellent:
+E1 = 2.9365 eV, E2 = 2.9666 eV (E21 = 30.16 meV), density integrating to
+1 ± 1e−15, centroid at exactly (40.0, 34.0) nm — the centre of the core —
+boundary probability 0.0, and **symmetry error 1.5e−15 and 2.3e−15**.
 
 ## Work-laptop checklist
 

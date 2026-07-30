@@ -270,12 +270,25 @@ demos:
       - mesh-anisotropy, domain-padding, and grid-alignment tests
     home_syntax_check: parsed_free_3_0_0
     home_solver_check: refused_free_edition_1d_only
-    licensed_validation: {}
+    licensed_validation:
+      date: "2026-07-30"
+      solver: "nextnano++ 3.0.0"
+      evidence: >-
+        2D execution works: all 25 decks were accepted and ran to completion.
+        24 then failed in this repository's parser on an ambiguous
+        probabilities glob (the solver writes both probabilities_k00000.fld and
+        probabilities_shift_k00000.fld). The run established that 2D output is
+        binary AVS/Express .fld, that dim1 varies fastest so a variable
+        reshapes to (ny, nx), and that bandedges.fld uses its own 2n-2 doubled
+        grid rather than the quantum grid. Re-analysed against the committed
+        fixture the baseline gives E21 = 30.16 meV, a density integrating to 1
+        within 1e-15, a centroid exactly at the core centre, zero boundary
+        probability, and symmetry errors of 1.5e-15 and 2.3e-15.
     pending_licensed_checks:
-      - Confirm the 2D field-output file names and slice extraction.
-      - Confirm a symmetric geometry produces a symmetric ground state.
-      - Confirm the wide-wire limit approaches the 1D quantum-well result.
+      - Re-run with the corrected .fld reader and confirm all 25 cases parse.
+      - Confirm the mesh, anisotropy, padding, and alignment sweeps converge.
+      - Confirm the wide-wire limit approaches the 1D reference result.
     unvalidated_syntax:
-      - 2D field output file names (bandedges.fld, probabilities .fld)
-      - 2D material or region-index field name and integer encoding
-      - grid_y.dat presence and column layout
+      - the integer-to-material encoding inside Structure/material_indices.txt
+        (read from the legend file rather than assumed, but seen for only one
+        structure so far)

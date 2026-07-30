@@ -394,26 +394,52 @@ artifacts:
     description: Written by classical{ output_bandgap{} }.
 
   # --- 2D ------------------------------------------------------------------
+  # --- 2D (all confirmed on the licensed laptop, 2026-07-30) ---------------
+  # 2D output is the AVS/Express .fld format: an ASCII header followed by
+  # little-endian float64 blocks at byte offsets the header states. dim1 varies
+  # fastest, so a variable reshapes to (dim2, dim1) = (ny, nx). See
+  # outputs.read_avs_field.
   bandedges_2d:
-    pattern: "**/bias_*/bandedges.*"
+    pattern: "**/bias_*/bandedges.fld"
     required: false
-    confirmed: false
-    description: UNCONFIRMED. 2D field output; the Free edition cannot run 2D.
+    confirmed: true
+    units:
+      band_edge: eV
 
   probabilities_2d:
-    pattern: "**/bias_*/Quantum/{region}/Gamma/probabilities*.*"
+    pattern: "**/bias_*/Quantum/{region}/Gamma/probabilities_k00000.fld"
     required: false
-    confirmed: false
+    confirmed: true
+    description: >-
+      One variable per state, labelled Psi^2_i[nm^-2]. Named exactly rather
+      than by wildcard: the solver also writes probabilities_shift_k00000.fld
+      beside it, and a `probabilities*.*` glob matched both and failed every
+      2D case as ambiguous on the first licensed run.
+    units:
+      probability_density: nm^-2
 
-  material_index_2d:
-    pattern: "**/Structure/material_index.*"
+  envelopes_2d:
+    pattern: "**/bias_*/Quantum/{region}/Gamma/envelopes_k00000.fld"
     required: false
-    confirmed: false
+    confirmed: true
+    units:
+      envelope: nm^-1
 
-  region_index_2d:
-    pattern: "**/Structure/region_index.*"
+  material_map_2d:
+    pattern: "**/Structure/materials.fld"
     required: false
-    confirmed: false
+    confirmed: true
+    description: 2D material index map; the integer legend is material_indices.txt.
+
+  material_index_legend:
+    pattern: "**/Structure/material_indices.txt"
+    required: false
+    confirmed: true
+
+  region_map_2d:
+    pattern: "**/Structure/regions_material.fld"
+    required: false
+    confirmed: true
 
   grid_x:
     pattern: "**/grid_x.dat"
@@ -423,4 +449,7 @@ artifacts:
   grid_y:
     pattern: "**/grid_y.dat"
     required: false
-    confirmed: false
+    confirmed: true
+    description: >-
+      Written for 2D and 3D runs. Confirmed on the licensed laptop 2026-07-30;
+      columns are Position[nm] and Index[].

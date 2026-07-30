@@ -937,40 +937,76 @@ def test_demo10_geometry_offset_shifts_the_core_only():
     assert shifted.core_x_nm[0] == pytest.approx(centred.core_x_nm[0] + 0.5)
 
 
-def test_demo10_2d_field_reader_accepts_triples_and_refuses_a_bad_reshape(tmp_path):
-    x = np.linspace(0.0, 4.0, 5)
-    y = np.linspace(0.0, 3.0, 4)
-    xx, yy = np.meshgrid(x, y)
-    values = xx + 10.0 * yy
-    triples = tmp_path / "triples.dat"
-    np.savetxt(
-        triples,
-        np.column_stack([xx.ravel(), yy.ravel(), values.ravel()]),
-        header="x[nm] y[nm] Psi^2[nm^-2]",
-        comments="",
-    )
-    field = demo10.read_2d_field(triples, x, y)
-    assert field.shape == (4, 5)
-    assert np.allclose(field, values)
-    second = 2.0 * values
-    combined = tmp_path / "combined.dat"
-    np.savetxt(
-        combined,
-        np.column_stack(
-            [xx.ravel(), yy.ravel(), values.ravel(), second.ravel()]
-        ),
-        header="x[nm] y[nm] Psi1^2[nm^-2] Psi2^2[nm^-2]",
-        comments="",
-    )
-    fields = demo10.read_2d_fields(combined, x, y)
-    assert fields.shape == (2, 4, 5)
-    assert np.allclose(fields[0], values)
-    assert np.allclose(fields[1], second)
+def test_demo10_reads_the_real_2d_probability_field():
+    """The text-table reader could never have read this: it is binary AVS."""
 
-    ragged = tmp_path / "ragged.dat"
-    np.savetxt(ragged, np.arange(7.0).reshape(-1, 1), header="v", comments="")
-    with pytest.raises(outputs.ParserError, match="do not fill"):
-        demo10.read_2d_field(ragged, x, y)
+    fixture = FIXTURES / "demo10_wire_2d"
+    x_text = outputs.read_table(fixture / "grid_x.dat").column(0)
+    y_text = outputs.read_table(fixture / "grid_y.dat").column(0)
+    path = (
+        fixture / "bias_00000" / "Quantum" / "wire" / "Gamma" / "probabilities_k00000.fld"
+    )
+    fields = demo10.read_2d_fields(path, x_text, y_text)
+    assert fields.shape == (4, y_text.size, x_text.size)
+    labels, units = demo10.field_labels(path)
+    assert labels[0].startswith("Psi^2_1") and units[0] == "nm^-2"
+
+
+def test_demo10_field_axes_are_cross_checked_against_the_grid_files():
+    fixture = FIXTURES / "demo10_wire_2d"
+    path = (
+        fixture / "bias_00000" / "Quantum" / "wire" / "Gamma" / "probabilities_k00000.fld"
+    )
+    x_text = outputs.read_table(fixture / "grid_x.dat").column(0)
+    y_text = outputs.read_table(fixture / "grid_y.dat").column(0)
+    # Swapping the axes must be caught, not silently transposed.
+    with pytest.raises(outputs.ParserError, match="dim1|coord"):
+        demo10.read_2d_fields(path, y_text, x_text)
+
+
+def test_demo10_native_axes_are_full_precision_unlike_the_text_grid():
+    fixture = FIXTURES / "demo10_wire_2d"
+    path = (
+        fixture / "bias_00000" / "Quantum" / "wire" / "Gamma" / "probabilities_k00000.fld"
+    )
+    x_native, y_native, fields = demo10.read_2d_fields_native(path)
+    x_text = outputs.read_table(fixture / "grid_x.dat").column(0)
+    # grid_x.dat is rounded to about six significant figures.
+    assert 0.0 < float(np.max(np.abs(x_native - x_text))) < 1e-3
+    # Only the full-precision axis is mirror-symmetric enough for the symmetry
+    # diagnostic; the rounded one is refused, which is what masked a perfectly
+    # symmetric result on the first licensed run.
+    assert analysis.symmetry_error(x_native, y_native, fields[0], axis="x") < 1e-12
+    with pytest.raises(analysis.AnalysisError, match="not symmetric"):
+        analysis.symmetry_error(x_text, y_native, fields[0], axis="x")
+
+
+def test_demo10_analysis_on_real_2d_output(tmp_path):
+    cfg = workflow.load_demo_config(DEMO_DIRS["10"])
+    extracted = tmp_path / "extracted"
+    plots = tmp_path / "plots"
+    extracted.mkdir()
+    plots.mkdir()
+    observables, validation = demo10.analyse_case(
+        cfg, FIXTURES / "demo10_wire_2d", extracted, plots
+    )
+    # A symmetric wire gives a symmetric ground state, to machine precision.
+    assert observables["symmetry_error_x"] < 1e-12
+    assert observables["symmetry_error_y"] < 1e-12
+    assert validation["symmetric_geometry_gives_symmetric_state"] is True
+    # The state sits exactly at the centre of the core.
+    assert observables["ground_state_centroid_x_nm"] == pytest.approx(40.0, abs=1e-6)
+    assert observables["ground_state_centroid_y_nm"] == pytest.approx(34.0, abs=1e-6)
+    assert observables["ground_state_raw_integral"] == pytest.approx(1.0, abs=1e-9)
+    assert observables["ground_state_boundary_probability"] < 1e-6
+    # The band-edge map is on its own doubled grid, and that is recorded.
+    assert observables["band_map_on_quantum_grid"] is False
+    assert observables["band_map_grid_points_x"] == 124
+    # The material legend travels with the map so the integers mean something.
+    assert observables["material_indices_present"] == [27, 43]
+    assert any("GaAs" in line for line in observables["material_index_legend"])
+    assert (plots / "ground_state_density.png").is_file()
+    assert (plots / "material_map.png").is_file()
 
 
 def test_demo10_symmetry_and_slices_on_a_synthetic_wire_state():

@@ -1,0 +1,4 @@
+Index   Material
+   -1   no_material_defined
+   27   GaAs
+   43   Al(x)Ga(1-x)As

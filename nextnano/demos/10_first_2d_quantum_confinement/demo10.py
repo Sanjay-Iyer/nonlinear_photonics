@@ -47,11 +47,14 @@ PLOT_SET: tuple[tuple[str, str], ...] = (
     ("one_d_limit.png", "Wide-wire limit against the 1D quantum well"),
 )
 
+# Confirmed on the licensed laptop on 2026-07-30: 2D output is AVS/Express
+# .fld (ASCII header + little-endian float64 blocks at declared byte offsets),
+# dim1 varies fastest so a variable reshapes to (ny, nx), grid_y.dat exists
+# beside grid_x.dat, and the probability file is probabilities_k00000.fld with
+# a probabilities_shift_k00000.fld twin. The (ny, nx) ordering is not an
+# assumption: it is the only one under which the density integrates to 1.
 UNVALIDATED_SYNTAX: tuple[str, ...] = (
-    "2D field output file names (bandedges and probabilities .fld/.dat)",
-    "2D material/region-index output file name and integer encoding",
-    "grid_y.dat presence and column layout",
-    "the storage order of a 2D field (row-major in x or in y)",
+    "the integer-to-material encoding inside Structure/material_indices.txt",
 )
 
 
@@ -194,14 +197,7 @@ def analyse_1d_reference(
 
 
 def read_2d_field(path: Path, x_nm: np.ndarray, y_nm: np.ndarray) -> np.ndarray:
-    """Read a 2D field, resolving the storage order explicitly.
-
-    Two layouts are plausible and only one can be right; guessing is exactly the
-    failure this repository forbids. Either the file carries x, y, value triples
-    (which is self-describing), or it is a flat list whose length must equal
-    nx*ny -- and in that case the row/column order is stated in the manifest as
-    an assumption for the licensed run to confirm.
-    """
+    """First variable of a 2D field file, as ``(y, x)``."""
 
     return read_2d_fields(path, x_nm, y_nm)[0]
 
@@ -209,45 +205,77 @@ def read_2d_field(path: Path, x_nm: np.ndarray, y_nm: np.ndarray) -> np.ndarray:
 def read_2d_fields(
     path: Path, x_nm: np.ndarray, y_nm: np.ndarray
 ) -> np.ndarray:
-    """Read one or more fields as ``(field, y, x)`` without dropping columns."""
+    """Read every variable of a 2D field file as ``(variable, y, x)``.
 
-    table = outputs.read_table(path)
-    nx, ny = int(x_nm.size), int(y_nm.size)
-    header_names = [name.lower() for name, _ in table.header]
-    labelled_coordinates = (
-        len(header_names) >= 2
-        and header_names[0].startswith("x")
-        and header_names[1].startswith("y")
-    )
-    coordinate_like = (
-        table.n_columns >= 3
-        and table.data.shape[0] == nx * ny
-        and np.unique(table.data[:, 0]).size == nx
-        and np.unique(table.data[:, 1]).size == ny
-    )
-    if table.n_columns >= 3 and (labelled_coordinates or coordinate_like):
-        fields = np.full((table.n_columns - 2, ny, nx), np.nan)
-        for row in table.data:
-            xi = int(np.argmin(np.abs(x_nm - row[0])))
-            yi = int(np.argmin(np.abs(y_nm - row[1])))
-            fields[:, yi, xi] = row[2:]
-        if np.isnan(fields).any():
-            raise outputs.ParserError(
-                f"{path}: x/y triples did not cover the whole {ny}x{nx} grid."
-            )
-        return fields
-    if table.data.shape[0] == nx * ny:
-        return np.stack(
-            [table.data[:, column].reshape((ny, nx)) for column in range(table.n_columns)]
-        )
-    flat = table.data.reshape(-1)
-    if flat.size % (nx * ny) != 0:
+    nextnano++ writes 2D data as AVS/Express ``.fld``: an ASCII header followed
+    by little-endian float64 blocks at byte offsets the header states. The
+    header carries the dimensions, the coordinate axes, the variable count, and
+    the labels, so nothing about the layout is guessed --
+    :func:`outputs.read_avs_field` checks that the byte accounting closes and
+    that the coordinate axes are monotonic before returning anything.
+
+    The axes in the file are cross-checked against ``grid_x.dat`` /
+    ``grid_y.dat`` here, so a mismatched pairing fails instead of silently
+    transposing a map.
+    """
+
+    field = outputs.read_avs_field(path)
+    if len(field.dims) != 2:
         raise outputs.ParserError(
-            f"{path}: {flat.size} values do not fill one or more {ny}x{nx} fields. "
-            "The 2D output layout for this solver build is unconfirmed; record the "
-            "real one and update the parser profile."
+            f"{path} declares ndim={len(field.dims)}; this demo is 2D only."
         )
-    return flat.reshape((-1, ny, nx))
+    nx, ny = int(x_nm.size), int(y_nm.size)
+    if field.dims != (nx, ny):
+        raise outputs.ParserError(
+            f"{path} declares dim1={field.dims[0]}, dim2={field.dims[1]}, but "
+            f"grid_x.dat has {nx} points and grid_y.dat has {ny}."
+        )
+    # grid_x.dat / grid_y.dat are written as text with about six significant
+    # figures, so they differ from the binary float64 coordinates by up to
+    # ~5e-5 nm. The tolerance is set well above that rounding and far below any
+    # real defect: a transposed or mispaired axis is wrong by nanometres.
+    for axis, (declared, expected) in enumerate(
+        zip(field.coords, (x_nm, y_nm)), start=1
+    ):
+        difference = float(np.max(np.abs(declared - expected)))
+        if difference > 1.0e-3:
+            raise outputs.ParserError(
+                f"{path}: coord {axis} disagrees with the grid file by "
+                f"{difference:.3g} nm (spans {declared[0]}..{declared[-1]} against "
+                f"{expected[0]}..{expected[-1]})."
+            )
+    return np.stack(field.variables)
+
+
+def read_2d_fields_native(
+    path: Path,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Read a 2D field on **its own** axes, as ``(x_nm, y_nm, fields)``.
+
+    Not every 2D output shares the quantum grid. Confirmed on the licensed run
+    of 2026-07-30: with a 63 x 51 simulation grid, ``bandedges.fld`` came back
+    124 x 100 -- the ``2n - 2`` doubled grid that lets a piecewise-constant band
+    edge be drawn with sharp interfaces instead of being smeared across a cell.
+    Material and region maps use the same doubled grid.
+
+    Forcing those onto the quantum grid would either fail or, worse, silently
+    resample a discontinuous quantity. Each field therefore carries its own
+    coordinates, which is exactly what the ``.fld`` header provides.
+    """
+
+    field = outputs.read_avs_field(path)
+    if len(field.dims) != 2:
+        raise outputs.ParserError(
+            f"{path} declares ndim={len(field.dims)}; this demo is 2D only."
+        )
+    return field.coords[0], field.coords[1], np.stack(field.variables)
+
+
+def field_labels(path: Path) -> tuple[tuple[str, ...], tuple[str, ...]]:
+    """Variable names and units declared in a 2D field file's header."""
+
+    field = outputs.read_avs_field(path)
+    return field.labels, field.units
 
 
 def analyse_case(
@@ -288,11 +316,16 @@ def analyse_case(
     outputs.require_or_diagnose(
         grids, raw, ["grid_x", "grid_y"], why="this is a 2D simulation"
     )
-    x_nm = outputs.read_table(grids.one("grid_x")).column(0)
-    y_nm = outputs.read_table(grids.one("grid_y")).column(0)
-    observables["grid_points_x"] = int(x_nm.size)
-    observables["grid_points_y"] = int(y_nm.size)
-    observables["grid_points_total"] = int(x_nm.size * y_nm.size)
+    # grid_x.dat / grid_y.dat are the human-readable axes and are used only to
+    # cross-check the field files. Every calculation below uses the FULL-PRECISION
+    # float64 axes from the .fld header instead: the text files carry about six
+    # significant figures, and that rounding is enough to make a perfectly
+    # mirror-symmetric mesh look asymmetric to the symmetry diagnostic.
+    x_text = outputs.read_table(grids.one("grid_x")).column(0)
+    y_text = outputs.read_table(grids.one("grid_y")).column(0)
+    observables["grid_points_x"] = int(x_text.size)
+    observables["grid_points_y"] = int(y_text.size)
+    observables["grid_points_total"] = int(x_text.size * y_text.size)
 
     spectrum = outputs.resolve_outputs(
         profile, raw, ["energy_spectrum_gamma"], substitutions={"region": region}
@@ -324,10 +357,16 @@ def analyse_case(
         why="output_states{ probabilities = yes } was requested in a 2D region",
     )
     density_fields: list[np.ndarray] = []
+    x_nm, y_nm = x_text, y_text
     for path in densities.many("probabilities_2d"):
-        density_fields.extend(read_2d_fields(path, x_nm, y_nm))
+        # Cross-checks the field axes against the text grid, then hands back the
+        # exact ones.
+        density_fields.extend(read_2d_fields(path, x_text, y_text))
+        field_x, field_y, _ = read_2d_fields_native(path)
+        x_nm, y_nm = field_x, field_y
     if not density_fields:
         raise DemoError("no 2D probability-density fields were parsed.")
+    observables["grid_axis_source"] = "probabilities .fld header (float64)"
     normalised_fields: list[np.ndarray] = []
     raw_integrals: list[float] = []
     for state_index, field in enumerate(density_fields, start=1):
@@ -424,9 +463,11 @@ def analyse_case(
             "grid_points_x": int(x_nm.size),
             "grid_points_y": int(y_nm.size),
             "mesh_anisotropy": observables["mesh_anisotropy"],
-            "field_storage_order_assumption": (
-                "row index runs over y, column index over x; UNCONFIRMED for this "
-                "solver build"
+            "field_storage_order": (
+                "AVS/Express .fld, dim1 (x) varies fastest, so each variable "
+                "reshapes to (ny, nx): row index over y, column index over x. "
+                "Confirmed 2026-07-30 -- it is the only ordering under which the "
+                "probability density integrates to 1 over the cross-section."
             ),
         },
     )
@@ -436,15 +477,22 @@ def analyse_case(
         conduction_fields.many("bandedges_2d")
     )
     if conduction_fields.many("bandedges_2d"):
-        band_maps = read_2d_fields(
-            conduction_fields.many("bandedges_2d")[0], x_nm, y_nm
+        # On its own doubled grid, not the quantum grid -- see
+        # read_2d_fields_native.
+        band_x, band_y, band_maps = read_2d_fields_native(
+            conduction_fields.many("bandedges_2d")[0]
         )
         conduction_map = band_maps[0]
+        observables["band_map_grid_points_x"] = int(band_x.size)
+        observables["band_map_grid_points_y"] = int(band_y.size)
+        observables["band_map_on_quantum_grid"] = bool(
+            band_x.size == x_nm.size and band_y.size == y_nm.size
+        )
         write_csv(
             extracted / "conduction_band_map.csv",
             {
-                "x_nm": np.tile(x_nm, y_nm.size),
-                "y_nm": np.repeat(y_nm, x_nm.size),
+                "x_nm": np.tile(band_x, band_y.size),
+                "y_nm": np.repeat(band_y, band_x.size),
                 "conduction_band_eV": conduction_map.reshape(-1),
             },
         )
@@ -452,35 +500,47 @@ def analyse_case(
             plotting.map_2d(
                 plots_dir / "conduction_band_map.png",
                 title="2D conduction-band map",
-                x_nm=x_nm,
-                y_nm=y_nm,
+                x_nm=band_x,
+                y_nm=band_y,
                 values=conduction_map,
                 colorbar_label="Conduction-band edge (eV)",
                 contours={"GaAs core": (wire.core_x_nm, wire.core_y_nm)},
             )
 
-    material_outputs = outputs.resolve_outputs(profile, raw, ["material_index_2d"])
-    validation["material_map_present"] = bool(
-        material_outputs.many("material_index_2d")
-    )
-    if material_outputs.many("material_index_2d"):
-        material_map = read_2d_field(
-            material_outputs.many("material_index_2d")[0], x_nm, y_nm
+    material_outputs = outputs.resolve_outputs(profile, raw, ["material_map_2d"])
+    validation["material_map_present"] = bool(material_outputs.many("material_map_2d"))
+    if material_outputs.many("material_map_2d"):
+        material_x, material_y, material_maps = read_2d_fields_native(
+            material_outputs.many("material_map_2d")[0]
         )
+        material_map = material_maps[0]
         write_csv(
             extracted / "material_map.csv",
             {
-                "x_nm": np.tile(x_nm, y_nm.size),
-                "y_nm": np.repeat(y_nm, x_nm.size),
+                "x_nm": np.tile(material_x, material_y.size),
+                "y_nm": np.repeat(material_y, material_x.size),
                 "material_index": material_map.reshape(-1),
             },
+        )
+        # The integer legend lives in a separate text file; carrying it through
+        # means the map can be read without guessing what 27 and 43 mean.
+        legend = outputs.resolve_outputs(profile, raw, ["material_index_legend"])
+        if legend.many("material_index_legend"):
+            observables["material_index_legend"] = (
+                legend.one("material_index_legend")
+                .read_text(encoding="utf-8", errors="replace")
+                .strip()
+                .splitlines()
+            )
+        observables["material_indices_present"] = sorted(
+            int(value) for value in np.unique(material_map)
         )
         if cfg["outputs"].get("write_plots", True):
             plotting.map_2d(
                 plots_dir / "material_map.png",
                 title="2D material-index map",
-                x_nm=x_nm,
-                y_nm=y_nm,
+                x_nm=material_x,
+                y_nm=material_y,
                 values=material_map,
                 colorbar_label="Material index",
                 contours={"GaAs core": (wire.core_x_nm, wire.core_y_nm)},
@@ -816,8 +876,9 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
                 "the third direction is assumed translationally invariant; the "
                 "wire is infinitely long and free-electron-like along it"
             ),
-            "field_storage_order_assumption": (
-                "row index over y, column index over x — UNCONFIRMED"
+            "field_storage_order": (
+                "AVS/Express .fld, dim1 (x) fastest -> (ny, nx). Confirmed "
+                "2026-07-30 by the density integrating to 1."
             ),
         },
     )

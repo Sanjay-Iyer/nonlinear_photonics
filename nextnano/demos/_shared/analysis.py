@@ -605,16 +605,26 @@ def symmetry_error(
     x, y, array = _check_2d(x_nm, y_nm, values)
     if axis == "x":
         flipped = array[:, ::-1]
-        centred = np.allclose(x - x[0], x[-1] - x[::-1], atol=1e-9)
+        nodes = x
     elif axis == "y":
         flipped = array[::-1, :]
-        centred = np.allclose(y - y[0], y[-1] - y[::-1], atol=1e-9)
+        nodes = y
     else:
         raise AnalysisError("axis must be 'x' or 'y'.")
-    if not centred:
+    # A reflection asymmetry is only interpretable on a mesh that is itself
+    # mirror-symmetric; otherwise a non-uniform grid would masquerade as broken
+    # physics. The tolerance is scaled to the axis span so it is meaningful for
+    # any size of domain, and the measured asymmetry goes into the message so a
+    # near miss is diagnosable rather than just refused.
+    span = float(nodes[-1] - nodes[0])
+    mesh_asymmetry = float(np.max(np.abs((nodes - nodes[0]) - (nodes[-1] - nodes[::-1]))))
+    if mesh_asymmetry > 1e-9 * max(span, 1.0):
         raise AnalysisError(
-            f"the {axis} grid is not symmetric about its centre, so a reflection "
-            "asymmetry cannot be separated from a non-uniform mesh."
+            f"the {axis} grid is not symmetric about its centre (mirror mismatch "
+            f"{mesh_asymmetry:.3g} over a {span:.6g} span), so a reflection "
+            "asymmetry cannot be separated from a non-uniform mesh. Note that "
+            "grid_x.dat / grid_y.dat are rounded to about six significant "
+            "figures; use the full-precision axes from the field file."
         )
     peak = float(np.max(np.abs(array)))
     if peak <= 0:

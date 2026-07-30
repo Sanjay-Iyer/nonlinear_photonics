@@ -397,6 +397,174 @@ def read_profile_table(path: Path, *, value_columns: int | None = None) -> tuple
     return x, values
 
 
+@dataclass(frozen=True)
+class FieldFile:
+    """A parsed AVS/Express ``.fld`` field, as nextnano++ writes 2D and 3D data.
+
+    The file is an ASCII header followed by little-endian float64 blocks at
+    byte offsets the header states.  Every quantity needed to read it is in the
+    header, so nothing here is inferred.
+    """
+
+    path: Path
+    dims: tuple[int, ...]
+    coords: tuple[np.ndarray, ...]
+    labels: tuple[str, ...]
+    units: tuple[str, ...]
+    variables: tuple[np.ndarray, ...]
+
+    @property
+    def x_nm(self) -> np.ndarray:
+        return self.coords[0]
+
+    @property
+    def y_nm(self) -> np.ndarray:
+        if len(self.coords) < 2:
+            raise ParserError(f"{self.path} is {len(self.dims)}D and has no y axis.")
+        return self.coords[1]
+
+    def variable(self, index: int) -> np.ndarray:
+        """One variable, indexed from 1 as the header numbers them."""
+
+        if not 1 <= index <= len(self.variables):
+            raise ParserError(
+                f"{self.path} holds {len(self.variables)} variable(s); {index} requested."
+            )
+        return self.variables[index - 1]
+
+
+_FLD_SCALARS = re.compile(r"^\s*(ndim|dim\d+|nspace|veclen|data|field)\s*=\s*(\S+)")
+_FLD_BLOCK = re.compile(r"^\s*(variable|coord)\s+(\d+)\b.*?\bskip=(\d+)", re.IGNORECASE)
+_FLD_LABEL = re.compile(r"^\s*label\s*=\s*(.+?)\s*$")
+_FLD_FILETYPE = re.compile(r"\bfiletype=(\w+)", re.IGNORECASE)
+
+
+def read_avs_field(path: Path) -> FieldFile:
+    """Read a nextnano++ ``.fld`` field file.
+
+    Layout, confirmed against a real licensed 2D run on 2026-07-30::
+
+        ndim = 2 / dim1 = 63 / dim2 = 51 / veclen = 4
+        data = double / field = rectilinear
+        label = Psi^2_1[nm^-2]                  (one per variable)
+        variable N file=... filetype=binary skip=<byte offset>
+        coord    N file=... filetype=binary skip=<byte offset>
+
+    ``dim1`` varies fastest, so each variable reshapes to ``dims`` reversed --
+    ``(ny, nx)`` in 2D, i.e. row index over y and column index over x. That is
+    not assumed: it is the only ordering under which the probability density
+    integrates to 1 over the cross-section, which this function's caller checks.
+    """
+
+    if not path.is_file():
+        raise ParserError(f"field file not found: {path}")
+    raw = path.read_bytes()
+    meta: dict[str, str] = {}
+    labels: list[str] = []
+    variable_skips: dict[int, int] = {}
+    coord_skips: dict[int, int] = {}
+    # The header is ASCII and short; the binary payload begins at the first
+    # declared skip offset, so bounding the scan avoids decoding binary noise.
+    header_limit = 4096
+    for line in raw[:header_limit].split(b"\n"):
+        text = line.decode("latin-1")
+        if text.startswith("#"):
+            continue
+        scalar = _FLD_SCALARS.match(text)
+        if scalar:
+            meta[scalar.group(1)] = scalar.group(2)
+            continue
+        label = _FLD_LABEL.match(text)
+        if label and "file=" not in text:
+            labels.append(label.group(1))
+            continue
+        block = _FLD_BLOCK.match(text)
+        if block:
+            filetype = _FLD_FILETYPE.search(text)
+            if filetype and filetype.group(1).lower() != "binary":
+                raise ParserError(
+                    f"{path}: {block.group(1)} {block.group(2)} is "
+                    f"filetype={filetype.group(1)}; only binary is supported."
+                )
+            target = variable_skips if block.group(1).lower() == "variable" else coord_skips
+            target[int(block.group(2))] = int(block.group(3))
+
+    for required in ("ndim", "veclen", "data"):
+        if required not in meta:
+            raise ParserError(f"{path}: field header is missing '{required}'.")
+    if meta["data"].lower() not in {"double", "xdr_double"}:
+        raise ParserError(
+            f"{path}: data type is {meta['data']!r}; only double is supported."
+        )
+    ndim = int(meta["ndim"])
+    veclen = int(meta["veclen"])
+    try:
+        dims = tuple(int(meta[f"dim{axis}"]) for axis in range(1, ndim + 1))
+    except KeyError as exc:
+        raise ParserError(f"{path}: header declares ndim={ndim} but lacks {exc}.") from exc
+    if sorted(variable_skips) != list(range(1, veclen + 1)):
+        raise ParserError(
+            f"{path}: header declares veclen={veclen} but lists variables "
+            f"{sorted(variable_skips)}."
+        )
+    if sorted(coord_skips) != list(range(1, ndim + 1)):
+        raise ParserError(
+            f"{path}: header declares ndim={ndim} but lists coords "
+            f"{sorted(coord_skips)}."
+        )
+
+    def block_at(skip: int, count: int, what: str) -> np.ndarray:
+        end = skip + count * 8
+        if end > len(raw):
+            raise ParserError(
+                f"{path}: {what} needs bytes {skip}..{end} but the file is "
+                f"{len(raw)} bytes. The header and payload disagree."
+            )
+        values = np.frombuffer(raw, dtype="<f8", count=count, offset=skip)
+        if not np.isfinite(values).all():
+            raise ParserError(f"{path}: {what} contains non-finite values.")
+        return values
+
+    coords = tuple(
+        block_at(coord_skips[axis], dims[axis - 1], f"coord {axis}")
+        for axis in range(1, ndim + 1)
+    )
+    for axis, values in enumerate(coords, start=1):
+        if values.size > 1 and not np.all(np.diff(values) > 0):
+            raise ParserError(f"{path}: coord {axis} is not strictly increasing.")
+
+    points = int(np.prod(dims))
+    # dim1 fastest -> reversed dims, giving [.., y, x].
+    variables = tuple(
+        block_at(variable_skips[index], points, f"variable {index}").reshape(dims[::-1])
+        for index in range(1, veclen + 1)
+    )
+    expected_end = variable_skips[veclen] + points * 8
+    if expected_end != len(raw):
+        raise ParserError(
+            f"{path}: byte accounting does not close — the last variable ends at "
+            f"{expected_end} but the file is {len(raw)} bytes."
+        )
+
+    names: list[str] = []
+    units: list[str] = []
+    for label in labels[:veclen]:
+        parsed = parse_header(label)
+        names.append(parsed[0][0] if parsed else label)
+        units.append(parsed[0][1] if parsed else "")
+    while len(names) < veclen:
+        names.append(f"variable_{len(names) + 1}")
+        units.append("")
+    return FieldFile(
+        path=path,
+        dims=dims,
+        coords=coords,
+        labels=tuple(names),
+        units=tuple(units),
+        variables=variables,
+    )
+
+
 def read_matrix_elements(path: Path) -> dict[tuple[int, int], dict[str, float]]:
     """Read a nextnano++ matrix-element ``.txt`` table.
 

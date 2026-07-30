@@ -590,6 +590,85 @@ def test_2d_slices_cut_through_the_centre():
     assert float(axis[int(np.argmax(vertical))]) == pytest.approx(20.0, abs=1.0)
 
 
+def test_avs_field_reader_on_real_2d_output():
+    """The binary .fld reader, against genuine licensed 2D output."""
+
+    path = (
+        FIXTURES
+        / "demo10_wire_2d"
+        / "bias_00000"
+        / "Quantum"
+        / "wire"
+        / "Gamma"
+        / "probabilities_k00000.fld"
+    )
+    field = outputs.read_avs_field(path)
+    assert field.dims == (63, 51)
+    assert len(field.variables) == 4
+    assert field.labels[0].startswith("Psi^2_1")
+    assert field.units[0] == "nm^-2"
+    # dim1 varies fastest, so each variable is (ny, nx).
+    assert field.variables[0].shape == (51, 63)
+    assert field.x_nm.size == 63 and field.y_nm.size == 51
+    assert float(field.x_nm[0]) == 0.0 and float(field.x_nm[-1]) == 80.0
+    assert float(field.y_nm[0]) == 0.0 and float(field.y_nm[-1]) == 68.0
+
+
+def test_avs_storage_order_is_fixed_by_the_normalisation_not_by_assumption():
+    """(ny, nx) is the only ordering under which the density integrates to 1."""
+
+    path = (
+        FIXTURES
+        / "demo10_wire_2d"
+        / "bias_00000"
+        / "Quantum"
+        / "wire"
+        / "Gamma"
+        / "probabilities_k00000.fld"
+    )
+    field = outputs.read_avs_field(path)
+    x, y = field.x_nm, field.y_nm
+    correct = field.variables[0]
+    assert correct.shape == (y.size, x.size)
+    _, integral = analysis.normalise_density_2d(x, y, correct)
+    assert integral == pytest.approx(1.0, abs=1e-9)
+    # The transposed reading is not merely different, it is unnormalised.
+    swapped = np.frombuffer(
+        path.read_bytes(), dtype="<f8", count=x.size * y.size, offset=1645
+    ).reshape((x.size, y.size)).T
+    _, wrong_integral = analysis.normalise_density_2d(x, y, swapped)
+    assert abs(wrong_integral - 1.0) > 0.1
+
+
+def test_avs_reader_rejects_a_truncated_or_inconsistent_file(tmp_path):
+    source = (
+        FIXTURES
+        / "demo10_wire_2d"
+        / "bias_00000"
+        / "Quantum"
+        / "wire"
+        / "Gamma"
+        / "probabilities_k00000.fld"
+    )
+    raw = source.read_bytes()
+    truncated = tmp_path / "truncated.fld"
+    truncated.write_bytes(raw[:-64])
+    with pytest.raises(outputs.ParserError, match="byte accounting|file is"):
+        outputs.read_avs_field(truncated)
+
+
+def test_band_edge_map_uses_its_own_doubled_grid():
+    """Not every 2D output shares the quantum grid."""
+
+    field = outputs.read_avs_field(
+        FIXTURES / "demo10_wire_2d" / "bias_00000" / "bandedges.fld"
+    )
+    # 2n - 2 in each direction: interfaces are drawn sharply rather than smeared.
+    assert field.dims == (124, 100)
+    assert field.dims != (63, 51)
+    assert field.variables[0].shape == (100, 124)
+
+
 def test_2d_field_shape_mismatch_is_an_error():
     x, y, _ = _wire_density()
     with pytest.raises(analysis.AnalysisError, match="matches neither"):
