@@ -54,6 +54,18 @@ ever tracked. Only text you author (and the small results you curate) is.
 
 ---
 
+## YAML-driven learning demos
+
+The first three progressive GaAs/AlGaAs learning demos now live in
+[`demos/`](demos/README.md): classical band edges, one-band electron states,
+and controlled numerical convergence. They use an ignored
+`config/machines/nextnano_machine.local.yaml`, keep routine results under the
+repository, and support successful input/provenance-only runs on an unlicensed
+home laptop. They do not replace or modify the validated smoke-test workflow
+below.
+
+---
+
 ## Quick reference
 
 **Home (author + generate + push):**

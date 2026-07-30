@@ -1,0 +1,30 @@
+demo_id: 01_classical_single_quantum_well
+title: Classical GaAs/AlGaAs single quantum well
+template: classical_single_qw.in.j2
+
+scientific:
+  well_width_nm: 10.0
+  left_barrier_width_nm: 20.0
+  right_barrier_width_nm: 20.0
+  aluminum_fraction: 0.30
+  temperature_K: 300
+
+numerical:
+  active_region_grid_spacing_nm: 0.25
+  exterior_grid_spacing_nm: 0.50
+
+outputs:
+  bandedges_glob: "**/*bandedge*.dat"
+  bandedge_columns:
+    position_nm: 0
+    conduction_eV: 1
+    heavy_hole_eV: 4
+    light_hole_eV: 5
+    split_off_eV: 6
+  write_csv: true
+  write_plots: true
+
+validation:
+  completion_markers: ["simulation done", "done."]
+  fatal_markers: ["terminating program", "fatal error", "license expired"]
+

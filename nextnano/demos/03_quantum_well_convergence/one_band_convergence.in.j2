@@ -1,0 +1,65 @@
+# Demo 3: controlled numerical sweeps of the validated Demo 2 physical model.
+# Exactly one numerical factor is changed per generated sweep case.
+
+global{
+    simulate1D{}
+    temperature = {{temperature_K}}
+    substrate{ name = "GaAs" }
+    crystal_zb{ x_hkl = [1, 0, 0]  y_hkl = [0, 1, 0] }
+}
+
+contacts{
+    fermi{ name = qw_contact  bias = 0.0 }
+}
+
+grid{
+    xgrid{
+        line{ pos = 0.0                  spacing = {{exterior_grid_spacing_nm}} }
+        line{ pos = {{well_start_nm}}    spacing = {{active_region_grid_spacing_nm}} }
+        line{ pos = {{well_end_nm}}      spacing = {{active_region_grid_spacing_nm}} }
+        line{ pos = {{domain_end_nm}}    spacing = {{exterior_grid_spacing_nm}} }
+    }
+}
+
+structure{
+    region{
+        everywhere{}
+        ternary_constant{
+            name = "Al(x)Ga(1-x)As"
+            alloy_x = {{aluminum_fraction}}
+        }
+        contact{ name = qw_contact }
+    }
+    region{
+        line{ x = [{{well_start_nm}}, {{well_end_nm}}] }
+        binary{ name = "GaAs" }
+    }
+}
+
+classical{
+    Gamma{}
+    HH{}
+    LH{}
+    SO{}
+    output_bandedges{ averaged = no }
+}
+
+quantum{
+    region{
+        name = "qw"
+        x = [{{quantum_start_nm}}, {{quantum_end_nm}}]
+        no_density = yes
+        boundary{ x = dirichlet }
+        Gamma{ num_ev = {{number_of_states}} }
+        output_states{
+            max_num       = {{number_of_states}}
+            envelopes     = yes
+            probabilities = yes
+        }
+    }
+}
+
+run{
+    quantum{}
+}
+

@@ -1,0 +1,46 @@
+# Demo 1: classical GaAs/AlGaAs single quantum well.
+# Syntax basis: validated hello_02_algaas_qw.in structure and classical blocks.
+# IMPORTANT: the empty run{} block avoids enabling strain or quantum physics,
+# but still requires parser/execution validation on the licensed work laptop.
+
+global{
+    simulate1D{}
+    crystal_zb{ x_hkl = [1, 0, 0]  y_hkl = [0, 1, 0] }
+    substrate{ name = "GaAs" }
+    temperature = {{temperature_K}}
+}
+
+grid{
+    xgrid{
+        line{ pos = 0.0                  spacing = {{exterior_grid_spacing_nm}} }
+        line{ pos = {{well_start_nm}}    spacing = {{active_region_grid_spacing_nm}} }
+        line{ pos = {{well_end_nm}}      spacing = {{active_region_grid_spacing_nm}} }
+        line{ pos = {{domain_end_nm}}    spacing = {{exterior_grid_spacing_nm}} }
+    }
+}
+
+structure{
+    region{
+        everywhere{}
+        ternary_constant{
+            name = "Al(x)Ga(1-x)As"
+            alloy_x = {{aluminum_fraction}}
+        }
+    }
+    region{
+        line{ x = [{{well_start_nm}}, {{well_end_nm}}] }
+        binary{ name = "GaAs" }
+    }
+}
+
+classical{
+    Gamma{}
+    HH{}
+    LH{}
+    SO{}
+    output_bandedges{ averaged = no }
+}
+
+run{
+}
+

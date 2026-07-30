@@ -1,0 +1,1337 @@
+"""Shared YAML-driven workflow for the first three nextnano++ learning demos.
+
+The module is intentionally importable without nextnanopy or a licensed
+nextnano++ installation.  Home-laptop runs validate configuration, render
+inputs, write provenance, and exercise parser/selection code.  Solver imports
+and path checks happen only when the machine YAML requests execution.
+"""
+
+from __future__ import annotations
+
+import csv
+import datetime as dt
+import hashlib
+import json
+import logging
+import math
+import os
+import re
+import subprocess
+import sys
+import time
+import uuid
+from dataclasses import asdict, dataclass
+from pathlib import Path
+from typing import Any, Iterable
+
+import matplotlib
+
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+import numpy as np
+import yaml
+
+NEXTNANO_ROOT = Path(__file__).resolve().parents[2]
+REPOSITORY_ROOT = NEXTNANO_ROOT.parent
+MACHINE_CONFIG = NEXTNANO_ROOT / "config" / "machines" / "nextnano_machine.local.yaml"
+MACHINE_EXAMPLE = (
+    NEXTNANO_ROOT / "config" / "machines" / "nextnano_machine.example.yaml"
+)
+DEFAULT_RESULTS_ROOT = NEXTNANO_ROOT / "results" / "demo_runs"
+
+TOP_LEVEL_KEYS = {
+    "demo_id",
+    "title",
+    "template",
+    "scientific",
+    "numerical",
+    "outputs",
+    "validation",
+    "sweeps",
+}
+MACHINE_KEYS = {
+    "portable_root",
+    "executable",
+    "database",
+    "license",
+    "threads",
+    "run_solver",
+    "results_root",
+}
+COMMON_SCIENTIFIC_KEYS = {
+    "well_width_nm",
+    "left_barrier_width_nm",
+    "right_barrier_width_nm",
+    "barrier_width_nm",
+    "aluminum_fraction",
+    "temperature_K",
+}
+COMMON_NUMERICAL_KEYS = {
+    "active_region_grid_spacing_nm",
+    "exterior_grid_spacing_nm",
+    "number_of_states",
+    "quantum_region_padding_nm",
+}
+OUTPUT_KEYS = {
+    "bandedges_glob",
+    "energy_spectrum_glob",
+    "probability_glob",
+    "bandedge_columns",
+    "energy_columns",
+    "write_csv",
+    "write_plots",
+}
+VALIDATION_KEYS = {
+    "completion_markers",
+    "fatal_markers",
+    "minimum_well_probability",
+    "maximum_boundary_probability",
+    "normalization_tolerance",
+    "absolute_energy_tolerance_meV",
+    "relative_energy_tolerance",
+}
+SWEEP_KEYS = {
+    "grid_spacing_nm",
+    "domain_padding_nm",
+    "quantum_region_padding_nm",
+    "number_of_states",
+}
+
+
+class DemoError(RuntimeError):
+    """Actionable workflow, configuration, solver, or parser failure."""
+
+
+@dataclass(frozen=True)
+class MachineConfig:
+    """Resolved machine-specific execution settings."""
+
+    portable_root: Path | None
+    executable: Path | None
+    database: Path | None
+    license: Path | None
+    threads: int
+    run_solver: bool
+    results_root: Path
+    source_path: Path
+    discovery_notes: tuple[str, ...]
+
+
+@dataclass
+class RunOutcome:
+    """Result returned by one rendered input execution/analysis."""
+
+    run_dir: Path
+    solver_status: str
+    return_code: int | None
+    runtime_seconds: float
+    observables: dict[str, Any]
+    validation: dict[str, Any]
+    warnings: list[str]
+    failure_reason: str | None
+
+
+def _strict_keys(mapping: Any, allowed: set[str], label: str) -> dict[str, Any]:
+    if not isinstance(mapping, dict):
+        raise DemoError(f"{label} must be a YAML mapping.")
+    unknown = sorted(set(mapping) - allowed)
+    if unknown:
+        raise DemoError(f"{label} has unsupported key(s): {', '.join(unknown)}")
+    return mapping
+
+
+def _read_yaml(path: Path) -> dict[str, Any]:
+    if not path.is_file():
+        raise DemoError(f"YAML file not found: {path}")
+    try:
+        data = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    except yaml.YAMLError as exc:
+        raise DemoError(f"{path} is not valid YAML: {exc}") from exc
+    if not isinstance(data, dict):
+        raise DemoError(f"{path} must contain a top-level mapping.")
+    return data
+
+
+def _finite_number(value: Any, label: str) -> float:
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError) as exc:
+        raise DemoError(f"{label} must be a finite number, got {value!r}.") from exc
+    if not math.isfinite(numeric):
+        raise DemoError(f"{label} must be finite, got {value!r}.")
+    return numeric
+
+
+def load_demo_config(demo_dir: Path) -> dict[str, Any]:
+    """Load and strictly validate a demo's scientific YAML."""
+
+    path = demo_dir / "demo.yaml"
+    cfg = _strict_keys(_read_yaml(path), TOP_LEVEL_KEYS, str(path))
+    for required in ("demo_id", "title", "template", "scientific", "numerical"):
+        if required not in cfg:
+            raise DemoError(f"{path}: missing required key '{required}'.")
+    expected = demo_dir.name.split("_", 1)[0]
+    if not str(cfg["demo_id"]).startswith(expected):
+        raise DemoError(
+            f"{path}: demo_id {cfg['demo_id']!r} does not match directory {demo_dir.name!r}."
+        )
+    scientific = _strict_keys(
+        cfg["scientific"], COMMON_SCIENTIFIC_KEYS, f"{path}: scientific"
+    )
+    numerical = _strict_keys(
+        cfg["numerical"], COMMON_NUMERICAL_KEYS, f"{path}: numerical"
+    )
+    cfg["outputs"] = _strict_keys(
+        cfg.get("outputs", {}), OUTPUT_KEYS, f"{path}: outputs"
+    )
+    cfg["validation"] = _strict_keys(
+        cfg.get("validation", {}), VALIDATION_KEYS, f"{path}: validation"
+    )
+    if "sweeps" in cfg:
+        cfg["sweeps"] = _strict_keys(
+            cfg["sweeps"], SWEEP_KEYS, f"{path}: sweeps"
+        )
+
+    for name in (
+        "well_width_nm",
+        "left_barrier_width_nm",
+        "right_barrier_width_nm",
+        "barrier_width_nm",
+        "temperature_K",
+        "aluminum_fraction",
+    ):
+        if name in scientific:
+            value = _finite_number(scientific[name], f"{path}: scientific.{name}")
+            if value <= 0:
+                raise DemoError(f"{path}: scientific.{name} must be finite and > 0.")
+    if float(scientific.get("aluminum_fraction", 0.3)) >= 1:
+        raise DemoError(f"{path}: aluminum_fraction must lie strictly between 0 and 1.")
+    for name, value in numerical.items():
+        numeric = _finite_number(value, f"{path}: numerical.{name}")
+        if numeric <= 0:
+            raise DemoError(f"{path}: numerical.{name} must be finite and > 0.")
+    if "number_of_states" in numerical and int(
+        float(numerical["number_of_states"])
+    ) != float(numerical["number_of_states"]):
+        raise DemoError(f"{path}: numerical.number_of_states must be an integer.")
+    for name in ("minimum_well_probability", "maximum_boundary_probability"):
+        if name in cfg["validation"]:
+            value = _finite_number(
+                cfg["validation"][name], f"{path}: validation.{name}"
+            )
+            if not 0 <= value <= 1:
+                raise DemoError(f"{path}: validation.{name} must lie in [0, 1].")
+    for name in (
+        "normalization_tolerance",
+        "absolute_energy_tolerance_meV",
+        "relative_energy_tolerance",
+    ):
+        if name in cfg["validation"]:
+            value = _finite_number(
+                cfg["validation"][name], f"{path}: validation.{name}"
+            )
+            if value < 0:
+                raise DemoError(f"{path}: validation.{name} must be >= 0.")
+    for sweep, values in cfg.get("sweeps", {}).items():
+        if not isinstance(values, list) or not values:
+            raise DemoError(f"{path}: sweeps.{sweep} must be a non-empty list.")
+        for value in values:
+            numeric = _finite_number(value, f"{path}: sweeps.{sweep}")
+            if numeric <= 0:
+                raise DemoError(
+                    f"{path}: every sweeps.{sweep} value must be finite and > 0."
+                )
+            if sweep == "number_of_states" and int(numeric) != numeric:
+                raise DemoError(
+                    f"{path}: every sweeps.number_of_states value must be an integer."
+                )
+    return cfg
+
+
+def repository_root(start: Path | None = None) -> Path:
+    """Find the enclosing Git repository without relying on the cwd."""
+
+    current = (start or Path(__file__)).resolve()
+    if current.is_file():
+        current = current.parent
+    for candidate in (current, *current.parents):
+        if (candidate / ".git").exists():
+            return candidate
+    raise DemoError(f"could not find repository root above {current}")
+
+
+def _resolve_local_path(raw: Any, *, base: Path = REPOSITORY_ROOT) -> Path | None:
+    if raw is None or str(raw).strip() in {"", "null", "None"}:
+        return None
+    expanded = os.path.expandvars(os.path.expanduser(str(raw).strip()))
+    path = Path(expanded)
+    return (base / path).resolve() if not path.is_absolute() else path.resolve()
+
+
+def sibling_portable_root(repo_root: Path = REPOSITORY_ROOT) -> Path | None:
+    """Return the conventional sibling ``../2026_07_03`` when it exists."""
+
+    candidate = (repo_root / ".." / "2026_07_03").resolve()
+    return candidate if candidate.is_dir() else None
+
+
+def _discover_unique(root: Path, kind: str) -> Path:
+    if kind == "executable":
+        candidates = [
+            p
+            for p in root.rglob("*.exe")
+            if "nextnano" in p.name.lower()
+            and "nextnanomat" not in p.name.lower()
+            and "license" not in p.name.lower()
+        ]
+    elif kind == "database":
+        candidates = [
+            p
+            for pattern in ("*database*.xml", "*database*.nnp", "database*.txt")
+            for p in root.rglob(pattern)
+        ]
+    elif kind == "license":
+        candidates = list(root.rglob("*.lic"))
+    else:  # pragma: no cover - internal guard
+        raise ValueError(kind)
+    candidates = sorted({p.resolve() for p in candidates if p.is_file()})
+    if not candidates:
+        raise DemoError(f"no plausible {kind} found beneath portable_root: {root}")
+    if len(candidates) > 1:
+        listed = "\n".join(f"  - {p}" for p in candidates)
+        raise DemoError(
+            f"multiple plausible {kind} files found beneath {root}; set an explicit "
+            f"path in nextnano_machine.local.yaml:\n{listed}"
+        )
+    return candidates[0]
+
+
+def load_machine_config(config_path: Path | None = None) -> MachineConfig:
+    """Load the ignored local machine YAML, falling back to dry-run example values."""
+
+    requested = config_path or MACHINE_CONFIG
+    source = requested if requested.is_file() else MACHINE_EXAMPLE
+    data = _strict_keys(_read_yaml(source), MACHINE_KEYS, str(source))
+    run_solver = data.get("run_solver", False)
+    if not isinstance(run_solver, bool):
+        raise DemoError(f"{source}: run_solver must be true or false.")
+    try:
+        threads = int(data.get("threads", 4))
+    except (TypeError, ValueError) as exc:
+        raise DemoError(f"{source}: threads must be an integer.") from exc
+    if threads < 1:
+        raise DemoError(f"{source}: threads must be >= 1.")
+
+    notes: list[str] = []
+    if source != requested:
+        notes.append(
+            f"local machine YAML not found; using tracked dry-run example: {source}"
+        )
+    portable = _resolve_local_path(data.get("portable_root"))
+    if portable is None:
+        portable = sibling_portable_root()
+        if portable:
+            notes.append(f"portable_root discovered as repository sibling: {portable}")
+    elif portable.is_dir():
+        notes.append(f"portable_root resolved from YAML: {portable}")
+
+    resolved: dict[str, Path | None] = {}
+    for kind in ("executable", "database", "license"):
+        explicit = _resolve_local_path(data.get(kind))
+        if explicit is not None:
+            resolved[kind] = explicit
+            selected = explicit.name if kind == "license" else str(explicit)
+            notes.append(f"{kind} selected explicitly: {selected}")
+        elif run_solver:
+            if portable is None or not portable.is_dir():
+                raise DemoError(
+                    "solver execution is enabled but portable_root is missing. "
+                    "Set portable_root or the three explicit machine paths."
+                )
+            resolved[kind] = _discover_unique(portable, kind)
+            selected = (
+                resolved[kind].name
+                if kind == "license" and resolved[kind] is not None
+                else str(resolved[kind])
+            )
+            notes.append(f"{kind} auto-discovered: {selected}")
+        else:
+            resolved[kind] = None
+
+    if run_solver:
+        for kind, path in resolved.items():
+            if path is None or not path.is_file():
+                raise DemoError(f"configured {kind} does not exist: {path}")
+    results_root = _resolve_local_path(data.get("results_root")) or DEFAULT_RESULTS_ROOT
+    return MachineConfig(
+        portable_root=portable,
+        executable=resolved["executable"],
+        database=resolved["database"],
+        license=resolved["license"],
+        threads=threads,
+        run_solver=run_solver,
+        results_root=results_root,
+        source_path=source,
+        discovery_notes=tuple(notes),
+    )
+
+
+_PLACEHOLDER = re.compile(r"{{\s*([A-Za-z_]\w*)\s*}}")
+
+
+def render_template(template_text: str, values: dict[str, Any]) -> str:
+    """Strict deterministic ``{{name}}`` rendering for nextnano input decks."""
+
+    referenced = set(_PLACEHOLDER.findall(template_text))
+    missing = sorted(referenced - set(values))
+    if missing:
+        raise DemoError(f"undefined input-template variable(s): {', '.join(missing)}")
+
+    def replacement(match: re.Match[str]) -> str:
+        value = values[match.group(1)]
+        if isinstance(value, bool):
+            return "yes" if value else "no"
+        return str(value)
+
+    rendered = _PLACEHOLDER.sub(replacement, template_text)
+    if _PLACEHOLDER.search(rendered):
+        raise DemoError("unresolved template variable remains after rendering.")
+    return rendered.replace("\r\n", "\n").replace("\r", "\n")
+
+
+def make_run_id() -> str:
+    """Create a sortable run ID with collision-resistant suffix."""
+
+    stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%S.%fZ")
+    return f"{stamp}_{uuid.uuid4().hex[:8]}"
+
+
+def _atomic_text(path: Path, text: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f".{path.name}.{uuid.uuid4().hex}.tmp")
+    temporary.write_text(text, encoding="utf-8", newline="\n")
+    os.replace(temporary, path)
+
+
+def _atomic_json(path: Path, data: Any) -> None:
+    _atomic_text(path, json.dumps(data, indent=2, sort_keys=True) + "\n")
+
+
+def _sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _git_state() -> tuple[str | None, bool | None]:
+    try:
+        commit = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=REPOSITORY_ROOT,
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout.strip()
+        dirty = bool(
+            subprocess.run(
+                ["git", "status", "--porcelain"],
+                cwd=REPOSITORY_ROOT,
+                capture_output=True,
+                text=True,
+                check=True,
+            ).stdout.strip()
+        )
+        return commit, dirty
+    except (OSError, subprocess.SubprocessError):
+        return None, None
+
+
+def machine_summary(machine: MachineConfig) -> dict[str, Any]:
+    """Return provenance without exposing the license path or contents."""
+
+    return {
+        "config_source": str(machine.source_path),
+        "portable_root": str(machine.portable_root) if machine.portable_root else None,
+        "executable": str(machine.executable) if machine.executable else None,
+        "database": str(machine.database) if machine.database else None,
+        "license_filename": machine.license.name if machine.license else None,
+        "threads": machine.threads,
+        "run_solver": machine.run_solver,
+        "results_root": str(machine.results_root),
+        "discovery_notes": list(machine.discovery_notes),
+    }
+
+
+def _parameters(cfg: dict[str, Any]) -> dict[str, Any]:
+    scientific = dict(cfg["scientific"])
+    numerical = dict(cfg["numerical"])
+    if "barrier_width_nm" in scientific:
+        scientific.setdefault("left_barrier_width_nm", scientific["barrier_width_nm"])
+        scientific.setdefault("right_barrier_width_nm", scientific["barrier_width_nm"])
+    left = float(scientific["left_barrier_width_nm"])
+    well = float(scientific["well_width_nm"])
+    right = float(scientific["right_barrier_width_nm"])
+    values = {**scientific, **numerical}
+    values.update(
+        {
+            "well_start_nm": f"{left:.12g}",
+            "well_end_nm": f"{left + well:.12g}",
+            "domain_end_nm": f"{left + well + right:.12g}",
+            "quantum_start_nm": f"{max(0.0, left - float(numerical.get('quantum_region_padding_nm', left))):.12g}",
+            "quantum_end_nm": f"{min(left + well + right, left + well + float(numerical.get('quantum_region_padding_nm', right))):.12g}",
+        }
+    )
+    return values
+
+
+def _create_layout(run_dir: Path) -> dict[str, Path]:
+    paths = {
+        "generated": run_dir / "generated_input",
+        "raw": run_dir / "raw_output",
+        "extracted": run_dir / "extracted",
+        "plots": run_dir / "plots",
+    }
+    for path in paths.values():
+        path.mkdir(parents=True, exist_ok=False)
+    return paths
+
+
+def _logger(run_dir: Path) -> logging.Logger:
+    logger = logging.getLogger(f"nextnano_demo.{run_dir.name}.{uuid.uuid4().hex}")
+    logger.setLevel(logging.INFO)
+    logger.propagate = False
+    formatter = logging.Formatter("%(asctime)sZ %(levelname)s %(message)s")
+    formatter.converter = time.gmtime
+    file_handler = logging.FileHandler(run_dir / "console.log", encoding="utf-8")
+    file_handler.setFormatter(formatter)
+    stream_handler = logging.StreamHandler(sys.stdout)
+    stream_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+    logger.addHandler(stream_handler)
+    return logger
+
+
+def _execute_solver(machine: MachineConfig, deck: Path, raw_output: Path) -> tuple[int | None, float]:
+    import nextnanopy as nn
+
+    kwargs = {
+        "exe": str(machine.executable),
+        "database": str(machine.database),
+        "license": str(machine.license),
+        "outputdirectory": str(raw_output),
+        "threads": machine.threads,
+    }
+    start = time.perf_counter()
+    info = nn.InputFile(str(deck)).execute(**kwargs)
+    elapsed = time.perf_counter() - start
+    process = info.get("process") if isinstance(info, dict) else None
+    code = process.poll() if process is not None else None
+    if code is None and process is not None:
+        code = process.wait(timeout=10)
+    return (int(code) if code is not None else None), elapsed
+
+
+def _numeric_rows(path: Path) -> np.ndarray:
+    rows: list[list[float]] = []
+    for raw in path.read_text(encoding="utf-8", errors="replace").splitlines():
+        stripped = raw.strip()
+        if not stripped or stripped.startswith(("#", "%", "!")):
+            continue
+        fields = re.split(r"[\s,;]+", stripped)
+        try:
+            values = [float(field) for field in fields if field]
+        except ValueError:
+            continue
+        if values:
+            rows.append(values)
+    if not rows:
+        raise DemoError(f"no numeric rows found in output file: {path}")
+    width = max(map(len, rows))
+    rows = [row for row in rows if len(row) == width]
+    data = np.asarray(rows, dtype=float)
+    if data.ndim != 2 or not np.isfinite(data).all():
+        raise DemoError(f"non-finite or malformed numeric data in: {path}")
+    return data
+
+
+def parse_numeric_table(path: Path, columns: dict[str, int]) -> dict[str, np.ndarray]:
+    """Parse a nextnano-style comment-headed numeric table by explicit indices."""
+
+    data = _numeric_rows(path)
+    parsed: dict[str, np.ndarray] = {}
+    for name, raw_index in columns.items():
+        index = int(raw_index)
+        if index < 0 or index >= data.shape[1]:
+            raise DemoError(
+                f"{path} has {data.shape[1]} columns; requested {name} index {index}."
+            )
+        parsed[name] = data[:, index]
+    return parsed
+
+
+def _single_glob(root: Path, pattern: str, label: str) -> Path:
+    matches = sorted(p for p in root.glob(pattern) if p.is_file())
+    if not matches:
+        raise DemoError(f"expected {label} output matching {pattern!r} beneath {root}")
+    if len(matches) > 1:
+        listed = "\n".join(f"  - {p}" for p in matches)
+        raise DemoError(f"ambiguous {label} outputs matching {pattern!r}:\n{listed}")
+    return matches[0]
+
+
+def _write_csv(path: Path, columns: dict[str, np.ndarray]) -> None:
+    names = list(columns)
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(names)
+        writer.writerows(zip(*(columns[name] for name in names)))
+
+
+def _analyse_bandedges(
+    cfg: dict[str, Any], raw: Path, extracted: Path, plots: Path
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    outputs = cfg["outputs"]
+    source = _single_glob(
+        raw, outputs.get("bandedges_glob", "**/*bandedge*.dat"), "band-edge"
+    )
+    columns = outputs.get(
+        "bandedge_columns",
+        {
+            "position_nm": 0,
+            "conduction_eV": 1,
+            "heavy_hole_eV": 4,
+            "light_hole_eV": 5,
+            "split_off_eV": 6,
+        },
+    )
+    data = parse_numeric_table(source, columns)
+    x = data["position_nm"]
+    params = _parameters(cfg)
+    well_start = float(params["well_start_nm"])
+    well_end = float(params["well_end_nm"])
+    monotonic = bool(np.all(np.diff(x) > 0))
+    inside = (x >= well_start) & (x <= well_end)
+    outside = ~inside
+    if not inside.any() or not outside.any():
+        raise DemoError("band-edge grid does not sample both well and barriers.")
+    ec = data["conduction_eV"]
+    well_ec = float(np.median(ec[inside]))
+    barrier_ec = float(np.median(ec[outside]))
+    _write_csv(extracted / "band_edges.csv", data)
+    composition = {
+        "position_nm": x,
+        "aluminum_fraction": np.where(
+            inside, 0.0, float(cfg["scientific"]["aluminum_fraction"])
+        ),
+    }
+    _write_csv(extracted / "composition_profile.csv", composition)
+
+    if cfg["outputs"].get("write_plots", True):
+        fig, ax = plt.subplots(figsize=(8, 4.8))
+        for name, values in data.items():
+            if name != "position_nm":
+                ax.plot(x, values, label=name.replace("_eV", ""))
+        ax.axvspan(well_start, well_end, color="0.9", zorder=-1, label="GaAs well")
+        ax.set(xlabel="Position (nm)", ylabel="Band edge (eV)", title=cfg["title"])
+        ax.legend(fontsize=8, ncol=2)
+        fig.tight_layout()
+        fig.savefig(plots / "band_edges.png", dpi=180)
+        plt.close(fig)
+
+        fig, ax = plt.subplots(figsize=(8, 3.6))
+        ax.step(
+            composition["position_nm"],
+            composition["aluminum_fraction"],
+            where="mid",
+        )
+        ax.set(
+            xlabel="Position (nm)",
+            ylabel="Al mole fraction x",
+            ylim=(-0.02, max(0.05, float(cfg["scientific"]["aluminum_fraction"]) * 1.1)),
+            title="Al composition profile",
+        )
+        fig.tight_layout()
+        fig.savefig(plots / "composition_profile.png", dpi=180)
+        plt.close(fig)
+
+    observables = {
+        "bandedges_source": str(source),
+        "grid_points": int(x.size),
+        "well_start_nm": well_start,
+        "well_end_nm": well_end,
+        "well_conduction_edge_eV": well_ec,
+        "barrier_conduction_edge_eV": barrier_ec,
+        "conduction_offset_meV": 1000.0 * (barrier_ec - well_ec),
+    }
+    validation = {
+        "position_monotonic": monotonic,
+        "finite_values": True,
+        "interfaces_sampled": bool(
+            np.min(np.abs(x - well_start)) <= np.max(np.diff(x))
+            and np.min(np.abs(x - well_end)) <= np.max(np.diff(x))
+        ),
+        "gaas_is_electron_well": barrier_ec > well_ec,
+    }
+    validation["passed"] = all(validation.values())
+    return observables, validation
+
+
+def _probability_files(root: Path, pattern: str) -> list[Path]:
+    return sorted(p for p in root.glob(pattern) if p.is_file())
+
+
+def _analyse_quantum(
+    cfg: dict[str, Any], raw: Path, extracted: Path, plots: Path
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    observables, validation = _analyse_bandedges(cfg, raw, extracted, plots)
+    outputs = cfg["outputs"]
+    spectrum_path = _single_glob(
+        raw,
+        outputs.get("energy_spectrum_glob", "**/*energy*spectrum*Gamma*.dat"),
+        "electron energy-spectrum",
+    )
+    energy_columns = outputs.get("energy_columns", {"state_index": 0, "energy_eV": 1})
+    spectrum = parse_numeric_table(spectrum_path, energy_columns)
+    energies = np.asarray(spectrum["energy_eV"], dtype=float)
+    energies = np.sort(np.unique(energies))
+    if energies.size == 0:
+        raise DemoError(f"no electron eigenenergies parsed from {spectrum_path}")
+
+    params = _parameters(cfg)
+    well_start = float(params["well_start_nm"])
+    well_end = float(params["well_end_nm"])
+    probability_paths = _probability_files(
+        raw, outputs.get("probability_glob", "**/*probabilit*Gamma*.dat")
+    )
+    if not probability_paths:
+        raise DemoError("no electron probability-density outputs were found.")
+
+    probabilities: list[dict[str, Any]] = []
+    probability_csv: dict[str, np.ndarray] = {}
+    common_x: np.ndarray | None = None
+    for index, path in enumerate(probability_paths[: len(energies)], start=1):
+        table = _numeric_rows(path)
+        if table.shape[1] < 2:
+            raise DemoError(f"probability file needs at least two columns: {path}")
+        x = table[:, 0]
+        density = np.maximum(table[:, -1], 0.0)
+        norm = float(np.trapezoid(density, x))
+        if not math.isfinite(norm) or norm <= 0:
+            raise DemoError(f"invalid probability normalization in {path}: {norm}")
+        normalized = density / norm
+        inside = (x >= well_start) & (x <= well_end)
+        well_probability = float(np.trapezoid(normalized[inside], x[inside]))
+        span = float(x[-1] - x[0])
+        left_boundary = x <= x[0] + 0.05 * span
+        right_boundary = x >= x[-1] - 0.05 * span
+        boundary_probability = float(
+            np.trapezoid(normalized[left_boundary], x[left_boundary])
+            + np.trapezoid(normalized[right_boundary], x[right_boundary])
+        )
+        probabilities.append(
+            {
+                "state": index,
+                "source": str(path),
+                "raw_integral": norm,
+                "well_probability": well_probability,
+                "barrier_probability": max(0.0, 1.0 - well_probability),
+                "boundary_probability": boundary_probability,
+            }
+        )
+        if common_x is None:
+            common_x = x
+            probability_csv["position_nm"] = x
+        if np.array_equal(x, common_x):
+            probability_csv[f"state_{index}"] = normalized
+
+    if probability_csv:
+        _write_csv(extracted / "probability_densities.csv", probability_csv)
+    with (extracted / "eigenenergies.csv").open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(["state", "energy_eV"])
+        writer.writerows(enumerate(energies, start=1))
+
+    if outputs.get("write_plots", True) and probability_csv:
+        fig, ax = plt.subplots(figsize=(8, 4.8))
+        for name, density in probability_csv.items():
+            if name != "position_nm":
+                ax.plot(common_x, density, label=name)
+        ax.axvspan(well_start, well_end, color="0.9", zorder=-1)
+        ax.set(
+            xlabel="Position (nm)",
+            ylabel="Normalized probability density (1/nm)",
+            title="Electron probability densities",
+        )
+        ax.legend()
+        fig.tight_layout()
+        fig.savefig(plots / "probability_densities.png", dpi=180)
+        plt.close(fig)
+
+        band_data = parse_numeric_table(
+            Path(observables["bandedges_source"]),
+            outputs.get(
+                "bandedge_columns",
+                {"position_nm": 0, "conduction_eV": 1},
+            ),
+        )
+        fig, ax = plt.subplots(figsize=(8, 4.8))
+        ax.plot(
+            band_data["position_nm"],
+            band_data["conduction_eV"],
+            color="black",
+            label="Γ conduction edge",
+        )
+        barrier_offset = (
+            float(observables["barrier_conduction_edge_eV"])
+            - float(observables["well_conduction_edge_eV"])
+        )
+        display_height = max(0.02, 0.15 * barrier_offset)
+        for index, energy in enumerate(energies[: len(probabilities)], start=1):
+            key = f"state_{index}"
+            if key not in probability_csv:
+                continue
+            density = probability_csv[key]
+            peak = float(np.max(density))
+            displayed = energy + display_height * density / peak
+            ax.plot(common_x, displayed, label=f"E{index} + scaled |ψ|²")
+            ax.axhline(energy, color="0.7", linewidth=0.6)
+        ax.set(
+            xlabel="Position (nm)",
+            ylabel="Energy (eV)",
+            title="Band edge with probability-density display offsets",
+        )
+        ax.text(
+            0.01,
+            0.02,
+            "Curves are scaled |ψ|² added to each eigenenergy for display; "
+            "amplitude is not an energy.",
+            transform=ax.transAxes,
+            fontsize=7,
+        )
+        ax.legend(fontsize=7, ncol=2)
+        fig.tight_layout()
+        fig.savefig(plots / "band_edge_with_probability_offsets.png", dpi=180)
+        plt.close(fig)
+
+    barrier_edge = float(observables["barrier_conduction_edge_eV"])
+    minimum_well = float(cfg["validation"].get("minimum_well_probability", 0.5))
+    max_boundary = float(cfg["validation"].get("maximum_boundary_probability", 1e-4))
+    normalization_tolerance = float(
+        cfg["validation"].get("normalization_tolerance", 1e-3)
+    )
+    bound = [
+        bool(
+            energy < barrier_edge
+            and i < len(probabilities)
+            and probabilities[i]["well_probability"] >= minimum_well
+        )
+        for i, energy in enumerate(energies)
+    ]
+    validation.update(
+        {
+            "energies_finite_and_ordered": bool(
+                np.isfinite(energies).all() and np.all(np.diff(energies) > 0)
+            ),
+            "at_least_one_bound_state": any(bound),
+            "ground_state_well_probability": probabilities[0]["well_probability"]
+            >= minimum_well,
+            "ground_state_boundary_probability": probabilities[0][
+                "boundary_probability"
+            ]
+            <= max_boundary,
+            "probability_normalized": all(
+                abs(item["raw_integral"] - 1.0) <= normalization_tolerance
+                for item in probabilities
+            ),
+        }
+    )
+    validation["passed"] = all(
+        value for key, value in validation.items() if key != "passed"
+    )
+    observables.update(
+        {
+            "energy_spectrum_source": str(spectrum_path),
+            "electron_eigenenergies_eV": energies.tolist(),
+            "E1_eV": float(energies[0]),
+            "E2_eV": float(energies[1]) if len(energies) > 1 else None,
+            "E2_minus_E1_meV": (
+                float(1000.0 * (energies[1] - energies[0]))
+                if len(energies) > 1
+                else None
+            ),
+            "bound_state_flags": bound,
+            "state_probabilities": probabilities,
+            "well_probability": probabilities[0]["well_probability"],
+            "boundary_probability": probabilities[0]["boundary_probability"],
+        }
+    )
+    return observables, validation
+
+
+def _log_checks(raw: Path, cfg: dict[str, Any]) -> dict[str, Any]:
+    logs = sorted(raw.rglob("*.log"))
+    text = "\n".join(
+        path.read_text(encoding="utf-8", errors="replace") for path in logs
+    ).lower()
+    fatal = [str(x).lower() for x in cfg["validation"].get("fatal_markers", [])]
+    complete = [
+        str(x).lower() for x in cfg["validation"].get("completion_markers", [])
+    ]
+    return {
+        "log_files": [str(path) for path in logs],
+        "no_fatal_marker": not any(marker in text for marker in fatal),
+        "completion_marker_found": (
+            any(marker in text for marker in complete) if complete else bool(logs)
+        ),
+    }
+
+
+def _manifest_base(
+    cfg: dict[str, Any],
+    machine: MachineConfig,
+    template: Path,
+    generated: Path,
+) -> dict[str, Any]:
+    commit, dirty = _git_state()
+    return {
+        "schema": 1,
+        "demo_id": cfg["demo_id"],
+        "timestamp_utc": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "git_commit": commit,
+        "git_dirty": dirty,
+        "template_path": str(template),
+        "generated_input_path": str(generated),
+        "generated_input_sha256": _sha256(generated),
+        "scientific_parameters": cfg["scientific"],
+        "numerical_parameters": cfg["numerical"],
+        "machine": machine_summary(machine),
+    }
+
+
+def run_case(
+    demo_dir: Path,
+    cfg: dict[str, Any],
+    machine: MachineConfig,
+    run_dir: Path,
+) -> RunOutcome:
+    """Render, optionally execute, parse, validate, and preserve one case."""
+
+    layout = _create_layout(run_dir)
+    logger = _logger(run_dir)
+    template = demo_dir / str(cfg["template"])
+    if not template.is_file():
+        raise DemoError(f"input template not found: {template}")
+    values = _parameters(cfg)
+    rendered = render_template(template.read_text(encoding="utf-8"), values)
+    generated = layout["generated"] / f"{cfg['demo_id']}.in"
+    _atomic_text(generated, rendered)
+    _atomic_text(run_dir / "demo_resolved.yaml", yaml.safe_dump(cfg, sort_keys=True))
+    _atomic_json(run_dir / "machine_summary.json", machine_summary(machine))
+    manifest = _manifest_base(cfg, machine, template, generated)
+    warnings: list[str] = []
+    failure_reason: str | None = None
+    observables: dict[str, Any] = {}
+    validation: dict[str, Any] = {"input_generation": True}
+    return_code: int | None = None
+    runtime = 0.0
+
+    if not machine.run_solver:
+        status = "skipped_no_solver"
+        warnings.append(
+            "Input generation and validation succeeded. Solver execution was "
+            "skipped because run_solver is false; run this demo on the licensed "
+            "work laptop with nextnano_machine.local.yaml."
+        )
+        logger.info(warnings[-1])
+    else:
+        logger.info("Executing %s", generated)
+        try:
+            return_code, runtime = _execute_solver(machine, generated, layout["raw"])
+            if return_code not in (0, None):
+                raise DemoError(f"nextnano++ returned nonzero exit code {return_code}")
+            log_validation = _log_checks(layout["raw"], cfg)
+            if cfg["demo_id"].startswith("01"):
+                observables, parsed_validation = _analyse_bandedges(
+                    cfg, layout["raw"], layout["extracted"], layout["plots"]
+                )
+            else:
+                observables, parsed_validation = _analyse_quantum(
+                    cfg, layout["raw"], layout["extracted"], layout["plots"]
+                )
+            validation.update(log_validation)
+            validation.update(parsed_validation)
+            validation["passed"] = all(
+                bool(value)
+                for key, value in validation.items()
+                if key not in {"log_files", "passed"}
+            )
+            if not validation["passed"]:
+                raise DemoError("one or more scientific/output validations failed")
+            status = "completed"
+        except Exception as exc:  # preserve all artifacts and record the failure
+            status = "failed"
+            failure_reason = f"{type(exc).__name__}: {exc}"
+            logger.exception("Run failed: %s", exc)
+
+    manifest.update(
+        {
+            "solver_execution_status": status,
+            "return_code": return_code,
+            "runtime_seconds": runtime,
+            "completion_status": status,
+            "warnings": warnings,
+            "observables": observables,
+            "validation": validation,
+            "failure_reason": failure_reason,
+        }
+    )
+    _atomic_json(run_dir / "run_manifest.json", manifest)
+    return RunOutcome(
+        run_dir=run_dir,
+        solver_status=status,
+        return_code=return_code,
+        runtime_seconds=runtime,
+        observables=observables,
+        validation=validation,
+        warnings=warnings,
+        failure_reason=failure_reason,
+    )
+
+
+def select_coarsest_converged(
+    rows: Iterable[dict[str, Any]],
+    *,
+    reference_e1_eV: float,
+    absolute_tolerance_meV: float,
+    relative_tolerance: float,
+    maximum_boundary_probability: float,
+    minimum_well_probability: float,
+) -> dict[str, Any] | None:
+    """Select the coarsest successful grid satisfying all requested tolerances."""
+
+    eligible: list[dict[str, Any]] = []
+    for row in rows:
+        energy = row.get("E1_eV")
+        if not row.get("solver_success") or energy is None:
+            continue
+        absolute_meV = abs(float(energy) - reference_e1_eV) * 1000.0
+        relative = absolute_meV / max(abs(reference_e1_eV) * 1000.0, 1e-15)
+        if (
+            absolute_meV <= absolute_tolerance_meV
+            and relative <= relative_tolerance
+            and float(row.get("boundary_probability", math.inf))
+            <= maximum_boundary_probability
+            and float(row.get("well_probability", -math.inf))
+            >= minimum_well_probability
+        ):
+            copy = dict(row)
+            copy["absolute_difference_meV"] = absolute_meV
+            copy["relative_difference"] = relative
+            eligible.append(copy)
+    if not eligible:
+        return None
+    return max(eligible, key=lambda row: float(row["value"]))
+
+
+def _case_cfg(base: dict[str, Any], sweep: str, value: Any) -> dict[str, Any]:
+    copied = json.loads(json.dumps(base))
+    if sweep == "grid_spacing_nm":
+        copied["numerical"]["active_region_grid_spacing_nm"] = value
+        copied["numerical"]["exterior_grid_spacing_nm"] = value
+    elif sweep == "domain_padding_nm":
+        copied["scientific"]["left_barrier_width_nm"] = value
+        copied["scientific"]["right_barrier_width_nm"] = value
+    elif sweep == "quantum_region_padding_nm":
+        copied["numerical"]["quantum_region_padding_nm"] = value
+    elif sweep == "number_of_states":
+        copied["numerical"]["number_of_states"] = value
+    else:  # pragma: no cover
+        raise DemoError(f"unsupported sweep: {sweep}")
+    return copied
+
+
+def _summary_row(sweep: str, value: Any, outcome: RunOutcome) -> dict[str, Any]:
+    obs = outcome.observables
+    return {
+        "sweep": sweep,
+        "value": value,
+        "solver_success": outcome.solver_status == "completed",
+        "status": outcome.solver_status,
+        "E1_eV": obs.get("E1_eV"),
+        "E2_eV": obs.get("E2_eV"),
+        "E2_minus_E1_meV": obs.get("E2_minus_E1_meV"),
+        "well_probability": obs.get("well_probability"),
+        "boundary_probability": obs.get("boundary_probability"),
+        "grid_points": obs.get("grid_points"),
+        "runtime_seconds": outcome.runtime_seconds,
+        "convergence_status": outcome.validation.get("passed"),
+        "difference_from_reference_meV": None,
+        "E2_difference_from_reference_meV": None,
+        "failure_reason": outcome.failure_reason,
+        "run_dir": str(outcome.run_dir),
+    }
+
+
+def _write_convergence_artifacts(
+    parent: Path, cfg: dict[str, Any], rows: list[dict[str, Any]]
+) -> dict[str, Any]:
+    extracted = parent / "extracted"
+    plots = parent / "plots"
+    extracted.mkdir(exist_ok=True)
+    plots.mkdir(exist_ok=True)
+    tolerances = cfg["validation"]
+
+    for sweep in SWEEP_KEYS:
+        successful = [
+            row for row in rows if row["sweep"] == sweep and row["solver_success"]
+        ]
+        if not successful:
+            continue
+        if sweep == "grid_spacing_nm":
+            reference = min(successful, key=lambda row: float(row["value"]))
+        else:
+            reference = max(successful, key=lambda row: float(row["value"]))
+        reference_e1 = float(reference["E1_eV"])
+        reference_e2 = (
+            float(reference["E2_eV"]) if reference["E2_eV"] is not None else None
+        )
+        for row in successful:
+            e1_difference = abs(float(row["E1_eV"]) - reference_e1) * 1000.0
+            row["difference_from_reference_meV"] = e1_difference
+            e2_difference = None
+            if reference_e2 is not None and row["E2_eV"] is not None:
+                e2_difference = abs(float(row["E2_eV"]) - reference_e2) * 1000.0
+            row["E2_difference_from_reference_meV"] = e2_difference
+            energy_differences = [e1_difference]
+            if e2_difference is not None:
+                energy_differences.append(e2_difference)
+            absolute_ok = max(energy_differences) <= float(
+                tolerances["absolute_energy_tolerance_meV"]
+            )
+            relative_ok = all(
+                difference
+                / max(
+                    abs(reference_e1 if index == 0 else reference_e2) * 1000.0,
+                    1e-15,
+                )
+                <= float(tolerances["relative_energy_tolerance"])
+                for index, difference in enumerate(energy_differences)
+            )
+            row["convergence_status"] = bool(
+                absolute_ok
+                and relative_ok
+                and float(row["boundary_probability"])
+                <= float(tolerances["maximum_boundary_probability"])
+                and float(row["well_probability"])
+                >= float(tolerances["minimum_well_probability"])
+            )
+
+    grid_rows = [
+        row
+        for row in rows
+        if row["sweep"] == "grid_spacing_nm" and row["solver_success"]
+    ]
+    selected_grid = None
+    if grid_rows:
+        grid_reference = min(grid_rows, key=lambda row: float(row["value"]))
+        selected_grid = select_coarsest_converged(
+            grid_rows,
+            reference_e1_eV=float(grid_reference["E1_eV"]),
+            absolute_tolerance_meV=float(
+                tolerances["absolute_energy_tolerance_meV"]
+            ),
+            relative_tolerance=float(tolerances["relative_energy_tolerance"]),
+            maximum_boundary_probability=float(
+                tolerances["maximum_boundary_probability"]
+            ),
+            minimum_well_probability=float(
+                tolerances["minimum_well_probability"]
+            ),
+        )
+        if selected_grid and not selected_grid.get("convergence_status"):
+            selected_grid = None
+
+    domain_rows = [
+        row
+        for row in rows
+        if row["sweep"] == "domain_padding_nm"
+        and row["solver_success"]
+        and row.get("convergence_status")
+    ]
+    selected_domain = (
+        min(domain_rows, key=lambda row: float(row["value"])) if domain_rows else None
+    )
+    recommendation = {
+        "grid_spacing_nm": selected_grid,
+        "domain_padding_nm": selected_domain,
+        "principle": (
+            "Choose the coarsest grid and smallest domain that satisfy E1/E2 "
+            "and probability tolerances; the finest/largest cases are references."
+        ),
+    }
+
+    lines = ["# Quantum-well convergence summary", ""]
+    lines.append(
+        "| sweep | value | status | E1 (eV) | E2 (eV) | ΔE (meV) | "
+        "E1 diff (meV) | converged | well P | boundary P | runtime (s) |"
+    )
+    lines.append("|---|---:|---|---:|---:|---:|---:|---|---:|---:|---:|")
+    for row in rows:
+        fmt = lambda v: "—" if v is None else f"{float(v):.8g}"
+        lines.append(
+            f"| {row['sweep']} | {row['value']} | {row['status']} | "
+            f"{fmt(row['E1_eV'])} | {fmt(row['E2_eV'])} | "
+            f"{fmt(row['E2_minus_E1_meV'])} | "
+            f"{fmt(row['difference_from_reference_meV'])} | "
+            f"{row['convergence_status']} | {fmt(row['well_probability'])} | "
+            f"{fmt(row['boundary_probability'])} | {fmt(row['runtime_seconds'])} |"
+        )
+    failed = [
+        row
+        for row in rows
+        if not row["solver_success"] or row.get("convergence_status") is False
+    ]
+    lines.extend(["", "## Failed, skipped, missing, or suspicious runs", ""])
+    lines.extend(
+        [
+            f"- {row['sweep']}={row['value']}: {row['status']} — "
+            f"{row['failure_reason'] or ('no licensed execution' if not row['solver_success'] else 'outside one or more convergence tolerances')}"
+            for row in failed
+        ]
+        or ["- None."]
+    )
+    lines.extend(["", "## Recommendation", ""])
+    if selected_grid:
+        lines.append(
+            f"Use the coarsest tested grid satisfying every tolerance: "
+            f"**{selected_grid['value']} nm**. The finest grid is the reference, "
+            "not automatically the best production choice."
+        )
+    else:
+        lines.append(
+            "No production grid recommendation is available until licensed runs "
+            "complete successfully and satisfy all configured tolerances."
+        )
+    if selected_domain:
+        lines.append(
+            f"Use the smallest tested outer barrier/domain padding satisfying "
+            f"every tolerance: **{selected_domain['value']} nm per side**."
+        )
+    else:
+        lines.append(
+            "No production domain-padding recommendation is available until "
+            "licensed runs complete successfully and satisfy all tolerances."
+        )
+    _atomic_json(extracted / "convergence_summary.json", rows)
+    fieldnames = list(rows[0]) if rows else []
+    with (extracted / "convergence_summary.csv").open(
+        "w", newline="", encoding="utf-8"
+    ) as handle:
+        writer = csv.DictWriter(handle, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(rows)
+    _atomic_text(extracted / "convergence_table.md", "\n".join(lines) + "\n")
+    _atomic_json(extracted / "recommendation.json", recommendation)
+
+    plot_specs = [
+        ("grid_spacing_nm", "E1_eV", "E1 versus grid spacing", "E1 (eV)", "E1_vs_grid.png"),
+        ("grid_spacing_nm", "E2_eV", "E2 versus grid spacing", "E2 (eV)", "E2_vs_grid.png"),
+        ("grid_spacing_nm", "E2_minus_E1_meV", "E2 − E1 versus grid spacing", "ΔE (meV)", "spacing_vs_grid.png"),
+        ("domain_padding_nm", "E1_eV", "E1 versus domain padding", "E1 (eV)", "energy_vs_domain.png"),
+        ("grid_spacing_nm", "runtime_seconds", "Runtime versus grid spacing", "Runtime (s)", "runtime_vs_grid.png"),
+    ]
+    for sweep, observable, title, ylabel, filename in plot_specs:
+        selected = [
+            row
+            for row in rows
+            if row["sweep"] == sweep and row.get(observable) is not None
+        ]
+        fig, ax = plt.subplots(figsize=(6.4, 4.2))
+        if selected:
+            selected.sort(key=lambda row: float(row["value"]))
+            ax.plot(
+                [float(row["value"]) for row in selected],
+                [float(row[observable]) for row in selected],
+                "o-",
+            )
+        else:
+            ax.text(
+                0.5,
+                0.5,
+                "No licensed solver data yet",
+                ha="center",
+                va="center",
+                transform=ax.transAxes,
+            )
+        ax.set(xlabel=sweep.replace("_", " "), ylabel=ylabel, title=title)
+        fig.tight_layout()
+        fig.savefig(plots / filename, dpi=180)
+        plt.close(fig)
+    return recommendation
+
+
+def run_demo(demo_dir: Path, machine_path: Path | None = None) -> int:
+    """Run one demo using only its YAML and the machine-local YAML."""
+
+    demo_dir = demo_dir.resolve()
+    cfg = load_demo_config(demo_dir)
+    machine = load_machine_config(machine_path)
+    parent = machine.results_root / cfg["demo_id"] / make_run_id()
+    parent.mkdir(parents=True, exist_ok=False)
+
+    if cfg["demo_id"].startswith("03"):
+        _atomic_text(parent / "demo_resolved.yaml", yaml.safe_dump(cfg, sort_keys=True))
+        _atomic_json(parent / "machine_summary.json", machine_summary(machine))
+        rows: list[dict[str, Any]] = []
+        for sweep, values in cfg.get("sweeps", {}).items():
+            if not isinstance(values, list) or not values:
+                raise DemoError(f"sweeps.{sweep} must be a non-empty list.")
+            for index, value in enumerate(values, start=1):
+                case_cfg = _case_cfg(cfg, sweep, value)
+                safe = str(value).replace(".", "p")
+                case_dir = parent / "runs" / sweep / f"{index:02d}_{safe}"
+                outcome = run_case(demo_dir, case_cfg, machine, case_dir)
+                rows.append(_summary_row(sweep, value, outcome))
+        recommendation = _write_convergence_artifacts(parent, cfg, rows)
+        commit, dirty = _git_state()
+        manifest = {
+            "schema": 1,
+            "demo_id": cfg["demo_id"],
+            "timestamp_utc": dt.datetime.now(dt.timezone.utc).isoformat(),
+            "git_commit": commit,
+            "git_dirty": dirty,
+            "machine": machine_summary(machine),
+            "run_count": len(rows),
+            "solver_success_count": sum(bool(row["solver_success"]) for row in rows),
+            "recommendation": recommendation,
+            "status": (
+                "completed"
+                if machine.run_solver and all(row["solver_success"] for row in rows)
+                else "dry_run_complete"
+                if not machine.run_solver
+                else "failed"
+            ),
+        }
+        _atomic_json(parent / "run_manifest.json", manifest)
+        _atomic_text(
+            parent / "console.log",
+            f"Demo 3 status: {manifest['status']}\n"
+            f"Run count: {manifest['run_count']}\n"
+            f"Solver successes: {manifest['solver_success_count']}\n",
+        )
+        print(f"Demo 3 artifacts: {parent}")
+        return 0 if not machine.run_solver or manifest["status"] == "completed" else 1
+
+    outcome = run_case(demo_dir, cfg, machine, parent)
+    print(f"Demo artifacts: {parent}")
+    if outcome.solver_status == "skipped_no_solver":
+        return 0
+    return 0 if outcome.solver_status == "completed" else 1
+
+
+def cli(demo_dir: Path) -> int:
+    """Small entry point used by each demo-local ``run.py``."""
+
+    try:
+        return run_demo(demo_dir)
+    except DemoError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 2

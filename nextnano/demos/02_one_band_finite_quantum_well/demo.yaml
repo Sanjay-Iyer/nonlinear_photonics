@@ -1,0 +1,39 @@
+demo_id: 02_one_band_finite_quantum_well
+title: One-band finite GaAs/AlGaAs quantum well
+template: one_band_finite_qw.in.j2
+
+scientific:
+  well_width_nm: 10.0
+  barrier_width_nm: 20.0
+  aluminum_fraction: 0.30
+  temperature_K: 300
+
+numerical:
+  number_of_states: 4
+  quantum_region_padding_nm: 10.0
+  active_region_grid_spacing_nm: 0.25
+  exterior_grid_spacing_nm: 0.50
+
+outputs:
+  bandedges_glob: "**/*bandedge*.dat"
+  energy_spectrum_glob: "**/*energy*spectrum*Gamma*.dat"
+  probability_glob: "**/*probabilit*Gamma*.dat"
+  bandedge_columns:
+    position_nm: 0
+    conduction_eV: 1
+    heavy_hole_eV: 4
+    light_hole_eV: 5
+    split_off_eV: 6
+  energy_columns:
+    state_index: 0
+    energy_eV: 1
+  write_csv: true
+  write_plots: true
+
+validation:
+  completion_markers: ["simulation done", "done."]
+  fatal_markers: ["terminating program", "fatal error", "license expired"]
+  minimum_well_probability: 0.50
+  maximum_boundary_probability: 0.0001
+  normalization_tolerance: 0.001
+

@@ -23,6 +23,7 @@ mpl-cache/
 # Machine-specific local config: created by hand on each machine, never tracked.
 # A `git pull` will never overwrite it.
 nextnano/config/paths.local.yaml
+nextnano/config/machines/nextnano_machine.local.yaml
 # Raw solver output: ignore EVERYTHING under output/ (fields, meshes, logs, data,
 # temp files all land here), but keep the empty dir in git via its .gitkeep.
 # Scoping solver artifacts to output/ this way avoids broad repo-wide *.dat /
@@ -30,6 +31,9 @@ nextnano/config/paths.local.yaml
 # curated results under nextnano/results/ stay fully tracked.
 nextnano/output/**
 !nextnano/output/.gitkeep
+# Routine demo runs are reproducible and may be large. Curated results elsewhere
+# under nextnano/results remain tracked deliberately.
+nextnano/results/demo_runs/**
 # Any nextnano license file, anywhere -- licensed asset, must never be committed.
 *.lic
 # Python / test caches (also covered repo-wide above; repeated so this block is

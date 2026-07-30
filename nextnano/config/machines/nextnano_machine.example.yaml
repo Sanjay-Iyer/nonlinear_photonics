@@ -1,0 +1,19 @@
+# Copy this file to nextnano_machine.local.yaml in this directory.
+# The local file is gitignored. Paths are resolved from the Git repository root,
+# never from the current working directory. Forward slashes work on Windows.
+#
+# HOME LAPTOP: leave run_solver false. No licensed files are needed.
+# WORK LAPTOP: set run_solver true and verify portable_root. Set any explicit
+# path below if auto-discovery reports zero or multiple plausible candidates.
+
+portable_root: ../2026_07_03
+executable: null
+database: null
+license: null
+threads: 4
+run_solver: false
+
+# null keeps routine runs beneath nextnano/results/demo_runs in this repository.
+# An explicit relative or absolute directory is also allowed.
+results_root: null
+

@@ -1,0 +1,47 @@
+demo_id: 03_quantum_well_convergence
+title: GaAs/AlGaAs finite-well numerical convergence
+template: one_band_convergence.in.j2
+
+scientific:
+  well_width_nm: 10.0
+  left_barrier_width_nm: 20.0
+  right_barrier_width_nm: 20.0
+  aluminum_fraction: 0.30
+  temperature_K: 300
+
+numerical:
+  number_of_states: 6
+  quantum_region_padding_nm: 10.0
+  active_region_grid_spacing_nm: 0.25
+  exterior_grid_spacing_nm: 0.50
+
+sweeps:
+  grid_spacing_nm: [1.0, 0.5, 0.25, 0.125]
+  domain_padding_nm: [10.0, 20.0, 40.0, 80.0]
+  quantum_region_padding_nm: [2.5, 5.0, 10.0, 20.0]
+  number_of_states: [4, 6, 8, 12]
+
+outputs:
+  bandedges_glob: "**/*bandedge*.dat"
+  energy_spectrum_glob: "**/*energy*spectrum*Gamma*.dat"
+  probability_glob: "**/*probabilit*Gamma*.dat"
+  bandedge_columns:
+    position_nm: 0
+    conduction_eV: 1
+    heavy_hole_eV: 4
+    light_hole_eV: 5
+    split_off_eV: 6
+  energy_columns:
+    state_index: 0
+    energy_eV: 1
+  write_csv: true
+  write_plots: true
+
+validation:
+  completion_markers: ["simulation done", "done."]
+  fatal_markers: ["terminating program", "fatal error", "license expired"]
+  absolute_energy_tolerance_meV: 0.10
+  relative_energy_tolerance: 0.0001
+  maximum_boundary_probability: 0.0001
+  minimum_well_probability: 0.50
+  normalization_tolerance: 0.001
