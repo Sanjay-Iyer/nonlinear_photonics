@@ -58,6 +58,6 @@ Geometry, materials, grids, classical band requests, and the one-band quantum
 block are derived from the repository's validated `hello_02_algaas_qw.in` and
 `hello_04a_qw_77K_oneband.in` decks. Demo 1 deliberately does not use the
 validated bulk deck's `run{ strain{} }`, because this lesson disables strain.
-Its empty `run{}` trigger is marked in the template as requiring licensed
-work-laptop parser validation. Demos 2–3 use the validated `run{ quantum{} }`
-pattern.
+Its empty `run{}` trigger and neutral mandatory contact were successfully
+executed with licensed nextnano++ 3.0.0 on 2026-07-30. Demos 2–3 use the
+validated `run{ quantum{} }` pattern.

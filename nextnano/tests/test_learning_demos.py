@@ -245,6 +245,25 @@ def test_machine_summary_redacts_license_path_and_contents(tmp_path):
     assert "TOP SECRET" not in encoded
 
 
+def test_solver_log_sanitizer_redacts_identity_and_key(tmp_path):
+    raw = tmp_path / "raw"
+    raw.mkdir()
+    log = raw / "solver.log"
+    log.write_text(
+        "Licensed to: Example Person, example@example.invalid\n"
+        "License key: private-key-value\n"
+        "DONE.\n",
+        encoding="utf-8",
+    )
+    assert workflow._sanitize_solver_logs(raw) == 1
+    sanitized = log.read_text(encoding="utf-8")
+    assert "Example Person" not in sanitized
+    assert "example@example.invalid" not in sanitized
+    assert "private-key-value" not in sanitized
+    assert sanitized.count("<redacted>") == 2
+    assert "DONE." in sanitized
+
+
 def test_numeric_output_parser_fixture(tmp_path):
     path = tmp_path / "bandedges.dat"
     path.write_text(

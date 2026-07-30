@@ -44,6 +44,6 @@ interfaces? Why does more aluminum raise the barrier? Why does changing well
 width move interfaces but not create quantum levels? Which YAML values are
 physical and which are numerical?
 
-The empty classical-only `run{}` trigger is the only syntax element not yet
-licensed-parser validated. A parser rejection is preserved as a failed run; do
-not advance until it is resolved without adding forbidden physics.
+Licensed validation completed on 2026-07-30 with nextnano++ 3.0.0
+(2026-06-16 kernel): the deck was accepted, wrote Γ/HH/LH/SO band edges, and
+finished with `DONE.` without enabling a quantum or Poisson block.

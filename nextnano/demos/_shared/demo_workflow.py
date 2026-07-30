@@ -592,13 +592,37 @@ def _execute_solver(machine: MachineConfig, deck: Path, raw_output: Path) -> tup
         "threads": machine.threads,
     }
     start = time.perf_counter()
-    info = nn.InputFile(str(deck)).execute(**kwargs)
+    # nextnano++ prints licensed-user/key fields in its live banner. Suppress
+    # the vendor stream here; our own logger still reports start, completion,
+    # failures, runtime, validation, and artifact locations.
+    info = nn.InputFile(str(deck)).execute(show_log=False, **kwargs)
     elapsed = time.perf_counter() - start
     process = info.get("process") if isinstance(info, dict) else None
     code = process.poll() if process is not None else None
     if code is None and process is not None:
         code = process.wait(timeout=10)
     return (int(code) if code is not None else None), elapsed
+
+
+_SENSITIVE_SOLVER_LOG_LINES = (
+    re.compile(r"(?im)^(\s*Licensed\s+to\s*:).*$"),
+    re.compile(r"(?im)^(\s*License\s+key\s*:).*$"),
+)
+
+
+def _sanitize_solver_logs(raw_output: Path) -> int:
+    """Redact licensed-user/key fields from retained nextnano++ text logs."""
+
+    redacted_files = 0
+    for path in sorted(raw_output.rglob("*.log")):
+        text = path.read_text(encoding="utf-8", errors="replace")
+        sanitized = text
+        for pattern in _SENSITIVE_SOLVER_LOG_LINES:
+            sanitized = pattern.sub(r"\1 <redacted>", sanitized)
+        if sanitized != text:
+            _atomic_text(path, sanitized)
+            redacted_files += 1
+    return redacted_files
 
 
 def _numeric_rows(path: Path) -> np.ndarray:
@@ -1016,7 +1040,17 @@ def run_case(
     else:
         logger.info("Executing %s", generated)
         try:
-            return_code, runtime = _execute_solver(machine, generated, layout["raw"])
+            try:
+                return_code, runtime = _execute_solver(
+                    machine, generated, layout["raw"]
+                )
+            finally:
+                redacted_files = _sanitize_solver_logs(layout["raw"])
+                if redacted_files:
+                    logger.info(
+                        "Redacted licensed-user/key fields from %d solver log(s).",
+                        redacted_files,
+                    )
             if return_code not in (0, None):
                 raise DemoError(f"nextnano++ returned nonzero exit code {return_code}")
             log_validation = _log_checks(layout["raw"], cfg)
@@ -1038,6 +1072,10 @@ def run_case(
             if not validation["passed"]:
                 raise DemoError("one or more scientific/output validations failed")
             status = "completed"
+            logger.info(
+                "Solver and scientific validation completed successfully in %.3f s.",
+                runtime,
+            )
         except Exception as exc:  # preserve all artifacts and record the failure
             status = "failed"
             failure_reason = f"{type(exc).__name__}: {exc}"
