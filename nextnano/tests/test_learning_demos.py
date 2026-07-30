@@ -77,6 +77,60 @@ def test_missing_portable_is_actionable_when_execution_enabled(tmp_path):
         workflow.load_machine_config(config)
 
 
+def test_auto_mode_executes_when_portable_installation_is_complete(tmp_path):
+    portable = tmp_path / "2026_07_03"
+    portable.mkdir()
+    exe = portable / "nextnano++.exe"
+    database = portable / "database_nnp.xml"
+    license_file = portable / "License_nnp.lic"
+    for path in (exe, database, license_file):
+        path.write_text("fixture", encoding="utf-8")
+    config = _machine_yaml(
+        tmp_path / "machine.yaml",
+        portable_root=str(portable),
+        run_solver="auto",
+    )
+    machine = workflow.load_machine_config(config)
+    assert machine.run_solver is True
+    assert machine.executable == exe.resolve()
+    assert machine.database == database.resolve()
+    assert machine.license == license_file.resolve()
+
+
+def test_existing_legacy_machine_config_is_reused_automatically(
+    tmp_path, monkeypatch
+):
+    exe = tmp_path / "configured_solver.exe"
+    database = tmp_path / "configured_database.xml"
+    license_file = tmp_path / "configured_license.lic"
+    for path in (exe, database, license_file):
+        path.write_text("fixture", encoding="utf-8")
+    legacy = tmp_path / "paths.local.yaml"
+    legacy.write_text(
+        yaml.safe_dump(
+            {
+                "nextnano++": {
+                    "exe": str(exe),
+                    "database": str(database),
+                    "license": str(license_file),
+                    "outputdirectory": str(tmp_path / "old_output"),
+                    "threads": 7,
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(workflow, "LEGACY_MACHINE_CONFIG", legacy)
+    monkeypatch.setattr(workflow, "MACHINE_CONFIG", tmp_path / "missing_local.yaml")
+    machine = workflow.load_machine_config()
+    assert machine.run_solver is True
+    assert machine.executable == exe.resolve()
+    assert machine.database == database.resolve()
+    assert machine.license == license_file.resolve()
+    assert machine.threads == 7
+    assert machine.source_path == legacy
+
+
 def test_machine_yaml_rejects_unknown_keys(tmp_path):
     config = _machine_yaml(tmp_path / "machine.yaml")
     data = yaml.safe_load(config.read_text(encoding="utf-8"))

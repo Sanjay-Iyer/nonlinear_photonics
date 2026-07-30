@@ -1,19 +1,24 @@
-# Copy this file to nextnano_machine.local.yaml in this directory.
-# The local file is gitignored. Paths are resolved from the Git repository root,
-# never from the current working directory. Forward slashes work on Windows.
+# This tracked file supplies zero-configuration defaults. You normally do not
+# need to copy or edit it. Paths are resolved from the Git repository root,
+# never from the current working directory.
 #
-# HOME LAPTOP: leave run_solver false. No licensed files are needed.
-# WORK LAPTOP: set run_solver true and verify portable_root. Set any explicit
-# path below if auto-discovery reports zero or multiple plausible candidates.
+# With run_solver: auto the demo runner uses, in order:
+#   1. optional nextnano_machine.local.yaml overrides;
+#   2. the existing nextnano/config/paths.local.yaml;
+#   3. the active environment's existing nextnanopy configuration;
+#   4. auto-discovery beneath portable_root.
+#
+# If no configured/portable solver exists (the home laptop), it dry-runs.
+# If a licensed setup exists (the work laptop), it executes automatically.
 
 portable_root: ../2026_07_03
 executable: null
 database: null
 license: null
 threads: 4
-run_solver: false
+run_solver: auto
 
 # null keeps routine runs beneath nextnano/results/demo_runs in this repository.
-# An explicit relative or absolute directory is also allowed.
+# For unusual machines, copy this file to nextnano_machine.local.yaml and use
+# explicit paths. That local override remains gitignored.
 results_root: null
-

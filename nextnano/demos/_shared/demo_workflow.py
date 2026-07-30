@@ -37,6 +37,7 @@ MACHINE_CONFIG = NEXTNANO_ROOT / "config" / "machines" / "nextnano_machine.local
 MACHINE_EXAMPLE = (
     NEXTNANO_ROOT / "config" / "machines" / "nextnano_machine.example.yaml"
 )
+LEGACY_MACHINE_CONFIG = NEXTNANO_ROOT / "config" / "paths.local.yaml"
 DEFAULT_RESULTS_ROOT = NEXTNANO_ROOT / "results" / "demo_runs"
 
 TOP_LEVEL_KEYS = {
@@ -307,26 +308,86 @@ def _discover_unique(root: Path, kind: str) -> Path:
 
 
 def load_machine_config(config_path: Path | None = None) -> MachineConfig:
-    """Load the ignored local machine YAML, falling back to dry-run example values."""
+    """Resolve execution settings with zero-config work/home laptop behavior.
+
+    An explicit/new local demo config wins.  When it is absent, the runner
+    reuses the repository's established ``paths.local.yaml`` or the active
+    environment's nextnanopy configuration before trying sibling-portable
+    discovery.  ``run_solver: auto`` executes only when a complete licensed
+    setup is available; otherwise it performs the successful home dry-run.
+    """
 
     requested = config_path or MACHINE_CONFIG
     source = requested if requested.is_file() else MACHINE_EXAMPLE
     data = _strict_keys(_read_yaml(source), MACHINE_KEYS, str(source))
-    run_solver = data.get("run_solver", False)
-    if not isinstance(run_solver, bool):
-        raise DemoError(f"{source}: run_solver must be true or false.")
-    try:
-        threads = int(data.get("threads", 4))
-    except (TypeError, ValueError) as exc:
-        raise DemoError(f"{source}: threads must be an integer.") from exc
-    if threads < 1:
-        raise DemoError(f"{source}: threads must be >= 1.")
+    run_setting = data.get("run_solver", "auto")
+    if isinstance(run_setting, str):
+        run_setting = run_setting.strip().lower()
+    if run_setting not in (True, False, "auto"):
+        raise DemoError(f"{source}: run_solver must be true, false, or auto.")
+    auto_mode = run_setting == "auto"
+    run_solver = bool(run_setting) if not auto_mode else False
 
     notes: list[str] = []
     if source != requested:
         notes.append(
-            f"local machine YAML not found; using tracked dry-run example: {source}"
+            f"local machine override not found; using tracked automatic defaults: {source}"
         )
+
+    # Reuse the original repository-local nextnano configuration when present.
+    # This is the most likely zero-setup route on a work laptop that already ran
+    # the validated smoke tests.
+    if config_path is None and source == MACHINE_EXAMPLE and LEGACY_MACHINE_CONFIG.is_file():
+        legacy = _read_yaml(LEGACY_MACHINE_CONFIG)
+        section = legacy.get("nextnano++")
+        if not isinstance(section, dict):
+            raise DemoError(
+                f"{LEGACY_MACHINE_CONFIG} must contain a 'nextnano++:' mapping."
+            )
+        legacy_paths = {
+            "executable": section.get("exe"),
+            "database": section.get("database"),
+            "license": section.get("license"),
+        }
+        if all(str(value or "").strip() for value in legacy_paths.values()):
+            data.update(legacy_paths)
+            data["threads"] = section.get("threads", data.get("threads", 4))
+            source = LEGACY_MACHINE_CONFIG
+            run_solver = True
+            auto_mode = False
+            notes.append(
+                f"reusing established repository machine configuration: {source}"
+            )
+
+    # If there is no repository-local setup, reuse the active environment's
+    # nextnanopy configuration without modifying or saving it.
+    if config_path is None and source == MACHINE_EXAMPLE and auto_mode:
+        try:
+            import nextnanopy as nn
+
+            options = nn.config.get_options("nextnano++")
+            configured = {
+                "executable": options.get("exe"),
+                "database": options.get("database"),
+                "license": options.get("license"),
+            }
+            configured_paths = {
+                kind: _resolve_local_path(value)
+                for kind, value in configured.items()
+            }
+            if all(path is not None and path.is_file() for path in configured_paths.values()):
+                data.update(configured)
+                data["threads"] = options.get("threads") or data.get("threads", 4)
+                source = Path(nn.config.fullpath)
+                run_solver = True
+                auto_mode = False
+                notes.append(
+                    "reusing the active environment's existing nextnanopy "
+                    f"configuration: {source}"
+                )
+        except Exception as exc:  # nextnanopy is optional for home dry-runs
+            notes.append(f"nextnanopy configuration unavailable: {type(exc).__name__}")
+
     portable = _resolve_local_path(data.get("portable_root"))
     if portable is None:
         portable = sibling_portable_root()
@@ -334,6 +395,17 @@ def load_machine_config(config_path: Path | None = None) -> MachineConfig:
             notes.append(f"portable_root discovered as repository sibling: {portable}")
     elif portable.is_dir():
         notes.append(f"portable_root resolved from YAML: {portable}")
+
+    if auto_mode and portable is not None and portable.is_dir():
+        run_solver = True
+        notes.append("licensed execution enabled automatically from portable_root")
+
+    try:
+        threads = int(data.get("threads", 4))
+    except (TypeError, ValueError) as exc:
+        raise DemoError(f"{source}: threads must be an integer.") from exc
+    if threads < 1:
+        raise DemoError(f"{source}: threads must be >= 1.")
 
     resolved: dict[str, Path | None] = {}
     for kind in ("executable", "database", "license"):
@@ -937,8 +1009,8 @@ def run_case(
         status = "skipped_no_solver"
         warnings.append(
             "Input generation and validation succeeded. Solver execution was "
-            "skipped because run_solver is false; run this demo on the licensed "
-            "work laptop with nextnano_machine.local.yaml."
+            "skipped because no complete licensed nextnano configuration or "
+            "portable installation was available on this machine."
         )
         logger.info(warnings[-1])
     else:
