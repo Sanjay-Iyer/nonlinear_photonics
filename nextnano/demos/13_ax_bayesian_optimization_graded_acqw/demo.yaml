@@ -43,7 +43,14 @@ workflow:
   # synthetic_smoke_test | demo12_replay | prepare_candidates |
   # run_pending_candidates | closed_loop | analyze_existing_results |
   # validate_top_designs
-  mode: closed_loop
+  #
+  # Currently set to run_pending_candidates: this executes the candidate whose
+  # input has already been generated and then stops, WITHOUT proposing more. It
+  # is the one-trial licensed probe that proves deck -> solver -> extraction ->
+  # alloy validation -> QC -> Ax completion -> checkpoint before 15 more trials
+  # are committed to it. Change to closed_loop once that trial looks right; the
+  # study then continues from where it stopped and repeats nothing.
+  mode: run_pending_candidates
   resume: true
   # Directory (under the results root) holding the Ax snapshot and the immutable
   # trial ledger. Kept outside any single run directory so a run never destroys
@@ -52,7 +59,9 @@ workflow:
   experiment_name: demo13_graded_acqw_bo
 
 simulation:
-  run_solver: false
+  # This gate can only ever DISABLE the solver. A machine without a complete
+  # licensed nextnano++ setup still skips execution with run_solver: true.
+  run_solver: true
   threads: 4
 
 bo:

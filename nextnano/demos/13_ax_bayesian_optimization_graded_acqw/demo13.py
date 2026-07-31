@@ -1544,11 +1544,21 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
     validate_demo13_config(cfg)
     versions = axsearch13.check_ax_version(cfg)
 
-    if not bool((cfg.get("simulation") or {}).get("run_solver", False)):
+    simulation = cfg.get("simulation") or {}
+    if not bool(simulation.get("run_solver", False)):
         # The YAML gate can only ever disable the solver, never enable one that
         # the machine does not have.
         context = dataclasses.replace(
             context, machine=dataclasses.replace(context.machine, run_solver=False)
+        )
+    if simulation.get("threads") is not None:
+        # Thread count is a scheduling preference, not a capability, so unlike
+        # run_solver the demo's YAML may raise it as well as lower it.
+        context = dataclasses.replace(
+            context,
+            machine=dataclasses.replace(
+                context.machine, threads=int(simulation["threads"])
+            ),
         )
 
     mode = str((cfg.get("workflow") or {}).get("mode", "closed_loop"))
