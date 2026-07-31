@@ -13,10 +13,25 @@ These demos form one controlled progression. Run and validate them in order:
 9. a relative three-level nonlinear-optics design sweep (never absolute χ(2));
 10. first 2D confinement and mesh/domain/symmetry diagnostics.
 
+Three further demos build on that sequence rather than extending it:
+
+11. paper validation of the interband χ(2) of an asymmetric coupled quantum
+    well, with corrected origin-independence and quasi-bound diagnostics;
+12. graded GaAs/AlGaAs interfaces: profile shapes, locations, robustness, and a
+    grid-and-Pareto optimization over the completed sweeps;
+13. [Ax](https://ax.dev) Bayesian optimization of the same graded design space,
+    replacing the grid with a closed loop that proposes, simulates, quality-
+    controls, and learns — see
+    [`13_ax_bayesian_optimization_graded_acqw/README.md`](13_ax_bayesian_optimization_graded_acqw/README.md).
+
 Demos 1–3 have passed licensed work-laptop validation. Demos 4–5 are complete
-for the next licensed validation cycle. Demos 6–10 remain gated by their
+for the next licensed validation cycle. Demos 6–13 remain gated by their
 documented Standard-only syntax and output checks. The authoritative
 machine-readable state is [`demo_registry.yaml`](demo_registry.yaml).
+
+Demo 13 needs one dependency the others do not: `ax-platform`, pinned in
+[`requirements.txt`](../../requirements.txt). Installing it does not require a
+nextnano licence.
 
 ## Home laptop: generate and validate
 

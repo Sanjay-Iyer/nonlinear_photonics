@@ -73,6 +73,12 @@ analysis:
     # The two knobs are swept separately and the state-count audit checks that
     # each one moves what it claims to. See scripts/audit_state_counts.py.
     chi2_max_states_per_band: [2, 3, 4]
+    # Relative spread of peak |chi(2)| across the window sweep that still counts
+    # as converged. The 2026-07-31 run came in at 0.95: going from two states
+    # per band to three dropped the peak twentyfold, because at the design point
+    # hh3 sits 1-3 meV from hh2. Windows that pull in an unbound state are
+    # excluded from the comparison rather than counted against it.
+    chi2_state_window_relative_tolerance: 0.05
     # k-parallel convergence is post-processing on the Stage 1 states.
     k_parallel_points: [24, 48, 96, 192]
     k_parallel_fraction_of_bz: [0.05, 0.10, 0.20]

@@ -69,6 +69,8 @@ PLOT_SET: tuple[tuple[str, str], ...] = (
     ("convergence_summary.png", "Numerical convergence"),
     ("sensitivity.png", "Sensitivity of chi(2) to the unknown inputs"),
     ("validation_scorecard.png", "Final validation scorecard"),
+    ("figure2d_comparison.png", "Paper Fig. 2d with this work overlaid"),
+    ("figure2d_comparison_broad.png", "Paper Fig. 2d, full 400-1800 nm range"),
     # --- refined sweep and state tracking (Stage 3b) ------------------------
     ("chi2_metrics_vs_asymmetry.png", "Both chi(2) metrics versus asymmetry"),
     ("resonance_vs_asymmetry.png", "Resonance wavelength versus asymmetry"),

@@ -1,0 +1,14 @@
+schema: 1
+tier: A
+case_count: 4
+purpose: Validate grading grammar, solver alloy output, extraction, and reporting before larger sweeps.
+cases:
+  - {case_id: v_abrupt, implementation: native, profile: abrupt, thickness_nm: 0.0}
+  - {case_id: v_native, implementation: native, profile: linear, thickness_nm: 2.0}
+  - {case_id: v_sigmoid, implementation: staircase, profile: sigmoid, thickness_nm: 2.0}
+  - {case_id: v_stair, implementation: staircase, profile: staircase_linear, thickness_nm: 2.0}
+gate: >-
+  Do not enable Tier B or C until the realized alloy profiles, endpoints,
+  thickness, monotonicity, device length, and native/staircase agreement have
+  been inspected from real licensed nextnano++ outputs.
+

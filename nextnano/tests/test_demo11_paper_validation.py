@@ -1022,9 +1022,11 @@ def test_status_vocabulary_keeps_independent_claims_independent():
     # The unresolved ones, which must NOT read as reproduced.
     assert status["asymmetry optimum near s = 0.42"] == report11.PROVISIONAL
     assert status["smoothness of chi(2) versus asymmetry"] == report11.FAILED
-    assert status["state-count convergence of Eq. 2"] == report11.UNRESOLVED
+    assert status["chi(2) converged in the size of Eq. 2's state sum"] == (
+        report11.UNRESOLVED
+    )
     assert (
-        status["physical-state tracking across the refined sweep"]
+        status["cause of the chi(2)-versus-asymmetry discontinuity"]
         == report11.UNRESOLVED
     )
     assert status["run completed mechanically"] == report11.MECHANICAL
@@ -1057,6 +1059,199 @@ def test_the_asymmetry_optimum_is_never_called_reproduced():
     assert entry["provisional_reason"]
     status = {c["claim"]: c["status"] for c in comparison["status"]["claims"]}
     assert status["asymmetry optimum near s = 0.42"] != report11.REPRODUCED
+
+
+def _window_case(case_id, states, magnitude, *, bound_ok=True):
+    spec = sweeps.CaseSpec(
+        case_id=case_id, label=f"Eq. 2 over {states} states per band",
+        swept={"max_states_per_band": states}, config={},
+        metadata={"stage": "stage2", "sweep_kind": "stage2"},
+    )
+    return sweeps.CaseResult(
+        spec=spec, run_dir=Path("."), status="completed",
+        observables={
+            "chi2_max_states_per_band": states,
+            "chi2_peak_magnitude": magnitude,
+            "chi2_peak_wavelength_nm": 1519.0,
+            "chi2_triple_sum_terms_evaluated": states * states * 2 * states,
+        },
+        validation={"chi2_states_pass_bound_criterion": bound_ok},
+    )
+
+
+def test_a_connected_knob_is_not_the_same_as_a_converged_answer():
+    """The 2026-07-31 run's real numbers: 2 -> 3 states drops the peak 20x.
+
+    The state-count audit passing only says the sweep measures something. If
+    chi(2) then moves by a factor of twenty, the calculation is not converged,
+    and the report must not read those two facts as one.
+    """
+
+    results = [
+        _window_case("s2m1", 2, 1.08967),
+        _window_case("s2m2", 3, 0.0545972),
+    ]
+    # The knob is connected: term counts differ.
+    assert report11._state_count_convergence_meaningful(results) is True
+    # But chi(2) is nowhere near converged.
+    record = report11._state_window_convergence(results, relative_tolerance=0.05)
+    assert record["converged"] is False
+    assert record["relative_spread"] > 0.9
+
+
+def test_a_window_that_pulls_in_an_unbound_state_is_excluded_not_counted():
+    """Widening the sum until it swallows an unbound state is a different
+    calculation, not a convergence point, and must not be averaged in."""
+
+    results = [
+        _window_case("s2m1", 2, 1.09),
+        _window_case("s2m2", 3, 1.10),
+        _window_case("s2m3", 4, 0.04, bound_ok=False),
+    ]
+    record = report11._state_window_convergence(results, relative_tolerance=0.05)
+    assert [p["case_id"] for p in record["points"]] == ["s2m1", "s2m2"]
+    assert [e["case_id"] for e in record["excluded"]] == ["s2m3"]
+    assert "unbound" in record["excluded"][0]["reason"]
+    # Excluding the invalid point leaves the remaining two genuinely converged.
+    assert record["converged"] is True
+
+
+def test_a_single_usable_window_is_unverified_not_converged():
+    record = report11._state_window_convergence(
+        [_window_case("s2m1", 2, 1.09)], relative_tolerance=0.05
+    )
+    assert record["converged"] is None
+    assert "UNVERIFIED" in record["reason"]
+
+
+def test_tracking_that_changes_nothing_does_not_excuse_the_discontinuity():
+    """The actual 2026-07-31 outcome.
+
+    Tracking ran cleanly and reordered nothing, so the cliff is not a labelling
+    artifact. That is a real answer, and it must not be reported as the
+    discontinuity having been explained away.
+    """
+
+    cfg = workflow.load_demo_config(DEMO11)
+    targets = demo11.paper_targets(DEMO11)
+    results = [
+        _fake_case("r1", "stage3_refined", asymmetry=0.39, chi2_peak_magnitude=0.0743,
+                   chi2_relative_at_reference=0.05),
+        _fake_case("r2", "stage3_refined", asymmetry=0.40, chi2_peak_magnitude=1.1517,
+                   chi2_relative_at_reference=0.60),
+    ]
+    comparison = report11.build(
+        cfg=cfg, targets=targets, results=results, reference=None,
+        stage5={"modes": {}}, stage6={}, parent=Path("."),
+        stage3b={
+            "available": True, "points": 17, "ambiguous_assignments": 0,
+            "reordering_detected": False, "tracking_changes_chi2_at": [],
+        },
+    )
+    status = {c["claim"]: c for c in comparison["status"]["claims"]}
+    cause = status["cause of the chi(2)-versus-asymmetry discontinuity"]
+    assert cause["status"] == report11.FAILED
+    assert "NOT a labelling artifact" in cause["detail"]
+    assert comparison["smoothness"]["factor"] > 2.0
+
+
+def test_figure2d_comparison_marks_the_published_peaks(tmp_path):
+    """The paper's Fig. 2d curves are not published data; only its peaks are."""
+
+    focused = tmp_path / "chi2_focused_wavelength.csv"
+    grid = np.linspace(1400.0, 1800.0, 401)
+    magnitude = 1.0 / (1.0 + ((grid - 1519.0) / 12.0) ** 2)
+    np.savetxt(
+        focused,
+        np.column_stack([grid, magnitude, np.zeros_like(grid), magnitude]),
+        delimiter=",", header="wavelength_nm,chi2_real,chi2_imag,chi2_magnitude",
+        comments="",
+    )
+    wide = tmp_path / "wide.csv"
+    wide_magnitude = 1.0 / (1.0 + ((grid - 1461.0) / 15.0) ** 2)
+    np.savetxt(
+        wide,
+        np.column_stack([grid, wide_magnitude, np.zeros_like(grid), wide_magnitude]),
+        delimiter=",", header="wavelength_nm,chi2_real,chi2_imag,chi2_magnitude",
+        comments="",
+    )
+    published = demo11.paper_targets(DEMO11)["targets"]
+    out = tmp_path / "figure2d_comparison.png"
+    report11.figure2d_comparison(
+        out, focused_csv=focused, published=published, window_curves=[(3, wide)]
+    )
+    assert out.is_file()
+    # And it degrades to a labelled placeholder rather than vanishing.
+    missing = tmp_path / "missing.png"
+    report11.figure2d_comparison(
+        missing, focused_csv=tmp_path / "nope.csv", published=published
+    )
+    assert missing.is_file()
+
+
+def test_digitised_figure_data_is_quarantined_from_published_values():
+    """A number read off a raster must never sit beside a quoted one."""
+
+    targets = demo11.paper_targets(DEMO11)
+    figure = targets["digitised_figures"]["figure_2d"]
+    assert figure["kind"] == "digitised_from_figure"
+    assert figure["wavelength_uncertainty_nm"] > 0
+    assert "do not quote" in figure["caveat"].lower()
+    # And it is a separate top-level section, not folded into `targets`.
+    assert "digitised_figures" not in targets["targets"]
+    assert not any("digitis" in name for name in targets["targets"])
+    # The two peak pairs the figure shows are two-photon/one-photon partners.
+    peaks = figure["simulation_peaks_nm"]
+    assert peaks == [535, 760, 1080, 1520]
+    assert 1520 / 760 == pytest.approx(2.0, abs=0.02)
+    assert 1080 / 535 == pytest.approx(2.0, abs=0.05)
+
+
+def test_broad_figure2d_default_is_clean_lines_without_peak_boxes(tmp_path, monkeypatch):
+    """The publication figure is curves plus a line legend, without peak boxes."""
+
+    grid = np.linspace(400.0, 1800.0, 701)
+
+    def lorentz(centre, width, height):
+        return height / (1.0 + ((grid - centre) / width) ** 2)
+
+    # Matches the paper at 1520, misses 535/760/1080, invents one at 1300.
+    magnitude = lorentz(1520.0, 25.0, 1.0) + lorentz(1300.0, 20.0, 0.75)
+    broad = tmp_path / "chi2_broad_wavelength.csv"
+    np.savetxt(
+        broad,
+        np.column_stack([grid, magnitude, np.zeros_like(grid), magnitude]),
+        delimiter=",", header="wavelength_nm,chi2_real,chi2_imag,chi2_magnitude",
+        comments="",
+    )
+    digitised = demo11.paper_targets(DEMO11)["digitised_figures"]["figure_2d"]
+    out = tmp_path / "figure2d_comparison_broad.png"
+    captured = {}
+
+    def save_without_closing(fig, path, **_kwargs):
+        captured["figure"] = fig
+        fig.savefig(path)
+
+    monkeypatch.setattr(report11.plotting, "save_figure", save_without_closing)
+    report11.figure2d_comparison_broad(out, broad_csv=broad, digitised=digitised)
+    assert out.is_file()
+    left_axis = captured["figure"].axes[0]
+    assert len(left_axis.lines) == 2  # paper simulation and this work only
+    assert not left_axis.texts       # no "paper only" / "ours only" boxes
+    legend_labels = [text.get_text() for text in left_axis.get_legend().get_texts()]
+    assert not any("uncertainty" in label for label in legend_labels)
+
+    # The peak detector behind the annotations must ignore shoulder wiggles.
+    normalised = magnitude / magnitude.max()
+    found = report11._prominent_peaks(
+        grid, normalised, minimum_height=0.4, minimum_prominence=0.1
+    )
+    assert [round(p, -1) for p in found] == [1300.0, 1520.0]
+
+    # And with no digitised data it degrades to a placeholder, not a crash.
+    missing = tmp_path / "no_data.png"
+    report11.figure2d_comparison_broad(missing, broad_csv=broad, digitised=None)
+    assert missing.is_file()
 
 
 def test_stage3b_figures_render_from_tracking_rows(tmp_path):

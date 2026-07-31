@@ -83,21 +83,61 @@ def _skip(path: Path) -> None:
     SKIPPED_FIGURES.append(Path(path).name)
 
 
-def _finish(fig: "plt.Figure", path: Path) -> Path | None:
+def _finish(fig: "plt.Figure", path: Path, *, tight: bool = True) -> Path | None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    fig.tight_layout()
+    if tight:
+        fig.tight_layout()
     fig.savefig(path, dpi=180)
     plt.close(fig)
     return path
 
 
-def save_figure(fig: "plt.Figure", path: Path) -> Path | None:
-    """Save a custom demo figure with the same layout and DPI conventions."""
+def save_figure(fig: "plt.Figure", path: Path, *, tight: bool = True) -> Path | None:
+    """Save a custom demo figure with the same layout and DPI conventions.
+
+    ``tight=False`` keeps whatever margins the caller set with
+    ``subplots_adjust``. A figure that reserves space below the axes for
+    explanatory text needs this: ``tight_layout`` recomputes the axes position
+    and leaves any ``fig.text`` placed in figure coordinates sitting on top of
+    the axis labels.
+    """
 
     if plt is None:
         _skip(path)
         return None
-    return _finish(fig, path)
+    return _finish(fig, path, tight=tight)
+
+
+def save_figure_formats(
+    fig: "plt.Figure",
+    base_path: Path,
+    *,
+    formats: Sequence[str] = ("png", "pdf"),
+    tight: bool = True,
+) -> list[Path]:
+    """Save one figure under several extensions and close it once.
+
+    Demos that publish figures need a raster for a document and a vector for a
+    poster, and they need both to be the same drawing.  ``save_figure`` closes
+    the figure, so writing several formats has to happen before that single
+    close; doing it here keeps the skip accounting and DPI identical to every
+    other figure in the repository.
+    """
+
+    if plt is None:
+        _skip(base_path)
+        return []
+    base = Path(base_path)
+    base.parent.mkdir(parents=True, exist_ok=True)
+    if tight:
+        fig.tight_layout()
+    written: list[Path] = []
+    for suffix in formats:
+        target = base.with_suffix(f".{str(suffix).lstrip('.')}")
+        fig.savefig(target, dpi=180)
+        written.append(target)
+    plt.close(fig)
+    return written
 
 
 def placeholder(path: Path, title: str, *, reason: str = PLACEHOLDER_TEXT) -> Path | None:

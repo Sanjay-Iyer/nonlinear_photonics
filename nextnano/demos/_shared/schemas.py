@@ -635,6 +635,127 @@ DEMO11_SCHEMA = DemoSchema(
     passthrough=frozenset({"analysis", "parser", "metric", "checks"}),
 )
 
+
+# Demo 12 deliberately keeps its study design in named YAML sections rather
+# than turning dozens of scientific settings into command-line flags.  The
+# baseline scientific/numerical vocabulary is inherited from Demo 11; the rich
+# study sections are validated by demo12.validate_demo12_config(), where their
+# relationships (profiles, locations, tiers and constraints) can be checked
+# more clearly than this scalar schema can express.
+DEMO12_SCHEMA = DemoSchema(
+    top_level=EXTENDED_TOP_LEVEL
+    | frozenset(
+        {
+            "baseline",
+            "grading",
+            "locations",
+            "joint_sweep",
+            "robustness",
+            "optimization",
+            "state_tracking",
+            "bound_states",
+            "chi2",
+            "execution",
+            "reporting",
+        }
+    ),
+    scientific=DEMO11_SCHEMA.scientific,
+    numerical=DEMO11_SCHEMA.numerical,
+    sweeps=frozenset(),
+    outputs=EXTENDED_OUTPUTS,
+    validation=DEMO11_SCHEMA.validation
+    | frozenset(
+        {
+            "grading_thickness_tolerance_nm",
+            "composition_endpoint_tolerance",
+            "integrated_composition_relative_tolerance",
+            "native_staircase_composition_rms_tolerance",
+            "native_staircase_bandedge_tolerance_meV",
+        }
+    ),
+    positive=DEMO11_SCHEMA.positive,
+    non_negative=DEMO11_SCHEMA.non_negative,
+    fraction=DEMO11_SCHEMA.fraction,
+    integer=DEMO11_SCHEMA.integer,
+    passthrough=frozenset(
+        {
+            "analysis",
+            "parser",
+            "metric",
+            "checks",
+            "baseline",
+            "grading",
+            "locations",
+            "joint_sweep",
+            "robustness",
+            "optimization",
+            "state_tracking",
+            "bound_states",
+            "chi2",
+            "execution",
+            "reporting",
+        }
+    ),
+)
+
+# Demo 13 keeps Demo 12's physical vocabulary unchanged -- a Demo 13 trial and a
+# Demo 12 case with the same geometry must be the same calculation -- and adds
+# only the sections that describe the *search*: `demo`, `workflow`,
+# `simulation`, `bo`, `validation_study` and `paper_comparison`. Their internal
+# relationships (iteration counts, search-space bounds, objective modes and
+# outcome constraints) are checked by demo13.validate_demo13_config(), which can
+# express them far more clearly than this scalar schema can.
+DEMO13_SCHEMA = DemoSchema(
+    top_level=EXTENDED_TOP_LEVEL
+    | frozenset(
+        {
+            "demo",
+            "baseline",
+            "workflow",
+            "simulation",
+            "bo",
+            "validation_study",
+            "grading",
+            "locations",
+            "state_tracking",
+            "bound_states",
+            "chi2",
+            "paper_comparison",
+            "reporting",
+        }
+    ),
+    scientific=DEMO11_SCHEMA.scientific,
+    numerical=DEMO11_SCHEMA.numerical,
+    sweeps=frozenset(),
+    outputs=EXTENDED_OUTPUTS,
+    validation=DEMO12_SCHEMA.validation,
+    positive=DEMO11_SCHEMA.positive,
+    non_negative=DEMO11_SCHEMA.non_negative,
+    fraction=DEMO11_SCHEMA.fraction,
+    integer=DEMO11_SCHEMA.integer,
+    passthrough=frozenset(
+        {
+            "analysis",
+            "parser",
+            "metric",
+            "checks",
+            "demo",
+            "baseline",
+            "workflow",
+            "simulation",
+            "bo",
+            "validation_study",
+            "grading",
+            "locations",
+            "state_tracking",
+            "bound_states",
+            "chi2",
+            "paper_comparison",
+            "reporting",
+        }
+    ),
+)
+
 DEMO_SCHEMAS: Mapping[str, DemoSchema] = {
     "01": LEGACY_SCHEMA,
     "02": LEGACY_SCHEMA,
@@ -647,6 +768,8 @@ DEMO_SCHEMAS: Mapping[str, DemoSchema] = {
     "09": DEMO9_SCHEMA,
     "10": DEMO10_SCHEMA,
     "11": DEMO11_SCHEMA,
+    "12": DEMO12_SCHEMA,
+    "13": DEMO13_SCHEMA,
 }
 
 

@@ -23,3 +23,16 @@ DEMOS_DIR = Path(__file__).resolve().parents[1] / "demos"
 for _demo_dir in sorted(DEMOS_DIR.glob("[0-9][0-9]_*")):
     if _demo_dir.is_dir() and str(_demo_dir) not in sys.path:
         sys.path.insert(0, str(_demo_dir))
+
+
+def pytest_configure(config):
+    """Register the markers the demo suites use.
+
+    ``slow`` marks the tests that fit a Gaussian process or run a whole Ax
+    study. They are part of the normal suite -- deselect them with
+    ``-m "not slow"`` when iterating on something else.
+    """
+
+    config.addinivalue_line(
+        "markers", "slow: fits surrogate models or runs a whole optimization study"
+    )

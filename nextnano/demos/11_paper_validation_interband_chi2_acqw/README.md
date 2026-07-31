@@ -38,6 +38,11 @@ commit `d1aed8d`), with **no material parameter adjusted**:
 | barrier optimum | 1 nm | **1.0 nm** | 0 | `reproduced` |
 | graded/abrupt ratio | 0.513 | **0.571** | +0.058 | `reproduced` |
 | asymmetry optimum | 0.42 | see below | — | **`provisionally_consistent`** |
+| χ⁽²⁾ vs state-sum size | — | 20× change, 2→3 states | — | **`failed`** |
+
+The 1519 nm entry carries an asterisk: it is the peak of the Eq. 2 scan with the
+paper's two-state sum, and that sum is not converged (see below). The two
+transition energies do not — they are solver eigenvalues.
 
 Orthonormality holds everywhere: the worst case across all 38 runs is 1.6e-13
 against a 1e-3 tolerance.
@@ -45,6 +50,52 @@ against a 1e-3 tolerance.
 A committed fixture under
 `nextnano/tests/fixtures/nextnano_pp_3_0_0/demo11_acqw_paper/` runs the whole
 pipeline in the test suite without a licence.
+
+## What the second licensed run found
+
+Run of 2026-07-31, 73/73 cases at production mesh, commit `5ace1dc`. The four
+issues below were all fixed, and running the fixed code turned up a fifth that
+matters more than any of them.
+
+**Eq. 2's two-state truncation is not converged, at the paper's own design
+point.** Widening the sum from two states per band to three drops the peak
+|χ⁽²⁾| from 1.090 to 0.0546 — a factor of **20** — and moves the resonance from
+1519 nm to 1461 nm. The third heavy hole is not a distant spectator: at
+s = 0.42 it sits **1–3 meV** from hh₂. All three states are bound (the four-state
+window is excluded because it pulls in an unbound state, which the report says
+out loud). The 1520 nm agreement is obtained *only* with the two-state sum the
+paper specifies, and does not survive relaxing it.
+
+The transition energies are unaffected — they are solver eigenvalues, not
+outputs of Eq. 2 — so E₁−HH₁ and E₂−HH₂ stay `reproduced`. Everything computed
+from the χ⁽²⁾ **scan** inherits the truncation.
+
+**The χ⁽²⁾(s) cliff is real, not a labelling artifact.** Physical-state tracking
+across the refined sweep reordered nothing: all 136 tracked states kept their
+energy index, zero ambiguous assignments, and the tracked and raw-index χ⁽²⁾
+curves are identical at all 17 points. The refined sweep instead localises the
+cliff to a single 0.01 step, s = 0.39 → 0.40, where χ⁽²⁾ jumps **15.5×** — and
+that is exactly where the hh₂–hh₃ gap reaches its minimum of **1.37 meV**:
+
+| s | hh₂−hh₃ gap | peak χ⁽²⁾ | hh₂ overlap with previous |
+|---:|---:|---:|---:|
+| 0.38 | 4.02 meV | 0.129 | 0.999 |
+| 0.39 | 2.54 meV | 0.074 | 0.995 |
+| **0.40** | **1.37 meV** | **1.152** | 0.953 |
+| 0.41 | 1.64 meV | 1.722 | **0.837** |
+| 0.42 | 3.03 meV | 1.090 | 0.977 |
+
+The apparent "optimum" at s = 0.41 is the top of an anticrossing spike, not a
+design optimum, and the paper's s = 0.42 sits on its shoulder. Both facts have
+the same cause as the truncation problem: hh₂ and hh₃ hybridise there, and Eq. 2
+keeps only one of them.
+
+**Padding does not converge at s = 0.55.** Probing away from the design point
+was the right call. At s = 0.38, 0.42, 0.46 and 0.50 boundary probability falls
+cleanly with padding (9.6e-4 → 2.1e-5 → 5.1e-7). At s = 0.55 it does not:
+1.3e-3 → 1.9e-3 → 1.0e-3. That state is genuinely quasi-bound — a 2.25 nm thin
+well cannot hold it — not a domain-truncation artifact, and no amount of padding
+will fix it.
 
 ## What the first licensed run exposed
 
@@ -172,6 +223,55 @@ Published values live in `paper_targets.yaml`, each with its `kind` and its
 `source`, and are **never** mixed with the simulation inputs in `demo.yaml`.
 That separation is what stops a change to the model from silently looking like
 a change to the paper's claims.
+
+## Figure 2 comparison
+
+Two figures, because there are two honest ways to compare against Fig. 2d and
+they carry different evidential weight.
+
+**`figure2d_comparison.png`** — the telecom window, 1400–1800 nm. Our |χ⁽²⁾(λ)|
+against the paper's two **text-quoted** peak wavelengths (simulated ≈1520 nm,
+measured ≈1560 nm), drawn as marked wavelengths. Nothing is invented: the paper
+states those two numbers, so those two numbers are what is drawn. The same curve
+with a wider Eq. 2 state window is overlaid, because the truncation moves the
+peak.
+
+**`figure2d_comparison_broad.png`** — the full published 400–1800 nm range, with
+the paper's simulation drawn *as a curve*. That curve is **digitised by eye from
+the published raster** (±20 nm, ±15 %), kept in its own
+`digitised_figures:` section of `paper_targets.yaml`, never mixed into
+`targets:`, and marked as such wherever it appears. It is weaker evidence than a
+quoted number and the figure says so on its face — but it enables a comparison
+the text cannot:
+
+| paper Fig. 2d simulated peak | this work |
+|---:|---|
+| ~535 nm | **absent** |
+| ~760 nm | **760 nm** ✓ |
+| ~1080 nm | **absent** |
+| ~1520 nm | **1520 nm** ✓ |
+| — | **1300 nm**, which the paper does not have (it has a dip near 1330) |
+
+1520/760 = 2.00 and 1080/535 = 2.02. Each pair is the two-photon and one-photon
+resonance of one transition: 1.63 eV for the first, ≈2.30 eV for the second. So
+the paper's own simulation contains a transition near 2.3 eV that our two-state
+sum cannot produce — independent corroboration, from the paper's published
+figure, of the state-truncation finding above.
+
+**Fig. 2a–2c are not comparable at all.** 2a is the measurement geometry, 2b the
+rotation-angle polar response, 2c the power-squared linearity. Those are
+measurement signatures of a real sample, not electronic structure, and this
+calculation cannot produce them. Only 2d is a simulation the paper compares
+against, so only 2d is reproduced here.
+
+Both simulations are normalised to their own maximum in both figures: the
+paper's absolute pm/V scale is not independently reproducible, so peak
+**positions** and lineshape are compared and heights are not.
+
+The broad comparison intentionally renders only the paper simulation, this
+work's simulation, and the three measured/control line series in the combined
+twin-axis legend. Peak classifications remain available to the analysis code,
+but the normal figure has no vertical peak guides or annotation boxes.
 
 ## The two χ⁽²⁾ metrics
 

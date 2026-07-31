@@ -1,0 +1,220 @@
+---
+demo_id: 12_graded_interface_coupled_quantum_well_optimization
+title: "Demo 12 — Graded-Interface Coupled Quantum Wells: Electronic Structure, Nonlinear Response, Robustness, and Optimization"
+template: graded_acqw.in.j2
+
+# Inherited unchanged from Demo 11 unless a case manifest says otherwise.
+baseline:
+  source_demo: 11_paper_validation_interband_chi2_acqw
+  reference_case: s1_ref
+  licensed_reference_run_date: "2026-07-31"
+  inheritance_note: >-
+    GaAs/Al0.55Ga0.45As, 7.1/2.9 nm wells, 1.8 nm central barrier,
+    18.2 nm period barrier, 300 K, Gamma+HH one-band model, four states,
+    5 meV broadening, 1550 nm reference, Demo 11 Eq. 2 relative chi(2),
+    extraction, QC, corrected origin test, and bound-state policy.
+
+scientific:
+  thick_well_nm: 7.1
+  thin_well_nm: 2.9
+  tunnel_barrier_nm: 1.8
+  period_barrier_nm: 18.2
+  aluminum_fraction: 0.55
+  temperature_K: 300
+  # Compatibility field inherited from Demo 11. Demo 12 uses grading below.
+  interface_grading_nm: 0.0
+
+numerical:
+  active_region_grid_spacing_nm: 0.10
+  exterior_grid_spacing_nm: 0.25
+  number_of_electron_states: 4
+  number_of_hole_states: 4
+  quantum_region_padding_nm: 6.0
+  domain_padding_nm: 0.0
+
+grading:
+  enabled: true
+  implementation: native
+  fallback_implementation: staircase
+  profile: linear
+  location_mode: all
+  selected_thickness_nm: 2.0
+  validation_thickness_nm: 2.0
+  profile_comparison_thickness_nm: 2.0
+  preserve_total_device_length: true
+  preserve_nominal_layer_centers: true
+  preserve_nominal_well_width: true
+  minimum_grid_points_per_grade: 10
+  staircase_sublayers: 16
+  sigmoid_steepness: 10.0
+  erf_span_sigma: 3.0
+  upward_thickness_nm: 1.5
+  downward_thickness_nm: 2.5
+  center_shift_nm: 0.0
+  interface_shift_nm: 0.0
+  profiles: [abrupt, linear, sigmoid, erf, cosine, staircase_linear, asymmetric]
+  thickness_nm: [0.0, 0.25, 0.5, 1.0, 1.5, 2.0, 3.0, 4.0]
+  definition: >-
+    Grading thickness is the full start-to-end transition width, centered on
+    the nominal abrupt interface. It replaces equal lengths of the adjacent
+    well and barrier. Layer centers and total device length remain fixed.
+    Overlapping centered grades are retained and explicitly flagged rather
+    than silently changing the geometry.
+    center_shift_nm moves only the grading ramp relative to its nominal
+    interface. interface_shift_nm translates the central barrier: the thick
+    well changes by +delta and the thin well by -delta at fixed total length.
+
+locations:
+  outer_interfaces: true
+  central_barrier_interfaces: true
+  study_modes: [none, outer_only, central_only, narrow_well_only, wide_well_only, all, left_only, right_only]
+
+joint_sweep:
+  asymmetry: {start: 0.36, stop: 0.56, step: 0.02}
+  grading_thickness_nm: [0.0, 0.5, 1.0, 1.5, 2.0, 3.0]
+  traversal: [asymmetry_rows, grading_columns]
+
+robustness:
+  enabled: true
+  nominal_designs:
+    - name: demo11_abrupt
+      overrides: {grading.selected_thickness_nm: 0.0, grading.profile: abrupt}
+    - name: graded_linear_1nm
+      overrides: {grading.selected_thickness_nm: 1.0, grading.profile: linear}
+    - name: graded_linear_2nm
+      overrides: {grading.selected_thickness_nm: 2.0, grading.profile: linear}
+    - name: graded_cosine_2nm
+      overrides: {grading.selected_thickness_nm: 2.0, grading.profile: cosine, grading.implementation: staircase}
+  perturbations:
+    narrow_well_nm: [-0.3, -0.2, -0.1, 0.1, 0.2, 0.3]
+    wide_well_nm: [-0.3, -0.2, -0.1, 0.1, 0.2, 0.3]
+    central_barrier_nm: [-0.3, -0.2, -0.1, 0.1, 0.2, 0.3]
+    grading_thickness_nm: [-0.5, -0.25, -0.1, 0.1, 0.25, 0.5]
+    aluminum_fraction: [-0.02, -0.01, -0.005, 0.005, 0.01, 0.02]
+    grading_center_nm: [-0.2, -0.1, 0.1, 0.2]
+    interface_shift_nm: [-0.2, -0.1, 0.1, 0.2]
+  acceptance:
+    maximum_target_detuning_nm: 10.0
+    maximum_boundary_probability: 1.0e-3
+
+optimization:
+  enabled: true
+  source_stages: [2, 3, 4, 5, 6]
+  method: grid_and_pareto
+  objectives:
+    peak_chi2_magnitude: maximize
+    chi2_at_target_wavelength: maximize
+    target_detuning_nm: minimize
+    robustness_score: maximize
+    boundary_probability: minimize
+    state_tracking_confidence: maximize
+  constraints:
+    maximum_target_detuning_nm: 10
+    maximum_boundary_probability: 1.0e-3
+    minimum_state_tracking_overlap: 0.80
+    maximum_origin_independence_error: 1.0e-6
+    require_bound_states: true
+  weighted_score:
+    enabled: true
+    role: secondary_ranking_only
+    weights: {peak_chi2_magnitude: 0.25, chi2_at_target_wavelength: 0.30, target_detuning_nm: 0.15, robustness_score: 0.20, state_tracking_confidence: 0.10}
+
+state_tracking:
+  enabled: true
+  method: overlap_assignment
+  dimensions: [asymmetry, grading_thickness]
+  minimum_confidence: 0.60
+  minimum_assignment_margin: 0.15
+  energy_continuity_weight: 0.05
+  ambiguity_threshold: 0.15
+  align_arbitrary_sign: true
+  save_complete_assignment_matrices: true
+
+bound_states:
+  policy: warn
+  maximum_boundary_probability: 1.0e-3
+  boundary_edge_fraction: 0.05
+
+chi2:
+  reference_wavelength_nm: 1550.0
+  integrated_wavelength_nm: [1400.0, 1800.0]
+  integrated_wavelength_points: 401
+  bandwidth_fraction_of_peak: 0.5
+  report_peak_metric: true
+  report_reference_metric: true
+  report_integrated_metric: true
+
+# Demo 11-compatible analysis and metric sections. They are reused verbatim by
+# demo11.analyse_case; Demo 12 adds tracking dimensions above.
+analysis:
+  quantum_region_name: acqw
+  dipole_polarization_name: growth_z
+  boundary_edge_fraction: 0.05
+  orthonormality_tolerance: 1.0e-3
+  maximum_origin_dependence: 1.0e-6
+  origin_independence_absolute_tolerance: 1.0e-12
+  origin_independence_scale_floor: 1.0e-9
+  origin_independence_shift_nm: 100.0
+
+metric:
+  mode: relative
+  broadening_meV: 5.0
+  k_parallel_fraction_of_bz: 0.10
+  k_parallel_points: 96
+  lattice_constant_nm: 0.565325
+  electron_mass_m0: 0.067
+  heavy_hole_inplane_mass_m0: 0.112
+  spin_degeneracy: 2
+  max_states_per_band: 2
+  r_e_hh_nm: null
+  n_wells_per_metre: null
+  calibration_target_pm_per_V: 2340.0
+  calibration_wavelength_nm: 1550.0
+  calibration_source: "Demo 11 / arXiv:2602.23246v1; calibrated mode is never called independent reproduction"
+  broad_wavelength_nm: [400.0, 1800.0]
+  broad_wavelength_points: 701
+  focused_wavelength_nm: [1400.0, 1800.0]
+  focused_wavelength_points: 401
+  reference_wavelength_nm: 1550.0
+
+outputs:
+  parser_profile: nextnano_pp_3_0_0
+  quantum_region_name: acqw
+  polarizations: [growth_z]
+  bandedge_columns: {position_nm: 0, conduction_eV: 1, heavy_hole_eV: 2, light_hole_eV: 3, split_off_eV: 4}
+  write_csv: true
+  write_plots: true
+
+validation:
+  completion_markers: [simulation completed, calculation successfully completed]
+  fatal_markers: [terminating program, fatal error, license expired]
+  convergence_warning_markers: [failed to converge]
+  minimum_confined_probability: 0.50
+  maximum_boundary_probability: 1.0e-3
+  quasi_bound_state_policy: warn
+  normalization_tolerance: 1.0e-3
+  transition_energy_tolerance_meV: 40.0
+  absolute_energy_tolerance_meV: 1.0
+  require_all_states_bound: false
+  grading_thickness_tolerance_nm: 0.05
+  composition_endpoint_tolerance: 1.0e-4
+  integrated_composition_relative_tolerance: 1.0e-3
+  native_staircase_composition_rms_tolerance: 0.02
+  native_staircase_bandedge_tolerance_meV: 5.0
+
+execution:
+  # A is the default and contains exactly four cases. B is the learning study.
+  # C is rejected unless enable_full_optimization is deliberately set true.
+  tier: A
+  run_solver: false
+  threads: 4
+  resume_completed_cases: true
+  enable_full_optimization: false
+
+reporting:
+  make_figures: true
+  export_csv: true
+  export_json: true
+  export_markdown: true
+  raw_points_only: true
+  guide_lines_allowed: true

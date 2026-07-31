@@ -1,0 +1,66 @@
+# Demo 13: graded-interface GaAs/AlGaAs asymmetric coupled quantum well, one
+# Bayesian-optimization trial.
+#
+# Byte-for-byte the Demo 12 deck below the header, and rendered by
+# demo12.render_values(), so an Ax trial and a Demo 12 grid case with the same
+# geometry are the same physical calculation. Any change here must be made in
+# Demo 12 first, or the warm-start observations stop being comparable.
+#
+# Confirmed repository syntax basis: Demo 11 and nextnano++ 3.0.0 parser.
+# Native linear grades use:
+#   ternary_linear{ alloy_x=[start,end] x=[position_start,position_end] }
+# Nonlinear mathematical shapes use explicit ternary_constant sublayers.
+# The licensed smoke run MUST inspect output_alloy_composition before a long run.
+
+global{
+    simulate1D{}
+    temperature = {{temperature_K}}
+    substrate{ name = "GaAs" }
+    crystal_zb{ x_hkl = [1, 0, 0]  y_hkl = [0, 1, 0] }
+}
+
+contacts{ fermi{ name = qw_contact  bias = 0.0 } }
+
+grid{
+    xgrid{
+{{grid_lines}}
+    }
+}
+
+structure{
+    output_region_index{ boxes = no }
+    output_material_index{ boxes = no }
+    output_alloy_composition{ boxes = no }
+{{structure_regions}}
+}
+
+classical{
+    Gamma{}
+    HH{}
+    LH{}
+    SO{}
+    output_bandedges{ averaged = no }
+    output_bandgap{}
+}
+
+quantum{
+    region{
+        name = "{{quantum_region_name}}"
+        x = [{{quantum_start_nm}}, {{quantum_end_nm}}]
+        no_density = yes
+        boundary{ x = dirichlet }
+        Gamma{ num_ev = {{number_of_electron_states}} }
+        HH{ num_ev = {{number_of_hole_states}} }
+        output_states{ max_num = {{output_state_count}} envelopes = yes probabilities = yes }
+        transition_energies{ Gamma_HH{} }
+        overlap_integrals{ Gamma_HH{} }
+        dipole_moment_matrix_elements{
+            polarization{ name = "{{dipole_polarization_name}}" re = [1, 0, 0] }
+            Gamma{}
+            HH{}
+        }
+    }
+}
+
+run{ quantum{} }
+

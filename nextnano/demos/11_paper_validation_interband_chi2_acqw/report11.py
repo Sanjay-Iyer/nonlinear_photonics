@@ -402,6 +402,14 @@ def build(
     smoothness = _monotone_break(
         stage3_refined or stage3, "asymmetry", METRICS[PRIMARY_METRIC]["observable"]
     )
+    window_convergence = _state_window_convergence(
+        results,
+        relative_tolerance=float(
+            ((cfg.get("analysis") or {}).get("convergence") or {}).get(
+                "chi2_state_window_relative_tolerance", 0.05
+            )
+        ),
+    )
 
     # --- interface abruptness ------------------------------------------------
     stage7 = {
@@ -607,11 +615,23 @@ def build(
             "the solver returns",
         ),
         (
-            "state-count convergence actually varied the sum",
+            "the state-count sweep actually varied the sum",
             _state_count_convergence_meaningful(results),
             "requesting more solver states does not widen Eq. 2's m,n,l sums. A "
             "state-count sweep in which the term count never changes has not "
-            "demonstrated convergence of anything",
+            "demonstrated convergence of anything. This checks only that the knob "
+            "is connected -- see the next criterion for whether chi(2) converged",
+        ),
+        (
+            "chi(2) is converged in the number of states Eq. 2 sums over",
+            window_convergence["converged"],
+            window_convergence["reason"]
+            + (
+                f". {len(window_convergence['excluded'])} window(s) excluded for "
+                "pulling an unbound state into the sum"
+                if window_convergence["excluded"]
+                else ""
+            ),
         ),
         (
             "every state entering Eq. 2 passes the bound-state criterion",
@@ -628,12 +648,23 @@ def build(
         stage3b=stage3b or {},
         smoothness=smoothness,
         optima=optima,
+        window_convergence=window_convergence,
     )
     return {
         "entries": entries,
         "summary": summary,
         "criteria": criteria,
         "status": status,
+        # Carried so the figure writers can mark the paper's published values
+        # without re-reading paper_targets.yaml and risking a second, divergent
+        # copy of them.
+        "published": dict(published),
+        # Digitised curves are carried separately from `published` so nothing
+        # downstream can mistake a value read off a raster for a quoted one.
+        "digitised_figure_2d": dict(
+            (targets.get("digitised_figures") or {}).get("figure_2d") or {}
+        ),
+        "state_window_convergence": window_convergence,
         "metrics": {name: dict(spec) for name, spec in METRICS.items()},
         "primary_metric": PRIMARY_METRIC,
         "optima": optima,
@@ -651,6 +682,11 @@ def _state_count_convergence_meaningful(
     ``max_states_per_band`` regardless, so all three cases evaluated an
     identical number of identical terms. Reporting the agreement as convergence
     would be reporting that a knob which was never connected had no effect.
+
+    This answers only "is the knob connected". Whether chi(2) is actually
+    *converged* in the size of the sum is a separate and much harder question,
+    answered by :func:`_state_window_convergence` -- conflating the two is
+    exactly the mistake this function exists to prevent.
     """
 
     counts = {
@@ -662,6 +698,94 @@ def _state_count_convergence_meaningful(
     if len(counts) < 2:
         return None if not counts else False
     return True
+
+
+def _state_window_convergence(
+    results: Sequence[sweeps.CaseResult], *, relative_tolerance: float
+) -> dict[str, Any]:
+    """Is chi(2) stable against the number of states Eq. 2 sums over?
+
+    A window sweep that changes the term count proves the knob works. It does
+    not prove the answer stopped moving, and on 2026-07-31 it emphatically had
+    not: going from two states per band to three dropped the peak |chi(2)| by a
+    factor of 20 and moved the resonance from 1519 nm to 1461 nm. The paper
+    specifies two states, but at its own design point the third heavy hole sits
+    1-3 meV away, so the truncation discards half of a hybridised pair.
+
+    Cases whose widened window pulls in a state that fails the bound-state
+    criterion are excluded and listed. Including an unbound state in Eq. 2 is
+    not a convergence data point -- it is a different, invalid calculation --
+    and silently averaging it in would make the spread look either better or
+    worse for the wrong reason.
+    """
+
+    points: list[dict[str, Any]] = []
+    excluded: list[dict[str, Any]] = []
+    for result in results:
+        window = result.observables.get("chi2_max_states_per_band")
+        magnitude = result.observables.get("chi2_peak_magnitude")
+        if window is None or magnitude is None or not result.solver_success:
+            continue
+        if "max_states_per_band" not in result.spec.swept:
+            continue
+        entry = {
+            "case_id": result.spec.case_id,
+            "max_states_per_band": int(window),
+            "peak_magnitude": float(magnitude),
+            "peak_wavelength_nm": result.observables.get("chi2_peak_wavelength_nm"),
+            "terms": result.observables.get("chi2_triple_sum_terms_evaluated"),
+        }
+        if result.validation.get("chi2_states_pass_bound_criterion") is False:
+            entry["reason"] = (
+                "the widened window pulls an unbound state into Eq. 2; this is a "
+                "different calculation, not a convergence point"
+            )
+            excluded.append(entry)
+            continue
+        points.append(entry)
+
+    points.sort(key=lambda item: item["max_states_per_band"])
+    record: dict[str, Any] = {
+        "relative_tolerance": float(relative_tolerance),
+        "points": points,
+        "excluded": excluded,
+        "converged": None,
+        "relative_spread": None,
+        "largest_step": None,
+    }
+    if len(points) < 2:
+        record["reason"] = (
+            f"only {len(points)} usable window(s); convergence of Eq. 2 in the "
+            "number of states it sums over is UNVERIFIED"
+            + (
+                f". {len(excluded)} case(s) were excluded for pulling an unbound "
+                "state into the sum, which is itself a finding: the quantum region "
+                "cannot support a wider window as configured"
+                if excluded
+                else ""
+            )
+        )
+        return record
+
+    magnitudes = [p["peak_magnitude"] for p in points]
+    largest = max(abs(m) for m in magnitudes)
+    if largest <= 0:
+        record["reason"] = "every window gives zero; nothing to compare"
+        return record
+    record["relative_spread"] = (max(magnitudes) - min(magnitudes)) / largest
+    steps = [
+        abs(b["peak_magnitude"] - a["peak_magnitude"]) / max(abs(a["peak_magnitude"]), 1e-300)
+        for a, b in zip(points, points[1:])
+    ]
+    record["largest_step"] = max(steps) if steps else None
+    record["converged"] = bool(record["relative_spread"] <= float(relative_tolerance))
+    record["reason"] = (
+        f"windows {[p['max_states_per_band'] for p in points]} give peak |chi(2)| "
+        f"{[round(m, 6) for m in magnitudes]}; relative spread "
+        f"{record['relative_spread']:.3f} against a tolerance of "
+        f"{relative_tolerance:.3f}"
+    )
+    return record
 
 
 def _optimum_margin_note(optima: Mapping[str, Any]) -> str:
@@ -693,6 +817,7 @@ def _status_table(
     stage3b: Mapping[str, Any],
     smoothness: Mapping[str, Any],
     optima: Mapping[str, Any],
+    window_convergence: Mapping[str, Any],
 ) -> dict[str, Any]:
     """Classify each claim on the six-level reproduction scale.
 
@@ -797,33 +922,68 @@ def _status_table(
             ),
         },
         {
-            "claim": "state-count convergence of Eq. 2",
+            # Two separate questions, and collapsing them into one status is how
+            # a disconnected knob came to look like convergence in the first
+            # place. "The sweep varies the sum" is plumbing; "chi(2) stopped
+            # moving" is the physics, and only the second can be `converged`.
+            "claim": "state-count sweep is wired to the sum (plumbing)",
             "status": (
-                REPRODUCED
+                CONVERGED
                 if _state_count_convergence_meaningful(results) is True
                 else UNRESOLVED
             ),
-            "detail": "unverified until the term count is shown to change with the "
-            "swept parameter. Agreement between runs whose sums are identical is "
-            "not evidence of convergence",
+            "detail": "the summation window changes the term count, so the sweep "
+            "measures something. This says nothing about whether chi(2) converged",
         },
         {
-            "claim": "physical-state tracking across the refined sweep",
+            "claim": "chi(2) converged in the size of Eq. 2's state sum",
             "status": (
-                REPRODUCED
-                if stage3b.get("available") and not stage3b.get("ambiguous_assignments")
-                else PROVISIONAL
-                if stage3b.get("available")
+                CONVERGED
+                if window_convergence.get("converged") is True
                 else UNRESOLVED
+                if window_convergence.get("converged") is None
+                else FAILED
+            ),
+            "detail": window_convergence.get("reason", "not evaluated")
+            + (
+                ". Eq. 2 as the paper specifies it -- two states per band -- is "
+                "NOT converged, so every number downstream of the chi(2) SCAN, "
+                "including the resonance position it puts at ~1520 nm, inherits "
+                "that. The transition energies themselves are solver eigenvalues "
+                "and are unaffected"
+                if window_convergence.get("converged") is False
+                else ""
+            ),
+        },
+        {
+            "claim": "cause of the chi(2)-versus-asymmetry discontinuity",
+            "status": (
+                UNRESOLVED
+                if not stage3b.get("available")
+                else PROVISIONAL
+                if stage3b.get("reordering_detected")
+                or stage3b.get("tracking_changes_chi2_at")
+                else FAILED
+                if (smoothness.get("factor") or 0) > 2.0
+                else REPRODUCED
             ),
             "detail": (
-                stage3b.get("reason")
-                or f"{stage3b.get('points', 0)} refined points tracked; "
-                f"{stage3b.get('ambiguous_assignments', 0)} ambiguous assignment(s)"
-                + (
-                    f" at {', '.join(stage3b.get('ambiguous_at', []))}"
-                    if stage3b.get("ambiguous_at")
-                    else ""
+                stage3b.get("reason", "state tracking has not run")
+                if not stage3b.get("available")
+                else (
+                    f"{stage3b.get('points', 0)} refined points tracked with "
+                    f"{stage3b.get('ambiguous_assignments', 0)} ambiguous "
+                    "assignment(s). "
+                    + (
+                        "Tracking reorders states and changes chi(2), so the "
+                        "raw-index curve was comparing different physical states "
+                        "at different sweep points."
+                        if stage3b.get("tracking_changes_chi2_at")
+                        else "Tracking changes NOTHING: the raw index already is "
+                        "the physically continuous labelling. The discontinuity "
+                        "is therefore NOT a labelling artifact and needs a "
+                        "physical explanation."
+                    )
                 )
             ),
         },
@@ -1085,6 +1245,328 @@ def write_assumptions(parent: Path, targets: Mapping[str, Any], cfg: Mapping[str
             default_flow_style=False,
         ),
     )
+
+
+def figure2d_comparison(
+    path: Path,
+    *,
+    focused_csv: Path,
+    published: Mapping[str, Any],
+    window_curves: Sequence[tuple[int, Path]] = (),
+) -> None:
+    """Rebuild the paper's Fig. 2d and overlay this work on it.
+
+    Fig. 2d plots the SHG response of the coupled-QW sample against fundamental
+    wavelength over 1400-1800 nm: a resonance near 1560 nm measured, near
+    1520 nm simulated, and a flat control with no resonance at all.
+
+    What can honestly be drawn here is limited, and the figure says so on its
+    face rather than in a caption somebody might not read:
+
+    * The paper's *curves* are not published as data. Only the two peak
+      positions it states in the text are, so those are drawn as marked
+      wavelengths, never as a fabricated lineshape.
+    * Fig. 2a-2c are the measurement geometry, the rotation-angle polar
+      response and the power-squared linearity. Those are measurement
+      signatures, not electronic structure, and this calculation cannot produce
+      them. Only 2d is comparable.
+    * The control sample is flat by measurement. Nothing is simulated for it,
+      so nothing is drawn for it.
+    * Our curve is |chi(2)| in arbitrary units and the paper's 2d axis is
+      measured SH signal. Both are normalised to their own maximum, which makes
+      the peak *positions* comparable and the heights meaningless -- stated on
+      the axis label so the normalisation cannot be mistaken for agreement.
+    """
+
+    plt = plotting.plt
+    if plt is None:
+        plotting.placeholder(path, "Figure 2d comparison")
+        return
+    if not focused_csv.is_file():
+        plotting.placeholder(
+            path,
+            "Figure 2d comparison",
+            reason="no focused wavelength scan; needs a completed reference case.",
+        )
+        return
+
+    data = np.loadtxt(focused_csv, delimiter=",", skiprows=1)
+    wavelength, magnitude = data[:, 0], data[:, 3]
+    peak_nm = float(wavelength[int(np.argmax(magnitude))])
+    scale = float(np.max(magnitude)) or 1.0
+
+    simulated = float(published["simulated_resonance_nm"]["value"])
+    measured = float(published["measured_resonance_nm"]["value"])
+
+    fig, ax = plt.subplots(figsize=(7.6, 4.8))
+    ax.plot(
+        wavelength, magnitude / scale, "-", linewidth=2.0, color="#1f77b4",
+        label=f"this work, |chi(2)| (2 states/band), peak {peak_nm:.0f} nm",
+    )
+
+    # The same quantity with a wider Eq. 2 sum. Not a detail: the 2026-07-31
+    # run showed the peak moving 1519 -> 1461 nm when a third state enters, so
+    # a Fig. 2d comparison that shows only the two-state curve would be
+    # claiming a resonance position the calculation has not converged.
+    for states, curve_path in window_curves:
+        if not curve_path.is_file():
+            continue
+        curve = np.loadtxt(curve_path, delimiter=",", skiprows=1)
+        values = curve[:, 3]
+        top = float(np.max(values)) or 1.0
+        ax.plot(
+            curve[:, 0], values / top, "--", linewidth=1.2, alpha=0.85,
+            label=f"this work, {states} states/band, peak "
+            f"{float(curve[int(np.argmax(values)), 0]):.0f} nm",
+        )
+
+    ax.axvline(simulated, color="#d62728", linestyle="--", linewidth=1.6,
+               label=f"paper, simulated ~{simulated:.0f} nm")
+    ax.axvline(measured, color="#2ca02c", linestyle="-.", linewidth=1.6,
+               label=f"paper, measured ~{measured:.0f} nm")
+    ax.plot([peak_nm], [1.0], "o", color="#1f77b4", markersize=8, zorder=5)
+
+    ax.annotate(
+        f"{peak_nm - simulated:+.0f} nm vs the paper's simulation",
+        xy=(peak_nm, 1.0), xytext=(peak_nm + 45, 0.86), fontsize=8,
+        arrowprops=dict(arrowstyle="->", color="0.4", linewidth=0.8),
+    )
+    ax.text(
+        0.015, 0.03,
+        "Paper's control sample shows no resonance (measured). Not simulated "
+        "here, so not drawn.\nFig. 2a-2c are measurement signatures and are "
+        "outside what this calculation can produce.\nBoth axes normalised to "
+        "their own maximum: peak POSITIONS are comparable, heights are not.",
+        transform=ax.transAxes, fontsize=7, color="0.35", va="bottom",
+    )
+    ax.set(
+        xlabel="Fundamental wavelength (nm)",
+        ylabel="Normalised SHG response / |chi(2)| (arb.)",
+        title="Figure 2d comparison — SHG versus fundamental wavelength\n"
+        "arXiv:2602.23246v1 Fig. 2d, with this work overlaid",
+        xlim=(float(wavelength.min()), float(wavelength.max())),
+        ylim=(0.0, 1.18),
+    )
+    ax.legend(fontsize=7.5, loc="upper right", framealpha=0.9)
+    ax.grid(alpha=0.25)
+    plotting.save_figure(fig, path)
+
+
+def _prominent_peaks(
+    x: np.ndarray,
+    y: np.ndarray,
+    *,
+    minimum_height: float,
+    minimum_prominence: float,
+) -> list[float]:
+    """Local maxima that stand clear of their surroundings.
+
+    A bare local-maximum test picks up every numerical wiggle on the shoulder of
+    a real resonance -- the 2 nm sampling of the broad scan produces a dozen of
+    them around 1350 nm alone. Prominence is measured as the drop to the lowest
+    point between this maximum and the nearest higher one on each side, which is
+    the standard definition and needs no scipy: the licensed ``llm``
+    environment is not guaranteed to have it.
+    """
+
+    values = np.asarray(y, dtype=float)
+    peaks: list[float] = []
+    for index in range(1, values.size - 1):
+        if values[index] <= values[index - 1] or values[index] <= values[index + 1]:
+            continue
+        if values[index] < minimum_height:
+            continue
+        left = values[:index]
+        right = values[index + 1:]
+        higher_left = np.flatnonzero(left >= values[index])
+        higher_right = np.flatnonzero(right >= values[index])
+        low_left = float(np.min(left[higher_left[-1]:])) if higher_left.size else float(
+            np.min(left)
+        )
+        low_right = float(np.min(right[: higher_right[0] + 1])) if higher_right.size else (
+            float(np.min(right))
+        )
+        prominence = values[index] - max(low_left, low_right)
+        if prominence >= minimum_prominence:
+            peaks.append(float(x[index]))
+    return peaks
+
+
+def figure2d_comparison_broad(
+    path: Path,
+    *,
+    broad_csv: Path,
+    digitised: Mapping[str, Any] | None,
+    annotate_peaks: bool = False,
+) -> dict[str, Any]:
+    """Fig. 2d over its full published range, paper curve drawn as a curve.
+
+    The companion :func:`figure2d_comparison` marks the paper's two text-quoted
+    peak wavelengths as vertical lines over the telecom window. This one
+    reproduces Fig. 2d as the paper actually drew it -- 400-1800 nm, simulated
+    |chi(2)| on the left axis, measured SH intensity on the right -- so the two
+    simulations can be compared as *lineshapes* rather than as two numbers.
+
+    The paper's curve here is **digitised by eye from the published raster**.
+    Its reading uncertainty is stated in the provenance note below the axes,
+    but the clean comparison itself contains only the curve series requested by
+    the user. This is weaker evidence than a quoted number and the figure says
+    so on its face.
+    """
+
+    plt = plotting.plt
+    if plt is None:
+        plotting.placeholder(path, "Figure 2d comparison (full range)")
+        return
+    if not broad_csv.is_file() or not digitised:
+        plotting.placeholder(
+            path,
+            "Figure 2d comparison (full range)",
+            reason=(
+                "needs the broad 400-1800 nm scan and the digitised Fig. 2d data."
+            ),
+        )
+        return
+
+    data = np.loadtxt(broad_csv, delimiter=",", skiprows=1)
+    wavelength, magnitude = data[:, 0], data[:, 3]
+    ours = magnitude / (float(np.max(magnitude)) or 1.0)
+
+    simulation = digitised["simulation_pm_per_V"]
+    sim_nm = np.asarray(simulation["wavelength_nm"], dtype=float)
+    sim_value = np.asarray(simulation["value"], dtype=float)
+    sim_norm = sim_value / (float(np.max(sim_value)) or 1.0)
+    band = float(digitised.get("amplitude_uncertainty_fraction", 0.15))
+
+    fig, ax = plt.subplots(figsize=(10.0, 6.4))
+    # Space reserved below the axes for the verdict and the digitising caveat.
+    # save_figure is told not to run tight_layout, which would undo this.
+    fig.subplots_adjust(
+        bottom=0.30 if annotate_peaks else 0.19,
+        top=0.87,
+        left=0.085,
+        right=0.90,
+    )
+    ax.plot(
+        sim_nm, sim_norm, "--", color="0.25", linewidth=1.8,
+        label="paper, simulated (digitised from Fig. 2d)",
+    )
+    ax.plot(
+        wavelength, ours, "-", color="#1f77b4", linewidth=2.0,
+        label="this work, |chi(2)| (2 states/band)",
+    )
+
+    # Peak classification remains available for diagnostic rerenders, but the
+    # publication/default figure is intentionally just the curves and their
+    # legend.  The previous annotation boxes obscured the comparison itself.
+    matched_peaks: list[float] = []
+    missing_peaks: list[float] = []
+    extra: list[float] = []
+    if annotate_peaks:
+        for peak in digitised.get("simulation_peaks_nm", []):
+            near = float(ours[np.argmin(np.abs(wavelength - float(peak)))])
+            matched = near > 0.4
+            (matched_peaks if matched else missing_peaks).append(float(peak))
+            ax.axvline(
+                float(peak), color="#2ca02c" if matched else "#d62728",
+                linestyle=":", linewidth=1.3, alpha=0.8,
+            )
+            ax.annotate(
+                f"{peak:.0f} nm\n{'both' if matched else 'paper only'}",
+                xy=(float(peak), 1.30), fontsize=7.5, ha="center", va="center",
+                color="#2ca02c" if matched else "#d62728",
+                bbox=dict(boxstyle="round,pad=0.22", facecolor="white",
+                          edgecolor="0.8", linewidth=0.5),
+            )
+
+        candidates = _prominent_peaks(
+            wavelength, ours, minimum_height=0.4, minimum_prominence=0.1
+        )
+        sim_on_our_grid = np.interp(wavelength, sim_nm, sim_norm)
+        for here in candidates:
+            index = int(np.argmin(np.abs(wavelength - here)))
+            if any(abs(here - p) < 100 for p in matched_peaks + missing_peaks + extra):
+                continue
+            if sim_on_our_grid[index] > 0.55:
+                continue
+            extra.append(here)
+        for here in extra:
+            ax.axvline(here, color="#9467bd", linestyle=":", linewidth=1.3, alpha=0.8)
+            ax.annotate(
+                f"{here:.0f} nm\nours only", xy=(here, 1.30), fontsize=7.5,
+                ha="center", va="center", color="#9467bd",
+                bbox=dict(boxstyle="round,pad=0.22", facecolor="white",
+                          edgecolor="0.8", linewidth=0.5),
+            )
+
+    right = ax.twinx()
+    for key, colour, marker, label in (
+        ("measured_80_period", "#d62728", "s", "measured, 80-period sample"),
+        ("measured_algaas_control", "#bf9000", "s", "measured, AlGaAs control"),
+        ("measured_gaas_control", "#1f4e9c", "s", "measured, GaAs control"),
+    ):
+        series = digitised.get(key)
+        if not series:
+            continue
+        right.plot(
+            series["wavelength_nm"], series["value"], marker, color=colour,
+            markersize=4.5, linestyle="-", linewidth=0.9, alpha=0.9, label=label,
+        )
+    right.set_ylabel("Measured normalised SH intensity (arb. u.), digitised")
+    right.set_ylim(0, 230)
+
+    ax.set(
+        xlabel="Fundamental wavelength (nm)",
+        ylabel="Simulated |chi(2)|, each curve normalised to its own maximum",
+        xlim=(400, 1800),
+        ylim=(0, 1.42 if annotate_peaks else 1.08),
+    )
+    ax.set_title(
+        "Figure 2d comparison, full published range — arXiv:2602.23246v1\n"
+        "paper simulation digitised from the figure; this work overlaid",
+        fontsize=11, pad=12,
+    )
+    handles, labels = ax.get_legend_handles_labels()
+    rh, rl = right.get_legend_handles_labels()
+    ax.legend(
+        handles + rh, labels + rl, fontsize=7.5, loc="upper left",
+        bbox_to_anchor=(0.008, 0.86), framealpha=0.92, ncol=2,
+    )
+    ax.grid(alpha=0.22)
+
+    if annotate_peaks:
+        verdict = (
+            f"Peak positions: {len(matched_peaks)} of "
+            f"{len(matched_peaks) + len(missing_peaks)} of the paper's simulated peaks "
+            "appear here"
+            + (f" ({', '.join(f'{p:.0f}' for p in matched_peaks)} nm)" if matched_peaks else "")
+            + (
+                f"; {', '.join(f'{p:.0f}' for p in missing_peaks)} nm "
+                f"{'are' if len(missing_peaks) > 1 else 'is'} absent"
+                if missing_peaks
+                else ""
+            )
+            + (
+                f"; this work additionally peaks at {', '.join(f'{p:.0f}' for p in extra)} nm"
+                if extra
+                else ""
+            )
+            + "."
+        )
+        fig.text(
+            0.5, 0.135, verdict, fontsize=8.5, color="0.15", ha="center", va="center",
+        )
+    fig.text(
+        0.5, 0.052,
+        "Paper curve DIGITISED BY EYE from a raster figure: positions +/-"
+        f"{digitised.get('wavelength_uncertainty_nm', 20):.0f} nm, heights +/-"
+        f"{band * 100:.0f}%. Not a published data series; do not quote it or "
+        "calibrate against it.\nBoth simulations normalised to their own maximum: "
+        "the paper's absolute pm/V scale is not independently reproducible here, so "
+        "only lineshape and peak positions are being compared.",
+        fontsize=7.5, color="0.4", ha="center", va="center",
+    )
+    plotting.save_figure(fig, path, tight=False)
 
 
 def _tracking_plots(
@@ -1579,6 +2061,33 @@ def write_plots(
         },
     )
     _tracking_plots(plots_dir, results, stage3b or {}, series)
+
+    # The paper's Fig. 2d, rebuilt with this work overlaid. The state-window
+    # cases are passed in so the figure shows how far the resonance moves when
+    # Eq. 2's truncation is relaxed.
+    window_curves = sorted(
+        (
+            int(r.observables["chi2_max_states_per_band"]),
+            r.run_dir / "extracted" / "chi2_focused.csv",
+        )
+        for r in results
+        if "max_states_per_band" in r.spec.swept
+        and r.observables.get("chi2_max_states_per_band") is not None
+        and int(r.observables["chi2_max_states_per_band"]) != int(
+            (cfg.get("metric") or {}).get("max_states_per_band", 2)
+        )
+    )
+    figure2d_comparison(
+        plots_dir / "figure2d_comparison.png",
+        focused_csv=parent / "extracted" / "chi2_focused_wavelength.csv",
+        published=(comparison.get("published") or {}),
+        window_curves=window_curves,
+    )
+    figure2d_comparison_broad(
+        plots_dir / "figure2d_comparison_broad.png",
+        broad_csv=parent / "extracted" / "chi2_broad_wavelength.csv",
+        digitised=(comparison.get("digitised_figure_2d") or None),
+    )
     plotting.line_plot(
         plots_dir / "localization_vs_asymmetry.png",
         title="Electron localisation versus asymmetry",

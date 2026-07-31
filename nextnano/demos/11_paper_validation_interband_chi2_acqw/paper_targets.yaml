@@ -178,3 +178,58 @@ missing_for_absolute_scale:
     description: >-
       The nextnano input deck, material database version, boundary conditions,
       and grid settings are not published.
+
+# =========================================================================
+# Curves read off a published FIGURE, not quoted in the text.
+#
+# These are kept in their own top-level section, never mixed into `targets`,
+# because they are a fundamentally weaker kind of evidence: someone reading
+# pixel positions off a rasterised plot. Every consumer must treat them as
+# approximate and label them as digitised wherever they are drawn or tabulated.
+#
+# Read from arXiv:2602.23246v1 Fig. 2d on 2026-07-31. Stated uncertainties are
+# honest reading error on that image, not instrument precision.
+# =========================================================================
+digitised_figures:
+  figure_2d:
+    source: >-
+      arXiv:2602.23246v1 Fig. 2d, digitised by eye from the published raster.
+      Left axis: simulated |chi(2)| in pm/V, 0-4000. Right axis: normalised SH
+      intensity, arbitrary units, 0-200. Fundamental wavelength 400-1800 nm.
+    kind: digitised_from_figure
+    wavelength_uncertainty_nm: 20.0
+    amplitude_uncertainty_fraction: 0.15
+    caveat: >-
+      Approximate. Use for comparing the SHAPE and the PEAK POSITIONS of the
+      paper's simulation against ours. Do not quote these as published values
+      and do not use them to calibrate anything: the paper's own text-quoted
+      numbers in `targets` are the citable ones.
+
+    # The paper's simulated chi(2) curve (dashed, left axis, pm/V).
+    simulation_pm_per_V:
+      wavelength_nm: [400, 450, 500, 535, 560, 610, 650, 700, 760, 800, 900,
+                      1000, 1080, 1150, 1250, 1330, 1400, 1450, 1500, 1520,
+                      1560, 1600, 1700, 1800]
+      value:         [100, 400, 900, 1300, 1050, 250, 800, 1600, 2400, 2100,
+                      1700, 2400, 3300, 2600, 1600, 700, 1500, 2400, 3600,
+                      4000, 3400, 2600, 1600, 1000]
+    # Features of that curve which are unambiguous even at this resolution.
+    simulation_peaks_nm: [535, 760, 1080, 1520]
+    simulation_dips_nm: [610, 1330]
+    note_on_peak_pairs: >-
+      1520/760 = 2.00 and 1080/535 = 2.02. Each pair is the two-photon and
+      one-photon resonance of one transition: 1.63 eV for the first, about
+      2.30 eV for the second. The paper's simulation therefore contains a
+      transition near 2.3 eV in addition to the 1.63 eV one its text discusses.
+
+    # Measured, right axis, normalised SH intensity (arb. u.).
+    measured_80_period:
+      wavelength_nm: [1400, 1450, 1500, 1520, 1540, 1550, 1570, 1600, 1650,
+                      1700, 1800]
+      value:         [55, 60, 150, 170, 195, 205, 185, 155, 130, 115, 65]
+    measured_algaas_control:
+      wavelength_nm: [1400, 1500, 1550, 1600, 1700, 1800]
+      value:         [50, 55, 65, 55, 35, 30]
+    measured_gaas_control:
+      wavelength_nm: [1400, 1500, 1550, 1600, 1700, 1800]
+      value:         [48, 30, 28, 30, 30, 30]
