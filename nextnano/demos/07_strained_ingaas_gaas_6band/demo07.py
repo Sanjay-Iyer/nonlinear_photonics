@@ -945,7 +945,11 @@ def _state_character_plot(
     plots_dir: Path, result: sweeps.CaseResult | None
 ) -> None:
     import json
-    import matplotlib.pyplot as plt
+    # Routed through the shared helper so a broken matplotlib
+    # skips the figure instead of aborting the run.
+    plt = plotting.plt
+    if plt is None:
+        return
 
     target = plots_dir / "state_character.png"
     if result is None:

@@ -17,6 +17,7 @@ import analysis
 import layers
 import nlo
 import outputs
+import plots
 import registry
 import schemas
 import sweeps
@@ -894,3 +895,75 @@ def test_grid_and_design_case_ids_stay_short():
         assert len(case.case_id) <= 6, case.case_id
     # The descriptive name is not lost, only moved off the filesystem.
     assert designs[0].label == "a_very_long_descriptive_design_name"
+
+
+# ---------------------------------------------------------------------------
+# plotting must never be able to abort a run
+# ---------------------------------------------------------------------------
+
+
+def test_plotting_is_available_in_this_environment():
+    # If this fails, the environment is broken, not the code -- but the demos
+    # below must still complete.
+    assert plots.plotting_available() is True
+    assert plots.unavailable_reason() is None
+
+
+def test_every_figure_degrades_to_a_recorded_skip(tmp_path, monkeypatch):
+    """A broken matplotlib must cost figures, never the run.
+
+    Reproduces the work-laptop failure of 2026-07-30, where a corrupt expat DLL
+    made `import matplotlib.pyplot` raise inside font_manager and aborted the
+    demo before a single input was generated.
+    """
+
+    monkeypatch.setattr(plots, "plt", None)
+    monkeypatch.setattr(
+        plots,
+        "MATPLOTLIB_ERROR",
+        "ImportError: DLL load failed while importing pyexpat: The handle is invalid.",
+    )
+    plots.reset_skipped()
+    assert plots.plotting_available() is False
+
+    target = tmp_path / "figure.png"
+    assert plots.line_plot(
+        target, title="t", xlabel="x", ylabel="y", series={"a": ([1.0], [2.0])}
+    ) is None
+    assert plots.placeholder(tmp_path / "placeholder.png", "t") is None
+    assert plots.band_diagram(
+        tmp_path / "band.png",
+        title="t",
+        position_nm=[0.0, 1.0],
+        conduction_eV=[1.0, 1.0],
+    ) is None
+    assert not target.exists()
+
+    status = plots.status()
+    assert status["available"] is False
+    assert "pyexpat" in status["unavailable_reason"]
+    assert status["skipped_figure_count"] == 3
+    assert "figure.png" in status["skipped_figures"]
+    plots.reset_skipped()
+
+
+def test_skipped_figures_are_reported_as_a_failed_criterion(tmp_path, monkeypatch):
+    monkeypatch.setattr(plots, "plt", None)
+    monkeypatch.setattr(plots, "MATPLOTLIB_ERROR", "ImportError: broken")
+    plots.reset_skipped()
+    plots.placeholder(tmp_path / "a.png", "a")
+
+    path = sweeps.write_validation_report(
+        tmp_path,
+        cfg={"demo_id": "04_x", "title": "t"},
+        manifest={"status": "dry_run_complete", "case_count": 1},
+        registry_record=None,
+        dependency_report=None,
+        criteria=[("something else", True, "")],
+    )
+    report = path.read_text(encoding="utf-8")
+    # The loss is surfaced as an explicit FAIL, not a quietly missing file.
+    assert "all requested figures were produced" in report
+    assert "| FAIL |" in report
+    assert "Numerical results are unaffected" in report
+    plots.reset_skipped()

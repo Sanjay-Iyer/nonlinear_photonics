@@ -15,11 +15,33 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
-import matplotlib
-
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 import numpy as np
+
+# Plotting is a presentation concern. A licensed solver run can take a long time
+# and its substance is the extracted tables, manifests, and validation report --
+# so a broken matplotlib installation must not destroy it. matplotlib is
+# therefore imported defensively and every figure degrades to a recorded skip.
+#
+# This is not hypothetical: on 2026-07-30 the work laptop's `llm` environment
+# had a corrupt expat DLL, and `import matplotlib.pyplot` failed deep inside
+# font_manager -> plistlib -> pyexpat with "DLL load failed while importing
+# pyexpat", aborting the demo before a single input was generated.
+#
+# Nothing is hidden: skipped figures are counted, named, reported in the run
+# manifest, and raised as an explicit FAIL criterion in the validation report.
+try:  # pragma: no cover - the failure path is environment-specific
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    MATPLOTLIB_ERROR: str | None = None
+except Exception as exc:  # pragma: no cover - exercised via the test monkeypatch
+    plt = None  # type: ignore[assignment]
+    MATPLOTLIB_ERROR = f"{type(exc).__name__}: {exc}"
+
+#: Figures that could not be drawn because plotting is unavailable.
+SKIPPED_FIGURES: list[str] = []
 
 PLACEHOLDER_TEXT = "No licensed solver data on this machine yet"
 DISPLAY_OFFSET_NOTE = (
@@ -28,7 +50,40 @@ DISPLAY_OFFSET_NOTE = (
 )
 
 
-def _finish(fig: plt.Figure, path: Path) -> Path:
+def plotting_available() -> bool:
+    """Whether figures can be drawn at all in this interpreter."""
+
+    return plt is not None
+
+
+def unavailable_reason() -> str | None:
+    """Why plotting is unavailable, or ``None`` when it works."""
+
+    return MATPLOTLIB_ERROR
+
+
+def reset_skipped() -> None:
+    """Clear the skipped-figure record; called once per demo run."""
+
+    SKIPPED_FIGURES.clear()
+
+
+def status() -> dict[str, Any]:
+    """Plotting provenance for the run manifest and validation report."""
+
+    return {
+        "available": plotting_available(),
+        "unavailable_reason": unavailable_reason(),
+        "skipped_figure_count": len(SKIPPED_FIGURES),
+        "skipped_figures": sorted(dict.fromkeys(SKIPPED_FIGURES)),
+    }
+
+
+def _skip(path: Path) -> None:
+    SKIPPED_FIGURES.append(Path(path).name)
+
+
+def _finish(fig: "plt.Figure", path: Path) -> Path | None:
     path.parent.mkdir(parents=True, exist_ok=True)
     fig.tight_layout()
     fig.savefig(path, dpi=180)
@@ -36,14 +91,21 @@ def _finish(fig: plt.Figure, path: Path) -> Path:
     return path
 
 
-def save_figure(fig: plt.Figure, path: Path) -> Path:
+def save_figure(fig: "plt.Figure", path: Path) -> Path | None:
     """Save a custom demo figure with the same layout and DPI conventions."""
 
+    if plt is None:
+        _skip(path)
+        return None
     return _finish(fig, path)
 
 
-def placeholder(path: Path, title: str, *, reason: str = PLACEHOLDER_TEXT) -> Path:
+def placeholder(path: Path, title: str, *, reason: str = PLACEHOLDER_TEXT) -> Path | None:
     """A labelled empty figure, so the plot set is always complete."""
+
+    if plt is None:
+        _skip(path)
+        return None
 
     fig, ax = plt.subplots(figsize=(6.4, 4.2))
     ax.text(0.5, 0.5, reason, ha="center", va="center", transform=ax.transAxes, wrap=True)
@@ -61,8 +123,12 @@ def line_plot(
     markers: bool = True,
     axhline: float | None = None,
     logy: bool = False,
-) -> Path:
+) -> Path | None:
     """One or more x/y series; falls back to a placeholder when all are empty."""
+
+    if plt is None:
+        _skip(path)
+        return None
 
     usable = {
         name: (list(x), list(y))
@@ -100,8 +166,12 @@ def band_diagram(
     energies_eV: Sequence[float] = (),
     regions: Mapping[str, tuple[float, float]] | None = None,
     extra_bands: Mapping[str, Sequence[float]] | None = None,
-) -> Path:
+) -> Path | None:
     """Conduction-band profile with horizontal eigenenergy lines."""
+
+    if plt is None:
+        _skip(path)
+        return None
 
     if not len(position_nm) or not len(conduction_eV):
         return placeholder(path, title)
@@ -135,8 +205,12 @@ def envelope_plot(
     position_nm: Sequence[float],
     envelopes: np.ndarray,
     regions: Mapping[str, tuple[float, float]] | None = None,
-) -> Path:
+) -> Path | None:
     """Signed envelope amplitudes psi_i(z), in nm^-1/2. Not a probability."""
+
+    if plt is None:
+        _skip(path)
+        return None
 
     array = np.atleast_2d(np.asarray(envelopes, dtype=float))
     if array.size == 0 or not len(position_nm):
@@ -166,8 +240,12 @@ def density_plot(
     position_nm: Sequence[float],
     densities: np.ndarray,
     regions: Mapping[str, tuple[float, float]] | None = None,
-) -> Path:
+) -> Path | None:
     """Normalised probability densities |psi_i|^2, in 1/nm."""
+
+    if plt is None:
+        _skip(path)
+        return None
 
     array = np.atleast_2d(np.asarray(densities, dtype=float))
     if array.size == 0 or not len(position_nm):
@@ -198,8 +276,12 @@ def band_with_display_offsets(
     energies_eV: Sequence[float],
     densities: np.ndarray,
     regions: Mapping[str, tuple[float, float]] | None = None,
-) -> Path:
+) -> Path | None:
     """Band edge with |psi|^2 drawn on top of each eigenenergy, clearly labelled."""
+
+    if plt is None:
+        _skip(path)
+        return None
 
     array = np.atleast_2d(np.asarray(densities, dtype=float))
     if array.size == 0 or not len(position_nm) or not len(energies_eV):
@@ -244,8 +326,12 @@ def heatmap(
     values: np.ndarray,
     colorbar_label: str = "",
     annotate: bool = False,
-) -> Path:
+) -> Path | None:
     """2D map of a scalar over two swept parameters, or a matrix-element table."""
+
+    if plt is None:
+        _skip(path)
+        return None
 
     array = np.asarray(values, dtype=float)
     if array.size == 0 or not len(x_values) or not len(y_values):
@@ -293,8 +379,12 @@ def matrix_heatmap(
     matrix: np.ndarray,
     labels: Sequence[str],
     colorbar_label: str,
-) -> Path:
+) -> Path | None:
     """Square state-to-state matrix (overlaps, |z_ij|, transition strengths)."""
+
+    if plt is None:
+        _skip(path)
+        return None
 
     array = np.asarray(matrix, dtype=float)
     if array.size == 0:
@@ -331,8 +421,12 @@ def rectangular_heatmap(
     xlabel: str,
     ylabel: str,
     colorbar_label: str,
-) -> Path:
+) -> Path | None:
     """Heat map whose row and column labels represent different state sets."""
+
+    if plt is None:
+        _skip(path)
+        return None
 
     array = np.asarray(matrix, dtype=float)
     if array.size == 0:
@@ -368,8 +462,12 @@ def bar_plot(
     labels: Sequence[str],
     values: Sequence[float],
     excluded: Sequence[bool] | None = None,
-) -> Path:
+) -> Path | None:
     """Ranking bar chart; excluded candidates are drawn hatched, never removed."""
+
+    if plt is None:
+        _skip(path)
+        return None
 
     if not len(labels) or not len(values):
         return placeholder(path, title)
@@ -404,8 +502,12 @@ def map_2d(
     values: np.ndarray,
     colorbar_label: str,
     contours: Mapping[str, tuple[tuple[float, float], tuple[float, float]]] | None = None,
-) -> Path:
+) -> Path | None:
     """A 2D cross-section map, optionally outlining named rectangles."""
+
+    if plt is None:
+        _skip(path)
+        return None
 
     array = np.asarray(values, dtype=float)
     if array.size == 0 or not len(x_nm) or not len(y_nm):

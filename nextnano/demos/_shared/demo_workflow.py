@@ -24,14 +24,17 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any, Iterable
 
-import matplotlib
-
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 import numpy as np
 import yaml
 
+import plots as _plots
 import schemas
+
+# Demos 1-3 draw their own figures directly. matplotlib is shared with the
+# Demo 4-10 helper so that a broken installation degrades identically: figures
+# are skipped and recorded, never allowed to abort a licensed solver run. See
+# the note at the top of plots.py.
+plt = _plots.plt
 
 NEXTNANO_ROOT = Path(__file__).resolve().parents[2]
 REPOSITORY_ROOT = NEXTNANO_ROOT.parent
@@ -683,7 +686,7 @@ def _analyse_bandedges(
     }
     _write_csv(extracted / "composition_profile.csv", composition)
 
-    if cfg["outputs"].get("write_plots", True):
+    if cfg["outputs"].get("write_plots", True) and _plots.plotting_available():
         fig, ax = plt.subplots(figsize=(8, 4.8))
         for name, values in data.items():
             if name != "position_nm":
@@ -833,7 +836,11 @@ def _analyse_quantum(
         writer.writerow(["state", "energy_eV"])
         writer.writerows(enumerate(energies, start=1))
 
-    if outputs.get("write_plots", True) and probability_csv:
+    if (
+        outputs.get("write_plots", True)
+        and probability_csv
+        and _plots.plotting_available()
+    ):
         fig, ax = plt.subplots(figsize=(8, 4.8))
         for name, density in probability_csv.items():
             if name != "position_nm":
@@ -1344,6 +1351,12 @@ def _write_convergence_artifacts(
         ("domain_padding_nm", "E1_eV", "E1 versus domain padding", "E1 (eV)", "energy_vs_domain.png"),
         ("grid_spacing_nm", "runtime_seconds", "Runtime versus grid spacing", "Runtime (s)", "runtime_vs_grid.png"),
     ]
+    if not _plots.plotting_available():
+        # Numerical artifacts above are already written; only the figures are
+        # lost, and plots.status() records which and why.
+        for _, _, _, _, filename in plot_specs:
+            _plots._skip(plots / filename)
+        return recommendation
     for sweep, observable, title, ylabel, filename in plot_specs:
         selected = [
             row

@@ -666,7 +666,11 @@ def _sweep_plots(
 def _band_diagram_panel(plots_dir: Path, results: Sequence[sweeps.CaseResult]) -> None:
     """Overlay the actual conduction-band profiles at representative fields."""
 
-    import matplotlib.pyplot as plt
+    # Routed through the shared helper so a broken matplotlib
+    # skips the figure instead of aborting the run.
+    plt = plotting.plt
+    if plt is None:
+        return
 
     profiles: list[tuple[float, np.ndarray]] = []
     for result in results:

@@ -22,6 +22,7 @@ from typing import Any, Callable, Iterable, Mapping, Sequence
 import yaml
 
 import demo_workflow as workflow
+import plots as _plots
 import registry as registry_module
 from demo_workflow import DemoError, MachineConfig
 
@@ -52,6 +53,7 @@ def prepare_run(demo_dir: Path, machine_path: Path | None = None) -> RunContext:
     parent.mkdir(parents=True, exist_ok=False)
     registry = registry_module.load_registry()
     record = registry.record(str(cfg["demo_id"]))
+    _plots.reset_skipped()
     workflow.write_text_atomically(
         parent / "demo_resolved.yaml", yaml.safe_dump(cfg, sort_keys=True)
     )
@@ -701,6 +703,7 @@ def write_sweep_manifest(
         manifest["dependency_status"] = dict(dependency_report)
     if parser_provenance is not None:
         manifest["parser_provenance"] = dict(parser_provenance)
+    manifest["plotting"] = _plots.status()
     if extra:
         manifest.update(dict(extra))
     workflow.write_json_atomically(parent / "sweep_manifest.json", manifest)
@@ -724,7 +727,34 @@ def write_validation_report(
     ``criteria`` entries are ``(name, passed_or_None, explanation)``; ``None``
     means "not evaluated on this machine", which is reported as such and never
     as a pass.
+
+    A plotting criterion is appended automatically. Figures degrade to a
+    recorded skip when matplotlib is unavailable so a broken installation cannot
+    abort a licensed run, and this is where that shows up as an explicit FAIL
+    rather than as a quietly missing file.
     """
+
+    plotting = _plots.status()
+    criteria = list(criteria)
+    if not plotting["available"]:
+        criteria.append(
+            (
+                "all requested figures were produced",
+                False,
+                f"plotting is unavailable in this interpreter "
+                f"({plotting['unavailable_reason']}); "
+                f"{plotting['skipped_figure_count']} figure(s) were skipped. "
+                "Numerical results are unaffected.",
+            )
+        )
+    elif plotting["skipped_figure_count"]:
+        criteria.append(
+            (
+                "all requested figures were produced",
+                False,
+                f"{plotting['skipped_figure_count']} figure(s) were skipped.",
+            )
+        )
 
     lines: list[str] = [
         f"# Validation report — {cfg.get('demo_id')}",

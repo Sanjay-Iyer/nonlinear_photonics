@@ -1164,7 +1164,11 @@ def _state_composition_plot(
     plots_dir: Path, result: sweeps.CaseResult | None
 ) -> None:
     import json
-    import matplotlib.pyplot as plt
+    # Routed through the shared helper so a broken matplotlib
+    # skips the figure instead of aborting the run.
+    plt = plotting.plt
+    if plt is None:
+        return
 
     target = plots_dir / "state_composition.png"
     if result is None:
@@ -1275,7 +1279,11 @@ def _matrix_element_plot(
 def _polarization_strength_plot(
     plots_dir: Path, result: sweeps.CaseResult | None
 ) -> None:
-    import matplotlib.pyplot as plt
+    # Routed through the shared helper so a broken matplotlib
+    # skips the figure instead of aborting the run.
+    plt = plotting.plt
+    if plt is None:
+        return
 
     target = plots_dir / "polarization_resolved_strengths.png"
     rows = result.observables.get("transition_rows") if result is not None else []
