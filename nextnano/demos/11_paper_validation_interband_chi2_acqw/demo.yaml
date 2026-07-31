@@ -1,0 +1,128 @@
+---
+demo_id: 11_paper_validation_interband_chi2_acqw
+title: Paper validation — interband chi(2) of asymmetric coupled quantum wells
+template: acqw_paper.in.j2
+
+# =========================================================================
+# Structure: Fig. 1a/1c of arXiv:2602.23246v1.
+#   s = (7.1 - 2.9) / (7.1 + 2.9) = 0.42, total GaAs = 10 nm, period = 30 nm.
+# Published values live in paper_targets.yaml with their provenance; the values
+# here are the SIMULATION INPUTS, kept separate so a deliberate change to the
+# model can never be mistaken for a change to the paper's claims.
+# =========================================================================
+scientific:
+  thick_well_nm: 7.1
+  thin_well_nm: 2.9
+  tunnel_barrier_nm: 1.8
+  # 18.2 nm of AlGaAs separates repeated coupled-QW sets; a single period is
+  # simulated with half of it on each side, giving the 30 nm period exactly.
+  period_barrier_nm: 18.2
+  aluminum_fraction: 0.55
+  temperature_K: 300
+  # Linear composition ramp width for the graded-interface model. The paper
+  # reports EDS gradients "mostly linear across 1 nm". Zero means abrupt.
+  interface_grading_nm: 0.0
+
+numerical:
+  active_region_grid_spacing_nm: 0.10
+  exterior_grid_spacing_nm: 0.25
+  number_of_electron_states: 4
+  number_of_hole_states: 4
+  quantum_region_padding_nm: 6.0
+  # Extra AlGaAs beyond half the period barrier, for domain convergence only.
+  domain_padding_nm: 0.0
+
+# =========================================================================
+# Stage configuration. Each stage is a separate group of solver cases plus its
+# own post-processing; see README.md.
+# =========================================================================
+analysis:
+  quantum_region_name: acqw
+  dipole_polarization_name: growth_z
+  boundary_edge_fraction: 0.05
+  # Envelopes within a band must be orthonormal to this tolerance, otherwise
+  # chi(2) depends on where the z origin is placed. See _shared/chi2.py.
+  orthonormality_tolerance: 1.0e-3
+  maximum_origin_dependence: 1.0e-6
+  # Stage 2 - numerical convergence.
+  convergence:
+    active_region_grid_spacing_nm: [0.20, 0.10, 0.05]
+    domain_padding_nm: [0.0, 4.0, 10.0]
+    quantum_region_padding_nm: [3.0, 6.0, 9.0]
+    number_of_electron_states: [3, 4, 6]
+    # k-parallel convergence is post-processing on the Stage 1 states.
+    k_parallel_points: [24, 48, 96, 192]
+    k_parallel_fraction_of_bz: [0.05, 0.10, 0.20]
+  # Stage 3 - asymmetry sweep at fixed 10 nm total well thickness.
+  # Finer between 0.30 and 0.55, around the paper's predicted optimum of 0.42.
+  # s = 1.0 exactly is a single 10 nm well, a different geometry rather than a
+  # two-well structure; the paper's claim that chi(2) -> 0 there is checked
+  # analytically instead (a symmetric structure gives identically zero, which is
+  # unit-tested in test_demo11_paper_validation.py).
+  asymmetry_sweep: [0.00, 0.10, 0.20, 0.30, 0.34, 0.38, 0.42, 0.46, 0.50,
+                    0.55, 0.60, 0.70, 0.80, 0.90]
+  # Stage 4 - tunnelling-barrier sweep at fixed asymmetry and total thickness.
+  barrier_sweep_nm: [0.5, 1.0, 1.5, 1.8, 2.0, 2.5, 3.0, 4.0, 5.0]
+  # Stage 7 - interface abruptness.
+  interface_models:
+    - name: ideal_abrupt
+      interface_grading_nm: 0.0
+    - name: graded_1nm
+      interface_grading_nm: 1.0
+
+# =========================================================================
+# chi(2) settings. Mode `relative` is the default and needs nothing the paper
+# does not publish. See _shared/chi2.py for what each mode may claim.
+# =========================================================================
+metric:
+  mode: relative
+  broadening_meV: 5.0
+  k_parallel_fraction_of_bz: 0.10
+  k_parallel_points: 96
+  lattice_constant_nm: 0.565325
+  electron_mass_m0: 0.067
+  heavy_hole_inplane_mass_m0: 0.112
+  spin_degeneracy: 2
+  # --- absolute mode: both MUST be supplied, and the paper publishes neither.
+  # Leave null and the run stays in relative mode rather than inventing a scale.
+  r_e_hh_nm: null
+  n_wells_per_metre: null
+  # --- calibrated mode: one global factor fitted to one published value.
+  calibration_target_pm_per_V: 2340.0
+  calibration_wavelength_nm: 1550.0
+  calibration_source: >-
+    arXiv:2602.23246v1 Section 3.1, simulated ideal-abrupt-interface chi(2) of
+    2340 pm/V at 1550 nm fundamental
+  # Stage 6 - wavelength ranges.
+  broad_wavelength_nm: [400.0, 1800.0]
+  broad_wavelength_points: 701
+  focused_wavelength_nm: [1400.0, 1800.0]
+  focused_wavelength_points: 401
+  # The fundamental at which single-number comparisons are quoted.
+  reference_wavelength_nm: 1550.0
+
+outputs:
+  parser_profile: nextnano_pp_3_0_0
+  quantum_region_name: acqw
+  polarizations: ["growth_z"]
+  bandedge_columns:
+    position_nm: 0
+    conduction_eV: 1
+    heavy_hole_eV: 2
+    light_hole_eV: 3
+    split_off_eV: 4
+  write_csv: true
+  write_plots: true
+
+validation:
+  completion_markers: ["simulation completed", "calculation successfully completed"]
+  fatal_markers: ["terminating program", "fatal error", "license expired"]
+  convergence_warning_markers: ["failed to converge"]
+  minimum_confined_probability: 0.50
+  maximum_boundary_probability: 0.001
+  normalization_tolerance: 0.001
+  # Agreement required against the paper's stated transition energies, in meV.
+  # This is a REPORTING threshold, not a target to tune material parameters to.
+  transition_energy_tolerance_meV: 40.0
+  absolute_energy_tolerance_meV: 1.0
+  require_all_states_bound: false

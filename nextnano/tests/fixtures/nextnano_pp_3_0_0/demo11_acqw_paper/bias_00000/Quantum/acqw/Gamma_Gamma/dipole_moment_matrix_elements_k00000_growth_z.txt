@@ -1,0 +1,5 @@
+|Gamma_i>     |Gamma_j>     |<Gamma_i|eps.d|Gamma_j>|[e*nm]     |<Gamma_i|eps.d|Gamma_j>|^2[e^2*nm^2]     Re<Gamma_i|eps.d|Gamma_j>[e*nm]     Im<Gamma_i|eps.d|Gamma_j>[e*nm]
+1             1             0                                   0                                         0                                   0
+1             2             1.04045                             1.08253                                   1.04045                             0
+2             1             1.04045                             1.08253                                   1.04045                             0
+2             2             0                                   0                                         0                                   0

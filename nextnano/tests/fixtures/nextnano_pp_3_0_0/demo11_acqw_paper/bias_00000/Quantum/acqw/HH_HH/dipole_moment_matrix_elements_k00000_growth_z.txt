@@ -1,0 +1,5 @@
+|HH_i>     |HH_j>     |<HH_i|eps.d|HH_j>|[e*nm]     |<HH_i|eps.d|HH_j>|^2[e^2*nm^2]     Re<HH_i|eps.d|HH_j>[e*nm]     Im<HH_i|eps.d|HH_j>[e*nm]
+1          1          0                             0                                   0                             0
+1          2          1.44924                       2.10031                             -1.44924                      0
+2          1          1.44924                       2.10031                             -1.44924                      0
+2          2          0                             0                                   0                             0

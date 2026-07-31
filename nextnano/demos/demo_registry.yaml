@@ -292,3 +292,29 @@ demos:
       - the integer-to-material encoding inside Structure/material_indices.txt
         (read from the legend file rather than assumed, but seen for only one
         structure so far)
+
+  11_paper_validation_interband_chi2_acqw:
+    title: Paper validation of the interband chi(2) of asymmetric coupled wells
+    status: implemented_dry_run
+    depends_on:
+      - 05_asymmetric_coupled_quantum_well_field
+      - 07_strained_ingaas_gaas_6band
+      - 08_eight_band_interband_optics
+      - 09_three_level_nonlinear_optics_sweep
+    introduces:
+      - reproduction of a published coupled-quantum-well structure
+      - "the paper's Eq. 2 interband chi(2) in relative/absolute/calibrated modes"
+      - graded versus abrupt interface comparison
+      - a formal classified paper-comparison report
+    home_syntax_check: parsed_free_3_0_0
+    home_solver_check: refused_free_edition_grid_limit
+    licensed_validation: {}
+    pending_licensed_checks:
+      - "Stage 1 - confirm E1-HH1 and E2-HH2 against the published 1.49 and 1.62 eV."
+      - "Stage 2 - confirm grid, domain, quantum-region, state-count and k-parallel convergence."
+      - "Stage 3 - confirm the asymmetry sweep peaks near s = 0.42 and vanishes at s = 0."
+      - "Stage 4 - confirm the tunnelling-barrier sweep peaks near 1 nm."
+      - "Stage 6 - confirm the two-photon resonance lands near 1520 nm."
+      - "Stage 7 - confirm the graded model reduces chi(2) relative to abrupt."
+    unvalidated_syntax:
+      - "structure/region/ternary_linear{} graded-alloy output: parse-validated only, no licensed run has produced its composition profile yet"

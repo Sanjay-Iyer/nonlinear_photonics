@@ -1,0 +1,180 @@
+---
+# Published values from:
+#   Enhanced Interband Optical Nonlinearities from Coupled Quantum Wells
+#   Ramesh et al., arXiv:2602.23246v1 [physics.optics], 26 Feb 2026
+#
+# Every entry records WHERE in the paper it comes from and what kind of claim it
+# is, because the reproduction status differs sharply between them. Structural
+# and spectral targets are checkable from the paper's own text; the absolute
+# chi(2) magnitudes depend on inputs the paper does not publish.
+#
+# `kind` values:
+#   structural   a layer thickness or composition, stated directly
+#   spectral     a transition energy or resonance wavelength
+#   simulated    a chi(2) the paper computed
+#   measured     a chi(2) the paper extracted from an SHG experiment
+#   qualitative  a stated trend rather than a number
+
+paper:
+  title: Enhanced Interband Optical Nonlinearities from Coupled Quantum Wells
+  arxiv: 2602.23246v1
+  date: "2026-02-26"
+
+targets:
+
+  # --- structure (Fig. 1a, Section 2.2) ------------------------------------
+  thick_well_nm:
+    value: 7.1
+    kind: structural
+    source: "Fig. 1c label; Section 2.2"
+  thin_well_nm:
+    value: 2.9
+    kind: structural
+    source: "Fig. 1c label; Section 2.2"
+  tunnel_barrier_nm:
+    value: 1.8
+    kind: structural
+    source: "Fig. 1a caption; Section 2.2"
+  period_barrier_nm:
+    value: 18.2
+    kind: structural
+    source: "Fig. 1a caption; Section 2.2"
+  aluminium_fraction:
+    value: 0.55
+    kind: structural
+    source: "Fig. 1c: GaAs/Al(0.55)Ga(0.45)As"
+  total_well_nm:
+    value: 10.0
+    kind: structural
+    source: "Section 2.2: 10 nm total QW thickness"
+  period_nm:
+    value: 30.0
+    kind: structural
+    source: >-
+      Fig. 1a caption states a 30 nm period, and 10 + 1.8 + 18.2 = 30.0.
+      NOTE: the Section 2.2 body text says "Each period is 20 nm" in the same
+      sentence that lists those three thicknesses. The arithmetic and the figure
+      caption agree on 30 nm, so 20 nm is taken to be a typo. This matters
+      because N_z (wells per unit length) sets the absolute chi(2) scale.
+  asymmetry_optimum:
+    value: 0.42
+    kind: structural
+    source: "Abstract of results; Fig. 1d; s = (7.1 - 2.9)/(7.1 + 2.9) = 0.42"
+
+  # --- electronic structure (Section 2.2) ----------------------------------
+  ground_interband_transition_eV:
+    value: 1.49
+    kind: spectral
+    source: "Section 2.2: ground states separated by 1.49 eV (832 nm)"
+  excited_interband_transition_eV:
+    value: 1.62
+    kind: spectral
+    source: "Section 2.2: first excited states separated by 1.62 eV (765 nm)"
+
+  # --- spectral response (Fig. 2d) -----------------------------------------
+  simulated_resonance_nm:
+    value: 1520.0
+    kind: spectral
+    source: "Section 2.2: simulated peak near 1520 nm"
+    note: >-
+      This is the TWO-PHOTON resonance of the excited-state transition:
+      2 hc / 1.62 eV = 1531 nm. The paper's companion peak "around 760 nm" is
+      the one-photon resonance of the same transition (hc / 1.62 eV = 765 nm).
+  measured_resonance_nm:
+    value: 1560.0
+    kind: spectral
+    source: "Section 2.2: measured SHG peak near 1560 nm"
+    note: >-
+      Measured, not simulated. The paper attributes the 40 nm offset to a
+      slightly lower transition energy in the grown sample. An electronic-
+      structure calculation of the designed layers should reproduce ~1520 nm,
+      not ~1560 nm.
+  short_wavelength_resonance_nm:
+    value: 760.0
+    kind: spectral
+    source: "Section 2.2: simulated peak around 760 nm"
+
+  # --- simulated chi(2) at 1550 nm fundamental (Fig. 3c) --------------------
+  chi2_ideal_abrupt_pm_per_V:
+    value: 2340.0
+    kind: simulated
+    source: "Section 3.1: simulation prediction of 2340 pm/V for abrupt interfaces"
+  chi2_eds_al_profile_pm_per_V:
+    value: 1200.0
+    kind: simulated
+    source: "Section 3.1: chi(2) = 1200 pm/V from the measured Al profile"
+  chi2_eds_ga_profile_pm_per_V:
+    value: 1363.0
+    kind: simulated
+    source: "Section 3.1: chi(2) = 1363 pm/V from the measured Ga profile"
+
+  # --- measured chi(2) at 1550 nm fundamental ------------------------------
+  # These are NOT electronic-structure predictions. They fold in surface band
+  # bending, standing-wave and sample-placement effects, and the Eq. 3 field-
+  # overlap extraction with its free parameter alpha. Demo 11 does not attempt
+  # to reproduce them and says so.
+  chi2_growth_interrupted_pm_per_V:
+    value: 1345.0
+    kind: measured
+    source: "Section 3.1: growth-interrupted sample, chi(2)_eff ~ 1345 pm/V"
+  chi2_12_and_16_period_pm_per_V:
+    value: 1170.0
+    kind: measured
+    source: "Section 2.3: ~1170 pm/V for the 12- and 16-period samples"
+  chi2_80_period_pm_per_V:
+    value: 1730.0
+    kind: measured
+    source: "Section 2.3: 80-period sample, 1730 pm/V"
+  chi2_4_period_pm_per_V:
+    value: 2750.0
+    kind: measured
+    source: "Section 2.3 and Abstract: 4-period sample, 2750 pm/V"
+
+  # --- reference bulk values -----------------------------------------------
+  chi2_bulk_gaas_pm_per_V:
+    value: 377.0
+    kind: reference
+    source: "Section 2.1, quoting refs 17/33/34/39"
+  chi2_bulk_algaas_pm_per_V:
+    value: 290.0
+    kind: reference
+    source: "Section 2.1"
+
+  # --- stated trends -------------------------------------------------------
+  barrier_optimum_nm:
+    value: 1.0
+    kind: qualitative
+    source: >-
+      Section 2.1: "we predicted maximum chi(2) for a ~1 nm barrier thickness".
+      The FABRICATED structure used 1.8 nm. These are two different statements:
+      the ideal optimum and the grown design. Demo 11 reports both and does not
+      treat the difference as a discrepancy.
+  chi2_zero_at_symmetric_limits:
+    value: 0.0
+    kind: qualitative
+    source: >-
+      Section 2.1: the structure chi(2) goes to zero at both extremes of QW
+      asymmetry, since both correspond to symmetric structures (s = 0 gives two
+      equal wells; s = 1 gives a single well).
+
+# Quantities the paper does not publish, which the absolute magnitude needs.
+missing_for_absolute_scale:
+  r_e_hh_nm:
+    description: >-
+      Interband matrix element of the unit-cell wavefunctions, <u_e|r|u_hh>,
+      obtained by the authors from HSE06 hybrid-functional DFT in VASP. No
+      numerical value appears in the paper.
+  n_wells_per_metre:
+    description: >-
+      N_z, the number of quantum wells per unit length. Ambiguous even given the
+      period: 1/(30 nm) counting coupled-well pairs, or 2/(30 nm) counting
+      individual wells.
+  k_parallel_quadrature:
+    description: >-
+      The paper integrates "from zone center to one-tenth of the Brillouin zone"
+      but does not give the quadrature, the zone-edge convention (pi/a or 2pi/a),
+      the in-plane effective masses, or whether spin degeneracy is folded in.
+  full_input_deck:
+    description: >-
+      The nextnano input deck, material database version, boundary conditions,
+      and grid settings are not published.

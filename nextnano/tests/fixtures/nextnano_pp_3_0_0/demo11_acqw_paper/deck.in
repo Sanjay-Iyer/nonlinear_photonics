@@ -1,0 +1,127 @@
+# Demo 11: asymmetric coupled GaAs/Al(0.55)Ga(0.45)As quantum wells.
+# Reproduction target: arXiv:2602.23246v1, "Enhanced Interband Optical
+# Nonlinearities from Coupled Quantum Wells".
+#
+# Structure (Fig. 1a/1c of the paper), grown left to right:
+#   AlGaAs period barrier / thick GaAs well / AlGaAs tunnel barrier /
+#   thin GaAs well / AlGaAs period barrier
+#
+# Syntax basis, all previously accepted by nextnano++ 3.0.0 in this repository:
+#   - Demo 5 coupled-well geometry and the one-band Gamma quantum region;
+#   - Demo 7/8 heavy-hole and interband optical requests;
+#   - hello_06b transition_energies / momentum_matrix_elements.
+# Graded interfaces use structure/region/ternary_linear{ alloy_x=[a,b] x=[p,q] },
+# which ramps the alloy fraction linearly across a named interval.
+#
+# PHYSICS NOTE. Al(0.55)Ga(0.45)As is INDIRECT: the X valley lies below Gamma
+# above x ~ 0.45. This deck solves the Gamma valley only, which is the valley
+# that governs the interband optical transition the paper measures. The barrier
+# is therefore a Gamma-valley barrier; X-valley states in the barrier are not
+# computed and would matter for transport or for carrier capture, neither of
+# which is part of this reproduction.
+#
+# The structure and grid blocks are generated in Python from demo.yaml so that
+# the layer boundaries used by the chi(2) analysis are, by construction, the
+# same numbers written here.
+
+global{
+    simulate1D{}
+    temperature = 300
+    substrate{ name = "GaAs" }
+    crystal_zb{ x_hkl = [1, 0, 0]  y_hkl = [0, 1, 0] }
+}
+
+contacts{
+    fermi{ name = qw_contact  bias = 0.0 }
+}
+
+grid{
+    xgrid{
+        line{ pos = 0  spacing = 0.6 }
+        line{ pos = 9.1  spacing = 0.4 }
+        line{ pos = 16.2  spacing = 0.4 }
+        line{ pos = 18  spacing = 0.4 }
+        line{ pos = 20.9  spacing = 0.4 }
+        line{ pos = 30  spacing = 0.6 }
+    }
+}
+
+structure{
+    output_region_index{ boxes = no }
+    output_material_index{ boxes = no }
+    output_alloy_composition{ boxes = no }
+    region{
+        everywhere{}
+        ternary_constant{
+            name    = "Al(x)Ga(1-x)As"
+            alloy_x = 0.55
+        }
+        contact{ name = qw_contact }
+    }
+    # left_well
+    region{
+        line{ x = [9.1, 16.2] }
+        binary{ name = "GaAs" }
+    }
+    # centre_barrier
+    region{
+        line{ x = [16.2, 18] }
+        ternary_constant{
+            name    = "Al(x)Ga(1-x)As"
+            alloy_x = 0.55
+        }
+    }
+    # right_well
+    region{
+        line{ x = [18, 20.9] }
+        binary{ name = "GaAs" }
+    }
+    # right_outer_barrier
+    region{
+        line{ x = [20.9, 30] }
+        ternary_constant{
+            name    = "Al(x)Ga(1-x)As"
+            alloy_x = 0.55
+        }
+    }
+}
+
+classical{
+    Gamma{}
+    HH{}
+    LH{}
+    SO{}
+    output_bandedges{ averaged = no }
+    output_bandgap{}
+}
+
+quantum{
+    region{
+        name = "acqw"
+        x = [3.1, 26.9]
+        no_density = yes
+        boundary{ x = dirichlet }
+        Gamma{ num_ev = 2 }
+        HH{    num_ev = 2 }
+        output_states{
+            max_num       = 2
+            envelopes     = yes
+            probabilities = yes
+        }
+        # Interband transition energies and electron-hole envelope overlaps.
+        # Both are needed by Eq. 2 of the paper and both are cross-checked
+        # against values recomputed from the envelopes.
+        transition_energies{ Gamma_HH{} }
+        overlap_integrals{ Gamma_HH{} }
+        # Growth-axis dipole matrix elements: <psi|z|psi> within each band.
+        dipole_moment_matrix_elements{
+            polarization{ name = "growth_z"  re = [1, 0, 0] }
+            Gamma{}
+            HH{}
+        }
+    }
+}
+
+run{
+    quantum{}
+}

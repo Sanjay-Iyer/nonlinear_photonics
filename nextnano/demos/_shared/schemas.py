@@ -42,6 +42,7 @@ EXTENDED_VALIDATION: frozenset[str] = BASE_VALIDATION | frozenset(
         "maximum_matrix_element_disagreement_nm",
         "minimum_parity_confidence",
         "require_all_states_bound",
+        "transition_energy_tolerance_meV",
     }
 )
 
@@ -580,6 +581,54 @@ DEMO10_SCHEMA = DemoSchema(
     passthrough=frozenset({"analysis", "parser", "checks"}),
 )
 
+
+DEMO11_SCHEMA = DemoSchema(
+    top_level=EXTENDED_TOP_LEVEL,
+    scientific=frozenset(
+        {
+            "thick_well_nm",
+            "thin_well_nm",
+            "tunnel_barrier_nm",
+            "period_barrier_nm",
+            "aluminum_fraction",
+            "temperature_K",
+            "interface_grading_nm",
+        }
+    ),
+    numerical=frozenset(
+        {
+            "active_region_grid_spacing_nm",
+            "exterior_grid_spacing_nm",
+            "number_of_electron_states",
+            "number_of_hole_states",
+            "quantum_region_padding_nm",
+            "domain_padding_nm",
+        }
+    ),
+    sweeps=frozenset(),
+    outputs=EXTENDED_OUTPUTS,
+    validation=EXTENDED_VALIDATION | frozenset({"transition_energy_tolerance_meV"}),
+    positive=frozenset(
+        {
+            "thick_well_nm",
+            "thin_well_nm",
+            "tunnel_barrier_nm",
+            "period_barrier_nm",
+            "temperature_K",
+            "active_region_grid_spacing_nm",
+            "exterior_grid_spacing_nm",
+            "number_of_electron_states",
+            "number_of_hole_states",
+            "quantum_region_padding_nm",
+        }
+    ),
+    # Grading of zero means abrupt interfaces, which is the paper's ideal case.
+    non_negative=frozenset({"interface_grading_nm", "domain_padding_nm"}),
+    fraction=frozenset({"aluminum_fraction"}),
+    integer=frozenset({"number_of_electron_states", "number_of_hole_states"}),
+    passthrough=frozenset({"analysis", "parser", "metric", "checks"}),
+)
+
 DEMO_SCHEMAS: Mapping[str, DemoSchema] = {
     "01": LEGACY_SCHEMA,
     "02": LEGACY_SCHEMA,
@@ -591,6 +640,7 @@ DEMO_SCHEMAS: Mapping[str, DemoSchema] = {
     "08": DEMO8_SCHEMA,
     "09": DEMO9_SCHEMA,
     "10": DEMO10_SCHEMA,
+    "11": DEMO11_SCHEMA,
 }
 
 
