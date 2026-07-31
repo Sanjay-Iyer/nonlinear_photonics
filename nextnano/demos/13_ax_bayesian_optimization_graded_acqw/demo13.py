@@ -48,6 +48,7 @@ from demo_workflow import (  # noqa: E402
     DemoError,
     git_state,
     machine_summary,
+    run_subdirectory,
     write_json_atomically,
     write_text_atomically,
 )
@@ -1051,7 +1052,9 @@ def physics_curves(
         if xs:
             profiles.append({"label": label, "x": xs, "y": ys})
         envelopes.extend(_envelope_curves(extracted, label))
-        band_edges.extend(_band_edge_curves(cfg, Path(str(directory)) / "raw", label))
+        band_edges.extend(
+            _band_edge_curves(cfg, run_subdirectory(Path(str(directory)), "raw"), label)
+        )
     return {
         "spectra": spectra,
         "profiles": profiles,

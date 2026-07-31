@@ -33,6 +33,7 @@ import metrics13  # noqa: E402
 import plots13  # noqa: E402
 import replay13  # noqa: E402
 import report13  # noqa: E402
+import sweeps  # noqa: E402
 import synthetic13  # noqa: E402
 import tables13  # noqa: E402
 import tracking13  # noqa: E402
@@ -429,6 +430,71 @@ def test_snapshot_round_trips_and_resumes_generation(fast_cfg, tmp_path):
     reloaded = axsearch13.load_client(path)
     assert len(reloaded._experiment.trials) == 2
     assert list(reloaded.get_next_trials(max_trials=1))[0] == 2
+
+
+def test_run_subdirectory_agrees_with_the_layout_actually_created(tmp_path):
+    """Reconstructing a run's subdirectory must match what was written there.
+
+    Reproduces the work-laptop failure of 2026-07-31, where all sixteen licensed
+    trials were marked failed: the alloy-composition check rebuilt the solver
+    output path as ``run_dir / "raw"``, but the layout builder creates
+    ``raw_output``, so the scan searched a directory that never existed.
+    """
+
+    run_dir = tmp_path / "t0000"
+    layout = demo_workflow.create_run_layout(run_dir)
+    for key, path in layout.items():
+        assert path.is_dir()
+        assert demo_workflow.run_subdirectory(run_dir, key) == path
+    with pytest.raises(demo_workflow.DemoError):
+        demo_workflow.run_subdirectory(run_dir, "raw_output")
+
+
+def test_alloy_composition_check_searches_the_real_solver_output_directory(cfg, tmp_path):
+    """The composition check must look where the solver actually wrote."""
+
+    import demo12
+
+    run_dir = tmp_path / "t0000"
+    layout = demo_workflow.create_run_layout(run_dir)
+    table = layout["raw"] / "Structure" / "alloy_composition.dat"
+    table.parent.mkdir(parents=True)
+    table.write_text("0.0 0.55\n1.0 0.55\n", encoding="utf-8")
+
+    case = sweeps.CaseSpec(
+        case_id="t0000",
+        label="probe",
+        swept={},
+        config=design13.resolve_config(
+            {
+                "asymmetry_s": 0.46,
+                "central_barrier_thickness_nm": 1.8,
+                "grading_thickness_nm": 0.0,
+                "grading_profile": "abrupt",
+            },
+            cfg,
+        ),
+        metadata={},
+    )
+    result = sweeps.CaseResult(case, run_dir, "completed", 0, 0.0, {}, {}, [], None)
+    # It must find the one table rather than raising "found 0".
+    comparison = demo12._extract_realized_composition(case, result)
+    assert comparison["realized_profile_status"] in {"reproduced", "invalid"}
+    assert "source" in comparison
+
+
+def test_missing_alloy_output_names_the_directory_it_searched(cfg, tmp_path):
+    import demo12
+
+    run_dir = tmp_path / "t0000"
+    demo_workflow.create_run_layout(run_dir)
+    case = sweeps.CaseSpec("t0000", "probe", {}, dict(cfg), {})
+    result = sweeps.CaseResult(case, run_dir, "completed", 0, 0.0, {}, {}, [], None)
+    with pytest.raises(demo_workflow.DemoError) as failure:
+        demo12._extract_realized_composition(case, result)
+    message = str(failure.value)
+    assert "raw_output" in message
+    assert "exists: True" in message
 
 
 def test_pending_trial_directory_is_archived_not_overwritten(tmp_path):

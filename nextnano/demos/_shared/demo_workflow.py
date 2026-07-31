@@ -503,16 +503,38 @@ def _parameters(cfg: dict[str, Any]) -> dict[str, Any]:
     return values
 
 
+#: Layout key -> directory name created under every run directory.
+#:
+#: Two of these differ from their key (``raw`` -> ``raw_output``,
+#: ``generated`` -> ``generated_input``), and code that reconstructs a path from
+#: a run directory afterwards has guessed wrong at least twice. Anything that
+#: needs one of these later must go through :func:`run_subdirectory` rather than
+#: rebuilding the name, so the two can never drift apart again.
+RUN_SUBDIRECTORIES: dict[str, str] = {
+    "generated": "generated_input",
+    "raw": "raw_output",
+    "extracted": "extracted",
+    "plots": "plots",
+}
+
+
 def _create_layout(run_dir: Path) -> dict[str, Path]:
-    paths = {
-        "generated": run_dir / "generated_input",
-        "raw": run_dir / "raw_output",
-        "extracted": run_dir / "extracted",
-        "plots": run_dir / "plots",
-    }
+    paths = {key: run_dir / name for key, name in RUN_SUBDIRECTORIES.items()}
     for path in paths.values():
         path.mkdir(parents=True, exist_ok=False)
     return paths
+
+
+def run_subdirectory(run_dir: Path, key: str) -> Path:
+    """Locate one of a run's layout directories by its layout key."""
+
+    try:
+        return Path(run_dir) / RUN_SUBDIRECTORIES[key]
+    except KeyError as exc:
+        raise DemoError(
+            f"unknown run-layout key {key!r}; expected one of "
+            f"{sorted(RUN_SUBDIRECTORIES)}"
+        ) from exc
 
 
 def _logger(run_dir: Path) -> logging.Logger:

@@ -27,7 +27,12 @@ import layers
 import outputs
 import plots as plotting
 import sweeps
-from demo_workflow import DemoError, write_json_atomically, write_text_atomically
+from demo_workflow import (
+    DemoError,
+    run_subdirectory,
+    write_json_atomically,
+    write_text_atomically,
+)
 
 import grading12
 import tracking12
@@ -528,7 +533,7 @@ def _extract_realized_composition(case: sweeps.CaseSpec, result: sweeps.CaseResu
 
     if not result.solver_success:
         return {"realized_profile_status": "not run"}
-    raw = result.run_dir / "raw"
+    raw = run_subdirectory(result.run_dir, "raw")
     candidates = [
         path for path in raw.rglob("*.dat")
         if "alloy" in path.name.lower()
@@ -536,9 +541,15 @@ def _extract_realized_composition(case: sweeps.CaseSpec, result: sweeps.CaseResu
         and "quantum" not in {part.lower() for part in path.parts}
     ]
     if len(candidates) != 1:
+        # Name the directory that was searched and what was actually in it. The
+        # first licensed run of this function searched a path that has never
+        # existed and reported only "found 0", which said nothing about why.
+        present = sorted(path.name for path in raw.rglob("*.dat"))[:20]
         raise DemoError(
             "Stage 1 requires one unambiguous solver alloy-composition table; "
-            f"found {len(candidates)}: {[str(path.relative_to(raw)) for path in candidates]}"
+            f"found {len(candidates)}: {[str(path.relative_to(raw)) for path in candidates]}. "
+            f"Searched {raw} (exists: {raw.is_dir()}); .dat files present there: "
+            f"{present or 'none'}"
         )
     numeric: list[list[float]] = []
     for line in candidates[0].read_text(encoding="utf-8", errors="replace").splitlines():
