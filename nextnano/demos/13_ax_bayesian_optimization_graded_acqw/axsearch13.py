@@ -39,6 +39,9 @@ from __future__ import annotations
 import datetime as dt
 import json
 import math
+import os
+import time
+import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
 import sys
@@ -517,19 +520,67 @@ def load_client(path: Path) -> Any:
     return Client.load_from_json_file(str(path))
 
 
+#: Attempts and initial backoff for the checkpoint rename. Six attempts with
+#: doubling backoff spans about three seconds, which covers the window a
+#: Windows antivirus or indexing service holds a freshly written file.
+REPLACE_ATTEMPTS = 6
+REPLACE_BACKOFF_SECONDS = 0.05
+
+
 def save_client(client: Any, path: Path) -> Path:
-    """Checkpoint Ax's state atomically.
+    """Checkpoint Ax's state as safely as this filesystem allows.
 
     ``save_to_json_file`` writes in place. A power cut halfway through would
     leave a truncated snapshot and destroy the optimization history, which is
-    exactly the failure this demo is required to survive, so the write goes to a
-    sibling temporary file and is then replaced.
+    exactly the failure this demo exists to survive, so the write goes to a
+    sibling temporary file and is then renamed over the target.
+
+    Two Windows realities complicate that:
+
+    * the rename fails with ``PermissionError`` (WinError 5) while an antivirus
+      scanner or indexing service still holds a handle on the file it has just
+      seen appear -- a transient condition, observed on the work laptop at the
+      fifth checkpoint of a run that had already checkpointed four times;
+    * checkpoints happen after every generated and every completed trial, so a
+      fixed temporary name means consecutive writes contend for one path.
+
+    So the temporary name is unique per write, the rename is retried with
+    backoff, and a rename that will not succeed degrades to a direct write
+    rather than aborting.  Losing a licensed nextnano trial -- minutes of solver
+    time already spent -- because a virus scanner was reading a JSON file would
+    be an absurd way to end a run.  A direct write is less crash-safe for that
+    one checkpoint; it is not less safe than not checkpointing at all.
     """
 
     path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary = path.with_name(f".{path.name}.{uuid.uuid4().hex}.tmp")
     client.save_to_json_file(str(temporary))
-    temporary.replace(path)
+
+    last_error: OSError | None = None
+    for attempt in range(REPLACE_ATTEMPTS):
+        try:
+            os.replace(temporary, path)
+            return path
+        except OSError as exc:
+            last_error = exc
+            if attempt < REPLACE_ATTEMPTS - 1:
+                time.sleep(REPLACE_BACKOFF_SECONDS * (2**attempt))
+
+    try:
+        path.write_text(temporary.read_text(encoding="utf-8"), encoding="utf-8")
+    except OSError as exc:
+        raise DemoError(
+            f"could not checkpoint the Ax experiment to {path}: {type(exc).__name__}: "
+            f"{exc}. The last rename error was {type(last_error).__name__}: "
+            f"{last_error}. Optimization history cannot be preserved on this "
+            "filesystem; check permissions, and exclude the results directory "
+            "from real-time antivirus scanning."
+        ) from exc
+    finally:
+        try:
+            temporary.unlink(missing_ok=True)
+        except OSError:  # pragma: no cover - best-effort cleanup
+            pass
     return path
 
 

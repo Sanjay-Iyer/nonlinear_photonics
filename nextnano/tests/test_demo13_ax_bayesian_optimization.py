@@ -431,6 +431,94 @@ def test_snapshot_round_trips_and_resumes_generation(fast_cfg, tmp_path):
     assert list(reloaded.get_next_trials(max_trials=1))[0] == 2
 
 
+def test_checkpoint_survives_a_transient_windows_rename_denial(fast_cfg, tmp_path, monkeypatch):
+    """WinError 5 during the checkpoint rename must not end a licensed run.
+
+    Reproduces the work-laptop failure of 2026-07-31: the fifth checkpoint of a
+    run that had already checkpointed four times was denied while an antivirus
+    or indexing service held the target file.
+    """
+
+    spec = axsearch13.build_optimization_spec(fast_cfg)
+    client = axsearch13.create_client(fast_cfg, spec)
+    path = tmp_path / "ax_experiment_snapshot.json"
+    axsearch13.save_client(client, path)
+    first = path.read_text(encoding="utf-8")
+
+    real_replace = axsearch13.os.replace
+    calls = {"count": 0}
+
+    def flaky(source, target):
+        calls["count"] += 1
+        if calls["count"] <= 3:
+            raise PermissionError(5, "Access is denied")
+        return real_replace(source, target)
+
+    monkeypatch.setattr(axsearch13.os, "replace", flaky)
+    monkeypatch.setattr(axsearch13, "REPLACE_BACKOFF_SECONDS", 0.0)
+    for index, _parameters in client.get_next_trials(max_trials=1).items():
+        client.complete_trial(index, raw_data={name: 0.5 for name in spec.reported_metrics})
+    assert axsearch13.save_client(client, path) == path
+    assert calls["count"] == 4
+    assert path.read_text(encoding="utf-8") != first
+    assert not list(tmp_path.glob("*.tmp"))
+
+
+def test_checkpoint_falls_back_to_a_direct_write_when_rename_never_succeeds(
+    fast_cfg, tmp_path, monkeypatch
+):
+    spec = axsearch13.build_optimization_spec(fast_cfg)
+    client = axsearch13.create_client(fast_cfg, spec)
+    path = tmp_path / "ax_experiment_snapshot.json"
+
+    def always_denied(source, target):
+        raise PermissionError(5, "Access is denied")
+
+    monkeypatch.setattr(axsearch13.os, "replace", always_denied)
+    monkeypatch.setattr(axsearch13, "REPLACE_BACKOFF_SECONDS", 0.0)
+    axsearch13.save_client(client, path)
+    assert path.is_file()
+    # The snapshot must still be a loadable Ax experiment, not a partial write.
+    assert axsearch13.load_client(path) is not None
+    assert not list(tmp_path.glob("*.tmp"))
+
+
+def test_checkpoint_reports_an_unwritable_target_actionably(fast_cfg, tmp_path, monkeypatch):
+    spec = axsearch13.build_optimization_spec(fast_cfg)
+    client = axsearch13.create_client(fast_cfg, spec)
+
+    def always_denied(source, target):
+        raise PermissionError(5, "Access is denied")
+
+    monkeypatch.setattr(axsearch13.os, "replace", always_denied)
+    monkeypatch.setattr(axsearch13, "REPLACE_BACKOFF_SECONDS", 0.0)
+    monkeypatch.setattr(
+        Path, "write_text", lambda *args, **kwargs: (_ for _ in ()).throw(PermissionError(5, "denied"))
+    )
+    with pytest.raises(demo_workflow.DemoError) as failure:
+        axsearch13.save_client(client, tmp_path / "snapshot.json")
+    assert "antivirus" in str(failure.value)
+
+
+def test_consecutive_checkpoints_do_not_share_a_temporary_path(fast_cfg, tmp_path, monkeypatch):
+    """A fixed temporary name makes back-to-back checkpoints contend on Windows."""
+
+    spec = axsearch13.build_optimization_spec(fast_cfg)
+    client = axsearch13.create_client(fast_cfg, spec)
+    path = tmp_path / "ax_experiment_snapshot.json"
+    seen: list[str] = []
+    real_replace = axsearch13.os.replace
+
+    def record(source, target):
+        seen.append(Path(source).name)
+        return real_replace(source, target)
+
+    monkeypatch.setattr(axsearch13.os, "replace", record)
+    for _ in range(3):
+        axsearch13.save_client(client, path)
+    assert len(set(seen)) == 3
+
+
 def test_ledger_records_are_immutable_once_terminal(tmp_path):
     ledger = axsearch13.Ledger(tmp_path)
     ledger.write({"trial_index": 0, "status": "completed"})
