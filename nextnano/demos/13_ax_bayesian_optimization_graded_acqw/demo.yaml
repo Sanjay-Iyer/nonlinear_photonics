@@ -50,7 +50,7 @@ workflow:
   # alloy validation -> QC -> Ax completion -> checkpoint before 15 more trials
   # are committed to it. Change to closed_loop once that trial looks right; the
   # study then continues from where it stopped and repeats nothing.
-  mode: run_pending_candidates
+  mode: closed_loop
   resume: true
   # Directory (under the results root) holding the Ax snapshot and the immutable
   # trial ledger. Kept outside any single run directory so a run never destroys

@@ -431,6 +431,55 @@ def test_snapshot_round_trips_and_resumes_generation(fast_cfg, tmp_path):
     assert list(reloaded.get_next_trials(max_trials=1))[0] == 2
 
 
+def test_pending_trial_directory_is_archived_not_overwritten(tmp_path):
+    """A candidate generated without a solver must be runnable later.
+
+    Reproduces the work-laptop failure of 2026-07-31: the run that proposed
+    trial 0 wrote its deck and skipped execution, and executing it afterwards
+    hit `FileExistsError` from the shared layout builder.
+    """
+
+    import demo13
+
+    run_dir = tmp_path / "runs" / "t0000"
+    (run_dir / "generated_input").mkdir(parents=True)
+    (run_dir / "generated_input" / "case.in").write_text("deck", encoding="utf-8")
+    (run_dir / "run_manifest.json").write_text(
+        json.dumps({"completion_status": "skipped_no_solver"}), encoding="utf-8"
+    )
+
+    archived = demo13.archive_unexecuted_run_dir(run_dir)
+
+    assert archived is not None
+    assert not run_dir.exists(), "the trial directory must be free for the real run"
+    archive = Path(archived)
+    assert archive.is_dir()
+    assert (archive / "generated_input" / "case.in").read_text(encoding="utf-8") == "deck"
+    # The shared layout builder can now do its job on a clean directory.
+    layout = demo_workflow.create_run_layout(run_dir)
+    assert layout["generated"].is_dir()
+
+
+def test_archiving_a_directory_that_never_ran_is_a_no_op(tmp_path):
+    import demo13
+
+    assert demo13.archive_unexecuted_run_dir(tmp_path / "runs" / "t0042") is None
+
+
+def test_a_completed_licensed_run_directory_is_never_archived(tmp_path):
+    import demo13
+
+    run_dir = tmp_path / "runs" / "t0000"
+    run_dir.mkdir(parents=True)
+    (run_dir / "run_manifest.json").write_text(
+        json.dumps({"completion_status": "completed"}), encoding="utf-8"
+    )
+    with pytest.raises(demo_workflow.DemoError) as failure:
+        demo13.archive_unexecuted_run_dir(run_dir)
+    assert "Refusing to overwrite a licensed result" in str(failure.value)
+    assert (run_dir / "run_manifest.json").is_file()
+
+
 def test_checkpoint_survives_a_transient_windows_rename_denial(fast_cfg, tmp_path, monkeypatch):
     """WinError 5 during the checkpoint rename must not end a licensed run.
 

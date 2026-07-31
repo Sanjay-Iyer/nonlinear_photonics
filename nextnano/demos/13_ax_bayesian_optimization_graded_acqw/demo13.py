@@ -182,6 +182,48 @@ def _trial_case(
     )
 
 
+def archive_unexecuted_run_dir(run_dir: Path) -> str | None:
+    """Move a never-executed trial directory aside so the trial can be rerun.
+
+    A pending trial already has a directory: the run that proposed it wrote the
+    generated deck there and then skipped execution, because that machine had no
+    licensed solver.  Executing it later has to write into the same place, and
+    the shared layout builder refuses to reuse *any* run directory -- which is
+    the right default, since it is what stops a rerun silently clobbering real
+    results.
+
+    So the stale attempt is renamed aside rather than deleted.  It contains no
+    physics, only an input and a manifest saying the solver was skipped, but
+    keeping it costs nothing and leaves the audit trail intact.  A directory
+    holding a *completed* run is never touched; reaching that state would mean
+    the ledger and the filesystem disagree about what has already been paid for,
+    and that is worth stopping on.
+    """
+
+    run_dir = Path(run_dir)
+    if not run_dir.exists():
+        return None
+    manifest = run_dir / "run_manifest.json"
+    status: str | None = None
+    if manifest.is_file():
+        try:
+            status = json.loads(manifest.read_text(encoding="utf-8")).get(
+                "completion_status"
+            )
+        except (json.JSONDecodeError, OSError):
+            status = None
+    if status == "completed":
+        raise DemoError(
+            f"{run_dir} already holds a completed nextnano++ run, but this trial "
+            "is not recorded as terminal in the ledger. Refusing to overwrite a "
+            "licensed result; reconcile the ledger and the run directory by hand."
+        )
+    stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    archived = run_dir.with_name(f"{run_dir.name}.superseded-{stamp}")
+    run_dir.rename(archived)
+    return str(archived)
+
+
 def run_trial(
     *,
     context: sweeps.RunContext,
@@ -195,6 +237,7 @@ def run_trial(
     cfg = context.cfg
     case = _trial_case(trial_index, parameters, cfg, iteration)
     run_dir = state_dir / "runs" / case.case_id
+    archived = archive_unexecuted_run_dir(run_dir)
     result = sweeps.execute_case(
         demo_dir=context.demo_dir,
         spec=case,
