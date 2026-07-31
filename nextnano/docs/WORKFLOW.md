@@ -382,6 +382,30 @@ it back to home) **before the next pull**, so the two clones don't diverge.
 
 ---
 
+## Getting demo results back to the home laptop
+
+`nextnano/results/demo_runs/**` is gitignored — a licensed demo run writes tens
+of megabytes of raw fields, meshes and per-case logs — so committing it is not
+the transfer path. Bundle the text artifacts instead:
+
+```powershell
+python .\nextnano\scripts\bundle_results.py --include-plots
+```
+
+That writes `<run>_bundle.zip` beside the run directory containing the reports,
+tables, per-case manifests and extracted diagnostics, and nothing that needed a
+licence to produce. Raw solver output is excluded by design. Drop the zip on
+the home laptop and read it there; no licence is needed to re-derive any
+conclusion from it.
+
+Demo-specific audits run against an existing run directory and need no solver:
+
+```powershell
+python .\nextnano\scripts\audit_state_counts.py
+```
+
+---
+
 ## Keeping results
 
 Raw solver output under `nextnano/output/` is gitignored and stays on the work

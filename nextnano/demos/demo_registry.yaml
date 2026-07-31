@@ -306,15 +306,43 @@ demos:
       - "the paper's Eq. 2 interband chi(2) in relative/absolute/calibrated modes"
       - graded versus abrupt interface comparison
       - a formal classified paper-comparison report
+      - "two separately reported chi(2) metrics: intrinsic peak versus fixed-wavelength"
+      - physical-state tracking across a sweep by envelope overlap
+      - "a six-level reproduction-status vocabulary distinct from the classification"
     home_syntax_check: parsed_free_3_0_0
     home_solver_check: refused_free_edition_grid_limit
-    licensed_validation: {}
+    licensed_validation:
+      2026-07-31:
+        commit: d1aed8ddc8fa83f5c07ead081319890ed0e5e0e6
+        cases: 38
+        outcome: all_completed
+        reproduced:
+          - "E1-HH1 = 1.48906 eV against the published 1.49 eV"
+          - "E2-HH2 = 1.62967 eV against the published 1.62 eV"
+          - "focused-scan peak at 1519 nm against the published ~1520 nm"
+          - "barrier optimum at 1.0 nm, under both chi(2) metrics"
+          - "graded/abrupt ratio 0.571 against the published 0.513"
+        exposed:
+          - "false origin-independence FAIL at the s = 0 parity zero: the relative
+             residual divided ~1e-14 of noise by a 5.7e-14 scale"
+          - "the asymmetry optimum was scored at a fixed 1550 nm across a sweep whose
+             resonance moves ~100 nm; on the intrinsic peak metric it is s = 0.50,
+             ahead of s = 0.55 by only 0.4%"
+          - "chi(2)(s) jumps by a factor of 8.5 between s = 0.38 and s = 0.42 while
+             <e2|hh2> collapses 0.958 -> 0.448 and E_hh2 reverses: an avoided crossing
+             followed by energy index"
+          - "state-count convergence was vacuous: the sum is capped at
+             max_states_per_band regardless of how many states the solver returns"
     pending_licensed_checks:
-      - "Stage 1 - confirm E1-HH1 and E2-HH2 against the published 1.49 and 1.62 eV."
-      - "Stage 2 - confirm grid, domain, quantum-region, state-count and k-parallel convergence."
-      - "Stage 3 - confirm the asymmetry sweep peaks near s = 0.42 and vanishes at s = 0."
-      - "Stage 4 - confirm the tunnelling-barrier sweep peaks near 1 nm."
-      - "Stage 6 - confirm the two-photon resonance lands near 1520 nm."
-      - "Stage 7 - confirm the graded model reduces chi(2) relative to abrupt."
+      - "Stage 2 - confirm the max_states_per_band sweep changes the term count, via
+         scripts/audit_state_counts.py. Until it reports PASS, state-count convergence
+         is UNVERIFIED."
+      - "Stage 2p - confirm padding convergence at s = 0.38, 0.46, 0.50 and 0.55, not
+         only at the 0.42 design point."
+      - "Stage 3b - run the refined s = 0.36-0.52 sweep and physical-state tracking, and
+         decide whether the s = 0.38 -> 0.42 cliff is a labelling artifact."
+      - "Stage 3 - the asymmetry optimum stays provisionally_consistent until Stage 3b
+         settles it. It must not be reported as reproduced before then."
+      - "Confirm the s = 0 case now passes origin independence on its absolute residual."
     unvalidated_syntax:
       - "structure/region/ternary_linear{} graded-alloy output: parse-validated only, no licensed run has produced its composition profile yet"

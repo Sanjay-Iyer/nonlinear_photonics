@@ -43,16 +43,48 @@ analysis:
   # Envelopes within a band must be orthonormal to this tolerance, otherwise
   # chi(2) depends on where the z origin is placed. See _shared/chi2.py.
   orthonormality_tolerance: 1.0e-3
-  maximum_origin_dependence: 1.0e-6
+  # --- origin-independence check -----------------------------------------
+  # chi(2) must not change when the z origin moves. Two tolerances, because one
+  # cannot cover both regimes: a symmetric structure has chi(2) = 0 by parity,
+  # so there the reference spectrum is pure rounding noise and a RELATIVE
+  # residual is a division of noise by noise. Above the scale floor the relative
+  # tolerance applies; at or below it, only the absolute one does. Neither
+  # regime is exempt from being checked.
+  maximum_origin_dependence: 1.0e-6          # relative, used above the floor
+  origin_independence_absolute_tolerance: 1.0e-12
+  # In relative-mode chi(2) units. The paper's structure sits near 1; a
+  # symmetric structure comes out at ~1e-14. Anything under this floor is
+  # numerically zero, not small. The margin is deliberately wide on both sides
+  # -- nine orders below the real structure, five above the parity zero -- so no
+  # case in this demo lands near the switchover, where a spectrum just above the
+  # floor would be judged relatively on a residual that is still pure noise.
+  origin_independence_scale_floor: 1.0e-9
+  # Large enough that a genuine origin dependence cannot hide inside the
+  # structure, and recorded with every result.
+  origin_independence_shift_nm: 100.0
   # Stage 2 - numerical convergence.
   convergence:
     active_region_grid_spacing_nm: [0.20, 0.10, 0.05]
     domain_padding_nm: [0.0, 4.0, 10.0]
     quantum_region_padding_nm: [3.0, 6.0, 9.0]
     number_of_electron_states: [3, 4, 6]
+    # Requesting more states from the solver does NOT widen Eq. 2's m,n,l sums:
+    # that is governed by metric.max_states_per_band, which the paper fixes at 2.
+    # The two knobs are swept separately and the state-count audit checks that
+    # each one moves what it claims to. See scripts/audit_state_counts.py.
+    chi2_max_states_per_band: [2, 3, 4]
     # k-parallel convergence is post-processing on the Stage 1 states.
     k_parallel_points: [24, 48, 96, 192]
     k_parallel_fraction_of_bz: [0.05, 0.10, 0.20]
+    # Padding convergence repeated at the asymmetries where Stage 3 misbehaves,
+    # rather than only at the design point. The 2026-07-31 licensed run showed
+    # boundary probability riding the 1e-3 threshold at s = 0.55 while the
+    # s = 0.42 padding scan looked clean, so a check at 0.42 alone proves
+    # nothing about the rest of the sweep.
+    padding_at_asymmetry:
+      enabled: true
+      asymmetry_values: [0.38, 0.42, 0.46, 0.50, 0.55]
+      quantum_region_padding_nm: [3.0, 6.0, 9.0]
   # Stage 3 - asymmetry sweep at fixed 10 nm total well thickness.
   # Finer between 0.30 and 0.55, around the paper's predicted optimum of 0.42.
   # s = 1.0 exactly is a single 10 nm well, a different geometry rather than a
@@ -61,6 +93,29 @@ analysis:
   # unit-tested in test_demo11_paper_validation.py).
   asymmetry_sweep: [0.00, 0.10, 0.20, 0.30, 0.34, 0.38, 0.42, 0.46, 0.50,
                     0.55, 0.60, 0.70, 0.80, 0.90]
+  # Stage 3b - refined sweep across the discontinuity the 2026-07-31 licensed
+  # run exposed. Between s = 0.38 and s = 0.42 the peak |chi(2)| jumps by 8.5x
+  # while <e2|hh2> collapses from 0.958 to 0.448 and E_hh2 turns around: the
+  # signature of an avoided crossing being tracked by energy index. The coarse
+  # sweep above is KEPT for context; this one resolves the cliff.
+  asymmetry_sweep_refined: [0.36, 0.37, 0.38, 0.39, 0.40, 0.41, 0.42, 0.43,
+                            0.44, 0.45, 0.46, 0.47, 0.48, 0.49, 0.50, 0.51,
+                            0.52]
+  # --- physical-state tracking across the refined sweep -------------------
+  # Assigning "hh2" to the second energy-ordered state is exactly what breaks
+  # at an avoided crossing. States are instead matched to their neighbours by
+  # envelope overlap, and the two labellings are reported side by side.
+  state_tracking:
+    enabled: true
+    # Below this best-match overlap an assignment is reported as ambiguous
+    # rather than accepted.
+    minimum_confidence: 0.60
+    # Best minus second-best overlap. A small margin means two candidates fit
+    # nearly equally well, which is what a crossing looks like.
+    minimum_assignment_margin: 0.15
+    # Energy continuity breaks ties only; it never overrides overlap.
+    energy_continuity_weight: 0.05
+    bands: [electron, heavy_hole]
   # Stage 4 - tunnelling-barrier sweep at fixed asymmetry and total thickness.
   barrier_sweep_nm: [0.5, 1.0, 1.5, 1.8, 2.0, 2.5, 3.0, 4.0, 5.0]
   # Stage 7 - interface abruptness.
@@ -83,6 +138,11 @@ metric:
   electron_mass_m0: 0.067
   heavy_hole_inplane_mass_m0: 0.112
   spin_degeneracy: 2
+  # States of each band entering Eq. 2's m,n,l sums. The paper uses the first
+  # two bound states of each band. This is INDEPENDENT of
+  # numerical.number_of_electron_states, which only sets how many states the
+  # solver returns; every artifact records both.
+  max_states_per_band: 2
   # --- absolute mode: both MUST be supplied, and the paper publishes neither.
   # Leave null and the run stays in relative mode rather than inventing a scale.
   r_e_hh_nm: null
@@ -120,6 +180,16 @@ validation:
   convergence_warning_markers: ["failed to converge"]
   minimum_confined_probability: 0.50
   maximum_boundary_probability: 0.001
+  # What to do with a state that fails the bound-state criterion but is still
+  # among the first max_states_per_band of its band:
+  #   warn       - keep it in Eq. 2, flag the case (the behaviour every result
+  #                to date was produced with, so it stays the default)
+  #   exclude    - drop it from Eq. 2 and record why
+  #   fail_case  - mark the case invalid
+  # `exclude` changes which states Eq. 2 sums over and so changes the physics;
+  # it is a deliberate experiment, not a cleanup. The active policy is named in
+  # the validation report either way.
+  quasi_bound_state_policy: warn
   normalization_tolerance: 0.001
   # Agreement required against the paper's stated transition energies, in meV.
   # This is a REPORTING threshold, not a target to tune material parameters to.

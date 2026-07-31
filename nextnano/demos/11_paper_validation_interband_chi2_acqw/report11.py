@@ -20,12 +20,55 @@ import plots as plotting
 import sweeps
 from demo_workflow import write_json_atomically, write_text_atomically
 
+#: Stages that vary the structural asymmetry: the original coarse sweep and the
+#: refined one that resolves the discontinuity it exposed. Both are plotted and
+#: compared; the coarse sweep is never discarded.
+ASYMMETRY_STAGES: tuple[str, ...] = ("stage3", "stage3_refined")
+
 DIRECT = "directly_reproduced"
 QUALITATIVE = "qualitatively_reproduced"
 CALIBRATED = "calibrated_reproduction"
 NOT_REPRODUCIBLE = "not_reproducible_from_available_information"
 OUT_OF_SCOPE = "outside_nextnano_scope"
 NEEDS_AUTHORS = "requires_author_data_or_code"
+
+# ---------------------------------------------------------------------------
+# reproduction status
+# ---------------------------------------------------------------------------
+# `classification` above says what KIND of comparison a quantity is. This says
+# how far the work has actually got with it, which is a different question and
+# was previously collapsed into a bare PASS. A criterion can be inside its
+# tolerance and still not be reproduced -- the asymmetry optimum is exactly that
+# case: the number agrees, but the metric that produced it conflates intrinsic
+# magnitude with detuning, and the underlying sweep has an unexplained
+# discontinuity next to the claimed optimum.
+
+MECHANICAL = "mechanically_completed"
+CONVERGED = "numerically_converged"
+REPRODUCED = "reproduced"
+PROVISIONAL = "provisionally_consistent"
+UNRESOLVED = "unresolved"
+FAILED = "failed"
+
+STATUS_ORDER: tuple[str, ...] = (
+    REPRODUCED,
+    CONVERGED,
+    PROVISIONAL,
+    MECHANICAL,
+    UNRESOLVED,
+    FAILED,
+)
+
+STATUS_MEANING: Mapping[str, str] = {
+    MECHANICAL: "the calculation ran to completion; nothing is claimed about the number",
+    CONVERGED: "the number is stable against the numerical parameters that were swept",
+    REPRODUCED: "computed here, agrees with the paper within a stated tolerance, and "
+    "the metric behind it is the one the paper's claim is about",
+    PROVISIONAL: "consistent with the paper, but resting on something not yet settled; "
+    "not a reproduction",
+    UNRESOLVED: "the calculation raises a question this run cannot answer",
+    FAILED: "the check did not pass",
+}
 
 
 def _observable(result: sweeps.CaseResult | None, name: str) -> float | None:
@@ -47,16 +90,28 @@ def _entry(
     note: str,
     *,
     tolerance: float | None = None,
+    provisional: bool = False,
+    provisional_reason: str = "",
 ) -> dict[str, Any]:
     difference = None
     relative = None
     within = None
+    at_boundary = False
     if paper_value is not None and ours is not None:
         difference = ours - paper_value
         if paper_value != 0:
             relative = difference / abs(paper_value)
         if tolerance is not None:
             within = abs(difference) <= tolerance
+            # Sitting exactly on the tolerance is not a result. The corrected
+            # asymmetry optimum lands at |diff| = 0.08000000000000007 against a
+            # 0.08 tolerance, so the verdict is decided by how 0.42 rounds in
+            # binary. Flagged rather than nudged: widening the tolerance to make
+            # it pass, or leaving it to report a hard FAIL, would both be
+            # claiming a precision the sweep does not have.
+            at_boundary = abs(abs(difference) - tolerance) <= 1e-9 * max(
+                abs(tolerance), 1.0
+            )
     # `classification` is the KIND of comparison this is. `outcome` is whether
     # it was actually evaluated. Without the split, a dry run would report
     # "directly_reproduced" for a quantity nothing has computed yet.
@@ -66,19 +121,29 @@ def _entry(
         outcome = "pending"
     elif within is None:
         outcome = "reported_without_tolerance"
+    elif at_boundary:
+        outcome = "at_tolerance_boundary"
     else:
         outcome = "within_tolerance" if within else "outside_tolerance"
+    # A number inside its tolerance is not automatically a reproduction: it can
+    # rest on an unsettled question, in which case it is consistency and has to
+    # be labelled that way. `provisional` carries that, and the status table
+    # downgrades the entry no matter how good the agreement looks.
     return {
         "quantity": name,
         "paper_value": paper_value,
         "our_value": ours,
         "units": units,
+        "tolerance": tolerance,
         "difference": difference,
         "relative_difference": relative,
         "within_tolerance": within,
+        "at_tolerance_boundary": at_boundary,
         "classification": classification,
         "outcome": outcome,
         "evaluated": ours is not None,
+        "provisional": bool(provisional),
+        "provisional_reason": provisional_reason,
         "note": note,
     }
 
@@ -92,6 +157,7 @@ def build(
     stage5: Mapping[str, Any],
     stage6: Mapping[str, Any],
     parent: Path,
+    stage3b: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Assemble every paper-vs-simulation comparison with its classification."""
 
@@ -215,18 +281,70 @@ def build(
     )
 
     # --- asymmetry and barrier trends ---------------------------------------
+    # Two metrics, reported separately and never merged. See METRICS.
     stage3 = [r for r in results if r.spec.metadata.get("stage") == "stage3"]
-    peak_asymmetry = _peak_of(stage3, "asymmetry", "chi2_relative_at_reference")
+    stage3_refined = [
+        r for r in results if r.spec.metadata.get("stage") == "stage3_refined"
+    ]
+    asymmetry_tolerance = 0.08
+    paper_asymmetry = float(published["asymmetry_optimum"]["value"])
+    optima: dict[str, Any] = {"asymmetry": {}, "barrier": {}}
+
+    for metric_name, spec in METRICS.items():
+        optima["asymmetry"][metric_name] = {
+            "coarse": _optimum(stage3, "asymmetry", spec["observable"]),
+            "refined": _optimum(stage3_refined, "asymmetry", spec["observable"]),
+        }
+    asymmetry_primary = optima["asymmetry"][PRIMARY_METRIC]
+    # The refined sweep supersedes the coarse one where it exists; it is denser
+    # over exactly the range in question. Where it has not been run, the coarse
+    # sweep is used and the entry says so.
+    primary_source = (
+        "refined" if asymmetry_primary["refined"]["value"] is not None else "coarse"
+    )
     entries.append(
         _entry(
-            "asymmetry_of_maximum_chi2",
-            float(published["asymmetry_optimum"]["value"]),
-            peak_asymmetry,
+            "asymmetry_optimum_peak_metric",
+            paper_asymmetry,
+            asymmetry_primary[primary_source]["value"],
             QUALITATIVE,
             "",
-            "Position of the maximum of the relative chi(2) across the asymmetry "
-            "sweep. The location is meaningful in relative mode; the height is not.",
-            tolerance=0.08,
+            "PRIMARY metric for the paper's optimum claim: the asymmetry that "
+            "maximises the intrinsic peak |chi(2)| over the focused scan, which "
+            "does not depend on where each structure's resonance falls. Taken "
+            f"from the {primary_source} sweep. This is NOT the same quantity as "
+            "asymmetry_optimum_at_reference_wavelength and the two can disagree.",
+            tolerance=asymmetry_tolerance,
+            provisional=True,
+            provisional_reason=(
+                "State identity across the sweep is unresolved: chi(2)(s) is "
+                "discontinuous and the states are labelled by energy index "
+                "through what looks like an avoided crossing. Until the refined "
+                "sweep and physical-state tracking settle that, an agreeing "
+                "number here is consistency, not reproduction."
+            ),
+        )
+    )
+    entries.append(
+        _entry(
+            "asymmetry_optimum_at_reference_wavelength",
+            paper_asymmetry,
+            optima["asymmetry"]["chi2_at_reference_wavelength"][primary_source]["value"],
+            QUALITATIVE,
+            "",
+            "SECONDARY, application-specific: the asymmetry that maximises "
+            f"|chi(2)| at {metric_cfg.get('reference_wavelength_nm', 1550.0)} nm. "
+            "Across this sweep the two-photon resonance moves by about 100 nm "
+            "against a "
+            f"{metric_cfg.get('broadening_meV', 5.0)} meV linewidth, so this "
+            "metric ranks structures partly by detuning from the fixed reference "
+            "and must not be read as the intrinsic chi(2) maximum.",
+            tolerance=asymmetry_tolerance,
+            provisional=True,
+            provisional_reason=(
+                "Reported for completeness. It answers 'which of these is best at "
+                "one wavelength', not 'which is most nonlinear'."
+            ),
         )
     )
     zero_case = next(
@@ -238,28 +356,51 @@ def build(
         _entry(
             "chi2_at_symmetric_limit",
             0.0,
-            _observable(zero_case, "chi2_relative_at_reference"),
+            _observable(zero_case, "chi2_peak_magnitude"),
             QUALITATIVE,
             "relative",
             "s = 0 gives two identical wells. A symmetric structure has "
             "identically zero chi(2) by parity; this checks the calculation "
-            "reproduces that rather than merely a small number.",
+            "reproduces that rather than merely a small number. Scored on the "
+            "peak magnitude over the whole focused scan, which is the strictest "
+            "of the two metrics -- a single wavelength could sit in a node.",
         )
     )
     stage4 = [r for r in results if r.spec.metadata.get("stage") == "stage4"]
-    peak_barrier = _peak_of(stage4, "tunnel_barrier_nm", "chi2_relative_at_reference")
+    for metric_name, spec in METRICS.items():
+        optima["barrier"][metric_name] = _optimum(
+            stage4, "tunnel_barrier_nm", spec["observable"]
+        )
     entries.append(
         _entry(
-            "barrier_of_maximum_chi2",
+            "barrier_optimum_peak_metric",
             float(published["barrier_optimum_nm"]["value"]),
-            peak_barrier,
+            optima["barrier"][PRIMARY_METRIC]["value"],
             QUALITATIVE,
             "nm",
-            "The paper predicts an ideal optimum near 1 nm while the fabricated "
-            "structure used 1.8 nm. Those are two different statements and both "
-            "are reported; the difference is a design choice, not a discrepancy.",
+            "PRIMARY: the barrier thickness that maximises the intrinsic peak "
+            "|chi(2)|. The paper predicts an ideal optimum near 1 nm while the "
+            "fabricated structure used 1.8 nm; those are two different statements "
+            "and both are reported. Unlike the asymmetry sweep, this optimum comes "
+            "out at the same place under both metrics, which is why it is not "
+            "marked provisional.",
             tolerance=0.6,
         )
+    )
+    entries.append(
+        _entry(
+            "barrier_optimum_at_reference_wavelength",
+            float(published["barrier_optimum_nm"]["value"]),
+            optima["barrier"]["chi2_at_reference_wavelength"]["value"],
+            QUALITATIVE,
+            "nm",
+            "SECONDARY, application-specific: the barrier that maximises "
+            f"|chi(2)| at {metric_cfg.get('reference_wavelength_nm', 1550.0)} nm.",
+            tolerance=0.6,
+        )
+    )
+    smoothness = _monotone_break(
+        stage3_refined or stage3, "asymmetry", METRICS[PRIMARY_METRIC]["observable"]
     )
 
     # --- interface abruptness ------------------------------------------------
@@ -399,9 +540,38 @@ def build(
             "computed end-to-end from Eq. 2 over 1400-1800 nm",
         ),
         (
-            "chi(2) maximum occurs near s = 0.42",
-            _within(entries, "asymmetry_of_maximum_chi2"),
-            "position of the maximum; height is not claimed in relative mode",
+            "chi(2) peak-magnitude maximum occurs near s = 0.42 (PROVISIONAL)",
+            _within(entries, "asymmetry_optimum_peak_metric"),
+            "scored on the intrinsic peak metric, not on the fixed-wavelength "
+            "value. PROVISIONAL: state identity across the sweep is unresolved, "
+            "so this is consistency rather than reproduction"
+            + (
+                ". The optimum sits EXACTLY on the +/-0.08 tolerance, so this "
+                "verdict is decided at the boundary and carries no information "
+                "either way -- the refined sweep is what settles it"
+                if _at_boundary(entries, "asymmetry_optimum_peak_metric")
+                else ""
+            ),
+        ),
+        (
+            "chi(2) versus asymmetry is smooth enough to have a meaningful optimum",
+            None
+            if smoothness.get("factor") is None
+            else bool(smoothness["factor"] <= 2.0),
+            (
+                "no adjacent-point data"
+                if smoothness.get("factor") is None
+                else f"largest step between adjacent asymmetries is a factor of "
+                f"{smoothness['factor']:.2f}"
+                + (
+                    f" between s = {smoothness['between'][0]} and "
+                    f"{smoothness['between'][1]}"
+                    if smoothness.get("between")
+                    else ""
+                )
+                + ". A physical chi(2)(s) is single-humped and smooth; a large "
+                "jump means the states being compared are not the same states"
+            ),
         ),
         (
             "chi(2) vanishes at the symmetric limit",
@@ -410,8 +580,9 @@ def build(
         ),
         (
             "barrier optimum near the published 1 nm",
-            _within(entries, "barrier_of_maximum_chi2"),
-            "ideal optimum, distinct from the 1.8 nm fabricated design",
+            _within(entries, "barrier_optimum_peak_metric"),
+            "ideal optimum, distinct from the 1.8 nm fabricated design; agrees "
+            "under both metrics",
         ),
         (
             "grading reduces chi(2) in the published proportion",
@@ -423,24 +594,375 @@ def build(
             _all_true(results, "envelopes_orthonormal")
             and _all_true(results, "chi2_origin_independent"),
             "Eq. 2 contains diagonal dipoles; without orthonormality the result "
-            "depends on where z = 0 is placed",
+            "depends on where z = 0 is placed. Near chi(2) = 0 the residual is "
+            "judged absolutely rather than relatively, because dividing rounding "
+            "noise by rounding noise is not a measurement",
+        ),
+        (
+            "Eq. 2 summed over exactly the configured state window",
+            _all_true(results, "chi2_state_window_as_configured"),
+            f"metric.max_states_per_band = "
+            f"{metric_cfg.get('max_states_per_band', 2)}; this is independent of "
+            "numerical.number_of_electron_states, which only sets how many states "
+            "the solver returns",
+        ),
+        (
+            "state-count convergence actually varied the sum",
+            _state_count_convergence_meaningful(results),
+            "requesting more solver states does not widen Eq. 2's m,n,l sums. A "
+            "state-count sweep in which the term count never changes has not "
+            "demonstrated convergence of anything",
+        ),
+        (
+            "every state entering Eq. 2 passes the bound-state criterion",
+            _all_true(results, "chi2_states_pass_bound_criterion"),
+            f"quasi-bound policy in force: "
+            f"{validation_cfg.get('quasi_bound_state_policy', 'warn')}; "
+            "state-resolved values are in each case's quasi_bound_states.csv",
         ),
     ]
-    return {"entries": entries, "summary": summary, "criteria": criteria}
+    status = _status_table(
+        entries=entries,
+        criteria=criteria,
+        results=results,
+        stage3b=stage3b or {},
+        smoothness=smoothness,
+        optima=optima,
+    )
+    return {
+        "entries": entries,
+        "summary": summary,
+        "criteria": criteria,
+        "status": status,
+        "metrics": {name: dict(spec) for name, spec in METRICS.items()},
+        "primary_metric": PRIMARY_METRIC,
+        "optima": optima,
+        "smoothness": smoothness,
+    }
 
 
-def _peak_of(
-    results: Sequence[sweeps.CaseResult], parameter: str, observable: str
-) -> float | None:
-    points = [
-        (float(r.observables[parameter]), float(r.observables[observable]))
+def _state_count_convergence_meaningful(
+    results: Sequence[sweeps.CaseResult],
+) -> bool | None:
+    """Did the state-count sweep change how many terms Eq. 2 evaluated?
+
+    The 2026-07-31 run swept 3, 4, and 6 solver states and got chi(2) agreeing
+    to ~1e-13. That is not convergence: the sum is capped at
+    ``max_states_per_band`` regardless, so all three cases evaluated an
+    identical number of identical terms. Reporting the agreement as convergence
+    would be reporting that a knob which was never connected had no effect.
+    """
+
+    counts = {
+        int(r.observables["chi2_triple_sum_terms_evaluated"])
         for r in results
-        if r.observables.get(parameter) is not None
-        and r.observables.get(observable) is not None
+        if r.spec.metadata.get("stage") == "stage2"
+        and r.observables.get("chi2_triple_sum_terms_evaluated") is not None
+    }
+    if len(counts) < 2:
+        return None if not counts else False
+    return True
+
+
+def _optimum_margin_note(optima: Mapping[str, Any]) -> str:
+    """How decisively the asymmetry optimum beats its runner-up, if at all.
+
+    A maximum that leads the next point by less than the sweep's own numerical
+    scatter is a ranking, not a maximum, and saying so is the whole point of
+    carrying the margin around. Silent when there is nothing to report.
+    """
+
+    record = (optima.get("asymmetry") or {}).get(PRIMARY_METRIC) or {}
+    record = record.get("refined") or record.get("coarse") or {}
+    margin = record.get("runner_up_margin_fraction")
+    if margin is None or record.get("value") is None:
+        return ""
+    return (
+        f" On the intrinsic peak metric the optimum is at s = {record['value']:.2f}, "
+        f"ahead of s = {record['runner_up']:.2f} by {margin * 100:.1f}%. Treat that "
+        "against the residual grid drift of the sweep before reading it as a "
+        "located maximum."
+    )
+
+
+def _status_table(
+    *,
+    entries: Sequence[Mapping[str, Any]],
+    criteria: Sequence[tuple[str, bool | None, str]],
+    results: Sequence[sweeps.CaseResult],
+    stage3b: Mapping[str, Any],
+    smoothness: Mapping[str, Any],
+    optima: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Classify each claim on the six-level reproduction scale.
+
+    Deliberately separate claims stay separate. The reference structure's
+    resonance is reproduced on its own evidence and is not downgraded because a
+    different question -- which asymmetry is optimal -- is unresolved.
+    """
+
+    def entry(name: str) -> Mapping[str, Any] | None:
+        return next((e for e in entries if e["quantity"] == name), None)
+
+    def verdict(name: str, *, provisional_ok: bool = True) -> str:
+        item = entry(name)
+        if item is None or not item["evaluated"]:
+            return UNRESOLVED
+        # A value sitting exactly on its tolerance has not failed and has not
+        # passed; calling it either would overstate what the sweep resolved.
+        if item.get("at_tolerance_boundary"):
+            return PROVISIONAL
+        if item["within_tolerance"] is False:
+            return FAILED
+        if item.get("provisional") and provisional_ok:
+            return PROVISIONAL
+        return REPRODUCED
+
+    claims: list[dict[str, Any]] = [
+        {
+            "claim": "transition energies (E1-HH1, E2-HH2)",
+            "status": (
+                REPRODUCED
+                if verdict("ground_interband_transition") == REPRODUCED
+                and verdict("excited_interband_transition") == REPRODUCED
+                else FAILED
+                if FAILED
+                in (
+                    verdict("ground_interband_transition"),
+                    verdict("excited_interband_transition"),
+                )
+                else UNRESOLVED
+            ),
+            "detail": "computed for the designed layers with no material parameter "
+            "adjusted, and inside the stated tolerance",
+        },
+        {
+            "claim": "resonance wavelength near 1520 nm, reference structure",
+            "status": verdict("focused_scan_peak_wavelength"),
+            "detail": "an independent statement about the reference structure. It "
+            "stands on its own evidence and is NOT downgraded because the "
+            "asymmetry optimum is unresolved -- they are different claims about "
+            "different things",
+        },
+        {
+            "claim": "tunnelling-barrier optimum near 1 nm",
+            "status": verdict("barrier_optimum_peak_metric"),
+            "detail": "the optimum falls at the same barrier under both metrics, so "
+            "it does not depend on the fixed-wavelength artifact",
+        },
+        {
+            "claim": "graded-to-abrupt chi(2) ratio",
+            "status": verdict("graded_to_abrupt_chi2_ratio"),
+            "detail": "a ratio, so the unknown absolute scale cancels",
+        },
+        {
+            "claim": "chi(2) origin independence",
+            "status": (
+                REPRODUCED
+                if _all_true(results, "chi2_origin_independent")
+                else FAILED
+                if _all_true(results, "chi2_origin_independent") is False
+                else UNRESOLVED
+            ),
+            "detail": "passes once the near-zero case is judged on its absolute "
+            "residual instead of a relative one. The symmetric structure is still "
+            "checked; it is checked against the tolerance that means something "
+            "there",
+        },
+        {
+            "claim": "asymmetry optimum near s = 0.42",
+            "status": PROVISIONAL
+            if verdict("asymmetry_optimum_peak_metric") in (REPRODUCED, PROVISIONAL)
+            else verdict("asymmetry_optimum_peak_metric"),
+            "detail": "NOT reproduced. Pending physical-state tracking across the "
+            "refined sweep."
+            + _optimum_margin_note(optima),
+        },
+        {
+            "claim": "smoothness of chi(2) versus asymmetry",
+            "status": (
+                UNRESOLVED
+                if smoothness.get("factor") is None
+                else REPRODUCED
+                if smoothness["factor"] <= 2.0
+                else FAILED
+            ),
+            "detail": (
+                "no adjacent-point data yet"
+                if smoothness.get("factor") is None
+                else f"largest adjacent-point step is a factor of "
+                f"{smoothness['factor']:.2f} under raw energy-index labelling. "
+                "Under raw indexing this is a FAIL; whether it survives physical-"
+                "state tracking is what the refined sweep decides"
+            ),
+        },
+        {
+            "claim": "state-count convergence of Eq. 2",
+            "status": (
+                REPRODUCED
+                if _state_count_convergence_meaningful(results) is True
+                else UNRESOLVED
+            ),
+            "detail": "unverified until the term count is shown to change with the "
+            "swept parameter. Agreement between runs whose sums are identical is "
+            "not evidence of convergence",
+        },
+        {
+            "claim": "physical-state tracking across the refined sweep",
+            "status": (
+                REPRODUCED
+                if stage3b.get("available") and not stage3b.get("ambiguous_assignments")
+                else PROVISIONAL
+                if stage3b.get("available")
+                else UNRESOLVED
+            ),
+            "detail": (
+                stage3b.get("reason")
+                or f"{stage3b.get('points', 0)} refined points tracked; "
+                f"{stage3b.get('ambiguous_assignments', 0)} ambiguous assignment(s)"
+                + (
+                    f" at {', '.join(stage3b.get('ambiguous_at', []))}"
+                    if stage3b.get("ambiguous_at")
+                    else ""
+                )
+            ),
+        },
+        {
+            "claim": "run completed mechanically",
+            "status": MECHANICAL,
+            "detail": f"{sum(1 for r in results if r.solver_success)} of "
+            f"{len(results)} cases completed. Says nothing about any number",
+        },
     ]
+    counts = {status: 0 for status in STATUS_ORDER}
+    for claim in claims:
+        counts[claim["status"]] = counts.get(claim["status"], 0) + 1
+    return {
+        "vocabulary": dict(STATUS_MEANING),
+        "claims": claims,
+        "counts": counts,
+        "reproduced_claims": [c["claim"] for c in claims if c["status"] == REPRODUCED],
+        "unresolved_claims": [
+            c["claim"] for c in claims if c["status"] in (UNRESOLVED, PROVISIONAL, FAILED)
+        ],
+    }
+
+
+#: The two ways a sweep point's chi(2) can be scored, and what each one means.
+#:
+#: They are NOT interchangeable. `peak_chi2_magnitude` is the largest |chi(2)|
+#: anywhere in the scanned band, so it measures the structure's intrinsic
+#: nonlinear strength regardless of where its resonance sits. `chi2_at_
+#: reference_wavelength` is the response at one fixed wavelength, which is what
+#: a device at that wavelength would see -- and which, across a sweep whose
+#: resonance moves by ~100 nm against a 5 meV linewidth, also ranks structures
+#: by how close their resonance happens to fall to that wavelength.
+METRICS: Mapping[str, Mapping[str, str]] = {
+    "peak_chi2_magnitude": {
+        "observable": "chi2_peak_magnitude",
+        "label": "peak |chi(2)| over the focused scan",
+        "meaning": "intrinsic, detuning-independent nonlinear magnitude",
+    },
+    "chi2_at_reference_wavelength": {
+        "observable": "chi2_relative_at_reference",
+        "label": "|chi(2)| at the reference wavelength",
+        "meaning": "application-specific response at one fixed wavelength; "
+        "confounded with resonance detuning across a sweep",
+    },
+}
+
+#: Which metric the paper's optimum claims are judged against. The paper's
+#: statement is about which structure is most nonlinear, not about which one
+#: happens to be resonant at 1550 nm.
+PRIMARY_METRIC = "peak_chi2_magnitude"
+
+
+def _optimum(
+    results: Sequence[sweeps.CaseResult], parameter: str, observable: str
+) -> dict[str, Any]:
+    """Where a swept parameter maximises one observable, and by how much.
+
+    The runner-up margin is part of the answer. An optimum that beats its
+    neighbour by 2% on a curve whose points scatter by more than that is a
+    ranking, not a maximum, and the report has to be able to say so.
+    """
+
+    points = sorted(
+        (
+            (float(r.observables[parameter]), float(r.observables[observable]), r.spec.case_id)
+            for r in results
+            if r.observables.get(parameter) is not None
+            and r.observables.get(observable) is not None
+        ),
+        key=lambda item: item[1],
+        reverse=True,
+    )
     if not points:
-        return None
-    return max(points, key=lambda item: item[1])[0]
+        return {"value": None, "magnitude": None, "runner_up": None,
+                "runner_up_margin_fraction": None, "points": 0, "case_id": None}
+    best_x, best_y, best_case = points[0]
+    runner_up = points[1] if len(points) > 1 else None
+    margin = None
+    if runner_up is not None and best_y != 0:
+        margin = (best_y - runner_up[1]) / abs(best_y)
+    return {
+        "value": best_x,
+        "magnitude": best_y,
+        "case_id": best_case,
+        "runner_up": None if runner_up is None else runner_up[0],
+        "runner_up_magnitude": None if runner_up is None else runner_up[1],
+        "runner_up_margin_fraction": margin,
+        "points": len(points),
+    }
+
+
+def _monotone_break(
+    results: Sequence[sweeps.CaseResult],
+    parameter: str,
+    observable: str,
+    *,
+    relative_floor: float = 1.0e-6,
+) -> dict[str, Any]:
+    """Largest point-to-point jump in a sweep, as a factor.
+
+    A smooth chi(2)(s) has neighbouring points within a few percent of one
+    another. The 2026-07-31 run had an 8.5x step between adjacent asymmetries,
+    and nothing in the report registered it because every individual comparison
+    was inside its tolerance. This measures it directly.
+
+    Points that are numerically zero are skipped, and the count of skipped pairs
+    is reported. The symmetric limit is a parity zero -- required physics, not a
+    discontinuity -- and a ratio taken against it is ~1e11, which would swamp
+    the real 8.5x step this is meant to find. Skipping is recorded rather than
+    silent, because "we did not measure the step next to s = 0" is a different
+    statement from "there was no step there".
+    """
+
+    points = sorted(
+        (
+            (float(r.observables[parameter]), float(r.observables[observable]), r.spec.case_id)
+            for r in results
+            if r.observables.get(parameter) is not None
+            and r.observables.get(observable) is not None
+        ),
+        key=lambda item: item[0],
+    )
+    magnitudes = [abs(y) for _, y, _ in points]
+    floor = (max(magnitudes) * float(relative_floor)) if magnitudes else 0.0
+    worst: dict[str, Any] = {"factor": None, "between": None, "case_ids": None}
+    skipped: list[str] = []
+    for (x0, y0, c0), (x1, y1, c1) in zip(points, points[1:]):
+        low, high = sorted((abs(y0), abs(y1)))
+        if low <= floor:
+            skipped.append(f"{c0}->{c1}")
+            continue
+        factor = high / low
+        if worst["factor"] is None or factor > worst["factor"]:
+            worst = {"factor": factor, "between": [x0, x1], "case_ids": [c0, c1]}
+    worst["points"] = len(points)
+    worst["skipped_pairs"] = skipped
+    worst["numerically_zero_floor"] = floor
+    return worst
 
 
 def _within(entries: Sequence[Mapping[str, Any]], name: str) -> bool | None:
@@ -448,6 +970,15 @@ def _within(entries: Sequence[Mapping[str, Any]], name: str) -> bool | None:
         if entry["quantity"] == name:
             return entry["within_tolerance"]
     return None
+
+
+def _at_boundary(entries: Sequence[Mapping[str, Any]], name: str) -> bool:
+    """Is this comparison sitting exactly on its tolerance?"""
+
+    for entry in entries:
+        if entry["quantity"] == name:
+            return bool(entry.get("at_tolerance_boundary"))
+    return False
 
 
 def _all_within(entries: Sequence[Mapping[str, Any]], names: Sequence[str]) -> bool | None:
@@ -556,6 +1087,133 @@ def write_assumptions(parent: Path, targets: Mapping[str, Any], cfg: Mapping[str
     )
 
 
+def _tracking_plots(
+    plots_dir: Path,
+    results: Sequence[sweeps.CaseResult],
+    stage3b: Mapping[str, Any],
+    series: Any,
+) -> None:
+    """Stage 3b figures: the same sweep seen two ways.
+
+    Every figure is emitted even with nothing to draw, as a labelled
+    placeholder, so a missing file always means a bug rather than "this machine
+    has no licence".
+    """
+
+    rows = list(stage3b.get("rows") or [])
+    comparison_rows = list(stage3b.get("comparison") or [])
+
+    def branch(band: str, key: str) -> dict[str, tuple[list[float], list[float]]]:
+        out: dict[str, tuple[list[float], list[float]]] = {}
+        for row in rows:
+            if row.get("band") != band:
+                continue
+            label = row.get(key)
+            if label is None:
+                continue
+            name = f"{band} {key.replace('_', ' ')} {label}"
+            xs, ys = out.setdefault(name, ([], []))
+            xs.append(float(row["sweep_value"]))
+            ys.append(float(row["energy_eV"]))
+        return {
+            name: tuple(map(list, zip(*sorted(zip(xs, ys))))) if xs else ([], [])
+            for name, (xs, ys) in out.items()
+        }
+
+    plotting.line_plot(
+        plots_dir / "refined_raw_index_branches.png",
+        title="Refined sweep: energies labelled by raw solver index",
+        xlabel="Asymmetry s",
+        ylabel="Energy (eV)",
+        series={**branch("electron", "raw_index"), **branch("heavy_hole", "raw_index")},
+    )
+    plotting.line_plot(
+        plots_dir / "refined_tracked_branches.png",
+        title="Refined sweep: energies labelled by tracked physical state",
+        xlabel="Asymmetry s",
+        ylabel="Energy (eV)",
+        series={
+            **branch("electron", "tracked_label"),
+            **branch("heavy_hole", "tracked_label"),
+        },
+    )
+
+    def by_label(band: str, field: str) -> dict[str, tuple[list[float], list[float]]]:
+        out: dict[str, tuple[list[float], list[float]]] = {}
+        for row in rows:
+            if row.get("band") != band or row.get(field) is None:
+                continue
+            name = f"{band} state {row['tracked_label']}"
+            xs, ys = out.setdefault(name, ([], []))
+            xs.append(float(row["sweep_value"]))
+            ys.append(float(row[field]))
+        return {
+            name: tuple(map(list, zip(*sorted(zip(xs, ys))))) if xs else ([], [])
+            for name, (xs, ys) in out.items()
+        }
+
+    plotting.line_plot(
+        plots_dir / "refined_localization.png",
+        title="Tracked-state localisation across the refined sweep",
+        xlabel="Asymmetry s",
+        ylabel="Probability in the thick well",
+        series=by_label("electron", "probability_left_well"),
+    )
+    plotting.line_plot(
+        plots_dir / "refined_assignment_overlap.png",
+        title=(
+            "Adjacent-point assignment overlap — a dip is a crossing the tracker "
+            "found hard"
+        ),
+        xlabel="Asymmetry s",
+        ylabel="|<psi_previous|psi_current>|",
+        series={
+            **by_label("electron", "overlap_with_previous"),
+            **by_label("heavy_hole", "overlap_with_previous"),
+        },
+    )
+    plotting.line_plot(
+        plots_dir / "refined_boundary_probability.png",
+        title="Boundary probability of the tracked states",
+        xlabel="Asymmetry s",
+        ylabel="Probability within 5% of each domain edge",
+        series={
+            **by_label("electron", "boundary_probability"),
+            **by_label("heavy_hole", "boundary_probability"),
+        },
+        logy=True,
+    )
+
+    def compare(key: str) -> tuple[list[float], list[float]]:
+        points = sorted(
+            (float(row["asymmetry"]), float(row[key]))
+            for row in comparison_rows
+            if row.get(key) is not None
+        )
+        return [p[0] for p in points], [p[1] for p in points]
+
+    plotting.line_plot(
+        plots_dir / "refined_chi2_raw_vs_tracked.png",
+        title="Peak chi(2): raw energy-index labelling versus tracked physical states",
+        xlabel="Asymmetry s",
+        ylabel="Peak |chi(2)| (relative, arbitrary units)",
+        series={
+            "raw solver index": compare("chi2_peak_magnitude_raw_index"),
+            "tracked physical state": compare("chi2_peak_magnitude_tracked"),
+        },
+    )
+
+
+def _fmt(value: Any) -> str:
+    """Table cell: em dash for missing, 6 significant figures for numbers."""
+
+    if value is None:
+        return "—"
+    if isinstance(value, float):
+        return f"{value:.6g}"
+    return str(value)
+
+
 def write_report(
     parent: Path,
     cfg: Mapping[str, Any],
@@ -564,6 +1222,7 @@ def write_report(
     stage5: Mapping[str, Any],
     stage6: Mapping[str, Any],
     manifest: Mapping[str, Any],
+    stage3b: Mapping[str, Any] | None = None,
 ) -> None:
     """paper_comparison_report.md."""
 
@@ -587,6 +1246,92 @@ def write_report(
         "conventions, and those set the scale. What *is* reproducible, and what ",
         "this demo actually tests, is the electronic structure, the resonance ",
         "positions, and the asymmetry / barrier / interface trends.",
+        "",
+        "## Reproduction status",
+        "",
+        "Each claim is graded on one scale. Being inside a tolerance is not the "
+        "same as being reproduced, and the two are not merged here.",
+        "",
+        "| claim | status | detail |",
+        "|---|---|---|",
+    ]
+    status = comparison.get("status") or {}
+    for claim in status.get("claims", []):
+        lines.append(
+            f"| {claim['claim']} | `{claim['status']}` | {claim['detail']} |"
+        )
+    lines += ["", "Status vocabulary:", ""]
+    for name in STATUS_ORDER:
+        lines.append(f"- `{name}` — {STATUS_MEANING[name]}")
+    lines += [
+        "",
+        "## The two chi(2) metrics",
+        "",
+        "Sweep optima are reported under both, and the two are not "
+        "interchangeable.",
+        "",
+        "| metric | what it measures |",
+        "|---|---|",
+    ]
+    for name, spec in (comparison.get("metrics") or METRICS).items():
+        primary = " **(primary)**" if name == comparison.get("primary_metric") else ""
+        lines.append(f"| `{name}`{primary} | {spec['meaning']} |")
+    optima = comparison.get("optima") or {}
+    if optima:
+        lines += [
+            "",
+            "| sweep | metric | optimum | runner-up | margin | paper | tolerance | verdict |",
+            "|---|---|---:|---:|---:|---:|---:|---|",
+        ]
+        entry_by_name = {e["quantity"]: e for e in comparison["entries"]}
+        for sweep_name, quantity_by_metric in (
+            (
+                "asymmetry",
+                {
+                    "peak_chi2_magnitude": "asymmetry_optimum_peak_metric",
+                    "chi2_at_reference_wavelength": (
+                        "asymmetry_optimum_at_reference_wavelength"
+                    ),
+                },
+            ),
+            (
+                "barrier",
+                {
+                    "peak_chi2_magnitude": "barrier_optimum_peak_metric",
+                    "chi2_at_reference_wavelength": (
+                        "barrier_optimum_at_reference_wavelength"
+                    ),
+                },
+            ),
+        ):
+            for metric_name, quantity in quantity_by_metric.items():
+                item = entry_by_name.get(quantity)
+                record = (optima.get(sweep_name) or {}).get(metric_name) or {}
+                if sweep_name == "asymmetry":
+                    record = record.get("refined") or record.get("coarse") or {}
+                if item is None:
+                    continue
+                within = item["within_tolerance"]
+                verdict = (
+                    "—"
+                    if within is None
+                    else ("PASS" if within else "**FAIL**")
+                )
+                if item.get("provisional") and within:
+                    verdict = "PASS (provisional)"
+                if item.get("at_tolerance_boundary"):
+                    verdict = "**on the boundary**"
+                margin = record.get("runner_up_margin_fraction")
+                lines.append(
+                    f"| {sweep_name} | `{metric_name}` "
+                    f"| {_fmt(item['our_value'])} "
+                    f"| {_fmt(record.get('runner_up'))} "
+                    f"| {'—' if margin is None else f'{margin * 100:.1f}%'} "
+                    f"| {_fmt(item['paper_value'])} "
+                    f"| {_fmt(item.get('tolerance'))} "
+                    f"| {verdict} |"
+                )
+    lines += [
         "",
         "## Classification summary",
         "",
@@ -624,6 +1369,10 @@ def write_report(
 
         within = entry["within_tolerance"]
         verdict = "—" if within is None else ("yes" if within else "**no**")
+        if entry.get("at_tolerance_boundary"):
+            verdict = "**on the boundary**"
+        if entry.get("provisional"):
+            verdict += " *(provisional)*"
         lines.append(
             f"| {entry['quantity']} | {fmt(entry['paper_value'])} | "
             f"{fmt(entry['our_value'])} | {entry['units'] or '—'} | "
@@ -633,6 +1382,8 @@ def write_report(
     lines += ["", "### Notes on each comparison", ""]
     for entry in comparison["entries"]:
         lines.append(f"- **{entry['quantity']}** — {entry['note']}")
+        if entry.get("provisional") and entry.get("provisional_reason"):
+            lines.append(f"  - *Provisional:* {entry['provisional_reason']}")
 
     lines += ["", "## chi(2) modes (Stage 5)", ""]
     for name, record in ((stage5 or {}).get("modes") or {}).items():
@@ -666,6 +1417,42 @@ def write_report(
         )
         lines.append("")
 
+    tracking = stage3b or {}
+    lines += ["## Physical-state tracking (Stage 3b)", ""]
+    if not tracking.get("available"):
+        lines += [
+            f"- Not available: {tracking.get('reason', 'not run')}",
+            "- Until this runs, the asymmetry optimum stays `provisionally_consistent`: "
+            "the states being compared across the sweep have not been shown to be the "
+            "same states.",
+            "",
+        ]
+    else:
+        lines += [
+            f"- Refined sweep points tracked: {tracking.get('points')}",
+            f"- Assignment backend: "
+            f"`{(tracking.get('bands') or {}).get('electron', {}).get('assignment_backend', 'unknown')}`",
+            f"- Ambiguous assignments: {tracking.get('ambiguous_assignments')}"
+            + (
+                f" (at {', '.join(tracking.get('ambiguous_at', []))})"
+                if tracking.get("ambiguous_at")
+                else ""
+            ),
+            f"- Raw index and tracked label disagree somewhere: "
+            f"{bool(tracking.get('reordering_detected'))}",
+            f"- Cases where tracking changes chi(2): "
+            + (
+                ", ".join(tracking.get("tracking_changes_chi2_at", []))
+                or "none — the two labellings give the same chi(2) everywhere"
+            ),
+            "",
+            "Where the two labellings agree, the discontinuity is not a labelling "
+            "artifact and needs a different explanation. Where they disagree, the "
+            "raw-index curve was comparing different physical states at different "
+            "sweep points and its optimum meant nothing.",
+            "",
+        ]
+
     lines += [
         "## What would be needed for an independent absolute reproduction",
         "",
@@ -692,52 +1479,131 @@ def write_plots(
     stage5: Mapping[str, Any],
     stage6: Mapping[str, Any],
     comparison: Mapping[str, Any],
+    stage3b: Mapping[str, Any] | None = None,
 ) -> None:
     """The figure set required by the demo's README."""
 
     plots_dir = parent / "plots"
     plots_dir.mkdir(parents=True, exist_ok=True)
 
-    def series(stage: str, parameter: str, observable: str) -> tuple[list[float], list[float]]:
-        xs: list[float] = []
-        ys: list[float] = []
+    def series(
+        stage: str | Sequence[str], parameter: str, observable: str
+    ) -> tuple[list[float], list[float]]:
+        stages = (stage,) if isinstance(stage, str) else tuple(stage)
+        points: list[tuple[float, float]] = []
         for r in results:
-            if r.spec.metadata.get("stage") != stage:
+            if r.spec.metadata.get("stage") not in stages:
                 continue
             x = r.observables.get(parameter)
             y = r.observables.get(observable)
             if x is None or y is None:
                 continue
-            xs.append(float(x))
-            ys.append(float(y))
-        return xs, ys
+            points.append((float(x), float(y)))
+        points.sort()
+        return [p[0] for p in points], [p[1] for p in points]
+
+    # --- asymmetry: both metrics, plus where the resonance actually sits ------
+    # Plotted together and unsmoothed. The discontinuity is the finding, not a
+    # blemish, and the resonance curve is what explains why the two metrics
+    # disagree about the optimum.
+    both = ASYMMETRY_STAGES
+    peak_series = series(both, "asymmetry", "chi2_peak_magnitude")
+    reference_series = series(both, "asymmetry", "chi2_relative_at_reference")
+    optima = (comparison.get("optima") or {}).get("asymmetry") or {}
+
+    def _optimum_marker(metric_name: str) -> tuple[list[float], list[float]]:
+        record = optima.get(metric_name) or {}
+        record = record.get("refined") or record.get("coarse") or {}
+        if record.get("value") is None or record.get("magnitude") is None:
+            return [], []
+        return [float(record["value"])], [float(record["magnitude"])]
 
     plotting.line_plot(
         plots_dir / "chi2_vs_asymmetry.png",
-        title="Relative chi(2) versus structural asymmetry (paper optimum s = 0.42)",
+        title=(
+            "chi(2) versus asymmetry: intrinsic peak vs fixed-wavelength "
+            "(paper target s = 0.42)"
+        ),
         xlabel="Asymmetry s = (d1 - d2)/(d1 + d2)",
         ylabel="|chi(2)| (relative, arbitrary units)",
-        series={"this work": series("stage3", "asymmetry", "chi2_relative_at_reference")},
+        series={
+            "peak |chi(2)| (primary, detuning-independent)": peak_series,
+            "|chi(2)| at the reference wavelength (secondary)": reference_series,
+            "paper target s = 0.42": (
+                [0.42, 0.42],
+                [0.0, max(peak_series[1] or [1.0])],
+            ),
+            "optimum, peak metric": _optimum_marker("peak_chi2_magnitude"),
+            "optimum, reference wavelength": _optimum_marker(
+                "chi2_at_reference_wavelength"
+            ),
+        },
         axhline=0.0,
     )
+    plotting.line_plot(
+        plots_dir / "chi2_metrics_vs_asymmetry.png",
+        title="The two metrics normalised to their own maxima",
+        xlabel="Asymmetry s",
+        ylabel="|chi(2)| / max|chi(2)| for that metric",
+        series={
+            name: (
+                xs,
+                [y / max(ys) for y in ys] if ys and max(ys) > 0 else ys,
+            )
+            for name, (xs, ys) in (
+                ("peak |chi(2)| (primary)", peak_series),
+                ("at the reference wavelength (secondary)", reference_series),
+            )
+        },
+        axhline=0.0,
+    )
+    plotting.line_plot(
+        plots_dir / "resonance_vs_asymmetry.png",
+        title=(
+            "Two-photon resonance versus asymmetry — why a fixed-wavelength "
+            "metric is not a ranking of nonlinear strength"
+        ),
+        xlabel="Asymmetry s",
+        ylabel="Peak |chi(2)| wavelength (nm)",
+        series={
+            "resonance of each structure": series(
+                both, "asymmetry", "chi2_peak_wavelength_nm"
+            ),
+            "reference wavelength": (
+                [x for x in (peak_series[0] or [0.0, 1.0])],
+                [
+                    float((cfg.get("metric") or {}).get("reference_wavelength_nm", 1550.0))
+                    for _ in (peak_series[0] or [0.0, 1.0])
+                ],
+            ),
+        },
+    )
+    _tracking_plots(plots_dir, results, stage3b or {}, series)
     plotting.line_plot(
         plots_dir / "localization_vs_asymmetry.png",
         title="Electron localisation versus asymmetry",
         xlabel="Asymmetry s",
         ylabel="Integrated probability",
         series={
-            "e1 in thick well": series("stage3", "asymmetry", "electron1_thick_well_probability"),
-            "e1 in thin well": series("stage3", "asymmetry", "electron1_thin_well_probability"),
-            "e2 in thick well": series("stage3", "asymmetry", "electron2_thick_well_probability"),
-            "e2 in thin well": series("stage3", "asymmetry", "electron2_thin_well_probability"),
+            "e1 in thick well": series(both, "asymmetry", "electron1_thick_well_probability"),
+            "e1 in thin well": series(both, "asymmetry", "electron1_thin_well_probability"),
+            "e2 in thick well": series(both, "asymmetry", "electron2_thick_well_probability"),
+            "e2 in thin well": series(both, "asymmetry", "electron2_thin_well_probability"),
         },
     )
     plotting.line_plot(
         plots_dir / "chi2_vs_barrier.png",
-        title="Relative chi(2) versus tunnelling-barrier thickness (paper optimum ~1 nm)",
+        title="chi(2) versus tunnelling-barrier thickness (paper optimum ~1 nm)",
         xlabel="Tunnelling barrier (nm)",
         ylabel="|chi(2)| (relative, arbitrary units)",
-        series={"this work": series("stage4", "tunnel_barrier_nm", "chi2_relative_at_reference")},
+        series={
+            "peak |chi(2)| (primary)": series(
+                "stage4", "tunnel_barrier_nm", "chi2_peak_magnitude"
+            ),
+            "at the reference wavelength (secondary)": series(
+                "stage4", "tunnel_barrier_nm", "chi2_relative_at_reference"
+            ),
+        },
     )
     for name, filename, title in (
         ("broad", "chi2_broad_wavelength.png", "Relative chi(2) over 400-1800 nm"),

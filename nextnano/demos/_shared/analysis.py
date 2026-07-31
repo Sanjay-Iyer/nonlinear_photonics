@@ -134,6 +134,30 @@ def boundary_probability(
     return float(left + right)
 
 
+def boundary_probability_split(
+    x: np.ndarray, density: np.ndarray, *, edge_fraction: float = 0.05
+) -> dict[str, float]:
+    """Boundary probability resolved into its two ends.
+
+    The total alone hides which way a state is leaking. A state spilling out of
+    the left contact and one spilling symmetrically out of both report the same
+    number, and they are different defects: the first usually means the domain
+    is too short on one side, the second that the state is simply not bound.
+    """
+
+    grid = _check_grid(x)
+    if not 0 < edge_fraction < 0.5:
+        raise AnalysisError("edge_fraction must lie in (0, 0.5).")
+    span = float(grid[-1] - grid[0])
+    left = region_probability(grid, density, grid[0], grid[0] + edge_fraction * span)
+    right = region_probability(grid, density, grid[-1] - edge_fraction * span, grid[-1])
+    return {
+        "left_boundary_probability": float(left),
+        "right_boundary_probability": float(right),
+        "boundary_probability": float(left + right),
+    }
+
+
 def overlap(x: np.ndarray, psi_a: np.ndarray, psi_b: np.ndarray) -> float:
     """<psi_a|psi_b> for two real envelopes sampled on the same grid."""
 
@@ -375,6 +399,26 @@ def _assign(cost: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         np.asarray([pair[0] for pair in pairs]),
         np.asarray([pair[1] for pair in pairs]),
     )
+
+
+def solve_assignment(cost: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """One-to-one assignment minimising ``cost``; Hungarian where available.
+
+    Public because more than one demo needs to re-solve an assignment with its
+    own cost matrix. :func:`assignment_backend` says which algorithm ran, and
+    that belongs in the manifest: scipy is present in the home ``NMIP``
+    environment but is not guaranteed in the licensed ``llm`` one, and the
+    greedy fallback can differ from the optimum on a genuinely ambiguous
+    matrix -- exactly the case this repository cares about.
+    """
+
+    return _assign(cost)
+
+
+def assignment_backend() -> str:
+    """``scipy_hungarian`` or ``greedy_fallback``."""
+
+    return "scipy_hungarian" if _linear_sum_assignment is not None else "greedy_fallback"
 
 
 def track_states(

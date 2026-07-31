@@ -63,6 +63,21 @@ commands need no flags. All generated inputs and outputs remain in
 `nextnano/results/demo_runs` (or the explicitly configured results root).
 Nothing is copied into or written beneath the portable package.
 
+`nextnano/results/demo_runs/**` is gitignored, so results come home in a
+bundle rather than a commit:
+
+```powershell
+python .\nextnano\scripts\bundle_results.py --include-plots
+```
+
+Demo 11 additionally has a solver-free audit that runs against an existing run
+directory and reports whether its state-count parameters reached the
+calculation at all:
+
+```powershell
+python .\nextnano\scripts\audit_state_counts.py
+```
+
 ## Syntax provenance
 
 Geometry, materials, grids, classical band requests, and the one-band quantum

@@ -202,6 +202,11 @@ LEGACY_SCHEMA = DemoSchema(
     integer=frozenset({"number_of_states"}),
 )
 
+#: What a demo may do with a state that is used by an analysis but fails the
+#: bound-state criterion. Kept here so the vocabulary is validated at load time
+#: rather than discovered as a silent no-op halfway through a licensed run.
+QUASI_BOUND_POLICIES: frozenset[str] = frozenset({"warn", "exclude", "fail_case"})
+
 _TRACKING_KEYS = frozenset(
     {
         "state_tracking_method",
@@ -607,7 +612,8 @@ DEMO11_SCHEMA = DemoSchema(
     ),
     sweeps=frozenset(),
     outputs=EXTENDED_OUTPUTS,
-    validation=EXTENDED_VALIDATION | frozenset({"transition_energy_tolerance_meV"}),
+    validation=EXTENDED_VALIDATION
+    | frozenset({"transition_energy_tolerance_meV", "quasi_bound_state_policy"}),
     positive=frozenset(
         {
             "thick_well_nm",
@@ -683,6 +689,13 @@ def validate_config(cfg: Mapping[str, Any], schema: DemoSchema, label: str) -> d
             value = _finite(data["validation"][name], f"{label}: validation.{name}")
             if not 0 <= value <= 1:
                 raise SchemaError(f"{label}: validation.{name} must lie in [0, 1].")
+    if "quasi_bound_state_policy" in data["validation"]:
+        policy = str(data["validation"]["quasi_bound_state_policy"])
+        if policy not in QUASI_BOUND_POLICIES:
+            raise SchemaError(
+                f"{label}: validation.quasi_bound_state_policy must be one of "
+                f"{', '.join(sorted(QUASI_BOUND_POLICIES))}, got {policy!r}."
+            )
     for name in (
         "normalization_tolerance",
         "absolute_energy_tolerance_meV",

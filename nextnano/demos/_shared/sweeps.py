@@ -264,26 +264,41 @@ def copy_config(config: Mapping[str, Any]) -> dict[str, Any]:
 _deep_copy = copy_config
 
 
-def apply_override(config: Mapping[str, Any], name: str, value: Any) -> dict[str, Any]:
-    """Return a copy of ``config`` with one scientific/numerical value replaced.
+#: Configuration sections a sweep may override a value in. ``metric`` is here
+#: because post-processing conventions -- how many states an equation sums over,
+#: what broadening it uses -- are swept in exactly the same way as geometry, and
+#: they belong in YAML rather than in a hardcoded keyword argument.
+OVERRIDABLE_SECTIONS: tuple[str, ...] = ("scientific", "numerical", "metric")
 
-    The parameter must already exist in exactly one of the two sections, so a
-    sweep can never silently introduce a key the schema would have rejected.
+
+def apply_override(config: Mapping[str, Any], name: str, value: Any) -> dict[str, Any]:
+    """Return a copy of ``config`` with one swept value replaced.
+
+    The parameter must already exist in exactly one of
+    :data:`OVERRIDABLE_SECTIONS`, so a sweep can never silently introduce a key
+    the schema would have rejected, and can never quietly write to the wrong
+    section when two of them happen to share a name.
     """
 
     copied = _deep_copy(config)
-    in_scientific = name in copied.get("scientific", {})
-    in_numerical = name in copied.get("numerical", {})
-    if in_scientific and in_numerical:
-        raise DemoError(f"parameter {name!r} is ambiguous: it is in both sections.")
-    if in_scientific:
-        copied["scientific"][name] = value
-    elif in_numerical:
-        copied["numerical"][name] = value
-    else:
+    present = [
+        section
+        for section in OVERRIDABLE_SECTIONS
+        if name in (copied.get(section) or {})
+    ]
+    if len(present) > 1:
         raise DemoError(
-            f"cannot sweep {name!r}: it is not declared under scientific or numerical."
+            f"parameter {name!r} is ambiguous: it appears in "
+            + " and ".join(present)
+            + "."
         )
+    if not present:
+        raise DemoError(
+            f"cannot sweep {name!r}: it is not declared under "
+            + ", ".join(OVERRIDABLE_SECTIONS)
+            + "."
+        )
+    copied[present[0]][name] = value
     return copied
 
 

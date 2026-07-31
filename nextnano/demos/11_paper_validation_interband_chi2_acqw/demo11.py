@@ -44,9 +44,15 @@ import plots as plotting
 import quantum1d
 import report11
 import sweeps
+import tracking11
 from demo_workflow import DemoError, write_csv, write_json_atomically
 
 PAPER = "arXiv:2602.23246v1"
+
+#: Stages whose cases vary the structural asymmetry. Stage 3 is the original
+#: coarse sweep, kept for context; stage 3b resolves the discontinuity it found.
+#: Defined in report11 so the report and the demo cannot drift apart.
+ASYMMETRY_STAGES = report11.ASYMMETRY_STAGES
 
 PLOT_SET: tuple[tuple[str, str], ...] = (
     ("composition_profile.png", "Layer composition profile"),
@@ -63,6 +69,15 @@ PLOT_SET: tuple[tuple[str, str], ...] = (
     ("convergence_summary.png", "Numerical convergence"),
     ("sensitivity.png", "Sensitivity of chi(2) to the unknown inputs"),
     ("validation_scorecard.png", "Final validation scorecard"),
+    # --- refined sweep and state tracking (Stage 3b) ------------------------
+    ("chi2_metrics_vs_asymmetry.png", "Both chi(2) metrics versus asymmetry"),
+    ("resonance_vs_asymmetry.png", "Resonance wavelength versus asymmetry"),
+    ("refined_raw_index_branches.png", "Energy branches by raw solver index"),
+    ("refined_tracked_branches.png", "Energy branches by tracked physical state"),
+    ("refined_localization.png", "Tracked-state localisation versus asymmetry"),
+    ("refined_assignment_overlap.png", "Adjacent-point assignment overlap"),
+    ("refined_boundary_probability.png", "Boundary probability versus asymmetry"),
+    ("refined_chi2_raw_vs_tracked.png", "Peak chi(2): raw index versus tracked states"),
 )
 
 #: How each comparison is classified in the report (Stage 8).
@@ -269,6 +284,7 @@ def chi2_settings(cfg: Mapping[str, Any], *, mode: str | None = None) -> chi2mod
             metric.get("heavy_hole_inplane_mass_m0", 0.112)
         ),
         "spin_degeneracy": int(metric.get("spin_degeneracy", 2)),
+        "max_states_per_band": int(metric.get("max_states_per_band", 2)),
     }
     if requested == "absolute":
         kwargs["r_e_hh_nm"] = metric.get("r_e_hh_nm")
@@ -278,6 +294,136 @@ def chi2_settings(cfg: Mapping[str, Any], *, mode: str | None = None) -> chi2mod
         kwargs["calibration_wavelength_nm"] = metric.get("calibration_wavelength_nm")
         kwargs["calibration_source"] = str(metric.get("calibration_source", ""))
     return chi2mod.Chi2Settings(**kwargs)
+
+
+def _quasi_bound_records(
+    electron_states: Sequence[Any],
+    electron: chi2mod.BandStates,
+    heavy_hole: chi2mod.BandStates,
+    *,
+    regions: Mapping[str, tuple[float, float]],
+    states_in_sum: int,
+    edge_fraction: float,
+    maximum_boundary_probability: float,
+    policy: str,
+) -> dict[str, Any]:
+    """Per-state confinement diagnostics for both bands.
+
+    The bound-state test differs between the two bands, and pretending it does
+    not would be the more misleading choice. Electrons get the full test from
+    ``quantum1d.state_table``: energy below the enclosing barrier maximum *and*
+    enough probability inside the wells. Heavy holes are solved here without a
+    matching valence barrier-edge profile, so only the probability half is
+    available, and each hole record says so rather than implying it passed a
+    test that was never run.
+    """
+
+    if policy not in {"warn", "exclude", "fail_case"}:
+        raise DemoError(
+            f"unknown quasi_bound_state_policy {policy!r}; expected warn, exclude, "
+            "or fail_case."
+        )
+
+    bound_by_index = {state.index: state for state in electron_states}
+    records: list[dict[str, Any]] = []
+
+    for band, label in ((electron, "electron"), (heavy_hole, "heavy_hole")):
+        for index in range(band.count):
+            density = band.envelopes[:, index] ** 2
+            split = analysis.boundary_probability_split(
+                band.z_nm, density, edge_fraction=edge_fraction
+            )
+            region_probabilities = {
+                name: analysis.region_probability(band.z_nm, density, *bounds)
+                for name, bounds in regions.items()
+            }
+            in_sum = index < states_in_sum
+            exclusion: list[str] = []
+            if not in_sum:
+                exclusion.append(
+                    f"state {index + 1} is beyond max_states_per_band="
+                    f"{states_in_sum}, so Eq. 2 never sees it"
+                )
+            if label == "electron":
+                state = bound_by_index.get(index + 1)
+                passes = bool(state.bound) if state is not None else None
+                criterion = state.bound_reason if state is not None else "not analysed"
+            else:
+                confined = sum(
+                    value for name, value in region_probabilities.items() if "well" in name
+                )
+                passes = bool(confined >= 0.5)
+                criterion = (
+                    f"confined probability {confined:.4f}; no valence barrier-edge "
+                    "profile is parsed for this band, so the energy half of the "
+                    "bound-state test was not applied"
+                )
+            boundary_ok = split["boundary_probability"] <= maximum_boundary_probability
+            if not boundary_ok:
+                exclusion.append(
+                    f"boundary probability {split['boundary_probability']:.3e} > "
+                    f"{maximum_boundary_probability:.1e}"
+                )
+            if passes is False:
+                exclusion.append(f"fails the bound-state criterion: {criterion}")
+            fails = (passes is False) or (not boundary_ok)
+            included = in_sum and not (fails and policy == "exclude")
+            records.append(
+                {
+                    "band": label,
+                    "state": index + 1,
+                    "energy_eV": float(band.energies_eV[index]),
+                    **split,
+                    **{f"probability_{n}": v for n, v in region_probabilities.items()},
+                    "passes_bound_criterion": passes,
+                    "bound_criterion_detail": criterion,
+                    "boundary_probability_within_threshold": bool(boundary_ok),
+                    "within_chi2_state_window": bool(in_sum),
+                    "included_in_chi2": bool(included),
+                    "exclusion_reason": "; ".join(exclusion) or "",
+                }
+            )
+
+    failing = [r for r in records if (r["passes_bound_criterion"] is False)
+               or not r["boundary_probability_within_threshold"]]
+    failing_in_sum = [r for r in failing if r["within_chi2_state_window"]]
+    return {
+        "policy": policy,
+        "policy_effect": {
+            "warn": "states are retained in Eq. 2 and the case is flagged",
+            "exclude": "failing states are dropped from Eq. 2 and recorded",
+            "fail_case": "the case is marked invalid",
+        }[policy],
+        "maximum_boundary_probability": float(maximum_boundary_probability),
+        "boundary_edge_fraction": float(edge_fraction),
+        "max_states_per_band": int(states_in_sum),
+        "records": records,
+        "failing_count": len(failing),
+        "failing_in_sum_count": len(failing_in_sum),
+        "failing_in_sum_reasons": [
+            f"{r['band']} state {r['state']}: {r['exclusion_reason']}"
+            for r in failing_in_sum
+        ],
+        "maximum_left": max([r["left_boundary_probability"] for r in records] or [0.0]),
+        "maximum_right": max([r["right_boundary_probability"] for r in records] or [0.0]),
+    }
+
+
+def _excluded_band(
+    band: chi2mod.BandStates, records: Sequence[Mapping[str, Any]], label: str
+) -> chi2mod.BandStates:
+    """Drop states the ``exclude`` policy rejected, preserving order."""
+
+    keep = [
+        r["state"] - 1
+        for r in records
+        if r["band"] == label and r["within_chi2_state_window"] and r["included_in_chi2"]
+    ]
+    if len(keep) == band.count or not keep:
+        return band
+    return chi2mod.BandStates(
+        band.z_nm, band.energies_eV[keep], band.envelopes[:, keep], band.label
+    )
 
 
 def analyse_case(
@@ -406,23 +552,93 @@ def analyse_case(
         [state.boundary_probability for state in electron_states if state.bound] or [0.0]
     )
 
+    # --- state-resolved quasi-bound diagnostics ------------------------------
+    # A single maximum across all states cannot say WHICH state is leaking or
+    # which way, and those are different defects with different fixes. Every
+    # state used by Eq. 2 is recorded individually, including the ones that
+    # pass.
+    quasi_bound = _quasi_bound_records(
+        electron_states,
+        electron,
+        heavy_hole,
+        regions=regions,
+        states_in_sum=int(settings.max_states_per_band),
+        edge_fraction=float(analysis_cfg.get("boundary_edge_fraction", 0.05)),
+        maximum_boundary_probability=float(
+            validation_cfg.get("maximum_boundary_probability", 1e-3)
+        ),
+        policy=str(validation_cfg.get("quasi_bound_state_policy", "warn")),
+    )
+    observables["quasi_bound_policy"] = quasi_bound["policy"]
+    observables["states_failing_bound_criterion"] = quasi_bound["failing_count"]
+    observables["states_failing_bound_criterion_in_chi2_sum"] = quasi_bound[
+        "failing_in_sum_count"
+    ]
+    observables["maximum_left_boundary_probability"] = quasi_bound["maximum_left"]
+    observables["maximum_right_boundary_probability"] = quasi_bound["maximum_right"]
+    write_json_atomically(extracted / "quasi_bound_states.json", quasi_bound)
+    if quasi_bound["records"]:
+        write_csv(
+            extracted / "quasi_bound_states.csv",
+            {
+                key: np.asarray([row.get(key) for row in quasi_bound["records"]])
+                for key in quasi_bound["records"][0]
+            },
+        )
+    if quasi_bound["policy"] == "fail_case" and quasi_bound["failing_in_sum_count"]:
+        raise DemoError(
+            "quasi_bound_state_policy is 'fail_case' and "
+            f"{quasi_bound['failing_in_sum_count']} state(s) entering Eq. 2 fail the "
+            "bound-state criterion: "
+            + "; ".join(quasi_bound["failing_in_sum_reasons"])
+        )
+
     # --- Eq. 2 at the reference wavelength ----------------------------------
     reference_nm = float(metric_cfg.get("reference_wavelength_nm", 1550.0))
+    # A symmetric structure has chi(2) = 0 by parity, so both the reference and
+    # the origin-shifted spectrum are rounding noise there. The check picks the
+    # comparison that is defensible for the magnitude actually present and
+    # records which one it used; it never divides by a near-zero chi(2), and it
+    # never lets a near-zero case through without an absolute check.
     try:
-        origin_error = chi2mod.origin_independence_error(
+        origin_check = chi2mod.origin_independence(
             electron,
             heavy_hole,
             [float(chi2mod.photon_energy_eV(reference_nm))],
             settings,
+            shift_nm=float(analysis_cfg.get("origin_independence_shift_nm", 100.0)),
+            absolute_tolerance=float(
+                analysis_cfg.get(
+                    "origin_independence_absolute_tolerance",
+                    chi2mod.DEFAULT_ORIGIN_ABSOLUTE_TOLERANCE,
+                )
+            ),
+            relative_tolerance=float(
+                analysis_cfg.get("maximum_origin_dependence", 1e-6)
+            ),
+            scale_floor=float(
+                analysis_cfg.get(
+                    "origin_independence_scale_floor",
+                    chi2mod.DEFAULT_ORIGIN_SCALE_FLOOR,
+                )
+            ),
         )
     except chi2mod.Chi2Error as exc:
-        origin_error = float("nan")
         observables["origin_independence_reason"] = str(exc)
-    observables["origin_independence_error"] = origin_error
-    validation["chi2_origin_independent"] = bool(
-        math.isfinite(origin_error)
-        and origin_error <= float(analysis_cfg.get("maximum_origin_dependence", 1e-6))
-    )
+        observables["origin_independence_error"] = float("nan")
+        observables["origin_independence_comparison_mode"] = "not_evaluated"
+        validation["chi2_origin_independent"] = False
+    else:
+        observables.update(origin_check.as_record())
+        # Kept under its historical name so older tables stay comparable: the
+        # relative residual where one is defined, the absolute one where it is
+        # not. The comparison mode alongside it says which.
+        observables["origin_independence_error"] = (
+            origin_check.relative_residual
+            if origin_check.relative_residual is not None
+            else origin_check.absolute_residual
+        )
+        validation["chi2_origin_independent"] = bool(origin_check.passed)
 
     focused = metric_cfg.get("focused_wavelength_nm", [1400.0, 1800.0])
     focused_grid = np.linspace(
@@ -430,9 +646,13 @@ def analyse_case(
         float(focused[1]),
         int(metric_cfg.get("focused_wavelength_points", 401)),
     )
+    chi2_electron, chi2_heavy_hole = electron, heavy_hole
+    if quasi_bound["policy"] == "exclude":
+        chi2_electron = _excluded_band(electron, quasi_bound["records"], "electron")
+        chi2_heavy_hole = _excluded_band(heavy_hole, quasi_bound["records"], "heavy_hole")
     spectrum = chi2mod.chi2_spectrum(
-        electron,
-        heavy_hole,
+        chi2_electron,
+        chi2_heavy_hole,
         chi2mod.photon_energy_eV(focused_grid),
         settings,
         orthonormality_tolerance=tolerance,
@@ -445,6 +665,91 @@ def analyse_case(
     peak = spectrum.peak()
     observables["chi2_peak_wavelength_nm"] = peak["wavelength_nm"]
     observables["chi2_peak_magnitude"] = peak["magnitude"]
+
+    # --- state-count propagation audit ---------------------------------------
+    # Requesting more states from nextnano++ and widening Eq. 2's sums are two
+    # different things, and the 2026-07-31 run showed why that has to be
+    # measured rather than assumed: chi(2) agreed to ~1e-13 across 3, 4, and 6
+    # requested states because the sum is capped at max_states_per_band
+    # independently of what the solver returned. Every layer of the path is
+    # recorded so a future convergence claim can be checked instead of believed.
+    rendered = render_values(cfg)
+    audit = {
+        "case_layer_yaml": {
+            "numerical.number_of_electron_states": int(
+                cfg["numerical"]["number_of_electron_states"]
+            ),
+            "numerical.number_of_hole_states": int(
+                cfg["numerical"]["number_of_hole_states"]
+            ),
+            "metric.max_states_per_band": int(settings.max_states_per_band),
+        },
+        "rendered_input_layer": {
+            "number_of_electron_states": rendered["number_of_electron_states"],
+            "number_of_hole_states": rendered["number_of_hole_states"],
+            "output_state_count": rendered["output_state_count"],
+        },
+        "extracted_layer": {
+            "electron_energy_rows": int(run.energies_eV.size),
+            "electron_envelope_columns": int(run.envelopes.shape[1]),
+            "electron_state_table_rows": len(electron_states),
+            "heavy_hole_energy_rows": int(hole_energies.size),
+            "heavy_hole_envelope_columns": int(hole_envelopes.shape[1]),
+        },
+        "bound_filter_layer": {
+            "electron_states_passing_bound_criterion": sum(
+                1 for state in electron_states if state.bound
+            ),
+            "quasi_bound_policy": quasi_bound["policy"],
+            "electron_states_after_policy": int(chi2_electron.count),
+            "heavy_hole_states_after_policy": int(chi2_heavy_hole.count),
+        },
+        "supplied_to_chi2_layer": {
+            "electron_states_supplied": int(chi2_electron.count),
+            "heavy_hole_states_supplied": int(chi2_heavy_hole.count),
+        },
+        "summation_layer": {
+            key: value
+            for key, value in spectrum.diagnostics.items()
+            if key.startswith(("triple_sum", "electron_states", "heavy_hole_states",
+                               "max_states", "overlap_electron_hole_shape",
+                               "position_matrix", "electron_envelope_shape",
+                               "heavy_hole_envelope_shape", "electron_energy_count",
+                               "heavy_hole_energy_count", "largest_numerator",
+                               "significance_floor"))
+        },
+        "exclusion_reasons": [
+            {
+                "band": r["band"],
+                "state": r["state"],
+                "included_in_chi2": r["included_in_chi2"],
+                "reason": r["exclusion_reason"],
+            }
+            for r in quasi_bound["records"]
+            if r["exclusion_reason"]
+        ],
+    }
+    audit["solver_states_not_reaching_the_sum"] = int(
+        max(0, chi2_electron.count - int(spectrum.diagnostics["electron_states_used"]))
+        + max(0, chi2_heavy_hole.count - int(spectrum.diagnostics["heavy_hole_states_used"]))
+    )
+    write_json_atomically(extracted / "state_count_audit.json", audit)
+    observables["chi2_max_states_per_band"] = int(settings.max_states_per_band)
+    observables["chi2_electron_states_used"] = int(
+        spectrum.diagnostics["electron_states_used"]
+    )
+    observables["chi2_heavy_hole_states_used"] = int(
+        spectrum.diagnostics["heavy_hole_states_used"]
+    )
+    observables["chi2_triple_sum_terms_evaluated"] = int(
+        spectrum.diagnostics["triple_sum_terms_evaluated"]
+    )
+    observables["chi2_triple_sum_terms_significant"] = int(
+        spectrum.diagnostics["triple_sum_terms_significant"]
+    )
+    observables["solver_states_not_reaching_the_sum"] = audit[
+        "solver_states_not_reaching_the_sum"
+    ]
 
     predicted = chi2mod.resonance_wavelengths_nm(
         [
@@ -522,6 +827,23 @@ def analyse_case(
             "bound_state_boundary_probability_small": bool(
                 observables["maximum_boundary_probability_bound_states"]
                 <= float(validation_cfg.get("maximum_boundary_probability", 1e-3))
+            ),
+            # Under the `exclude` policy the offending states are gone from the
+            # sum, so what matters is whether anything that FAILED still made it
+            # in. Under `warn` this is the same statement as the line above,
+            # restricted to the states Eq. 2 actually uses.
+            "chi2_states_pass_bound_criterion": bool(
+                quasi_bound["failing_in_sum_count"] == 0
+                or quasi_bound["policy"] == "exclude"
+            ),
+            # The sum must use exactly the configured window. If these ever
+            # disagree, a convergence sweep is measuring something other than
+            # what its label claims.
+            "chi2_state_window_as_configured": bool(
+                int(spectrum.diagnostics["electron_states_used"])
+                == int(settings.max_states_per_band)
+                and int(spectrum.diagnostics["heavy_hole_states_used"])
+                == int(settings.max_states_per_band)
             ),
         }
     )
@@ -620,6 +942,37 @@ def build_cases(cfg: Mapping[str, Any]) -> list[sweeps.CaseSpec]:
             _case(cfg, f"s2n{index}", f"{value} electron states", "stage2",
                   number_of_electron_states=value, number_of_hole_states=value)
         )
+    # Widening Eq. 2's m,n,l sums is a different experiment from asking the
+    # solver for more states, and needs enough solver states to draw on.
+    for index, value in enumerate(convergence.get("chi2_max_states_per_band", []), 1):
+        requested = max(int(value), int(cfg["numerical"]["number_of_electron_states"]))
+        cases.append(
+            _case(cfg, f"s2m{index}", f"Eq. 2 over {value} states per band", "stage2",
+                  max_states_per_band=int(value),
+                  number_of_electron_states=requested,
+                  number_of_hole_states=requested)
+        )
+    # Padding convergence repeated where Stage 3 misbehaved, not only at 0.42.
+    padding_probe = convergence.get("padding_at_asymmetry") or {}
+    if padding_probe.get("enabled"):
+        for a_index, asymmetry in enumerate(padding_probe.get("asymmetry_values", []), 1):
+            thick, thin = chi2mod.well_widths_from_asymmetry(
+                float(asymmetry), total_well
+            )
+            for p_index, padding in enumerate(
+                padding_probe.get("quantum_region_padding_nm", []), 1
+            ):
+                cases.append(
+                    _case(
+                        cfg,
+                        f"s2p{a_index}{p_index}",
+                        f"s = {asymmetry}, quantum padding {padding} nm",
+                        "stage2_padding",
+                        thick_well_nm=round(thick, 6),
+                        thin_well_nm=round(thin, 6),
+                        quantum_region_padding_nm=float(padding),
+                    )
+                )
 
     # Stage 3: asymmetry at fixed total well thickness.
     for index, value in enumerate(analysis_cfg.get("asymmetry_sweep", []), 1):
@@ -632,6 +985,19 @@ def build_cases(cfg: Mapping[str, Any]) -> list[sweeps.CaseSpec]:
             )
         cases.append(
             _case(cfg, f"s3a{index:02d}", f"s = {value}", "stage3",
+                  thick_well_nm=round(thick, 6), thin_well_nm=round(thin, 6))
+        )
+
+    # Stage 3b: the refined sweep across the discontinuity. Separate stage, so
+    # the coarse sweep it was derived from stays intact and comparable.
+    for index, value in enumerate(analysis_cfg.get("asymmetry_sweep_refined", []), 1):
+        thick, thin = chi2mod.well_widths_from_asymmetry(float(value), total_well)
+        if thin <= 0.0:
+            raise DemoError(
+                f"refined asymmetry {value} gives a zero-thickness thin well."
+            )
+        cases.append(
+            _case(cfg, f"s3r{index:02d}", f"s = {value}", "stage3_refined",
                   thick_well_nm=round(thick, 6), thin_well_nm=round(thin, 6))
         )
 
@@ -833,6 +1199,184 @@ def stage5_modes(
     return record
 
 
+def stage3b_state_tracking(
+    cfg: Mapping[str, Any], results: Sequence[sweeps.CaseResult], parent: Path
+) -> dict[str, Any]:
+    """Follow physical states across the refined asymmetry sweep.
+
+    This is the stage that answers whether the Stage 3 cliff is a crossing being
+    mislabelled or something physical. It recomputes chi(2) twice per point --
+    once with the solver's energy ordering, once with the tracked ordering -- so
+    the two curves can be laid side by side. Where tracking changes nothing the
+    curves coincide, and that is a real answer too.
+    """
+
+    analysis_cfg = cfg.get("analysis") or {}
+    tracking_cfg = analysis_cfg.get("state_tracking") or {}
+    record: dict[str, Any] = {
+        "available": False,
+        "enabled": bool(tracking_cfg.get("enabled", False)),
+        "bands": {},
+        "rows": [],
+    }
+    if not tracking_cfg.get("enabled", False):
+        record["reason"] = "analysis.state_tracking.enabled is false"
+        return record
+
+    refined = [
+        r
+        for r in results
+        if r.spec.metadata.get("stage") == "stage3_refined" and r.solver_success
+    ]
+    if len(refined) < 2:
+        record["reason"] = (
+            f"state tracking needs at least two completed refined-sweep cases; "
+            f"{len(refined)} available. No licensed solver output on this machine "
+            "produces none, which is reported rather than substituted."
+        )
+        return record
+
+    metric_cfg = cfg.get("metric") or {}
+    reference_nm = float(metric_cfg.get("reference_wavelength_nm", 1550.0))
+    focused = metric_cfg.get("focused_wavelength_nm", [1400.0, 1800.0])
+    grid = np.linspace(
+        float(focused[0]), float(focused[1]),
+        int(metric_cfg.get("focused_wavelength_points", 401)),
+    )
+    photons = chi2mod.photon_energy_eV(grid)
+    settings = chi2_settings(cfg, mode="relative")
+    tolerance = float(analysis_cfg.get("orthonormality_tolerance", 1e-3))
+
+    points: dict[str, list[tracking11.SweepPoint]] = {"electron": [], "heavy_hole": []}
+    bands_by_case: dict[str, tuple[chi2mod.BandStates, chi2mod.BandStates]] = {}
+    for result in sorted(refined, key=lambda r: float(r.observables.get("asymmetry", 0.0))):
+        bands = _load_bands(result)
+        if bands is None:
+            continue
+        electron, heavy_hole = bands
+        bands_by_case[result.spec.case_id] = bands
+        value = float(result.observables.get("asymmetry", 0.0))
+        points["electron"].append(
+            tracking11.SweepPoint(
+                result.spec.case_id, value, electron.z_nm,
+                electron.energies_eV, electron.envelopes,
+            )
+        )
+        points["heavy_hole"].append(
+            tracking11.SweepPoint(
+                result.spec.case_id, value, heavy_hole.z_nm,
+                heavy_hole.energies_eV, heavy_hole.envelopes,
+            )
+        )
+    if not bands_by_case:
+        record["reason"] = "no refined case committed the envelopes tracking needs"
+        return record
+
+    rows: list[dict[str, Any]] = []
+    tracked_by_band: dict[str, list[tracking11.TrackedState]] = {}
+    for band in tracking_cfg.get("bands", ["electron", "heavy_hole"]):
+        tracked, diagnostics = tracking11.track_band(
+            points.get(band, []),
+            band=band,
+            minimum_confidence=float(tracking_cfg.get("minimum_confidence", 0.60)),
+            minimum_margin=float(tracking_cfg.get("minimum_assignment_margin", 0.15)),
+            energy_continuity_weight=float(
+                tracking_cfg.get("energy_continuity_weight", 0.05)
+            ),
+        )
+        tracked_by_band[band] = tracked
+        record["bands"][band] = diagnostics
+        rows.extend(state.row() for state in tracked)
+
+    # chi(2) under both labellings, point by point.
+    comparison_rows: list[dict[str, Any]] = []
+    for case_id, (electron, heavy_hole) in bands_by_case.items():
+        result = next(r for r in refined if r.spec.case_id == case_id)
+        value = float(result.observables.get("asymmetry", 0.0))
+        row: dict[str, Any] = {"case_id": case_id, "asymmetry": value}
+        for label, (e_band, h_band) in (
+            ("raw_index", (electron, heavy_hole)),
+            (
+                "tracked",
+                (
+                    tracking11.reorder_to_tracked_labels(
+                        electron,
+                        [s for s in tracked_by_band.get("electron", [])
+                         if s.case_id == case_id],
+                    ),
+                    tracking11.reorder_to_tracked_labels(
+                        heavy_hole,
+                        [s for s in tracked_by_band.get("heavy_hole", [])
+                         if s.case_id == case_id],
+                    ),
+                ),
+            ),
+        ):
+            try:
+                spectrum = chi2mod.chi2_spectrum(
+                    e_band, h_band, photons, settings,
+                    orthonormality_tolerance=tolerance,
+                )
+            except chi2mod.Chi2Error as exc:
+                row[f"chi2_peak_magnitude_{label}"] = None
+                row[f"chi2_error_{label}"] = str(exc)
+                continue
+            peak = spectrum.peak()
+            row[f"chi2_peak_magnitude_{label}"] = peak["magnitude"]
+            row[f"chi2_peak_wavelength_nm_{label}"] = peak["wavelength_nm"]
+            row[f"chi2_at_reference_{label}"] = float(
+                abs(spectrum.at_wavelength(reference_nm))
+            )
+        raw_peak = row.get("chi2_peak_magnitude_raw_index")
+        tracked_peak = row.get("chi2_peak_magnitude_tracked")
+        row["tracking_changes_chi2"] = bool(
+            raw_peak is not None
+            and tracked_peak is not None
+            and abs(tracked_peak - raw_peak) > 1e-12 * max(abs(raw_peak), 1.0)
+        )
+        comparison_rows.append(row)
+
+    extracted = parent / "extracted"
+    extracted.mkdir(parents=True, exist_ok=True)
+    sweeps.write_state_tracking(parent, rows)
+    write_json_atomically(
+        extracted / "state_tracking_assignments.json",
+        {
+            "sweep": "stage3_refined",
+            "assignment_backend": analysis.assignment_backend(),
+            "bands": record["bands"],
+        },
+    )
+    if comparison_rows:
+        write_csv(
+            extracted / "chi2_raw_vs_tracked.csv",
+            {
+                key: np.asarray([row.get(key) for row in comparison_rows])
+                for key in comparison_rows[0]
+            },
+        )
+
+    ambiguous = [row for row in rows if row.get("ambiguous")]
+    record.update(
+        {
+            "available": True,
+            "rows": rows,
+            "comparison": comparison_rows,
+            "points": len(bands_by_case),
+            "ambiguous_assignments": len(ambiguous),
+            "ambiguous_at": sorted({row["case_id"] for row in ambiguous}),
+            "reordering_detected": any(
+                diagnostics.get("label_reordering_detected")
+                for diagnostics in record["bands"].values()
+            ),
+            "tracking_changes_chi2_at": [
+                row["case_id"] for row in comparison_rows if row["tracking_changes_chi2"]
+            ],
+        }
+    )
+    return record
+
+
 def stage6_wavelength(
     cfg: Mapping[str, Any], reference: sweeps.CaseResult | None, parent: Path
 ) -> dict[str, Any]:
@@ -905,6 +1449,7 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
     )
     stage5 = stage5_modes(cfg, reference, context.parent)
     stage6 = stage6_wavelength(cfg, reference, context.parent)
+    stage3b = stage3b_state_tracking(cfg, results, context.parent)
 
     comparison = report11.build(
         cfg=cfg,
@@ -913,13 +1458,16 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
         reference=reference,
         stage5=stage5,
         stage6=stage6,
+        stage3b=stage3b,
         parent=context.parent,
     )
 
     sweeps.write_sweep_summary(context.parent, results)
     failed, suspicious = sweeps.write_failed_and_suspicious(context.parent, results)
     report11.write_tables(context.parent, targets, results, comparison)
-    report11.write_plots(context.parent, cfg, results, reference, stage5, stage6, comparison)
+    report11.write_plots(
+        context.parent, cfg, results, reference, stage5, stage6, comparison, stage3b
+    )
     plotting.ensure_plot_set(
         context.parent / "plots",
         PLOT_SET,
@@ -940,7 +1488,15 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
             "paper": PAPER,
             "stage5_chi2_modes": stage5,
             "stage6_wavelength": stage6,
+            "stage3b_state_tracking": {
+                key: value
+                for key, value in stage3b.items()
+                # The per-state rows and every assignment matrix are already in
+                # extracted/; repeating them here would bloat the manifest.
+                if key not in {"rows", "bands", "comparison"}
+            },
             "comparison_summary": comparison["summary"],
+            "reproduction_status": comparison["status"],
             "chi2_assumptions": list(chi2mod.ASSUMPTIONS),
             "absolute_scale_disclaimer": (
                 "The absolute chi(2) magnitude cannot be reproduced independently: "
@@ -951,7 +1507,9 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
             ),
         },
     )
-    report11.write_report(context.parent, cfg, targets, comparison, stage5, stage6, manifest)
+    report11.write_report(
+        context.parent, cfg, targets, comparison, stage5, stage6, manifest, stage3b
+    )
     sweeps.write_validation_report(
         context.parent,
         cfg=cfg,
@@ -967,6 +1525,21 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
             "are never mixed with the simulation inputs in demo.yaml.",
             "Material parameters were not adjusted to improve agreement. Any "
             "difference from the paper is reported, not tuned away.",
+            "Sweep optima are reported under TWO metrics. `peak_chi2_magnitude` is "
+            "the intrinsic maximum of |chi(2)| over the scanned band and is the "
+            "primary metric for the paper's optimum claims. "
+            "`chi2_at_reference_wavelength` is the response at "
+            f"{(cfg.get('metric') or {}).get('reference_wavelength_nm', 1550.0)} nm "
+            "and is application-specific: across the asymmetry sweep the resonance "
+            "itself moves ~100 nm against a 5 meV linewidth, so a fixed-wavelength "
+            "comparison ranks structures partly by detuning.",
+            "Quasi-bound-state policy in force: "
+            f"{(cfg.get('validation') or {}).get('quasi_bound_state_policy', 'warn')}.",
+            "Eq. 2 sums over "
+            f"{(cfg.get('metric') or {}).get('max_states_per_band', 2)} state(s) per "
+            "band, independently of how many states the solver was asked for. "
+            "Requesting more solver states does not widen the sum; see "
+            "extracted/state_count_audit.json in each case.",
         ],
         unvalidated_syntax=[
             "structure/region/ternary_linear{} graded-alloy composition output",

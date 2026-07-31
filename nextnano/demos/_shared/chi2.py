@@ -256,6 +256,13 @@ class Chi2Settings:
     heavy_hole_inplane_mass_m0: float = 0.112
     #: Folded into the k-sum. The paper does not say whether it did this.
     spin_degeneracy: int = 2
+    #: How many states of each band enter the m, n, l sums of Eq. 2. The paper
+    #: uses the first two bound states of each band, so 2 is the reproduction
+    #: value. Raising it is a deliberate convergence experiment and changes what
+    #: is being computed -- which is exactly why it lives here, gets recorded in
+    #: every artifact, and is never inferred from how many states the solver
+    #: happened to return.
+    max_states_per_band: int = 2
     #: --- absolute mode only; no defaults, because the paper publishes none ---
     r_e_hh_nm: float | None = None
     n_wells_per_metre: float | None = None
@@ -281,6 +288,13 @@ class Chi2Settings:
             raise Chi2Error("k_parallel_points must be at least 2.")
         if int(self.spin_degeneracy) not in (1, 2):
             raise Chi2Error("spin_degeneracy must be 1 or 2.")
+        if int(self.max_states_per_band) != float(self.max_states_per_band):
+            raise Chi2Error("max_states_per_band must be an integer.")
+        if int(self.max_states_per_band) < 2:
+            raise Chi2Error(
+                "max_states_per_band must be at least 2: Eq. 2's second term needs "
+                "a second state in each band to have anything to sum over."
+            )
         if self.mode == "absolute":
             missing = [
                 name
@@ -343,6 +357,7 @@ class Chi2Settings:
             "electron_mass_m0": self.electron_mass_m0,
             "heavy_hole_inplane_mass_m0": self.heavy_hole_inplane_mass_m0,
             "spin_degeneracy": self.spin_degeneracy,
+            "max_states_per_band": self.max_states_per_band,
             "r_e_hh_nm": self.r_e_hh_nm,
             "n_wells_per_metre": self.n_wells_per_metre,
             "calibration_target_pm_per_V": self.calibration_target_pm_per_V,
@@ -362,7 +377,11 @@ ASSUMPTIONS: tuple[str, ...] = (
     "Dimensional analysis leaves no other choice that yields m/V.",
     "Spin degeneracy is applied as an explicit multiplicative factor; the paper "
     "does not say whether it folded one in.",
-    "Only the first two bound states of each band are used, as the paper states.",
+    "Only the first `max_states_per_band` states of each band enter the m, n, l "
+    "sums; the default is 2, as the paper states. This truncation is independent "
+    "of how many states the solver was asked for, so requesting more states from "
+    "nextnano++ does NOT by itself widen the sum -- raising max_states_per_band "
+    "is what does, and every result records both numbers.",
     "The Fermi factor is unity: the valence band is full and the conduction band "
     "empty, as the paper states.",
 )
@@ -458,7 +477,7 @@ def chi2_spectrum(
     photon_energies_eV: Sequence[float] | np.ndarray,
     settings: Chi2Settings | None = None,
     *,
-    max_states: int = 2,
+    max_states: int | None = None,
     orthonormality_tolerance: float = 1.0e-3,
 ) -> Chi2Result:
     """Evaluate the paper's Eq. 2 for second-harmonic generation.
@@ -467,13 +486,23 @@ def chi2_spectrum(
     ``omega_1 = omega_2 = omega``, so the two-photon denominator resonates at
     ``2 hbar omega = E_transition`` and the one-photon denominator at
     ``hbar omega = E_transition``.
+
+    ``max_states`` overrides ``settings.max_states_per_band`` for one call. The
+    number of states supplied is deliberately NOT the number used: passing more
+    states than the sum is configured for truncates them, and the diagnostics
+    record both counts so a convergence sweep can never look converged merely
+    because the extra states were silently discarded.
     """
 
     settings = settings or Chi2Settings()
     if electron.count < 1 or heavy_hole.count < 1:
         raise Chi2Error("both bands need at least one bound state.")
-    n_e = min(int(max_states), electron.count)
-    n_h = min(int(max_states), heavy_hole.count)
+    max_states = int(
+        settings.max_states_per_band if max_states is None else max_states
+    )
+    n_e = min(max_states, electron.count)
+    n_h = min(max_states, heavy_hole.count)
+    supplied_e, supplied_h = electron.count, heavy_hole.count
     if n_e < max_states or n_h < max_states:
         raise Chi2Error(
             f"the paper's Eq. 2 uses the first {max_states} bound states of each "
@@ -509,6 +538,60 @@ def chi2_spectrum(
     overlap_eh = overlap_matrix(electron, heavy_hole)      # <psi_e,n | psi_hh,m>
     z_e = position_matrix(electron)                        # <psi_e,n | z | psi_e,l>
     z_h = position_matrix(heavy_hole)                      # <psi_hh,m| z | psi_hh,l>
+
+    # Census of the m, n, l sums. The matrix elements carry no k or photon-energy
+    # dependence (see ASSUMPTIONS), so the term structure is fixed here once and
+    # reported. This is what makes "did widening the basis actually widen the
+    # sum?" an answerable question rather than an inference from the total.
+    conduction_numerators = np.array(
+        [
+            overlap_eh[n, m] * z_e[n, l] * overlap_eh[l, m]
+            for m in range(n_h)
+            for n in range(n_e)
+            for l in range(n_e)
+        ],
+        dtype=float,
+    )
+    valence_numerators = np.array(
+        [
+            overlap_eh[n, m] * z_h[m, l] * overlap_eh[n, l]
+            for m in range(n_h)
+            for n in range(n_e)
+            for l in range(n_h)
+        ],
+        dtype=float,
+    )
+    all_numerators = np.concatenate([conduction_numerators, valence_numerators])
+    largest = float(np.max(np.abs(all_numerators))) if all_numerators.size else 0.0
+    # "Significant" is relative to the largest term: an absolute cutoff would
+    # mean something different in relative and calibrated units.
+    significance_floor = largest * 1.0e-12
+    term_census = {
+        "electron_states_supplied": int(supplied_e),
+        "heavy_hole_states_supplied": int(supplied_h),
+        "electron_states_used": int(n_e),
+        "heavy_hole_states_used": int(n_h),
+        "max_states_per_band": int(max_states),
+        "electron_states_discarded_by_truncation": int(max(0, supplied_e - n_e)),
+        "heavy_hole_states_discarded_by_truncation": int(max(0, supplied_h - n_h)),
+        "triple_sum_terms_evaluated": int(all_numerators.size),
+        "triple_sum_terms_conduction": int(conduction_numerators.size),
+        "triple_sum_terms_valence": int(valence_numerators.size),
+        "triple_sum_terms_exactly_zero": int(np.count_nonzero(all_numerators == 0.0)),
+        "triple_sum_terms_nonzero": int(np.count_nonzero(all_numerators != 0.0)),
+        "triple_sum_terms_significant": int(
+            np.count_nonzero(np.abs(all_numerators) > significance_floor)
+        ),
+        "largest_numerator_magnitude": largest,
+        "significance_floor": significance_floor,
+        "overlap_electron_hole_shape": list(overlap_eh.shape),
+        "position_matrix_electron_shape": list(z_e.shape),
+        "position_matrix_heavy_hole_shape": list(z_h.shape),
+        "electron_envelope_shape": list(electron.envelopes.shape),
+        "heavy_hole_envelope_shape": list(heavy_hole.envelopes.shape),
+        "electron_energy_count": int(electron.energies_eV.size),
+        "heavy_hole_energy_count": int(heavy_hole.energies_eV.size),
+    }
 
     k, weights = _k_grid(settings)
     transitions = _transition_energies_eV(electron, heavy_hole, k, settings)
@@ -560,6 +643,8 @@ def chi2_spectrum(
         "position_matrix_heavy_hole_nm": z_h.tolist(),
         "k_max_per_nm": settings.k_max_per_nm,
         "reduced_mass_m0": settings.reduced_mass_kg() / ELECTRON_MASS_KG,
+        "k_parallel_points": int(k.size),
+        **term_census,
     }
 
     if settings.mode == "absolute":
@@ -617,6 +702,7 @@ def calibrate(
         electron_mass_m0=result.settings.electron_mass_m0,
         heavy_hole_inplane_mass_m0=result.settings.heavy_hole_inplane_mass_m0,
         spin_degeneracy=result.settings.spin_degeneracy,
+        max_states_per_band=result.settings.max_states_per_band,
         calibration_target_pm_per_V=float(target_pm_per_V),
         calibration_wavelength_nm=float(wavelength_nm_value),
         calibration_source=source,
@@ -689,23 +775,97 @@ def resonance_wavelengths_nm(
     }
 
 
-def origin_independence_error(
+#: Default floor, in relative-mode chi2 units, below which a spectrum is treated
+#: as numerically zero and the origin check switches to an absolute comparison.
+DEFAULT_ORIGIN_SCALE_FLOOR = 1.0e-9
+#: Default absolute residual permitted when the spectrum is at or below the
+#: floor. Sized for double-precision noise on a ~100 nm coordinate translation,
+#: not chosen to make any particular case pass.
+DEFAULT_ORIGIN_ABSOLUTE_TOLERANCE = 1.0e-12
+DEFAULT_ORIGIN_RELATIVE_TOLERANCE = 1.0e-6
+
+#: Comparison modes reported by :func:`origin_independence`.
+ORIGIN_MODE_RELATIVE = "relative"
+ORIGIN_MODE_ABSOLUTE_NEAR_ZERO = "absolute_near_zero"
+
+
+@dataclass(frozen=True)
+class OriginIndependenceCheck:
+    """Result of translating the z origin and re-evaluating Eq. 2.
+
+    A symmetric structure has chi2 = 0 by parity, so both the reference and the
+    shifted spectrum are pure rounding noise there. Dividing one by the other
+    manufactures a large "relative error" out of nothing, which is a false
+    failure rather than a physics result. The check therefore reports whichever
+    comparison is defensible for the magnitude actually present, and says which
+    one it used.
+    """
+
+    absolute_residual: float
+    scale: float
+    relative_residual: float | None
+    comparison_mode: str
+    absolute_tolerance: float
+    relative_tolerance: float
+    scale_floor: float
+    shift_nm: float
+    passed: bool
+    reason: str
+
+    def as_record(self) -> dict[str, Any]:
+        return {
+            "origin_independence_absolute_residual": self.absolute_residual,
+            "origin_independence_scale": self.scale,
+            "origin_independence_relative_residual": self.relative_residual,
+            "origin_independence_comparison_mode": self.comparison_mode,
+            "origin_independence_absolute_tolerance": self.absolute_tolerance,
+            "origin_independence_relative_tolerance": self.relative_tolerance,
+            "origin_independence_scale_floor": self.scale_floor,
+            "origin_independence_shift_nm": self.shift_nm,
+            "origin_independence_passed": self.passed,
+            "origin_independence_reason": self.reason,
+        }
+
+
+def origin_independence(
     electron: BandStates,
     heavy_hole: BandStates,
     photon_energies_eV: Sequence[float] | np.ndarray,
     settings: Chi2Settings | None = None,
     *,
     shift_nm: float = 100.0,
-) -> float:
-    """Relative change in |chi2| when the z origin is translated.
+    absolute_tolerance: float = DEFAULT_ORIGIN_ABSOLUTE_TOLERANCE,
+    relative_tolerance: float = DEFAULT_ORIGIN_RELATIVE_TOLERANCE,
+    scale_floor: float = DEFAULT_ORIGIN_SCALE_FLOOR,
+) -> OriginIndependenceCheck:
+    """Check that |chi2| does not move when the z origin is translated.
 
-    Eq. 2's diagonal position matrix elements are individually origin
-    dependent, and the dependence cancels between its two terms only for an
-    orthonormal envelope basis. Measuring the residual is therefore a direct,
-    end-to-end check that the states handed in are usable -- it catches a
-    too-coarse grid or mismatched quantum regions in a way that inspecting a
-    single number cannot.
+    Eq. 2's diagonal position matrix elements are individually origin dependent,
+    and the dependence cancels between its two terms only for an orthonormal
+    envelope basis. Measuring the residual is a direct, end-to-end check that
+    the states handed in are usable -- it catches a too-coarse grid or mismatched
+    quantum regions in a way that inspecting a single number cannot.
+
+    Two comparisons, one decision:
+
+    * ``scale > scale_floor`` -- the spectrum carries real magnitude, so the
+      residual is judged relative to it, exactly as before.
+    * ``scale <= scale_floor`` -- the spectrum is numerically zero, so only the
+      absolute residual is judged. No division by a near-zero value is
+      performed, and ``relative_residual`` is reported as ``None`` rather than
+      as a number that would be meaningless.
+
+    A near-zero spectrum is never waved through: it still has to keep its
+    absolute residual inside ``absolute_tolerance``.
     """
+
+    for name, value in (
+        ("absolute_tolerance", absolute_tolerance),
+        ("relative_tolerance", relative_tolerance),
+        ("scale_floor", scale_floor),
+    ):
+        if not math.isfinite(float(value)) or float(value) < 0:
+            raise Chi2Error(f"{name} must be finite and >= 0.")
 
     settings = settings or Chi2Settings()
     reference = chi2_spectrum(electron, heavy_hole, photon_energies_eV, settings)
@@ -721,10 +881,66 @@ def origin_independence_error(
         photon_energies_eV,
         settings,
     )
+    absolute_residual = float(np.max(np.abs(shifted.chi2 - reference.chi2)))
     scale = float(np.max(np.abs(reference.chi2)))
-    if scale <= 0:
-        return 0.0
-    return float(np.max(np.abs(shifted.chi2 - reference.chi2)) / scale)
+
+    if scale > float(scale_floor):
+        relative_residual = absolute_residual / scale
+        passed = relative_residual <= float(relative_tolerance)
+        reason = (
+            f"|chi2| = {scale:.3e} is above the {scale_floor:.1e} floor, so the "
+            f"residual is judged relative to it: {relative_residual:.3e} "
+            f"{'<=' if passed else '>'} {relative_tolerance:.1e}."
+        )
+        mode = ORIGIN_MODE_RELATIVE
+    else:
+        relative_residual = None
+        passed = absolute_residual <= float(absolute_tolerance)
+        reason = (
+            f"|chi2| = {scale:.3e} is at or below the {scale_floor:.1e} floor, so "
+            "the spectrum is numerically zero and a relative residual would be "
+            f"meaningless. Absolute residual {absolute_residual:.3e} "
+            f"{'<=' if passed else '>'} {absolute_tolerance:.1e}."
+        )
+        mode = ORIGIN_MODE_ABSOLUTE_NEAR_ZERO
+
+    return OriginIndependenceCheck(
+        absolute_residual=absolute_residual,
+        scale=scale,
+        relative_residual=relative_residual,
+        comparison_mode=mode,
+        absolute_tolerance=float(absolute_tolerance),
+        relative_tolerance=float(relative_tolerance),
+        scale_floor=float(scale_floor),
+        shift_nm=float(shift_nm),
+        passed=bool(passed),
+        reason=reason,
+    )
+
+
+def origin_independence_error(
+    electron: BandStates,
+    heavy_hole: BandStates,
+    photon_energies_eV: Sequence[float] | np.ndarray,
+    settings: Chi2Settings | None = None,
+    *,
+    shift_nm: float = 100.0,
+) -> float:
+    """The single decisive residual from :func:`origin_independence`.
+
+    Relative when the spectrum has magnitude, absolute when it does not. Kept
+    because a bare number is convenient in tests; anything that has to *judge*
+    the result should call :func:`origin_independence` and read the tolerance
+    and comparison mode it used, rather than comparing this against a threshold
+    of its own choosing.
+    """
+
+    check = origin_independence(
+        electron, heavy_hole, photon_energies_eV, settings, shift_nm=shift_nm
+    )
+    if check.relative_residual is not None:
+        return float(check.relative_residual)
+    return float(check.absolute_residual)
 
 
 def orthonormalise(band: BandStates) -> BandStates:
