@@ -495,6 +495,25 @@ def build_record(
         rejections.append("required_states")
     if record["origin_independence_valid"] != 1:
         rejections.append("origin_independence")
+    # Every configured outcome constraint is applied here, including the ones
+    # Ax also enforces. The first licensed run showed why: the six Sobol trials
+    # all landed 16-46 nm off target, Ax correctly reported "all training points
+    # are infeasible", and this table still called them valid because the
+    # detuning bound was checked by Ax and nowhere else. `trial_valid` has to
+    # mean the same thing as Ax feasibility, or the best-so-far curve credits a
+    # design the optimizer has excluded.
+    maximum_detuning = constraints.get("maximum_detuning_nm")
+    detuning = record.get("detuning_nm_abs")
+    if maximum_detuning is not None and detuning is not None and detuning > float(maximum_detuning):
+        rejections.append("detuning")
+    maximum_orthonormality = constraints.get("maximum_orthonormality_error")
+    orthonormality = record.get("orthonormality_error")
+    if (
+        maximum_orthonormality is not None
+        and orthonormality is not None
+        and orthonormality > float(maximum_orthonormality)
+    ):
+        rejections.append("orthonormality_error")
     maximum_boundary = constraints.get("maximum_boundary_probability")
     boundary = record.get("maximum_boundary_probability")
     if maximum_boundary is not None and boundary is not None and boundary > float(maximum_boundary):

@@ -819,6 +819,89 @@ def test_physically_invalid_trial_keeps_its_metrics(cfg):
     assert record["objective_available"] is True
 
 
+def test_trial_validity_applies_every_constraint_ax_is_given(cfg):
+    """`trial_valid` must mean the same thing as Ax feasibility.
+
+    The first licensed run put all six Sobol trials 16-46 nm off target. Ax
+    correctly reported them infeasible; this record called them valid, because
+    the detuning bound was enforced by Ax and nowhere else.
+    """
+
+    observables = _valid_observables(0.81)
+    observables["chi2_peak_wavelength_nm"] = 1522.0  # 28 nm below the 1550 nm target
+    record = metrics13.build_record(
+        parameters={
+            "asymmetry_s": 0.484,
+            "central_barrier_thickness_nm": 0.96,
+            "grading_thickness_nm": 0.0,
+            "grading_profile": "abrupt",
+        },
+        cfg=cfg,
+        observables=observables,
+        validation=dict(_VALID_VALIDATION),
+        status="completed",
+        tracking={"state_tracking_confidence": 0.99, "assignment_margin": 0.5},
+    )
+    assert record["detuning_nm"] == pytest.approx(-28.0)
+    assert "detuning" in record["constraint_violations"]
+    assert record["trial_valid"] is False
+    # The metrics survive the rejection; only the verdict changes.
+    assert record["chi2_at_target_wavelength_abs"] == pytest.approx(0.81)
+
+
+def test_every_constraint_metric_has_a_matching_validity_check(cfg):
+    """No configured outcome constraint may be enforced by Ax alone."""
+
+    spec = axsearch13.build_optimization_spec(cfg)
+    observables = _valid_observables(0.5)
+    observables["chi2_peak_wavelength_nm"] = 1552.0
+    good = metrics13.build_record(
+        parameters={
+            "asymmetry_s": 0.46,
+            "central_barrier_thickness_nm": 1.5,
+            "grading_thickness_nm": 1.0,
+            "grading_profile": "linear",
+        },
+        cfg=cfg,
+        observables=observables,
+        validation=dict(_VALID_VALIDATION),
+        status="completed",
+        tracking={"state_tracking_confidence": 0.99, "assignment_margin": 0.5},
+    )
+    assert good["trial_valid"] is True
+    bounds = cfg["bo"]["outcome_constraints"]
+    # Each constrained metric, pushed just past its bound, must invalidate.
+    breaches = {
+        "detuning_nm_abs": ("chi2_peak_wavelength_nm", 1550.0 + float(bounds["maximum_detuning_nm"]) + 1.0),
+        "maximum_boundary_probability": (
+            "maximum_boundary_probability_bound_states",
+            float(bounds["maximum_boundary_probability"]) * 10,
+        ),
+        "orthonormality_error": (
+            "orthonormality_error_electron",
+            float(bounds["maximum_orthonormality_error"]) * 10,
+        ),
+    }
+    for metric, (key, value) in breaches.items():
+        assert metric in spec.reported_metrics
+        broken = dict(observables)
+        broken[key] = value
+        record = metrics13.build_record(
+            parameters={
+                "asymmetry_s": 0.46,
+                "central_barrier_thickness_nm": 1.5,
+                "grading_thickness_nm": 1.0,
+                "grading_profile": "linear",
+            },
+            cfg=cfg,
+            observables=broken,
+            validation=dict(_VALID_VALIDATION),
+            status="completed",
+            tracking={"state_tracking_confidence": 0.99, "assignment_margin": 0.5},
+        )
+        assert record["trial_valid"] is False, f"{metric} is enforced by Ax alone"
+
+
 def test_objective_and_constraint_strings_match_the_configured_mode(cfg):
     spec = axsearch13.build_optimization_spec(cfg)
     assert spec.objective == "chi2_at_target_wavelength_abs"
