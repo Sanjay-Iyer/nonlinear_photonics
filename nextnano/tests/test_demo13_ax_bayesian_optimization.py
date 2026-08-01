@@ -155,7 +155,15 @@ def test_ax_search_space_is_created_for_both_encodings(cfg):
         parameters = next(iter(proposals.values()))
         canonical = design13.canonicalize(parameters, variant)
         assert 0.36 <= canonical["asymmetry_s"] <= 0.56
-        assert 0.5 <= canonical["central_barrier_thickness_nm"] <= 2.5
+        # Read from the configuration rather than hard-coded, so a deliberate
+        # bound change (v2's 0.5 nm -> v3's 0.85 nm) does not need this test
+        # edited, while an accidental one still fails it.
+        barrier = variant["bo"]["search_space"]["central_barrier_thickness_nm"]
+        assert (
+            float(barrier["lower"])
+            <= canonical["central_barrier_thickness_nm"]
+            <= float(barrier["upper"])
+        )
         assert 0.0 <= canonical["grading_thickness_nm"] <= 3.0
         assert canonical["grading_profile"] in design13.GRADING_PROFILES
 

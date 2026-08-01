@@ -89,17 +89,49 @@ EXTRACTION_VERSION = "demo13-metrics-1"
 #: one schema cannot be resumed under another -- the parameter names differ --
 #: so the mismatch is refused with instructions rather than loaded into a
 #: confusing half-state.
-EXPERIMENT_SCHEMA_VERSION = "demo13-search-space-2"
+#: Bumped for v3: the barrier lower bound moved to 0.85 nm, the minimum
+#: resolvable grade to 0.80 nm and the active mesh to 0.05 nm. None of those
+#: changes the parameter *names*, so without this bump a v2 snapshot would still
+#: have looked schema-compatible.
+EXPERIMENT_SCHEMA_VERSION = "demo13-search-space-3"
 
 
 def experiment_schema(cfg: Mapping[str, Any]) -> dict[str, Any]:
-    """The identity of the search space a snapshot was written against."""
+    """The identity of the search space a snapshot was written against.
 
+    Parameter *names* are not enough. v2 and v3 use the same encoding, the same
+    fraction parameterization and the same four parameter names, and differ only
+    in their bounds and in the minimum resolvable grade -- so a name-only schema
+    would have let a v2 checkpoint resume under v3's search space, silently
+    treating observations at a 0.5 nm barrier and a 0.10 nm mesh as though they
+    had been computed inside v3's space. The bounds and the mesh are therefore
+    part of the identity, and any change to them makes the snapshot
+    unresumable rather than quietly reinterpreted.
+    """
+
+    bounds = {
+        spec.name: [spec.lower, spec.upper]
+        for spec in design13.search_space_specs(cfg)
+        if isinstance(spec, design13.RangeSpec)
+    }
+    choices = {
+        spec.name: sorted(str(value) for value in spec.values)
+        for spec in design13.search_space_specs(cfg)
+        if isinstance(spec, design13.ChoiceSpec)
+    }
     return {
         "experiment_schema_version": EXPERIMENT_SCHEMA_VERSION,
         "encoding": str(cfg["bo"]["search_space"].get("encoding", "hierarchical")),
         "parameterization": design13.grading_parameterization(cfg),
         "parameters": sorted(spec.name for spec in design13.search_space_specs(cfg)),
+        "range_bounds": bounds,
+        "choice_values": choices,
+        "minimum_resolvable_grading_nm": design13.minimum_resolvable_grading_nm(cfg),
+        # The mesh is not an Ax parameter, but two observations computed at
+        # different mesh spacings are not observations of the same function.
+        "active_region_grid_spacing_nm": float(
+            cfg["numerical"]["active_region_grid_spacing_nm"]
+        ),
     }
 
 RUN_MODES: frozenset[str] = frozenset(
@@ -161,12 +193,67 @@ def validate_demo13_config(cfg: Mapping[str, Any]) -> None:
     if encoding == "hierarchical":
         design13.graded_thickness_bounds(cfg)
         design13.graded_profiles(cfg)
+    _validate_grading_resolution(cfg)
     tracking = _require_mapping(cfg, "state_tracking")
     for name, value in (tracking.get("parameter_scales") or {}).items():
         if float(value) <= 0:
             raise DemoError(f"state_tracking.parameter_scales.{name} must be positive")
     if not 0.0 <= float(tracking.get("minimum_confidence", 0.6)) <= 1.0:
         raise DemoError("state_tracking.minimum_confidence must lie in [0, 1]")
+
+
+def _validate_grading_resolution(cfg: Mapping[str, Any]) -> None:
+    """Keep the two grading minimums, and the mesh, mutually consistent.
+
+    v2 shipped ``minimum_graded_thickness_nm: 0.10`` alongside
+    ``minimum_grid_points_per_grade: 10`` at a 0.10 nm mesh, which demands
+    1.0 nm. Nothing complained, and the result was that "graded" designs one
+    mesh cell wide -- steps, not ramps -- were accepted as evidence about
+    grading. Each of these checks would have caught it.
+    """
+
+    space = cfg["bo"]["search_space"]
+    minimum_resolvable = design13.minimum_resolvable_grading_nm(cfg)
+    collapse = float(space.get("minimum_graded_thickness_nm", 0.0))
+    if minimum_resolvable > 0 and collapse < minimum_resolvable:
+        raise DemoError(
+            "bo.search_space.minimum_graded_thickness_nm "
+            f"({collapse:g} nm) is below "
+            "bo.search_space.minimum_mesh_resolvable_nonzero_grading_nm "
+            f"({minimum_resolvable:g} nm), so a grade narrower than the mesh can "
+            "resolve would be canonicalized as a real graded design and taught to "
+            "the surrogate. Raise the collapse threshold to at least the "
+            "resolvable minimum."
+        )
+    if minimum_resolvable <= 0:
+        return
+
+    grading = cfg.get("grading") or {}
+    active = float(cfg["numerical"]["active_region_grid_spacing_nm"])
+    points = int(grading.get("minimum_grid_points_per_grade", 10))
+    # Demo 12 refines *inside* a grade to honour this, so the global mesh does
+    # not have to. The check is that the demand is satisfiable at all.
+    if points >= 2 and minimum_resolvable / points <= 0.0:
+        raise DemoError("grading.minimum_grid_points_per_grade is unsatisfiable")
+
+    # A non-native profile is built from constant-composition sublayers. Each
+    # one has to be wider than the grade's own mesh spacing, or the staircase is
+    # finer than the grid that samples it.
+    sublayers = int(grading.get("staircase_sublayers", 16))
+    profiles = set(design13.graded_profiles(cfg))
+    if sublayers >= 1 and profiles - design13.NATIVE_PROFILES:
+        sublayer_nm = minimum_resolvable / sublayers
+        grade_spacing = min(active, minimum_resolvable / max(points, 2))
+        if sublayer_nm < grade_spacing:
+            raise DemoError(
+                f"the narrowest resolvable grade ({minimum_resolvable:g} nm) split "
+                f"into {sublayers} staircase sublayers gives {sublayer_nm:g} nm per "
+                f"sublayer, finer than the {grade_spacing:g} nm mesh inside the "
+                "grade. Raise grading.minimum_grid_points_per_grade, lower "
+                "grading.staircase_sublayers, or raise the resolvable minimum; "
+                f"non-native profiles ({', '.join(sorted(profiles - design13.NATIVE_PROFILES))}) "
+                "are built this way."
+            )
 
 
 def experiment_state_dir(cfg: Mapping[str, Any], results_root: Path) -> Path:

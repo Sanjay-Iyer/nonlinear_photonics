@@ -1077,6 +1077,10 @@ class Candidate:
 REJECT_GEOMETRY = "geometry_preflight"
 REJECT_DUPLICATE = "canonical_duplicate"
 REJECT_UNRESOLVABLE = "canonicalization_failed"
+#: A graded proposal whose realized width the mesh cannot resolve. Distinct from
+#: `geometry_preflight` because the geometry is perfectly constructible -- it is
+#: the *grade* that is not, and the fix is a different one.
+REJECT_SUBRESOLUTION = "subresolution_grade"
 
 
 def preflight(
@@ -1116,6 +1120,34 @@ def preflight(
     verdict["maximum_feasible_grading_nm"] = canonical.get(
         "_maximum_feasible_grading_nm"
     ) or design13.maximum_feasible_grading_for(canonical, cfg)
+
+    # A grade the mesh cannot resolve is not a grade. v2 quietly canonicalized
+    # such a proposal to abrupt, which meant a design with no grading in it
+    # entered the surrogate's training data wearing a profile label -- and is
+    # why v2 cannot say whether grading helps. Rejecting instead costs one
+    # regeneration attempt and no BO iteration, and keeps the graded branch's
+    # observations honestly graded.
+    if design13.rejects_subresolution_grades(cfg):
+        minimum = design13.minimum_resolvable_grading_nm(cfg)
+        realized, was_graded = design13.realized_grading_before_collapse(parameters, cfg)
+        verdict["realized_grading_before_collapse_nm"] = realized if was_graded else None
+        verdict["minimum_resolvable_grading_nm"] = minimum
+        if was_graded and realized < minimum:
+            maximum = verdict["maximum_feasible_grading_nm"] or 0.0
+            unbuildable = maximum < minimum
+            verdict["rejection_reason"] = (
+                f"{REJECT_SUBRESOLUTION}: the graded branch proposed a realized width "
+                f"of {realized:.4g} nm, below the {minimum:.4g} nm this mesh and "
+                "profile implementation can resolve"
+                + (
+                    f"; no grade at all is constructible here, because the largest "
+                    f"this geometry allows is {maximum:.4g} nm"
+                    if unbuildable
+                    else ""
+                )
+            )
+            verdict["geometry_reason"] = verdict["rejection_reason"]
+            return verdict
 
     try:
         resolved = design13.resolve_config(parameters, cfg)

@@ -41,6 +41,11 @@ GRADING_PROFILES: tuple[str, ...] = ("abrupt", "linear", "sigmoid", "erf", "cosi
 #: rest use Demo 12's documented constant-composition sublayer fallback.
 NATIVE_PROFILES: frozenset[str] = frozenset({"abrupt", "linear"})
 
+#: The hierarchical root's two values. Named so a comparison against the string
+#: cannot drift between modules.
+ABRUPT_MODE = "abrupt"
+GRADED_MODE = "graded"
+
 #: Continuous search dimensions, in the order used for every table and every
 #: normalized distance in this demo.
 RANGE_PARAMETERS: tuple[str, ...] = (
@@ -552,6 +557,62 @@ def enabled_optional_parameters(cfg: Mapping[str, Any]) -> list[str]:
         for name, entry in ((cfg.get("bo") or {}).get("optional_parameters") or {}).items()
         if isinstance(entry, Mapping) and bool(entry.get("enabled", False))
     ]
+
+
+def minimum_resolvable_grading_nm(cfg: Mapping[str, Any]) -> float:
+    """The narrowest grade this mesh and profile implementation can build.
+
+    Distinct from ``minimum_graded_thickness_nm``, which is the *collapse*
+    threshold: anything at or below it is canonicalized to abrupt.  This is the
+    *physical* limit the collapse threshold has to respect, derived in
+    ``EXPERIMENT_V3_DESIGN.md`` from the active mesh, the staircase sublayer
+    count and the flat-region requirement.  They are separate names because
+    conflating them is how v2 ended up with a 0.10 nm collapse threshold while
+    its own ``minimum_grid_points_per_grade: 10`` demanded 1.0 nm -- a "grade"
+    one mesh cell wide, which is a step.
+
+    Defaults to the collapse threshold when unset, so v2 configurations keep
+    their existing behaviour.
+    """
+
+    space = _search_space(cfg)
+    fallback = float(space.get("minimum_graded_thickness_nm", 0.0))
+    return float(space.get("minimum_mesh_resolvable_nonzero_grading_nm", fallback))
+
+
+def rejects_subresolution_grades(cfg: Mapping[str, Any]) -> bool:
+    """Whether a too-narrow graded proposal is rejected rather than collapsed.
+
+    Collapsing is what v2 did, and it is why nominally graded designs entered
+    the surrogate's training data as abrupt structures wearing a profile label.
+    Rejecting makes the proposal unrepeatable instead: it never reaches the
+    solver, never consumes a BO iteration, and a replacement is requested.
+    """
+
+    return bool(_search_space(cfg).get("reject_subresolution_grades", False))
+
+
+def realized_grading_before_collapse(
+    parameters: Mapping[str, Any], cfg: Mapping[str, Any]
+) -> tuple[float, bool]:
+    """``(realized_nm, was_proposed_graded)`` *before* the abrupt collapse.
+
+    :func:`canonicalize` folds a too-narrow grade to exactly 0 nm and relabels
+    it abrupt, which is correct for describing the structure but destroys the
+    information needed to reject the *proposal*.  A caller that wants to say
+    "you asked for a graded design and the mesh cannot build it" has to see the
+    width that was going to be built.
+    """
+
+    values = dict(parameters)
+    mode = values.pop("interface_mode", None)
+    if mode is not None and str(mode) == ABRUPT_MODE:
+        return 0.0, False
+    profile = str(values.get("grading_profile", "abrupt"))
+    if mode is None and profile == "abrupt":
+        return 0.0, False
+    realized, _fraction, _maximum = _resolve_grading_thickness(values, cfg)
+    return float(realized), True
 
 
 def grading_parameter_name(cfg: Mapping[str, Any]) -> str:
