@@ -568,3 +568,70 @@ def test_matching_schema_resumes_cleanly(cfg, tmp_path):
     stored = json.loads((tmp_path / "exp" / "experiment_schema.json").read_text("utf-8"))
     assert stored["parameterization"] == "fraction"
     assert stored["experiment_schema_version"] == demo13.EXPERIMENT_SCHEMA_VERSION
+
+
+# ---------------------------------------------------------------------------
+# the whole main() path, which unit tests alone did not cover
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("parameterization", ["fraction", "thickness"])
+def test_surrogate_slices_use_the_searched_grading_parameter(cfg, parameterization):
+    """Slices must vary a parameter that exists in the search space.
+
+    The unit tests all passed while `main()` raised KeyError: the surrogate
+    slice builder still named `grading_thickness_nm`, which the fraction
+    parameterization removes. Only an end-to-end run caught it.
+    """
+
+    import demo13
+
+    variant = copy.deepcopy(cfg)
+    variant["bo"]["search_space"]["parameterization"] = parameterization
+    grading = design13.grading_parameter_name(variant)
+    canonical, encoded = demo13._slice_points(variant, "asymmetry_s", grading)
+    assert canonical and encoded
+    assert all(grading in point for point in canonical)
+
+    def _constructible(point):
+        try:
+            design13.resolve_config(point, variant)
+        except demo_workflow.DemoError:
+            return False
+        return True
+
+    constructible = [point for point in canonical if _constructible(point)]
+    if parameterization == "fraction":
+        # Every point of the surface is a design that could actually be built.
+        assert len(constructible) == len(canonical)
+    else:
+        # Under the raw-thickness form the slice sweeps past what the
+        # held-fixed barrier can carry, so part of the surrogate surface
+        # describes structures that cannot exist. That is the weakness the
+        # fraction parameterization removes, and it is asserted here so the
+        # difference is on the record rather than folklore.
+        assert 0 < len(constructible) < len(canonical)
+
+    base = demo13._slice_base_point(variant, {})
+    assert grading in base
+    if parameterization == "fraction":
+        lower, upper = design13.graded_fraction_bounds(variant)
+        assert lower <= base[grading] <= upper
+        assert "grading_thickness_nm" not in base
+
+
+def test_partial_dependence_covers_every_range_parameter(cfg):
+    import demo13
+
+    grading = design13.grading_parameter_name(cfg)
+    for spec in design13.search_space_specs(cfg):
+        if not isinstance(spec, design13.RangeSpec):
+            continue
+        base = demo13._slice_base_point(cfg, {})
+        base[spec.name] = float(spec.lower)
+        assert design13.resolve_config(base, cfg)
+    assert grading in {
+        spec.name
+        for spec in design13.search_space_specs(cfg)
+        if isinstance(spec, design13.RangeSpec)
+    }

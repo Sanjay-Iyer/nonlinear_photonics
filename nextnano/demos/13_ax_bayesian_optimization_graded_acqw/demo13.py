@@ -961,6 +961,34 @@ def replay_study(cfg: Mapping[str, Any], results_root: Path | None) -> dict[str,
 # ---------------------------------------------------------------------------
 
 
+def _slice_base_point(
+    cfg: Mapping[str, Any], fixed: Mapping[str, Any]
+) -> dict[str, Any]:
+    """The held-fixed design a surrogate slice varies two coordinates of.
+
+    Carries whichever grading variable the search space declares: under the
+    fraction parameterization there is no `grading_thickness_nm` to hold fixed,
+    and asking for one raises.
+    """
+
+    point: dict[str, Any] = {
+        "asymmetry_s": float(fixed.get("asymmetry_s", 0.46)),
+        "central_barrier_thickness_nm": float(
+            fixed.get("central_barrier_thickness_nm", 1.8)
+        ),
+        "grading_profile": str(fixed.get("grading_profile", "linear")),
+    }
+    grading = design13.grading_parameter_name(cfg)
+    if grading == "grading_thickness_nm":
+        point[grading] = float(fixed.get("grading_thickness_nm", 1.5))
+    else:
+        lower, upper = design13.graded_fraction_bounds(cfg)
+        point[grading] = float(
+            fixed.get(grading, min(max(0.5, lower), upper))
+        )
+    return point
+
+
 def _slice_points(
     cfg: Mapping[str, Any], x_name: str, y_name: str
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
@@ -976,14 +1004,7 @@ def _slice_points(
     canonical_points: list[dict[str, Any]] = []
     for x in np.linspace(*bounds[x_name], count):
         for y in np.linspace(*bounds[y_name], count):
-            point = {
-                "asymmetry_s": float(fixed.get("asymmetry_s", 0.46)),
-                "central_barrier_thickness_nm": float(
-                    fixed.get("central_barrier_thickness_nm", 1.8)
-                ),
-                "grading_thickness_nm": float(fixed.get("grading_thickness_nm", 1.5)),
-                "grading_profile": str(fixed.get("grading_profile", "linear")),
-            }
+            point = _slice_base_point(cfg, fixed)
             point[x_name] = float(x)
             point[y_name] = float(y)
             canonical_points.append(point)
@@ -1015,8 +1036,9 @@ def surrogate_artifacts(
     slices: dict[str, list[dict[str, Any]]] = {}
     rows: list[dict[str, Any]] = []
     for name, (x_name, y_name) in (
-        ("asymmetry_grading", ("asymmetry_s", "grading_thickness_nm")),
-        ("barrier_grading", ("central_barrier_thickness_nm", "grading_thickness_nm")),
+        ("asymmetry_grading", ("asymmetry_s", design13.grading_parameter_name(cfg))),
+        ("barrier_grading", ("central_barrier_thickness_nm",
+                             design13.grading_parameter_name(cfg))),
     ):
         canonical_points, encoded = _slice_points(cfg, x_name, y_name)
         predictions = axsearch13.surrogate_predictions(experiment.client, encoded)
@@ -1056,14 +1078,7 @@ def surrogate_artifacts(
         count = int((cfg["bo"].get("surrogate_slices") or {}).get("grid_points", 21))
         points: list[dict[str, Any]] = []
         for value in np.linspace(spec.lower, spec.upper, count):
-            point = {
-                "asymmetry_s": float(fixed.get("asymmetry_s", 0.46)),
-                "central_barrier_thickness_nm": float(
-                    fixed.get("central_barrier_thickness_nm", 1.8)
-                ),
-                "grading_thickness_nm": float(fixed.get("grading_thickness_nm", 1.5)),
-                "grading_profile": str(fixed.get("grading_profile", "linear")),
-            }
+            point = _slice_base_point(cfg, fixed)
             point[spec.name] = float(value)
             points.append(point)
         predictions = axsearch13.surrogate_predictions(
