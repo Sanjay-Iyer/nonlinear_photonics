@@ -886,6 +886,8 @@ def budget_accounting(cfg: Mapping[str, Any], ledger: Ledger) -> dict[str, Any]:
     iterations having actually evaluated eight designs.
     """
 
+    import accounting13
+
     records = ledger.records()
     counts = design13.expected_evaluation_counts(cfg)
     initial = counts["num_initial_trials"]
@@ -897,14 +899,16 @@ def budget_accounting(cfg: Mapping[str, Any], ledger: Ledger) -> dict[str, Any]:
     sobol = [row for row in evaluations if str(row.get("generation_method")) == "Sobol"]
     model = [row for row in evaluations if str(row.get("generation_method")) == "MBM"]
     rejected = [row for row in records if _is(row, "rejected")]
+    # Classification is delegated. This function used to test the reason string
+    # for `geometry_preflight` or `canonical_duplicate` only, so a rejection
+    # carrying any other reason -- every one of v3's seven sub-resolution
+    # grades -- counted as neither, and the table reported 0 and 0 beside 7
+    # abandoned trials.
     preflight_invalid = [
         row for row in rejected
-        if REJECT_GEOMETRY in str(row.get("rejection_reason", ""))
+        if accounting13.rejection_category(row) in accounting13.PREFLIGHT_CATEGORIES
     ]
-    duplicates = [
-        row for row in rejected
-        if REJECT_DUPLICATE in str(row.get("rejection_reason", ""))
-    ]
+    duplicates = [row for row in rejected if accounting13.is_duplicate(row)]
     completed = [row for row in evaluations if _is(row, "completed")]
     outcome = lambda name: [  # noqa: E731 - a local projection, not a policy
         row for row in completed if str(row.get("trial_outcome_class")) == name

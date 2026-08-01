@@ -175,6 +175,74 @@ def verify_state_manifest(
     }
 
 
+def rehydrate_experiment_state(
+    bundle: Path, state_dir: Path, *, overwrite: bool = False
+) -> dict[str, Any]:
+    """Rebuild a runnable experiment directory from a transferred bundle.
+
+    A results bundle carries the Ax snapshot, the append-only ``trial_ledger.jsonl``
+    and the schema, but not the per-trial ``trials/trial_XXXX.json`` files that
+    :class:`axsearch13.Ledger` reads.  Those are recoverable: the JSONL holds the
+    complete record for every write, and the last entry for a trial index is that
+    trial's current state.
+
+    This exists so a licensed campaign can be reanalysed on a machine that never
+    ran it.  It writes only into ``state_dir``; the bundle is never modified, and
+    an existing state directory is refused unless ``overwrite`` is set, so a
+    rehydration cannot silently clobber a real experiment.
+    """
+
+    bundle, state_dir = Path(bundle), Path(state_dir)
+    ledger_source = bundle / "trial_ledger.jsonl"
+    if not ledger_source.is_file():
+        raise ReconstructionError(f"{bundle} holds no trial_ledger.jsonl")
+    if state_dir.exists() and any(state_dir.iterdir()) and not overwrite:
+        raise ReconstructionError(
+            f"{state_dir} already exists and is not empty. Refusing to overwrite an "
+            "experiment directory; pass overwrite=True only if you are certain."
+        )
+
+    (state_dir / "trials").mkdir(parents=True, exist_ok=True)
+    copied: list[str] = []
+    for name in CRITICAL_FILES + ("experiment_manifest.json",):
+        source = bundle / name
+        if source.is_file():
+            (state_dir / name).write_bytes(source.read_bytes())
+            copied.append(name)
+
+    # Last write wins, exactly as the live Ledger behaves: a trial left pending
+    # and later completed appears twice, and the completion is its state.
+    latest: dict[int, dict[str, Any]] = {}
+    malformed = 0
+    for line in ledger_source.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        try:
+            record = json.loads(line)
+            latest[int(record["trial_index"])] = record
+        except (json.JSONDecodeError, KeyError, TypeError, ValueError):
+            malformed += 1
+    for index, record in sorted(latest.items()):
+        (state_dir / "trials" / f"trial_{index:04d}.json").write_text(
+            json.dumps(record, indent=2, sort_keys=True, default=str) + "\n",
+            encoding="utf-8",
+        )
+    return {
+        "bundle": str(bundle),
+        "experiment_state_dir": str(state_dir),
+        "files_copied": sorted(copied),
+        "trial_records_written": len(latest),
+        "ledger_lines_malformed": malformed,
+        "trial_indices": sorted(latest),
+        "rehydrated_utc": dt.datetime.now(dt.timezone.utc).isoformat(),
+        "note": (
+            "Per-trial JSON files were reconstructed from trial_ledger.jsonl, which "
+            "is the authoritative append-only record. Raw solver output directories "
+            "are NOT part of a bundle and are not reconstructed."
+        ),
+    }
+
+
 def terminal_ledger_fingerprint(state_dir: Path) -> dict[str, str]:
     """A hash per *terminal* ledger record, keyed by trial index.
 

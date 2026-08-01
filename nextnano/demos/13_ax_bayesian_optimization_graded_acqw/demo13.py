@@ -53,6 +53,7 @@ from demo_workflow import (  # noqa: E402
     write_text_atomically,
 )
 
+import accounting13  # noqa: E402
 import analysis13  # noqa: E402
 import axsearch13  # noqa: E402
 import design13  # noqa: E402
@@ -127,12 +128,29 @@ def experiment_schema(cfg: Mapping[str, Any]) -> dict[str, Any]:
         "range_bounds": bounds,
         "choice_values": choices,
         "minimum_resolvable_grading_nm": design13.minimum_resolvable_grading_nm(cfg),
+        # Changes what a stored grading fraction *means*, so two snapshots
+        # written under different mappings describe different structures from
+        # the same numbers. Identity, not a preference.
+        "grading_fraction_spans_feasible_interval": design13.fraction_spans_feasible_interval(cfg),
         # The mesh is not an Ax parameter, but two observations computed at
         # different mesh spacings are not observations of the same function.
         "active_region_grid_spacing_nm": float(
             cfg["numerical"]["active_region_grid_spacing_nm"]
         ),
     }
+
+#: Sentinel: this schema field has no "before it existed" default, so a snapshot
+#: that predates it cannot be judged compatible on that field at all.
+_SCHEMA_NO_DEFAULT = object()
+
+#: What each schema field meant *before it was added*, for snapshots written
+#: without it. A field listed here can be introduced without invalidating every
+#: existing checkpoint; a field not listed here cannot.
+SCHEMA_FIELD_DEFAULTS: Mapping[str, Any] = {
+    # v3 ran with the fraction spanning [0, maximum]; the interval mapping is
+    # opt-in and postdates the v3 snapshot.
+    "grading_fraction_spans_feasible_interval": False,
+}
 
 RUN_MODES: frozenset[str] = frozenset(
     {
@@ -553,7 +571,15 @@ class Experiment:
         differences = [
             f"{key}: snapshot has {stored.get(key)!r}, configuration asks for {value!r}"
             for key, value in wanted.items()
-            if stored.get(key) != value
+            # A schema field added after a snapshot was written is absent from
+            # it. That absence means "whatever the behaviour was before the
+            # field existed", so it is compatible with exactly that default and
+            # incompatible with anything else. Without this, adding any new
+            # identity field would invalidate every existing checkpoint.
+            if key not in stored
+            and value != SCHEMA_FIELD_DEFAULTS.get(key, _SCHEMA_NO_DEFAULT)
+            or key in stored
+            and stored[key] != value
         ]
         if differences:
             detail = "\n  ".join(differences)
@@ -1238,6 +1264,62 @@ def _grading_columns(record: Mapping[str, Any]) -> dict[str, Any]:
     return tables13._grading_columns(record)
 
 
+def _branch_validity(
+    cfg: Mapping[str, Any], point: Mapping[str, Any]
+) -> dict[str, Any]:
+    """Whether a slice point is a physically valid member of its own branch.
+
+    A graded grid point whose realized width falls below the mesh-resolvable
+    minimum is not a graded design at all.  The v3 bundle nevertheless kept
+    hundreds of such points marked ``prediction_available`` with a graded
+    coordinate attached, so a surrogate surface showed a continuum of "graded"
+    predictions where the physical structure was the *same abrupt design*
+    repeated -- once per profile label, four times over.
+
+    Such a point is reported here as unavailable **for the branch it claims**,
+    with the reason, rather than silently canonicalized and plotted.
+    """
+
+    minimum = design13.minimum_resolvable_grading_nm(cfg)
+    requested = str(point.get("interface_mode", "graded"))
+    if requested == "abrupt" or str(point.get("grading_profile", "")) == "abrupt":
+        return {
+            "requested_branch": "abrupt",
+            "branch_valid": True,
+            "branch_invalid_reason": "",
+        }
+    try:
+        view = grading13.from_parameters(dict(point), cfg)
+    except Exception as exc:  # pragma: no cover - defensive
+        return {
+            "requested_branch": "graded",
+            "branch_valid": False,
+            "branch_invalid_reason": f"{type(exc).__name__}: {exc}",
+        }
+    if view.realized_grading_thickness_nm < minimum:
+        maximum = view.maximum_feasible_grading_nm
+        return {
+            "requested_branch": "graded",
+            "branch_valid": False,
+            "branch_invalid_reason": (
+                f"a graded point here realizes {view.realized_grading_thickness_nm:.4g} nm, "
+                f"below the {minimum:.4g} nm minimum this mesh can resolve"
+                + (
+                    f"; the largest grade this geometry allows is {maximum:.4g} nm"
+                    if maximum is not None
+                    else ""
+                )
+                + ". The physical structure is abrupt, so it is not plotted as a "
+                "graded prediction."
+            ),
+        }
+    return {
+        "requested_branch": "graded",
+        "branch_valid": True,
+        "branch_invalid_reason": "",
+    }
+
+
 def _realized_grading_columns(
     cfg: Mapping[str, Any], point: Mapping[str, Any]
 ) -> dict[str, Any]:
@@ -1257,6 +1339,66 @@ def _realized_grading_columns(
         key: value
         for key, value in view.as_record().items()
         if key != "source"
+    }
+
+
+def _normal_cdf(z: float) -> float:
+    return 0.5 * (1.0 + math.erf(float(z) / math.sqrt(2.0)))
+
+
+def _feasibility_probabilities(
+    experiment: "Experiment", row: Mapping[str, Any]
+) -> dict[str, Any]:
+    """Per-constraint and joint probability that a point satisfies the constraints.
+
+    Each modelled outcome constraint gets a Gaussian tail probability from the
+    surrogate's own posterior for that metric.  The direction matters and is
+    taken from the constraint, not assumed: an upper bound needs
+    ``P(y <= bound)`` and a lower bound needs ``P(y >= bound)``.  Getting that
+    backwards would make the most infeasible region look the most promising.
+
+    The joint probability multiplies them, which assumes the constraint
+    outcomes are independent given the design.  Ax's own acquisition does not
+    assume that, so this is a *proxy* and is labelled as one.
+    """
+
+    per_constraint: dict[str, Any] = {}
+    joint = 1.0
+    modelled = 0
+    for spec in feasibility13.build_constraints(experiment.cfg):
+        # Only constraints Ax actually models have a posterior. The binary 0/1
+        # validity flags are enforced as trial status and post-processing QC and
+        # are deliberately never given to the surrogate.
+        if spec.enforcement != "ax_outcome_constraint" or spec.is_binary_flag:
+            continue
+        mean = row.get(f"{spec.metric}_predicted_mean")
+        sem = row.get(f"{spec.metric}_predicted_standard_error")
+        if mean is None or sem is None:
+            continue
+        sigma = max(float(sem), 1e-12)
+        z = (float(spec.threshold) - float(mean)) / sigma
+        # "<=" is an upper bound and needs P(y <= threshold); ">=" is a lower
+        # bound and needs P(y >= threshold). Reversing these would make the
+        # most infeasible region look the most promising.
+        probability = _normal_cdf(z) if spec.operator == "<=" else 1.0 - _normal_cdf(z)
+        per_constraint[f"probability_satisfies_{spec.metric}"] = float(probability)
+        joint *= float(probability)
+        modelled += 1
+    if not modelled:
+        return {
+            "probability_of_feasibility": None,
+            "feasibility_probability_note": (
+                "no modelled constraint had a posterior at this point"
+            ),
+        }
+    return {
+        **per_constraint,
+        "probability_of_feasibility": float(joint),
+        "feasibility_probability_note": (
+            f"product of {modelled} independent Gaussian tail probabilities from the "
+            "reconstructed posterior; independence is an approximation and this is "
+            "not Ax's own feasibility weighting"
+        ),
     }
 
 
@@ -1313,6 +1455,16 @@ def surrogate_artifacts(
         predictions = model.predict(encoded)
         slice_rows: list[dict[str, Any]] = []
         for point, prediction in zip(search_points, predictions):
+            validity = _branch_validity(cfg, point)
+            available = bool(prediction.get("prediction_available", False))
+            reason = str(prediction.get("reason", ""))
+            if not validity["branch_valid"]:
+                # The model can predict here, but the point is not a member of
+                # the branch it claims: its physical structure is abrupt. It is
+                # withheld from the graded surface rather than drawn as one of
+                # hundreds of identical "graded" predictions.
+                available = False
+                reason = validity["branch_invalid_reason"]
             row = {
                 "slice": name,
                 **{key: value for key, value in point.items()},
@@ -1320,25 +1472,46 @@ def surrogate_artifacts(
                 # reader is never left to guess whether the grading column is a
                 # fraction or a length.
                 **_realized_grading_columns(cfg, point),
+                **validity,
                 **{
                     f"fixed_{key}": value
                     for key, value in fixed.items()
                     if key not in (x_name, y_name)
                 },
-                "prediction_available": prediction.get("prediction_available", False),
-                "reason": prediction.get("reason", ""),
+                "prediction_available": available,
+                "reason": reason,
             }
-            for key, value in prediction.items():
-                if str(key).endswith(("_predicted_mean", "_predicted_standard_error")):
-                    row[key] = value
+            if available:
+                for key, value in prediction.items():
+                    if str(key).endswith(
+                        ("_predicted_mean", "_predicted_standard_error")
+                    ):
+                        row[key] = value
             mean = row.get(f"{metric}_predicted_mean")
             sem = row.get(f"{metric}_predicted_standard_error")
             row["expected_improvement"] = (
                 None if mean is None else _expected_improvement(float(mean), sem, best_value)
             )
+            # Feasibility is the whole story on this campaign: three of sixteen
+            # completed trials satisfied the constraints, and the five genuine
+            # graded designs failed on detuning alone. An acquisition surface
+            # that ignores the constraints therefore points at designs the
+            # study already knows are infeasible.
+            row.update(_feasibility_probabilities(experiment, row))
+            joint = row.get("probability_of_feasibility")
+            row["constrained_expected_improvement_proxy"] = (
+                None
+                if row["expected_improvement"] is None or joint is None
+                else float(row["expected_improvement"]) * float(joint)
+            )
             row["expected_improvement_method"] = (
-                "analytic expected improvement from the Ax posterior mean and standard "
-                "error on this slice; not a replay of Ax's Monte-Carlo acquisition"
+                "analytic expected improvement from the reconstructed posterior; "
+                "NOT the original constrained Ax acquisition. Ax generated with a "
+                "Monte-Carlo, constraint-weighted, noisy-observation acquisition "
+                "(qLogNoisyEI); this is a different function of the same posterior, "
+                "and the exact acquisition cannot be replayed from a snapshot. The "
+                "constrained proxy multiplies it by the modelled joint probability "
+                "of feasibility."
             )
             slice_rows.append(row)
         slices[name] = slice_rows
@@ -1982,6 +2155,8 @@ def write_run_artifacts(
     validation: Mapping[str, Any],
     synthetic: bool,
     rejection_rows: Sequence[Mapping[str, Any]] = (),
+    iteration_mapping: Sequence[Mapping[str, Any]] = (),
+    proposed_vs_realized_rows: Sequence[Mapping[str, Any]] = (),
     budget_record: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Tables, figures and guides for one run bundle."""
@@ -2050,6 +2225,8 @@ def write_run_artifacts(
         warm_start_rows=((replay or {}).get("ingested") or {}).get("provenance_rows", []),
         plan_record=plan_record,
         rejection_rows=rejection_rows,
+        iteration_mapping=iteration_mapping,
+        proposed_vs_realized_rows=proposed_vs_realized_rows,
         budget_record=budget_record,
         synthetic=synthetic,
     )
@@ -2149,6 +2326,7 @@ def validation_lifecycle(
     model_available: bool,
     validation: Mapping[str, Any],
     dependency_report: Mapping[str, Any] | None,
+    accounting: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Five separable questions the single "is it validated?" flag used to blur.
 
@@ -2182,9 +2360,14 @@ def validation_lifecycle(
         # settles whether this process could have called it.
         "solver_invoked_by_this_run": bool(solver_ran_this_process)
         and mode != "analyze_existing_results",
+        # Read from the authoritative accounting. This used to read
+        # `plan_record["remaining_new_solver_runs"]`, a key `plan()` does not
+        # return, so the `.get` default of 1 was used on every run and the flag
+        # was permanently False -- including for the completed 16/16 campaign.
         "optimization_completed": bool(
-            plan_record.get("remaining_new_solver_runs", 1) == 0
+            (accounting or {}).get("optimization_completed", False)
         ),
+        "remaining_evaluations": int((accounting or {}).get("remaining_evaluations", -1)),
         "reporting_completed": bool(model_available),
         "stage5_physical_validation_completed": bool(
             validation.get("enabled") and validation.get("solver_ran")
@@ -2209,16 +2392,15 @@ def validation_lifecycle(
 
 
 def _lifecycle(record: Mapping[str, Any]) -> str:
-    status = str(record.get("status"))
-    if status == "rejected":
-        return "proposed, rejected as a canonical duplicate, never simulated"
-    if status == "failed":
-        return "proposed, executed, failed"
-    if status == "completed":
-        return "proposed, executed, completed" + (
-            "" if record.get("trial_valid") else ", rejected by outcome constraints"
-        )
-    return "proposed, input generated, execution pending"
+    """Delegates to the one place that classifies a proposal's outcome.
+
+    This used to hard-code "rejected as a canonical duplicate" for every
+    rejected record, which on the v3 campaign was wrong seven times out of
+    seven: all seven refusals were sub-resolution grades, and none was a
+    duplicate of anything.
+    """
+
+    return accounting13.lifecycle_phrase(record)
 
 
 # ---------------------------------------------------------------------------
@@ -2365,13 +2547,22 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
     if validation.get("enabled"):
         records = experiment.ledger.records()
 
-    budget = axsearch13.budget_accounting(cfg, experiment.ledger)
+    # The one authoritative count. Everything that reports a number -- console,
+    # both manifests, the validation report, the results overview, the budget
+    # table and the candidate history -- projects from this dict rather than
+    # recomputing, which is how the v3 bundle came to report 0 preflight-invalid
+    # proposals beside 7 abandoned trials.
+    accounting = accounting13.campaign_accounting(records, cfg)
+    accounting["analysis_only_run"] = mode == "analyze_existing_results"
+    write_json_atomically(
+        context.parent / "extracted" / "campaign_accounting.json", accounting
+    )
+    print("\n".join(accounting13.report_lines(accounting)))
+
+    # The budget table is a projection of the same dict, never a second
+    # derivation: two derivations is exactly what disagreed.
+    budget = accounting13.budget_table_row(accounting)
     write_json_atomically(context.parent / "extracted" / "budget_accounting.json", budget)
-    print(f"  proposals / evaluations     : "
-          f"{budget['sobol_proposals'] + budget['model_based_proposals']} proposed, "
-          f"{budget['ax_completed_observations']} completed, "
-          f"{budget['preflight_invalid_proposals']} preflight-invalid, "
-          f"{budget['duplicate_proposals']} duplicate")
 
     # A deserialized Ax client has no fitted adapter, so the surrogate is
     # rebuilt here -- from the completed observations, on a private copy of the
@@ -2397,10 +2588,24 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
         replay=replay,
         validation=validation,
         synthetic=synthetic,
-        rejection_rows=loop_result.get("rejections", []),
+        # Rebuilt from the ledger, not from this run's in-memory loop state.
+        # Reanalysis never runs the loop, so the old source was empty on every
+        # reanalysis -- for a campaign with seven refusals on record.
+        rejection_rows=accounting13.rejection_history(records, cfg),
+        iteration_mapping=accounting13.trial_iteration_mapping(records),
+        proposed_vs_realized_rows=accounting13.proposed_versus_realized_grading(records, cfg),
         budget_record=budget,
     )
 
+    # A refused proposal is not a solver case: no deck was rendered and nothing
+    # was executed, so it cannot be a case that failed to complete. Including
+    # them here made the shared manifest writer compare 16 completed against 23
+    # cases and stamp the whole campaign `status: failed` -- a campaign with
+    # sixteen successes and zero failures. They remain fully reported in the
+    # candidate-history and rejection-history tables.
+    evaluated_records = [
+        record for record in records if str(record.get("status")) != "rejected"
+    ]
     results = [
         sweeps.CaseResult(
             spec=sweeps.CaseSpec(
@@ -2423,7 +2628,7 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
             validation={"passed": bool(record.get("trial_valid"))},
             failure_reason=record.get("failure_reason"),
         )
-        for record in records
+        for record in evaluated_records
     ]
     sweeps.write_sweep_summary(context.parent, results)
     sweeps.write_failed_and_suspicious(context.parent, results)
@@ -2452,6 +2657,7 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
         model_available=model.available,
         validation=validation,
         dependency_report=context.dependency_report,
+        accounting=accounting,
     )
     write_json_atomically(
         context.parent / "extracted" / "validation_lifecycle.json", lifecycle
@@ -2496,6 +2702,13 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
             # and so reads `completed` without a solver having been invoked.
             # These two keys keep that from being read as a licensed run.
             "validation_lifecycle": lifecycle,
+            "campaign_accounting": accounting,
+            # The shared `status` field answers "did every case in this manifest
+            # complete". Refused proposals are not cases and are excluded from
+            # `results`, so their count is carried here instead of silently
+            # turning a successful campaign into `status: failed`.
+            "proposals_refused_at_preflight": accounting["preflight_rejected"],
+            "proposals_total": accounting["proposed_candidates"],
             "licensed_result_claim": (
                 "not run"
                 if not lifecycle["licensed_execution_completed"]

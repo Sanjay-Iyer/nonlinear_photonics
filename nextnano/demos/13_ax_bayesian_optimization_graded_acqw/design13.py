@@ -118,7 +118,19 @@ def _resolve_grading_thickness(
     # The feasible maximum depends on the geometry this candidate asks for, so
     # the well widths and barrier must be resolved before it can be computed.
     probe = _geometry_probe(values, cfg)
-    realized, maximum = geometry13.realize_from_fraction(probe, float(fraction))
+    realized, maximum = geometry13.realize_from_fraction(
+        probe,
+        float(fraction),
+        # Zero keeps the v3 mapping, under which a low fraction at a narrow
+        # barrier is refused. Non-zero makes the graded branch valid by
+        # construction. See `grading_fraction_spans_feasible_interval`.
+        minimum_nm=(
+            minimum_resolvable_grading_nm(cfg)
+            if fraction_spans_feasible_interval(cfg)
+            else 0.0
+        ),
+        fraction_bounds=graded_fraction_bounds(cfg),
+    )
     return realized, float(fraction), maximum
 
 
@@ -205,7 +217,13 @@ def canonicalize(parameters: Mapping[str, Any], cfg: Mapping[str, Any]) -> dict[
     if thickness < 0:
         raise DesignError("grading_thickness_nm cannot be negative")
 
-    if profile == "abrupt" or thickness <= minimum:
+    # Strictly below, not at-or-below. A grade exactly equal to the configured
+    # minimum *is* the minimum resolvable grade -- collapsing it would make the
+    # interval mapping's lower endpoint unreachable, since that endpoint is the
+    # minimum by construction. For v3's recorded designs this changes nothing:
+    # every refused grade was strictly below 0.80 nm and every accepted one
+    # strictly above.
+    if profile == "abrupt" or thickness < minimum:
         profile, thickness = "abrupt", 0.0
 
     canonical = {
@@ -578,6 +596,27 @@ def minimum_resolvable_grading_nm(cfg: Mapping[str, Any]) -> float:
     space = _search_space(cfg)
     fallback = float(space.get("minimum_graded_thickness_nm", 0.0))
     return float(space.get("minimum_mesh_resolvable_nonzero_grading_nm", fallback))
+
+
+def fraction_spans_feasible_interval(cfg: Mapping[str, Any]) -> bool:
+    """Whether the Ax grading coordinate spans ``[minimum, maximum]``.
+
+    ``False`` (the default, and what v3 ran) means the coordinate spans
+    ``[0, maximum]``: a low fraction at a narrow barrier realizes below the
+    mesh-resolvable minimum and is refused.  v3 spent seven proposals that way,
+    six of them on the ``erf`` branch the model kept returning to.
+
+    ``True`` maps the same coordinate onto the *feasible* interval, so every
+    value the optimizer can pick builds a resolvable grade and refusal is
+    reserved for geometries with no room at all.
+
+    This changes what a stored fraction means, so it is part of the experiment
+    schema: a snapshot written under one mapping cannot resume under the other.
+    """
+
+    return bool(
+        _search_space(cfg).get("grading_fraction_spans_feasible_interval", False)
+    )
 
 
 def rejects_subresolution_grades(cfg: Mapping[str, Any]) -> bool:

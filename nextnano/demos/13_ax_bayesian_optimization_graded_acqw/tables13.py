@@ -246,6 +246,8 @@ TABLE_CATALOGUE: Mapping[str, str] = {
     "bo_constraint_feasibility_audit": "one (trial, constraint) pair, with the exact value, threshold, comparison and verdict, and whether Ax was told about it",
     "bo_constraint_modelling_decisions": "one configured constraint, with its observed spread and why it is or is not modelled by the surrogate",
     "bo_candidate_rejection_history": "one Ax proposal that was refused before the solver ran, with the reason and the replacement that ran instead",
+    "bo_proposed_vs_realized_grading": "one proposal, with what Ax asked for beside what was built; a refused proposal built nothing and says so rather than reporting an abrupt 0 nm design",
+    "bo_trial_iteration_mapping": "one proposal, tying the proposal attempt, Ax trial index, completed-evaluation number, Sobol number and MBM iteration number together",
     "bo_budget_accounting": "the run's proposal and evaluation counters, kept separate",
     "bo_geometry_feasibility_by_layer": "one layer of one trial's stack, with how much a centred grade consumes and whether flat material survives",
 }
@@ -690,6 +692,8 @@ def write_all(
     warm_start_rows: Sequence[Mapping[str, Any]] = (),
     plan_record: Mapping[str, Any] | None = None,
     rejection_rows: Sequence[Mapping[str, Any]] = (),
+    iteration_mapping: Sequence[Mapping[str, Any]] = (),
+    proposed_vs_realized_rows: Sequence[Mapping[str, Any]] = (),
     budget_record: Mapping[str, Any] | None = None,
     synthetic: bool = False,
 ) -> list[str]:
@@ -729,6 +733,8 @@ def write_all(
     constraint_specs = feasibility13.build_constraints(cfg)
     emit("bo_constraint_feasibility_audit", feasibility13.audit_rows(records, constraint_specs))
     emit("bo_candidate_rejection_history", rejection_rows)
+    emit("bo_trial_iteration_mapping", iteration_mapping)
+    emit("bo_proposed_vs_realized_grading", proposed_vs_realized_rows)
     emit("bo_budget_accounting", [dict(budget_record)] if budget_record else [])
     emit(
         "bo_constraint_modelling_decisions",

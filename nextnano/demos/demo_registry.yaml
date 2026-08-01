@@ -425,22 +425,29 @@ demos:
     home_syntax_check: input_generation_only
     home_solver_check: not_attempted_no_licensed_solver
     licensed_validation:
-      date: "2026-07-31"
+      date: "2026-08-01"
       solver: "nextnano++ Standard (work laptop)"
       evidence: >-
-        16/16 trials completed with zero mechanical solver failures: 6 Sobol
-        initialization trials and 10 model-based Ax/BoTorch iterations, 8 of them
-        feasible under the modelled outcome constraints, best trial t0012. Solver
-        execution, extraction, QC, Ax completion and checkpoint/resume are
+        Experiment v3 (schema demo13-search-space-3, 0.05 nm mesh, 0.85-2.5 nm
+        barrier): 23 proposals, 7 refused at preflight as sub-resolution grades
+        with no solver launched, 16 completed with zero mechanical failures
+        (6 Sobol + 10 model-based), 3 feasible, best feasible trial t0021.
+        Solver execution, extraction, QC, Ax completion and checkpoint/resume are
         exercised for real. This validates the PLUMBING only. The objective is a
-        RELATIVE nonlinear-optical merit in arbitrary units, not calibrated chi(2)
-        in pm/V, and no design has passed Stage 5, so t0012 is a proposed optimum
-        and not a validated one.
+        RELATIVE nonlinear-optical merit in arbitrary units, never calibrated
+        chi(2) in pm/V. t0021 sits on the 0.85 nm barrier lower bound and has not
+        passed Stage 5, so it is a best-found design and not a validated optimum.
+        The campaign was run from a DIRTY work-laptop tree, so the recorded commit
+        does not fully describe the code that produced it.
+      superseded: >-
+        Experiment v2 (0.5 nm barrier bound, 0.10 nm mesh, best t0012) is a
+        separate earlier campaign under a different search space. Its numbers are
+        not comparable with v3's and must not be quoted for v3.
     pending_licensed_checks:
-      - Run Stage 5 local refinement, mesh, state-count and padding convergence on the top designs before calling any Ax optimum validated.
-      - Re-check state tracking near avoided crossings before accepting an optimum; the winner sits at a 0.5 nm barrier.
-      - Confirm the 0.5 nm central barrier is resolved by several mesh cells before treating it as a physical optimum rather than a bound artifact.
-      - Confirm every trial's realized alloy profile against its requested profile, as in Demo 12 Stage 1.
-      - Answer whether grading helps, with a v3 campaign that samples enough genuinely non-zero graded designs to support the claim.
+      - Run Stage 5 mesh convergence on t0021 first (0.025 / 0.05 / 0.10 nm) and stop if the objective, detuning, state identity or QC is unstable.
+      - Run Stage 5 local refinement, state-count and padding convergence on t0021, t0017, t0005 and t0022 before calling any design validated.
+      - Re-check state tracking with an order-independent anchor; t0021 sits at the 0.85 nm barrier lower bound where tunnel coupling is strongest.
+      - Confirm every trial's realized alloy profile against its requested profile; the v3 bundle carried no alloy-composition output, so no grading realization has been verified.
+      - Answer whether grading helps with a balanced paired campaign. v3 evaluated five genuinely graded designs (erf 3, sigmoid 1, cosine 1, linear 0) and none was feasible, so the present data cannot decide it.
     unvalidated_syntax:
       - inherits Demo 12's unvalidated ternary_linear/ternary_constant alloy-composition output layout

@@ -703,10 +703,18 @@ def test_registry_pending_checks_still_demand_stage_five():
     assert record.pending_licensed_checks, "validation must remain owed"
 
 
-def test_demo_yaml_points_at_the_completed_experiment_in_analysis_mode(cfg):
+def test_demo_yaml_points_at_the_current_experiment(cfg):
+    """The live configuration must name v3, and v2 must not be reachable from it.
+
+    This replaces a v2-era assertion that pinned `analyze_existing_results` and
+    `demo13_ax_experiment_v2`. v3 is the current campaign; its mode is a
+    deliberate choice recorded in the YAML, and the directory is what must never
+    silently point back at an older study.
+    """
+
     workflow = cfg["workflow"]
-    assert workflow["mode"] == "analyze_existing_results"
-    assert workflow["experiment_state_dir"] == "demo13_ax_experiment_v2"
+    assert workflow["experiment_state_dir"] == "demo13_ax_experiment_v3"
+    assert workflow["mode"] in {"closed_loop", "analyze_existing_results"}
 
 
 # ---------------------------------------------------------------------------

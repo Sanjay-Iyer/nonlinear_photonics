@@ -377,7 +377,11 @@ def evaluate(
 
 
 def realize_from_fraction(
-    cfg: Mapping[str, Any], fraction: float
+    cfg: Mapping[str, Any],
+    fraction: float,
+    *,
+    minimum_nm: float = 0.0,
+    fraction_bounds: tuple[float, float] | None = None,
 ) -> tuple[float, float]:
     """Turn a feasible-max fraction into a realized thickness.
 
@@ -385,17 +389,58 @@ def realize_from_fraction(
     the optimizer chooses *how much of the available room to use*, and the
     available room is recomputed from the barrier and well thicknesses of the
     very design being proposed. Returns ``(realized_nm, maximum_nm)``.
+
+    **Default (``minimum_nm = 0``): the v3 mapping.** The fraction spans
+    ``[0, maximum]``, so a low fraction at a narrow barrier lands below the
+    mesh-resolvable minimum and the proposal is refused.  Six of v3's seven
+    refusals were exactly this, all of them ``erf`` proposals the model kept
+    returning to.
+
+    **``minimum_nm > 0``: the interval mapping.** The fraction spans
+    ``[minimum_nm, maximum]`` instead, so every value the optimizer can choose
+    builds a resolvable grade and the graded branch is valid *by construction*.
+    Only a geometry with no room at all (``maximum < minimum_nm``) is refused.
+
+    The mapping is opt-in because it changes what a stored fraction *means*.
+    Reinterpreting v3's recorded fractions under it would silently redescribe
+    designs that have already been simulated, so it is gated by configuration
+    and recorded in the experiment schema.
     """
 
-    if not 0.0 <= float(fraction) <= 1.0:
+    lower, upper = fraction_bounds if fraction_bounds else (0.0, 1.0)
+    if not lower <= float(fraction) <= upper:
         raise DemoError(
-            f"grading_fraction_of_feasible_max must lie in [0, 1], got {fraction!r}"
+            f"grading_fraction_of_feasible_max must lie in [{lower}, {upper}], "
+            f"got {fraction!r}"
         )
     maximum, _binding = maximum_feasible_grading_nm(cfg)
     if maximum <= 0:
         return 0.0, 0.0
-    realized = float(fraction) * maximum
     snap = mesh_snap_nm(cfg)
+
+    if minimum_nm > 0.0:
+        if maximum < minimum_nm:
+            # No resolvable grade exists here at all. Returning 0 lets the
+            # caller refuse it with an accurate reason rather than building
+            # something narrower than the mesh.
+            return 0.0, maximum
+        span = upper - lower
+        position = 0.0 if span <= 0 else (float(fraction) - lower) / span
+        realized = minimum_nm + position * (maximum - minimum_nm)
+        if snap > 0:
+            # Snapping rounds *down*, which at the lower endpoint would drop the
+            # width just below the minimum and have it collapsed to abrupt --
+            # making the mapping's own lower bound unreachable. Step up one
+            # increment when that happens, unless there is no room to.
+            snapped = snap_to_mesh(realized, snap)
+            if snapped < minimum_nm:
+                snapped = snap_to_mesh(minimum_nm + snap, snap)
+                if snapped > maximum:
+                    return 0.0, maximum
+            realized = snapped
+        return min(realized, maximum), maximum
+
+    realized = float(fraction) * maximum
     return (snap_to_mesh(realized, snap) if snap > 0 else realized), maximum
 
 

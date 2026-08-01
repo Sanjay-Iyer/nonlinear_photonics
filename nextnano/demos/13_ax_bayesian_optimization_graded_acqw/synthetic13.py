@@ -48,9 +48,18 @@ from demo_workflow import DemoError  # noqa: E402
 import design13  # noqa: E402
 
 #: The maximum the Stage 1 smoke test must recover.
+#: The known optimum of the test surface.
+#:
+#: Its barrier was raised from 1.30 nm to 1.60 nm when v3 tightened the geometry.
+#: The largest grade a design can build is its central barrier minus
+#: ``grading.minimum_flat_region_nm``, so at a 1.30 nm barrier the maximum is
+#: 1.20 nm and the 1.40 nm optimum was **not constructible at its own barrier**:
+#: no proposal could reach it, and the recovery test was measuring how close the
+#: optimizer got to a point that does not exist. At 1.60 nm the maximum is
+#: 1.50 nm and the optimum is reachable, which is what makes recovery a real test.
 SYNTHETIC_OPTIMUM: Mapping[str, Any] = {
     "asymmetry_s": 0.46,
-    "central_barrier_thickness_nm": 1.30,
+    "central_barrier_thickness_nm": 1.60,
     "grading_thickness_nm": 1.40,
     "grading_profile": "cosine",
 }

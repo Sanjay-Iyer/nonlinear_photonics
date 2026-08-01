@@ -65,6 +65,13 @@ TRIAL_OUTCOME_CLASSES: tuple[str, ...] = (
     OUTCOME_NOT_RUN,
 )
 
+#: Stated on every chi(2) row when the extraction did not supply a unit string.
+#: The v3 tables carried an empty `chi2_units` for all sixteen trials, and an
+#: unlabelled chi(2) column is the one that gets quoted as pm/V. Demo 13 always
+#: runs `metric.mode: relative`, so the scale is a Demo 11 Eq. 2 relative
+#: susceptibility: a lineshape and a trend with no absolute calibration.
+DEFAULT_RELATIVE_CHI2_UNITS = "a.u. (relative |chi2|)"
+
 #: What ``physical_qc.bound_state_policy`` does with a bound-state QC failure.
 #:
 #: ``warn``       trial stays usable and is reported as valid_with_warning. The
@@ -484,7 +491,17 @@ def build_record(
     record.update(
         {
             "chi2_mode": observables.get("chi2_mode"),
-            "relative_chi2_units": observables.get("chi2_units"),
+            # Never blank. The v3 tables carried an empty `chi2_units` for all
+            # sixteen trials, which leaves a reader of a chi(2) column with no
+            # statement of scale at all -- and an unlabelled chi(2) number is
+            # exactly the one that gets quoted as pm/V. The fallback states the
+            # scale this demo always uses.
+            "relative_chi2_units": (
+                observables.get("chi2_units") or DEFAULT_RELATIVE_CHI2_UNITS
+            ),
+            "chi2_units": (
+                observables.get("chi2_units") or DEFAULT_RELATIVE_CHI2_UNITS
+            ),
             "relative_peak_chi2_abs": None if peak is None else abs(peak),
             "peak_wavelength_nm": peak_wavelength,
             "relative_chi2_at_target_wavelength_abs": (

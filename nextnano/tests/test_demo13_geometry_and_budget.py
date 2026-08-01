@@ -226,9 +226,13 @@ def test_fraction_parameterization_is_the_shipped_default(cfg):
     assert "grading_thickness_nm" not in names
 
 
-@pytest.mark.parametrize("asymmetry,barrier", [(0.36, 0.5), (0.46, 1.8), (0.56, 2.5),
-                                               (0.503818, 2.058127), (0.368472, 0.565246)])
-@pytest.mark.parametrize("fraction", [0.05, 0.5, 0.999, 1.0])
+# Barriers and fractions inside the LIVE search space. v3 raised the barrier
+# floor to 0.85 nm and the fraction floor to 0.35, so v2's corners (0.5 nm
+# barrier, 0.05 fraction) are no longer proposable and asking geometry to
+# realize them tests nothing the optimizer can reach.
+@pytest.mark.parametrize("asymmetry,barrier", [(0.36, 0.85), (0.46, 1.8), (0.56, 2.5),
+                                               (0.503818, 2.058127), (0.368472, 0.9)])
+@pytest.mark.parametrize("fraction", [0.35, 0.5, 0.999, 1.0])
 def test_every_fraction_yields_a_constructible_geometry(cfg, asymmetry, barrier, fraction):
     """The point of the parameterization: an impossible grade is unproposable.
 
