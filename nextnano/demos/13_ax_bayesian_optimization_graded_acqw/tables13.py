@@ -148,6 +148,38 @@ COLUMN_UNITS: Mapping[str, str] = {
     "importance": "first-order Sobol index",
     "predicted_mean": "metric units",
     "predicted_standard_error": "metric units",
+    "detuning_side": "category",
+    "qc_warnings": "names",
+    "bound_state_policy": "category",
+    "ax_constraint_violations": "names",
+    "feasible_under_ax_constraints": "boolean",
+    "design_hash": "hex digest of the realized structure",
+    "canonical_hash": "hex digest of the realized structure",
+    "proposed_grading_fraction": "fraction of the feasible maximum in [0,1]",
+    "grading_fraction_of_feasible_max": "fraction of the feasible maximum in [0,1]",
+    "maximum_feasible_grading_thickness_nm": "nm",
+    "realized_grading_thickness_nm": "nm",
+    "minimum_flat_region_nm": "nm",
+    "layer_thickness_nm": "nm",
+    "consumed_nm": "nm",
+    "remaining_flat_nm": "nm",
+    "graded_interface_count": "count",
+    "binding_layer": "name",
+    "geometry_feasible": "boolean",
+    "solver_launched": "boolean",
+    "proposal_attempt": "count",
+    "requested_bo_iteration": "count",
+    "replacement_trial_index": "trial index",
+    "sobol_proposals": "count",
+    "model_based_proposals": "count",
+    "preflight_invalid_proposals": "count",
+    "duplicate_proposals": "count",
+    "solver_attempts": "count",
+    "ax_completed_observations": "count",
+    "standardized_slack": "posterior standard deviations",
+    "minimum_raw_slack": "metric units",
+    "best_raw_slack": "metric units",
+    "resolvable_by_surrogate": "boolean",
 }
 
 #: Tables that also get Markdown and JSON, because they are the ones a human
@@ -164,6 +196,7 @@ SUMMARY_TABLES: tuple[str, ...] = (
     "bo_demo12_warm_start_provenance",
     "bo_search_space_definition",
     "bo_constraint_modelling_decisions",
+    "bo_budget_accounting",
 )
 
 #: Every table Demo 13 promises, with the meaning of one row.
@@ -191,6 +224,9 @@ TABLE_CATALOGUE: Mapping[str, str] = {
     "bo_search_space_definition": "one active search-space parameter",
     "bo_constraint_feasibility_audit": "one (trial, constraint) pair, with the exact value, threshold, comparison and verdict, and whether Ax was told about it",
     "bo_constraint_modelling_decisions": "one configured constraint, with its observed spread and why it is or is not modelled by the surrogate",
+    "bo_candidate_rejection_history": "one Ax proposal that was refused before the solver ran, with the reason and the replacement that ran instead",
+    "bo_budget_accounting": "the run's proposal and evaluation counters, kept separate",
+    "bo_geometry_feasibility_by_layer": "one layer of one trial's stack, with how much a centred grade consumes and whether flat material survives",
 }
 
 
@@ -587,6 +623,8 @@ def write_all(
     efficiency_rows: Sequence[Mapping[str, Any]] = (),
     warm_start_rows: Sequence[Mapping[str, Any]] = (),
     plan_record: Mapping[str, Any] | None = None,
+    rejection_rows: Sequence[Mapping[str, Any]] = (),
+    budget_record: Mapping[str, Any] | None = None,
     synthetic: bool = False,
 ) -> list[str]:
     """Write the complete table set and return the filenames written."""
@@ -624,6 +662,8 @@ def write_all(
     emit("bo_search_space_definition", search_space_rows(cfg))
     constraint_specs = feasibility13.build_constraints(cfg)
     emit("bo_constraint_feasibility_audit", feasibility13.audit_rows(records, constraint_specs))
+    emit("bo_candidate_rejection_history", rejection_rows)
+    emit("bo_budget_accounting", [dict(budget_record)] if budget_record else [])
     emit(
         "bo_constraint_modelling_decisions",
         feasibility13.constraint_spread(records, constraint_specs),

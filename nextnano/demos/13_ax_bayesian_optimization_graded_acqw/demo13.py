@@ -83,6 +83,23 @@ demo11 = demo12.demo11
 #: changes, so old and new trial records can never be silently mixed.
 EXTRACTION_VERSION = "demo13-metrics-1"
 
+#: Bumped whenever the Ax *search space* changes shape. A snapshot written under
+#: one schema cannot be resumed under another -- the parameter names differ --
+#: so the mismatch is refused with instructions rather than loaded into a
+#: confusing half-state.
+EXPERIMENT_SCHEMA_VERSION = "demo13-search-space-2"
+
+
+def experiment_schema(cfg: Mapping[str, Any]) -> dict[str, Any]:
+    """The identity of the search space a snapshot was written against."""
+
+    return {
+        "experiment_schema_version": EXPERIMENT_SCHEMA_VERSION,
+        "encoding": str(cfg["bo"]["search_space"].get("encoding", "hierarchical")),
+        "parameterization": design13.grading_parameterization(cfg),
+        "parameters": sorted(spec.name for spec in design13.search_space_specs(cfg)),
+    }
+
 RUN_MODES: frozenset[str] = frozenset(
     {
         "synthetic_smoke_test",
@@ -366,8 +383,10 @@ class Experiment:
         self.warm_start_path = self.state_dir / "warm_start_attachments.json"
         self.resumed = False
         self.warm_start_attachments: list[dict[str, Any]] = []
+        self.schema_path = self.state_dir / "experiment_schema.json"
         resume = bool((cfg.get("workflow") or {}).get("resume", True))
         if resume and self.snapshot_path.is_file():
+            self._check_schema_compatible(cfg)
             self.client = axsearch13.load_client(self.snapshot_path)
             self.resumed = True
             if self.warm_start_path.is_file():
@@ -389,6 +408,40 @@ class Experiment:
             self.state_dir / "demo_yaml_snapshot.yaml",
             yaml.safe_dump(dict(cfg), sort_keys=True),
         )
+        write_json_atomically(self.schema_path, experiment_schema(cfg))
+
+    def _check_schema_compatible(self, cfg: Mapping[str, Any]) -> None:
+        """Refuse to resume a snapshot whose search space no longer matches."""
+
+        wanted = experiment_schema(cfg)
+        if not self.schema_path.is_file():
+            # Written before schema stamping existed. Its parameters are
+            # discoverable from the snapshot itself, so say what to do rather
+            # than guess.
+            raise DemoError(
+                f"{self.state_dir} holds an Ax snapshot with no recorded search-space "
+                "schema, so it predates the grading parameterization change and "
+                "cannot be safely resumed. Either point workflow.experiment_state_dir "
+                "at a new directory, or set bo.search_space.parameterization back to "
+                "'thickness' and delete experiment_schema.json to pin the old shape."
+            )
+        stored = json.loads(self.schema_path.read_text(encoding="utf-8"))
+        differences = [
+            f"{key}: snapshot has {stored.get(key)!r}, configuration asks for {value!r}"
+            for key, value in wanted.items()
+            if stored.get(key) != value
+        ]
+        if differences:
+            detail = "\n  ".join(differences)
+            raise DemoError(
+                "cannot resume this experiment: the Ax search space has changed.\n  "
+                + detail
+                + f"\nThe snapshot in {self.state_dir} was built with different "
+                "parameters, and Ax cannot reinterpret its trials under new ones. "
+                "Either restore the configuration above, or start a fresh study by "
+                "pointing workflow.experiment_state_dir at a new directory. The old "
+                "directory is never modified."
+            )
 
     def checkpoint(self) -> None:
         axsearch13.save_client(self.client, self.snapshot_path)
@@ -454,6 +507,102 @@ def _record_trial(
     return payload
 
 
+def _accepted_candidates(
+    experiment: Experiment,
+    cfg: Mapping[str, Any],
+    wanted: int,
+    rejection_log: list[dict[str, Any]],
+) -> tuple[list[axsearch13.Candidate], list[dict[str, Any]]]:
+    """Ask Ax for candidates until ``wanted`` of them survive preflight.
+
+    A proposal rejected here never launches nextnano and never consumes one of
+    the requested BO iterations; a replacement is requested inside the same
+    iteration. The attempt limit is what stops this becoming an infinite loop
+    when the feasible region is empty.
+    """
+
+    limit = int(cfg["bo"].get("max_candidate_regeneration_attempts", 20))
+    if limit < 1:
+        raise DemoError("bo.max_candidate_regeneration_attempts must be at least 1")
+    accepted: list[axsearch13.Candidate] = []
+    events: list[dict[str, Any]] = []
+    attempt = 0
+    while len(accepted) < wanted and attempt < limit:
+        proposals = experiment.generate(1)
+        if not proposals:
+            break
+        for candidate in proposals:
+            attempt += 1
+            seen = axsearch13.seen_design_hashes(experiment.ledger, cfg)
+            verdict = axsearch13.preflight(candidate.parameters, cfg, seen)
+            if verdict["accepted"]:
+                candidate.design_hash = verdict["design_hash"]
+                candidate.preflight = verdict
+                accepted.append(candidate)
+                continue
+            # Rejected: abandon in Ax, record immutably, and try again.
+            experiment.abandon(candidate.trial_index, verdict["rejection_reason"])
+            record = {
+                "trial_valid": False,
+                "trial_outcome_class": metrics13.OUTCOME_INVALID,
+                "objective_available": False,
+                "rejection_reason": verdict["rejection_reason"],
+                "failure_reason": None,
+                "design_hash": verdict["design_hash"],
+                "duplicate_of_trial": verdict["duplicate_of_trial"],
+                "maximum_feasible_grading_thickness_nm": verdict["maximum_feasible_grading_nm"],
+                "realized_grading_thickness_nm": verdict["realized_grading_thickness_nm"],
+                "proposed_grading_fraction": verdict["proposed_grading_fraction"],
+                "geometry_reason": verdict["geometry_reason"],
+                "solver_launched": False,
+                **{
+                    f"parameter_{name}": value
+                    for name, value in design13.physical_design(
+                        verdict["canonical"]
+                    ).items()
+                },
+            }
+            _record_trial(
+                experiment,
+                candidate=candidate,
+                record=record,
+                status="rejected",
+                reported_to_ax_as="abandoned",
+                provenance={"extraction_version": EXTRACTION_VERSION},
+            )
+            rejection_log.append(
+                {
+                    "requested_bo_iteration": candidate.iteration,
+                    "proposal_attempt": attempt,
+                    "ax_trial_index": candidate.trial_index,
+                    "original_parameters": dict(candidate.parameters),
+                    "canonical_parameters": design13.physical_design(verdict["canonical"]),
+                    "maximum_feasible_grading_thickness_nm": verdict["maximum_feasible_grading_nm"],
+                    "realized_grading_thickness_nm": verdict["realized_grading_thickness_nm"],
+                    "proposed_grading_fraction": verdict["proposed_grading_fraction"],
+                    "canonical_hash": verdict["design_hash"],
+                    "rejection_reason": verdict["rejection_reason"],
+                    "duplicate_of_trial": verdict["duplicate_of_trial"],
+                    "replacement_trial_index": None,
+                    "solver_launched": False,
+                }
+            )
+            events.append(
+                {
+                    "stage": "candidate_rejected",
+                    "trial_index": candidate.trial_index,
+                    "reason": verdict["rejection_reason"],
+                }
+            )
+    # Attribute each rejection to the replacement that eventually ran.
+    if accepted and rejection_log:
+        replacement = accepted[0].trial_index
+        for row in reversed(rejection_log):
+            if row["replacement_trial_index"] is None:
+                row["replacement_trial_index"] = replacement
+    return accepted, events
+
+
 def closed_loop(
     context: sweeps.RunContext,
     experiment: Experiment,
@@ -464,6 +613,7 @@ def closed_loop(
     """Run pending trials, then iterate until the configured budget is met."""
 
     cfg = context.cfg
+    rejection_log: list[dict[str, Any]] = []
     counts = design13.expected_evaluation_counts(cfg)
     batch = counts["batch_size"]
     history: list[tracking13.TrialStates] = []
@@ -515,7 +665,13 @@ def closed_loop(
             tracking=tracking_record,
             runtime_seconds=runtime,
         )
-        record = {**record, **_geometry_fields(case)}
+        record = {**record, **_geometry_fields(case),
+                  "design_hash": candidate.design_hash,
+                  **{key: value for key, value in (candidate.preflight or {}).items()
+                     if key in {"maximum_feasible_grading_nm",
+                                "realized_grading_thickness_nm",
+                                "proposed_grading_fraction"}},
+                  "solver_launched": True}
         provenance = _provenance(
             cfg=cfg,
             context=context,
@@ -593,7 +749,8 @@ def closed_loop(
             events.append({"stage": "resumed_pending", "trial_index": candidate.trial_index})
 
     if not generate:
-        return {"events": events, "stop_reason": "generation disabled for this mode"}
+        return {"events": events, "stop_reason": "generation disabled for this mode",
+                "rejections": rejection_log}
 
     # 2. Then generate and evaluate until the configured budget is spent.
     while True:
@@ -616,41 +773,23 @@ def closed_loop(
             stop_reason = "configured initial trials and BO iterations are complete"
             break
         try:
-            candidates = experiment.generate(wanted)
+            accepted, rejected = _accepted_candidates(
+                experiment, cfg, wanted, rejection_log
+            )
         except DemoError as exc:
             stop_reason = str(exc)
             break
-        if not candidates:
-            stop_reason = "Ax generated no further candidates"
+        events.extend(rejected)
+        if not accepted:
+            stop_reason = (
+                "no valid unique candidate within "
+                f"{int(cfg['bo'].get('max_candidate_regeneration_attempts', 20))} "
+                "regeneration attempts; the search space may be mostly infeasible"
+                if rejected
+                else "Ax generated no further candidates"
+            )
             break
-        for candidate in candidates:
-            if candidate.duplicate_of is not None:
-                experiment.abandon(
-                    candidate.trial_index,
-                    f"canonical duplicate of trial {candidate.duplicate_of}",
-                )
-                _record_trial(
-                    experiment,
-                    candidate=candidate,
-                    record=metrics13.build_record(
-                        parameters=candidate.parameters,
-                        cfg=cfg,
-                        observables={},
-                        validation={},
-                        status="rejected",
-                        failure_reason=(
-                            f"canonical duplicate of trial {candidate.duplicate_of}; "
-                            "not simulated"
-                        ),
-                    ),
-                    status="rejected",
-                    reported_to_ax_as="abandoned",
-                    provenance={"extraction_version": EXTRACTION_VERSION},
-                )
-                events.append(
-                    {"stage": "duplicate_rejected", "trial_index": candidate.trial_index}
-                )
-                continue
+        for candidate in accepted:
             payload = execute(candidate)
             events.append(
                 {
@@ -665,8 +804,9 @@ def closed_loop(
                     "no licensed nextnano++ solver on this machine; the candidate "
                     "input was generated and the trial is left pending"
                 )
-                return {"events": events, "stop_reason": stop_reason}
-    return {"events": events, "stop_reason": stop_reason}
+                return {"events": events, "stop_reason": stop_reason,
+                        "rejections": rejection_log}
+    return {"events": events, "stop_reason": stop_reason, "rejections": rejection_log}
 
 
 # ---------------------------------------------------------------------------
@@ -1433,6 +1573,8 @@ def write_run_artifacts(
     replay: Mapping[str, Any] | None,
     validation: Mapping[str, Any],
     synthetic: bool,
+    rejection_rows: Sequence[Mapping[str, Any]] = (),
+    budget_record: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Tables, figures and guides for one run bundle."""
 
@@ -1499,6 +1641,8 @@ def write_run_artifacts(
         efficiency_rows=efficiency.get("summary", []),
         warm_start_rows=((replay or {}).get("ingested") or {}).get("provenance_rows", []),
         plan_record=plan_record,
+        rejection_rows=rejection_rows,
+        budget_record=budget_record,
         synthetic=synthetic,
     )
 
@@ -1712,6 +1856,14 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
     if validation.get("enabled"):
         records = experiment.ledger.records()
 
+    budget = axsearch13.budget_accounting(cfg, experiment.ledger)
+    write_json_atomically(context.parent / "extracted" / "budget_accounting.json", budget)
+    print(f"  proposals / evaluations     : "
+          f"{budget['sobol_proposals'] + budget['model_based_proposals']} proposed, "
+          f"{budget['ax_completed_observations']} completed, "
+          f"{budget['preflight_invalid_proposals']} preflight-invalid, "
+          f"{budget['duplicate_proposals']} duplicate")
+
     surrogate = surrogate_artifacts(experiment, records)
     artifacts = write_run_artifacts(
         context,
@@ -1722,6 +1874,8 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
         replay=replay,
         validation=validation,
         synthetic=synthetic,
+        rejection_rows=loop_result.get("rejections", []),
+        budget_record=budget,
     )
 
     results = [

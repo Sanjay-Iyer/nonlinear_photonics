@@ -111,12 +111,26 @@ def test_unknown_run_mode_is_rejected(cfg):
 
 def test_search_space_specs_match_the_yaml_bounds(cfg):
     specs = {spec.name: spec for spec in design13.search_space_specs(cfg)}
+    # The grading variable depends on bo.search_space.parameterization: the
+    # shipped default searches a fraction of the feasible maximum so that an
+    # unbuildable grade cannot be proposed at all.
+    grading = design13.grading_parameter_name(cfg)
     assert set(specs) == {
         "asymmetry_s",
         "central_barrier_thickness_nm",
-        "grading_thickness_nm",
+        grading,
         "grading_profile",
     }
+    if grading == "grading_fraction_of_feasible_max":
+        assert (specs[grading].lower, specs[grading].upper) == design13.graded_fraction_bounds(cfg)
+        # The nanometre bounds below apply only to the raw-thickness form; under
+        # the fraction form the realized width is bounded by the geometry
+        # instead, which is the whole point of the change.
+        specs = {**specs, "grading_thickness_nm": design13.RangeSpec(
+            "grading_thickness_nm",
+            *(float(cfg["bo"]["search_space"]["grading_thickness_nm"][key])
+              for key in ("lower", "upper")),
+        )}
     assert (specs["asymmetry_s"].lower, specs["asymmetry_s"].upper) == (0.36, 0.56)
     assert (
         specs["central_barrier_thickness_nm"].lower,
@@ -153,11 +167,14 @@ def test_hierarchical_abrupt_branch_carries_no_grading_parameters(cfg):
     for _ in range(12):
         for index, parameters in client.get_next_trials(max_trials=1).items():
             seen_modes.add(parameters.get("interface_mode"))
+            grading = design13.grading_parameter_name(cfg)
             if parameters.get("interface_mode") == "abrupt":
-                assert "grading_thickness_nm" not in parameters
+                assert grading not in parameters
                 assert "grading_profile" not in parameters
             else:
-                assert parameters["grading_thickness_nm"] > 0
+                assert parameters[grading] > 0
+                # Whatever the parameterization, the realized structure is graded.
+                assert design13.canonicalize(parameters, cfg)["grading_thickness_nm"] > 0
             client.complete_trial(
                 index,
                 raw_data={name: 1.0 for name in spec.reported_metrics},
@@ -1177,7 +1194,12 @@ def test_out_of_range_demo12_case_is_rejected(cfg):
     )
     row = replay13.ingest([case], cfg)["provenance_rows"][0]
     assert row["compatible"] is False
-    assert "outside the search range" in row["incompatibility_reasons"]
+    # Rejected either for lying outside the searched range or for being
+    # geometrically unbuildable; both are refusals to import silently.
+    assert (
+        "outside the search range" in row["incompatibility_reasons"]
+        or "outside the Demo 13 design space" in row["incompatibility_reasons"]
+    )
 
 
 def test_warm_start_can_be_disabled_and_the_study_still_starts(cfg, tmp_path):
@@ -1732,10 +1754,14 @@ def test_search_space_table_records_the_hierarchical_encoding(cfg):
     rows = tables13.search_space_rows(cfg)
     names = {row["parameter"] for row in rows}
     assert "interface_mode" in names
-    grading = next(row for row in rows if row["parameter"] == "grading_thickness_nm")
-    assert grading["lower"] == pytest.approx(
-        cfg["bo"]["search_space"]["minimum_graded_thickness_nm"]
-    )
+    grading_name = design13.grading_parameter_name(cfg)
+    grading = next(row for row in rows if row["parameter"] == grading_name)
+    if grading_name == "grading_thickness_nm":
+        assert grading["lower"] == pytest.approx(
+            cfg["bo"]["search_space"]["minimum_graded_thickness_nm"]
+        )
+    else:
+        assert (grading["lower"], grading["upper"]) == design13.graded_fraction_bounds(cfg)
 
 
 # ---------------------------------------------------------------------------

@@ -326,8 +326,12 @@ def _parameter_configs(cfg: Mapping[str, Any]) -> list[Any]:
             )
         )
 
+    grading_name = design13.grading_parameter_name(cfg)
     if encoding == "hierarchical":
-        lower, upper = design13.graded_thickness_bounds(cfg)
+        if grading_name == "grading_thickness_nm":
+            lower, upper = design13.graded_thickness_bounds(cfg)
+        else:
+            lower, upper = design13.graded_fraction_bounds(cfg)
         configs.insert(
             0,
             ChoiceParameterConfig(
@@ -336,13 +340,13 @@ def _parameter_configs(cfg: Mapping[str, Any]) -> list[Any]:
                 parameter_type="str",
                 dependent_parameters={
                     "abrupt": [],
-                    "graded": ["grading_thickness_nm", "grading_profile"],
+                    "graded": [grading_name, "grading_profile"],
                 },
             ),
         )
         configs.append(
             RangeParameterConfig(
-                name="grading_thickness_nm",
+                name=grading_name,
                 bounds=(lower, upper),
                 parameter_type="float",
             )
@@ -355,12 +359,14 @@ def _parameter_configs(cfg: Mapping[str, Any]) -> list[Any]:
             )
         )
     else:
-        entry = space["grading_thickness_nm"]
+        if grading_name == "grading_thickness_nm":
+            entry = space["grading_thickness_nm"]
+            bounds = (float(entry["lower"]), float(entry["upper"]))
+        else:
+            bounds = design13.graded_fraction_bounds(cfg)
         configs.append(
             RangeParameterConfig(
-                name="grading_thickness_nm",
-                bounds=(float(entry["lower"]), float(entry["upper"])),
-                parameter_type="float",
+                name=grading_name, bounds=bounds, parameter_type="float"
             )
         )
         configs.append(
@@ -410,19 +416,32 @@ def ax_parameters(
     }
     thickness = float(canonical.get("grading_thickness_nm", 0.0))
     profile = str(canonical.get("grading_profile", "abrupt"))
+    grading_name = design13.grading_parameter_name(cfg)
     for name in design13.enabled_optional_parameters(cfg):
         if name in canonical:
             values[name] = canonical[name]
+    def _grading_value() -> float:
+        if grading_name == "grading_thickness_nm":
+            lower, upper = design13.graded_thickness_bounds(cfg)
+            return min(max(thickness, lower), upper)
+        maximum = design13.maximum_feasible_grading_for(canonical, cfg)
+        lower, upper = design13.graded_fraction_bounds(cfg)
+        fraction = float(canonical.get("_proposed_grading_fraction") or
+                         (thickness / maximum if maximum > 0 else lower))
+        return min(max(fraction, lower), upper)
+
     if str(space.get("encoding", "hierarchical")) != "hierarchical":
-        values["grading_thickness_nm"] = thickness
+        values[grading_name] = _grading_value() if thickness > 0 else (
+            0.0 if grading_name == "grading_thickness_nm"
+            else design13.graded_fraction_bounds(cfg)[0]
+        )
         values["grading_profile"] = profile
         return values
     if profile == "abrupt" or thickness <= 0:
         values["interface_mode"] = "abrupt"
         return values
-    lower, upper = design13.graded_thickness_bounds(cfg)
     values["interface_mode"] = "graded"
-    values["grading_thickness_nm"] = min(max(thickness, lower), upper)
+    values[grading_name] = _grading_value()
     values["grading_profile"] = (
         profile if profile in design13.graded_profiles(cfg) else design13.graded_profiles(cfg)[0]
     )
@@ -833,6 +852,77 @@ def iteration_of(trial_ordinal: int, cfg: Mapping[str, Any]) -> int:
     return 1 + (trial_ordinal - initial) // batch
 
 
+#: Ledger statuses that represent a proposal which never reached the solver.
+NON_EVALUATION_STATUSES: frozenset[str] = frozenset({"rejected"})
+
+
+def budget_accounting(cfg: Mapping[str, Any], ledger: Ledger) -> dict[str, Any]:
+    """Section 3: proposals and evaluations counted separately.
+
+    ``num_iterations`` means *valid model-based evaluations*, so a proposal
+    rejected by preflight or as a duplicate is counted as a proposal and not as
+    an evaluation. Conflating the two is how a study can report ten completed
+    iterations having actually evaluated eight designs.
+    """
+
+    records = ledger.records()
+    counts = design13.expected_evaluation_counts(cfg)
+    initial = counts["num_initial_trials"]
+
+    def _is(row: Mapping[str, Any], status: str) -> bool:
+        return str(row.get("status")) == status
+
+    evaluations = [row for row in records if str(row.get("status")) not in NON_EVALUATION_STATUSES]
+    sobol = [row for row in evaluations if str(row.get("generation_method")) == "Sobol"]
+    model = [row for row in evaluations if str(row.get("generation_method")) == "MBM"]
+    rejected = [row for row in records if _is(row, "rejected")]
+    preflight_invalid = [
+        row for row in rejected
+        if REJECT_GEOMETRY in str(row.get("rejection_reason", ""))
+    ]
+    duplicates = [
+        row for row in rejected
+        if REJECT_DUPLICATE in str(row.get("rejection_reason", ""))
+    ]
+    completed = [row for row in evaluations if _is(row, "completed")]
+    outcome = lambda name: [  # noqa: E731 - a local projection, not a policy
+        row for row in completed if str(row.get("trial_outcome_class")) == name
+    ]
+    return {
+        "sobol_proposals": len([r for r in records if str(r.get("generation_method")) == "Sobol"]),
+        "sobol_observations_completed": len([r for r in sobol if _is(r, "completed")]),
+        "model_based_proposals": len([r for r in records if str(r.get("generation_method")) == "MBM"]),
+        "model_based_observations_completed": len([r for r in model if _is(r, "completed")]),
+        "preflight_invalid_proposals": len(preflight_invalid),
+        "duplicate_proposals": len(duplicates),
+        "abandoned_ax_trials": len(rejected),
+        "solver_attempts": len([r for r in evaluations if r.get("output_directory_path")]),
+        "solver_completed_cases": len([r for r in evaluations if r.get("solver_completed")]),
+        "ax_completed_observations": len(completed),
+        "scientifically_feasible_observations": len(
+            [r for r in completed if r.get("trial_valid")]
+        ),
+        "warning_only_observations": len(outcome(metrics_outcome_warning())),
+        "rejected_observations": len(
+            [r for r in completed if not r.get("trial_valid")]
+        ),
+        "mechanically_failed_trials": len([r for r in evaluations if _is(r, "failed")]),
+        "requested_initial_trials": initial,
+        "requested_bo_iterations": counts["num_iterations"],
+        "batch_size": counts["batch_size"],
+        "iteration_definition": (
+            "one requested BO iteration = one valid model-based evaluation; "
+            "preflight-invalid and duplicate proposals do not consume one"
+        ),
+    }
+
+
+def metrics_outcome_warning() -> str:
+    """Imported lazily to keep this module free of a metrics13 import cycle."""
+
+    return "valid_with_warning"
+
+
 def plan(cfg: Mapping[str, Any], ledger: Ledger) -> dict[str, Any]:
     """Section 20's pre-run report, recomputed from the YAML on every run.
 
@@ -841,10 +931,24 @@ def plan(cfg: Mapping[str, Any], ledger: Ledger) -> dict[str, Any]:
     """
 
     counts = design13.expected_evaluation_counts(cfg)
+    bo = cfg["bo"]
     records = ledger.records()
-    terminal = [row for row in records if str(row.get("status")) in TERMINAL_STATUSES]
+    # A rejected proposal is a proposal, not an evaluation. Unless the YAML says
+    # otherwise it must not consume one of the requested BO iterations, or a
+    # study that hit a few impossible geometries would quietly run short.
+    def _consumes_budget(row: Mapping[str, Any]) -> bool:
+        if str(row.get("status")) != "rejected":
+            return True
+        reason = str(row.get("rejection_reason", ""))
+        if REJECT_DUPLICATE in reason:
+            return bool(bo.get("duplicate_counts_as_bo_iteration", False))
+        return bool(bo.get("invalid_preflight_counts_as_bo_iteration", False))
+
+    budgeted = [row for row in records if _consumes_budget(row)]
+    terminal = [row for row in budgeted if str(row.get("status")) in TERMINAL_STATUSES]
     completed = [row for row in records if str(row.get("status")) == "completed"]
     failed = [row for row in records if str(row.get("status")) == "failed"]
+    rejected = [row for row in records if str(row.get("status")) == "rejected"]
     pending = [row for row in records if str(row.get("status")) not in TERMINAL_STATUSES]
 
     initial, batch = counts["num_initial_trials"], max(1, counts["batch_size"])
@@ -867,6 +971,9 @@ def plan(cfg: Mapping[str, Any], ledger: Ledger) -> dict[str, Any]:
         "total_expected_evaluations": counts["expected_maximum_new_solver_runs"],
         "evaluation_formula": "initial_trials + num_iterations * batch_size",
         "recorded_trials": len(records),
+        "recorded_proposals": len(records),
+        "budget_consuming_trials": len(budgeted),
+        "rejected_proposals": len(rejected),
         "completed_trials": len(completed),
         "failed_trials": len(failed),
         "pending_trials": len(pending),
@@ -928,6 +1035,9 @@ class Candidate:
     iteration: int
     generation: dict[str, Any]
     duplicate_of: int | None = None
+    #: Filled in by :func:`preflight` once the realized structure is known.
+    design_hash: str | None = None
+    preflight: dict[str, Any] = field(default_factory=dict)
 
     def as_record(self) -> dict[str, Any]:
         return {
@@ -937,8 +1047,111 @@ class Candidate:
             "parameters": dict(self.parameters),
             "canonical_parameters": dict(self.canonical),
             "duplicate_of_trial": self.duplicate_of,
+            "design_hash": self.design_hash,
             **{key: value for key, value in self.generation.items()},
         }
+
+
+#: Why a proposal never reached the solver.
+REJECT_GEOMETRY = "geometry_preflight"
+REJECT_DUPLICATE = "canonical_duplicate"
+REJECT_UNRESOLVABLE = "canonicalization_failed"
+
+
+def preflight(
+    parameters: Mapping[str, Any],
+    cfg: Mapping[str, Any],
+    seen_hashes: Mapping[str, int],
+) -> dict[str, Any]:
+    """Decide, without touching the solver, whether a proposal may be run.
+
+    The order is fixed and matters: canonicalize inactive parameters, realize
+    the physical geometry, check that it can be built, hash the realized
+    structure, then check for duplicates. Hashing before realization would let
+    two proposals that build the same deck hash differently.
+    """
+
+    import geometry13
+
+    verdict: dict[str, Any] = {
+        "accepted": False,
+        "rejection_reason": "",
+        "canonical": {},
+        "design_hash": None,
+        "duplicate_of_trial": None,
+        "maximum_feasible_grading_nm": None,
+        "realized_grading_thickness_nm": None,
+        "proposed_grading_fraction": None,
+        "geometry_reason": "",
+    }
+    try:
+        canonical = design13.canonicalize(parameters, cfg)
+    except DemoError as exc:
+        verdict["rejection_reason"] = f"{REJECT_UNRESOLVABLE}: {exc}"
+        return verdict
+    verdict["canonical"] = dict(canonical)
+    verdict["proposed_grading_fraction"] = canonical.get("_proposed_grading_fraction")
+    verdict["realized_grading_thickness_nm"] = canonical.get("grading_thickness_nm")
+    verdict["maximum_feasible_grading_nm"] = canonical.get(
+        "_maximum_feasible_grading_nm"
+    ) or design13.maximum_feasible_grading_for(canonical, cfg)
+
+    try:
+        resolved = design13.resolve_config(parameters, cfg)
+    except DemoError as exc:
+        verdict["rejection_reason"] = f"{REJECT_GEOMETRY}: {exc}"
+        verdict["geometry_reason"] = str(exc)
+        return verdict
+    geometry = geometry13.evaluate(resolved)
+    verdict["geometry_reason"] = geometry.reason
+    if not geometry.feasible:
+        verdict["rejection_reason"] = f"{REJECT_GEOMETRY}: {geometry.reason}"
+        return verdict
+
+    design_hash = design13.design_hash(parameters, cfg)
+    verdict["design_hash"] = design_hash
+    if bool(cfg["bo"]["search_space"].get("deduplicate_canonical_designs", True)):
+        previous = seen_hashes.get(design_hash)
+        if previous is not None:
+            verdict["duplicate_of_trial"] = previous
+            verdict["rejection_reason"] = (
+                f"{REJECT_DUPLICATE}: same realized structure as trial {previous}"
+            )
+            return verdict
+    verdict["accepted"] = True
+    return verdict
+
+
+def seen_design_hashes(ledger: Ledger, cfg: Mapping[str, Any]) -> dict[str, int]:
+    """Realized-structure hash -> the first trial that claimed it.
+
+    Rejected proposals are included when
+    ``prevent_resuggestion_of_rejected_candidates`` is set, so Ax cannot spend
+    the budget re-proposing a design already refused. Premium trial 13 was
+    exactly that: trial 12's invalid geometry, proposed again.
+    """
+
+    remember_rejected = bool(
+        cfg["bo"].get("prevent_resuggestion_of_rejected_candidates", True)
+    )
+    hashes: dict[str, int] = {}
+    for row in ledger.records():
+        status = str(row.get("status"))
+        if status == "rejected" and not remember_rejected:
+            continue
+        stored = row.get("design_hash")
+        if stored:
+            hashes.setdefault(str(stored), int(row["trial_index"]))
+            continue
+        parameters = row.get("parameters")
+        if isinstance(parameters, Mapping):
+            try:
+                hashes.setdefault(
+                    design13.design_hash(parameters, cfg), int(row["trial_index"])
+                )
+            except DemoError:
+                continue
+    return hashes
 
 
 def generate_candidates(

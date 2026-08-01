@@ -89,6 +89,15 @@ bo:
   # initial design is the requested Sobol quasi-random set and nothing else.
   initialize_with_center: false
 
+  # A requested BO iteration means one VALID model-based evaluation, not one raw
+  # Ax proposal. A proposal rejected by geometry preflight or as a canonical
+  # duplicate never reaches nextnano and never consumes an iteration; a
+  # replacement is requested within the same iteration, up to the attempt limit.
+  max_candidate_regeneration_attempts: 20
+  invalid_preflight_counts_as_bo_iteration: false
+  duplicate_counts_as_bo_iteration: false
+  prevent_resuggestion_of_rejected_candidates: true
+
   search_space:
     # hierarchical: an `interface_mode` tree parameter makes abrupt designs
     #   structurally free of grading parameters, so a duplicate abrupt geometry
@@ -96,6 +105,24 @@ bo:
     # flat: the four-parameter form; abrupt designs are canonicalized to
     #   0 nm grading and deduplicated explicitly.
     encoding: hierarchical
+
+    # thickness -> Ax searches grading_thickness_nm in nm directly. Whether a
+    #   value is constructible depends on the barrier and well widths of the
+    #   same candidate, so over-wide grades ARE proposable and must be rejected
+    #   by preflight. Premium trials 4 and 12 were lost this way.
+    # fraction  -> Ax searches grading_fraction_of_feasible_max in [0, 1] and
+    #   the realized width is that fraction of the largest constructible grade
+    #   for the geometry being proposed. An impossible grade becomes
+    #   unproposable rather than merely detectable.
+    #
+    # Changing this changes the Ax search space, so an experiment checkpointed
+    # under one value cannot be resumed under the other. demo13 refuses to load
+    # a mismatched snapshot and tells you how to proceed.
+    parameterization: fraction
+    grading_fraction_of_feasible_max:
+      lower: 0.05
+      upper: 1.0
+
     minimum_graded_thickness_nm: 0.10
     deduplicate_canonical_designs: true
     duplicate_tolerance:
@@ -266,6 +293,13 @@ grading:
   preserve_total_device_length: true
   preserve_nominal_layer_centers: true
   preserve_nominal_well_width: true
+  # Flat material each layer must retain outside every centred grade. Defaults
+  # to one active-mesh cell: a "layer" thinner than the grid is not resolvable.
+  minimum_flat_region_nm: 0.10
+  # Realized grade widths are snapped down onto this increment before the deck
+  # is rendered, so the canonical design hash is taken on the geometry that is
+  # actually built. 0 disables snapping.
+  mesh_snap_nm: 0.01
   minimum_grid_points_per_grade: 10
   staircase_sublayers: 16
   sigmoid_steepness: 10.0
