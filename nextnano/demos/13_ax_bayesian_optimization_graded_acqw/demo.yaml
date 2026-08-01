@@ -49,14 +49,20 @@ workflow:
   # run_pending_candidates | closed_loop | analyze_existing_results |
   # validate_top_designs
   #
-  # closed_loop: v3 is a NEW campaign and this mode SPENDS LICENSED SOLVER TIME.
-  # It proposes, runs and completes trials until the budget below is exhausted.
+  # analyze_existing_results: the v3 campaign in `experiment_state_dir` is
+  # COMPLETE (16/16 evaluations, 0 remaining). This mode reloads it, rebuilds
+  # every report and the analysis surrogate, and calls NO solver. It opens the
+  # experiment read-only, so it cannot generate a candidate, complete or fail a
+  # trial, rewrite the checkpoint, or touch a ledger record.
   #
-  # To reanalyse the completed v2 study instead, set
-  #   mode: analyze_existing_results
-  #   experiment_state_dir: demo13_ax_experiment_v2
-  # which calls no solver and opens that experiment read-only.
-  mode: closed_loop
+  # This is the safe default now that the campaign has finished. `closed_loop`
+  # would currently also do nothing -- the budget is exhausted -- but only until
+  # someone raises `num_iterations`, at which point the same command SPENDS
+  # LICENSED SOLVER TIME. Leaving analysis mode here removes that trap.
+  #
+  # `validate_top_designs` runs Stage 5 and also spends solver time; see
+  # V3_STAGE5_EXECUTION_PLAN.md, which is prepared but NOT authorized.
+  mode: analyze_existing_results
   resume: true
   # Directory (under the results root) holding the Ax snapshot and the immutable
   # trial ledger. Kept outside any single run directory so a run never destroys
@@ -166,6 +172,20 @@ bo:
     # is still *classified* as abrupt everywhere downstream -- hashing, plots,
     # tables, profile evidence -- because that is what it physically is.
     reject_subresolution_grades: true
+
+    # false (what v3 ran): the fraction spans [0, maximum_feasible], so a low
+    # fraction at a narrow barrier realizes below the resolvable minimum and the
+    # proposal is refused. Seven of v3's twenty-three proposals were spent that
+    # way, six of them on the erf branch the model kept returning to.
+    #
+    # true: the fraction spans [minimum, maximum] instead, so every value the
+    # optimizer can choose builds a resolvable grade and refusal is reserved for
+    # geometries with no room at all (central barrier below ~0.90 nm).
+    #
+    # This changes what a stored fraction MEANS, so it is part of the experiment
+    # schema: a snapshot written under one mapping cannot be resumed under the
+    # other. Left false so the completed v3 experiment stays loadable.
+    grading_fraction_spans_feasible_interval: false
     deduplicate_canonical_designs: true
     duplicate_tolerance:
       asymmetry_s: 1.0e-4
@@ -335,6 +355,12 @@ bo:
 
 validation_study:
   enabled: true
+  # Stage 5 writes mesh, state-count, padding and perturbation cases. Those are
+  # side calculations, not optimization trials, and the experiment directory
+  # holds the immutable ledger of a licensed campaign. They get their own
+  # directory; a configuration that points this at the optimization experiment
+  # is rejected at startup.
+  output_state_dir: demo13_ax_experiment_v3_stage5
   top_designs: 3
   local_refinement:
     asymmetry_s: [-0.02, 0.02]

@@ -481,8 +481,110 @@ def test_binary_qc_flags_never_enter_the_feasibility_product(cfg):
     assert "probability_satisfies_physical_qc_valid" not in result
 
 
+def test_a_placeholder_figure_is_machine_readable(tmp_path):
+    """A placeholder renders as an ordinary figure and cannot be told apart.
+
+    It is a matplotlib plot carrying its reason as text, so it is roughly the
+    size of a real figure. Without a marker, "is this figure real?" is
+    unanswerable by any automated check -- which is the question an audit of
+    "truthful placeholders" has to ask.
+    """
+
+    import json as _json
+
+    import plots13
+
+    path = tmp_path / "bo_surrogate_mean_asymmetry_vs_grading_thickness.png"
+    plots13._placeholder(path, "no model could be reconstructed")
+    marker = path.with_suffix(".placeholder.json")
+    assert marker.is_file(), "a placeholder must leave a machine-readable marker"
+    payload = _json.loads(marker.read_text(encoding="utf-8"))
+    assert payload["populated"] is False
+    assert payload["reason"] == "no model could be reconstructed"
+    assert payload["figure"] == path.name
+
+
+def test_a_surrogate_placeholder_never_blames_the_solver(tmp_path):
+    import json as _json
+
+    import plots13
+
+    path = tmp_path / "bo_partial_dependence_grading_thickness.png"
+    plots13._surrogate_placeholder(path, [{"reason": "branch invalid here"}])
+    payload = _json.loads(
+        path.with_suffix(".placeholder.json").read_text(encoding="utf-8")
+    )
+    assert "licensed" not in payload["reason"].lower()
+    assert "model availability" in payload["reason"].lower()
+
+
+def test_chi2_units_are_never_blank_even_on_historical_records():
+    """Every v3 ledger record predates `chi2_units`; the projection supplies it.
+
+    An unlabelled chi(2) column is the one that gets read as pm/V, and the
+    ledger is immutable so the records themselves cannot be repaired.
+    """
+
+    import metrics13
+    import tables13
+
+    historical = [{"trial_index": 1}, {"trial_index": 2, "chi2_units": ""}]
+    rows = tables13._project(historical, ["trial_index", "chi2_units"])
+    assert all(r["chi2_units"] == metrics13.DEFAULT_RELATIVE_CHI2_UNITS for r in rows)
+    assert "pm/V" not in metrics13.DEFAULT_RELATIVE_CHI2_UNITS
+    assert "relative" in metrics13.DEFAULT_RELATIVE_CHI2_UNITS
+    # A value that IS present must never be overwritten.
+    assert tables13._project(
+        [{"chi2_units": "measured pm/V"}], ["chi2_units"]
+    )[0]["chi2_units"] == "measured pm/V"
+
+
 def test_no_modelled_posterior_gives_a_stated_absence(cfg):
     experiment = type("_E", (), {"cfg": cfg})()
     result = demo13._feasibility_probabilities(experiment, {})
     assert result["probability_of_feasibility"] is None
     assert result["feasibility_probability_note"]
+
+
+# ---------------------------------------------------------------------------
+# Physics-audit findings: sign conventions that were inverted on every trial
+# ---------------------------------------------------------------------------
+
+
+def test_a_peak_below_the_target_is_blue_not_red():
+    """Every v3 trial peaked short of 1550 nm and was labelled `red_of_target`.
+
+    signed_detuning = peak - target, so a negative value means a SHORTER
+    wavelength, which is blue-shifted.
+    """
+
+    import metrics13
+
+    record = metrics13.build_record(
+        parameters={"asymmetry_s": 0.4, "central_barrier_thickness_nm": 1.2,
+                    "interface_mode": "abrupt"},
+        cfg=demo_workflow.load_demo_config(DEMO),
+        observables={"chi2_peak_wavelength_nm": 1537.0, "chi2_peak": 0.5},
+        validation={}, status="completed",
+    )
+    if record.get("signed_detuning_nm") is not None:
+        assert record["signed_detuning_nm"] < 0
+        assert record["detuning_side"] == "blue_of_target"
+
+
+def test_the_hole_anticrossing_gap_is_the_smallest_spacing():
+    """Hole energies decrease with index, so a plain `min` returned the largest.
+
+    The v3 records show -56.4 meV for t0005 whose true minimum spacing is
+    4.06 meV -- and 4 meV is inside the 5 meV broadening, so the diagnostic that
+    should have flagged a hole near-degeneracy reported its opposite.
+    """
+
+    import metrics13
+
+    # Descending, as real heavy-hole energies are. Adjacent spacings are
+    # 30.98, 4.06 and 56.36 meV; the smallest is 4.06.
+    holes = [0.0, -0.03098, -0.035040, -0.091400]
+    record = metrics13.electronic_structure({"heavy_hole_energies_eV": holes})
+    assert record["heavy_hole_anticrossing_gap_meV"] == pytest.approx(4.06, abs=0.01)
+    assert record["heavy_hole_anticrossing_gap_meV"] > 0

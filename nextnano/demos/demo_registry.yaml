@@ -402,12 +402,14 @@ demos:
 
   13_ax_bayesian_optimization_graded_acqw:
     title: Ax Bayesian optimization of graded asymmetric coupled quantum wells
-    # 2026-08-01: the 16-trial licensed campaign completed on the work laptop --
-    # zero mechanical solver failures, 6 Sobol + 10 model-based iterations, 8
-    # feasible trials, best t0012. That is a real licensed run, so
-    # implemented_dry_run understated it. It is NOT physical validation: Stage 5
-    # mesh, state-count, padding, refinement and robustness checks have not run,
-    # and the winning barrier sits on the lower search bound.
+    # 2026-08-01: the v3 licensed campaign completed on the work laptop -- 23
+    # proposals, 7 refused at preflight with no solver launched, 16 completed
+    # with zero mechanical failures, 3 feasible, best feasible t0021. That is a
+    # real licensed run, so implemented_dry_run understates it. It is NOT
+    # physical validation: Stage 5 mesh, state-count, padding, refinement and
+    # robustness checks have not run, and t0021's barrier sits on the 0.85 nm
+    # lower search bound. (An earlier v2 campaign, best t0012 at a 0.5 nm bound
+    # and a 0.10 nm mesh, is superseded and not comparable -- see below.)
     status: licensed_optimization_completed_validation_pending
     depends_on:
       - 12_graded_interface_coupled_quantum_well_optimization

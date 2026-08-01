@@ -223,7 +223,16 @@ def electronic_structure(observables: Mapping[str, Any]) -> dict[str, Any]:
         (holes[index + 1] - holes[index]) * 1000.0 for index in range(len(holes) - 1)
     ]
     record["heavy_hole_level_gaps_meV"] = hole_gaps
-    record["heavy_hole_anticrossing_gap_meV"] = min(hole_gaps) if hole_gaps else None
+    # Hole energies DECREASE with index, so every signed gap is negative and a
+    # plain `min` returns the *largest* separation -- the opposite of the
+    # "smallest adjacent-level spacing" this field promises. On v3 it reported
+    # -56.4 meV for t0005 whose true minimum spacing is 4.06 meV, and -53.9 meV
+    # for t0021 whose true minimum is 7.11 meV. Those are the spacings that sit
+    # at or inside the 5 meV broadening, so the one diagnostic that would have
+    # surfaced a hole near-degeneracy was reporting its opposite.
+    record["heavy_hole_anticrossing_gap_meV"] = (
+        min(abs(gap) for gap in hole_gaps) if hole_gaps else None
+    )
 
     # Intersubband e1->e2 dipole and oscillator strength. Both follow directly
     # from quantities Demo 11 already extracted; the interband transition dipole
@@ -510,10 +519,15 @@ def build_record(
             "signed_detuning_nm": signed_detuning,
             "absolute_detuning_nm": None if signed_detuning is None else abs(signed_detuning),
             "detuning_side": (
+                # signed_detuning = peak_wavelength - target. A peak at SHORTER
+                # wavelength is blue-shifted, so a negative value is blue, not
+                # red. This was inverted, and every v3 trial (peaks at
+                # 1485-1540 nm, all short of 1550 nm) carried
+                # `detuning_side: red_of_target` while sitting to the blue.
                 None
                 if signed_detuning is None
                 else ("on_target" if signed_detuning == 0 else
-                      "red_of_target" if signed_detuning < 0 else "blue_of_target")
+                      "blue_of_target" if signed_detuning < 0 else "red_of_target")
             ),
         }
     )

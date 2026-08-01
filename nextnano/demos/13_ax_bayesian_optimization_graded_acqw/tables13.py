@@ -35,6 +35,7 @@ from demo_workflow import write_json_atomically, write_text_atomically  # noqa: 
 import design13  # noqa: E402
 import feasibility13  # noqa: E402
 import grading13  # noqa: E402
+import metrics13  # noqa: E402
 
 #: Unit of every column name Demo 13 writes. ``a.u.`` marks the relative chi(2)
 #: scale of Demo 11's Eq. 2: a lineshape and a trend, with no absolute
@@ -422,8 +423,28 @@ _QC_COLUMNS = (
 )
 
 
+#: Columns that must never be emitted blank, and what they mean when the ledger
+#: does not carry them. A record written before a field existed cannot be
+#: repaired -- the ledger is immutable -- so the *projection* supplies the value
+#: instead. Every v3 trial predates `chi2_units`, and an unlabelled chi(2)
+#: column is precisely the one that gets read as pm/V.
+_COLUMN_FALLBACKS: Mapping[str, Any] = {
+    "chi2_units": metrics13.DEFAULT_RELATIVE_CHI2_UNITS,
+    "relative_chi2_units": metrics13.DEFAULT_RELATIVE_CHI2_UNITS,
+}
+
+
 def _project(records: Sequence[Mapping[str, Any]], columns: Sequence[str]) -> list[dict[str, Any]]:
-    return [{column: record.get(column) for column in columns} for record in records]
+    projected: list[dict[str, Any]] = []
+    for record in records:
+        row: dict[str, Any] = {}
+        for column in columns:
+            value = record.get(column)
+            if value in (None, "") and column in _COLUMN_FALLBACKS:
+                value = _COLUMN_FALLBACKS[column]
+            row[column] = value
+        projected.append(row)
+    return projected
 
 
 def objective_metric_name(spec: Any) -> str:

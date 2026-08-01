@@ -129,7 +129,10 @@ def test_signed_and_absolute_detuning_are_separate_metrics(
 
 
 def test_detuning_side_is_reported_but_never_constrained(cfg):
-    for peak_nm, side in ((1537.0, "red_of_target"), (1563.0, "blue_of_target"),
+    # A peak at a SHORTER wavelength than the target is blue-shifted. This test
+    # previously asserted the inverse and so encoded the bug: every v3 trial
+    # peaked short of 1550 nm and was labelled `red_of_target`.
+    for peak_nm, side in ((1537.0, "blue_of_target"), (1563.0, "red_of_target"),
                           (1550.0, "on_target")):
         record = metrics13.build_record(
             parameters={"asymmetry_s": 0.46, "central_barrier_thickness_nm": 1.5,

@@ -20,6 +20,7 @@ labelled placeholder, so a missing file is always a bug and never "no licence".
 from __future__ import annotations
 
 import csv
+import json
 import math
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -225,7 +226,22 @@ def _finish(fig: Any, path: Path) -> None:
 
 
 def _placeholder(path: Path, reason: str = PLACEHOLDER_REASON) -> None:
+    """A labelled empty figure, plus a machine-readable marker beside it.
+
+    A placeholder is rendered as an ordinary matplotlib figure carrying its
+    reason as text, so it is roughly the same size as a real plot and **cannot
+    be told apart by inspecting the file**. That makes "is this figure real?"
+    unanswerable by any automated check, which is precisely the question an
+    audit needs to ask. The sidecar answers it.
+    """
+
     plotting.placeholder(path, path.stem, reason=reason)
+    marker = path.with_suffix(".placeholder.json")
+    marker.write_text(
+        json.dumps({"figure": path.name, "populated": False, "reason": reason},
+                   indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
 
 
 def _surrogate_placeholder(path: Path, rows: Sequence[Mapping[str, Any]]) -> None:
@@ -242,9 +258,10 @@ def _surrogate_placeholder(path: Path, rows: Sequence[Mapping[str, Any]]) -> Non
         if str(row.get("reason", "")).strip()
     ]
     detail = f" Reported reason: {reasons[0]}" if reasons else ""
-    plotting.placeholder(
-        path, path.stem, reason=PLACEHOLDER_REASON_NO_SURROGATE + detail
-    )
+    # Through `_placeholder`, so a surrogate placeholder also leaves the
+    # machine-readable marker: "is this figure real?" must be answerable
+    # automatically for every empty figure, not just some of them.
+    _placeholder(path, PLACEHOLDER_REASON_NO_SURROGATE + detail)
 
 
 def grading_axis(cfg: Mapping[str, Any]) -> tuple[str, str]:

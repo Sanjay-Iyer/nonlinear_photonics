@@ -50,7 +50,11 @@ def cfg():
 def test_v3_workflow_targets_a_fresh_experiment_directory(cfg):
     workflow = cfg["workflow"]
     assert workflow["experiment_state_dir"] == "demo13_ax_experiment_v3"
-    assert workflow["mode"] == "closed_loop"
+    # The campaign is COMPLETE, so the shipped mode is analysis. `closed_loop`
+    # would currently also do nothing -- the budget is exhausted -- but only
+    # until someone raises `num_iterations`, at which point the same command
+    # spends licensed solver time.
+    assert workflow["mode"] == "analyze_existing_results"
     assert cfg["simulation"]["run_solver"] is True
     # v2 must not be named anywhere in the active configuration.
     assert "demo13_ax_experiment_v2" not in str(workflow)

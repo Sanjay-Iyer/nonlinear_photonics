@@ -212,12 +212,54 @@ def validate_demo13_config(cfg: Mapping[str, Any]) -> None:
         design13.graded_thickness_bounds(cfg)
         design13.graded_profiles(cfg)
     _validate_grading_resolution(cfg)
+    _validate_stage5_isolation(cfg)
     tracking = _require_mapping(cfg, "state_tracking")
     for name, value in (tracking.get("parameter_scales") or {}).items():
         if float(value) <= 0:
             raise DemoError(f"state_tracking.parameter_scales.{name} must be positive")
     if not 0.0 <= float(tracking.get("minimum_confidence", 0.6)) <= 1.0:
         raise DemoError("state_tracking.minimum_confidence must lie in [0, 1]")
+
+
+def stage5_state_dir(cfg: Mapping[str, Any], results_root: Path) -> Path:
+    """Where Stage 5 writes. Never the optimization experiment.
+
+    Defaults to ``<experiment>_stage5`` beside it, so the isolation holds even
+    when nothing is configured.
+    """
+
+    study = cfg.get("validation_study") or {}
+    workflow = cfg.get("workflow") or {}
+    configured = study.get("output_state_dir")
+    if configured:
+        return Path(results_root) / str(configured)
+    experiment = str(workflow.get("experiment_state_dir", "demo13_ax_experiment"))
+    return Path(results_root) / f"{experiment}_stage5"
+
+
+def _validate_stage5_isolation(cfg: Mapping[str, Any]) -> None:
+    """Refuse a configuration that would let Stage 5 write into the campaign.
+
+    Stage 5 adds mesh, state-count, padding and perturbation cases around the
+    best designs.  Those are side calculations, not optimization trials, and the
+    optimization experiment holds the immutable record of a licensed campaign.
+    Sharing one directory means a Stage 5 bug can reach the ledger that proves
+    what was spent -- so the configuration is rejected rather than trusted.
+    """
+
+    study = cfg.get("validation_study") or {}
+    configured = study.get("output_state_dir")
+    if not configured:
+        return
+    experiment = str((cfg.get("workflow") or {}).get("experiment_state_dir", ""))
+    if str(configured).strip() == experiment.strip():
+        raise DemoError(
+            "validation_study.output_state_dir must not be the optimization "
+            f"experiment directory ({experiment!r}). Stage 5 writes validation and "
+            "robustness cases; the optimization experiment holds the immutable "
+            "ledger of a licensed campaign. Point Stage 5 at its own directory, "
+            f"for example {experiment}_stage5."
+        )
 
 
 def _validate_grading_resolution(cfg: Mapping[str, Any]) -> None:
@@ -1972,7 +2014,17 @@ def run_validation_study(
     )
     validation_rows: list[dict[str, Any]] = []
     robustness_rows: list[dict[str, Any]] = []
-    state_dir = experiment.state_dir / "validation"
+    # Stage 5 writes into its OWN directory, never inside the optimization
+    # experiment. The experiment holds the immutable ledger of a licensed
+    # campaign; validation cases are side calculations and must not be able to
+    # reach it, even through a bug.
+    state_dir = stage5_state_dir(cfg, context.machine.results_root)
+    if state_dir.resolve() == experiment.state_dir.resolve():
+        raise DemoError(
+            "Stage 5 resolved to the optimization experiment directory "
+            f"({state_dir}). Set validation_study.output_state_dir to a separate "
+            "directory."
+        )
     for design in top:
         source = next(
             (
