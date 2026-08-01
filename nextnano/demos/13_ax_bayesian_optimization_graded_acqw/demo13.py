@@ -55,6 +55,7 @@ from demo_workflow import (  # noqa: E402
 
 import axsearch13  # noqa: E402
 import design13  # noqa: E402
+import feasibility13  # noqa: E402
 import metrics13  # noqa: E402
 import plots13  # noqa: E402
 import replay13  # noqa: E402
@@ -1026,9 +1027,9 @@ def physics_curves(
             for record in records
             if str(record.get("status")) == "completed"
             and record.get("trial_valid")
-            and record.get("chi2_at_target_wavelength_abs") is not None
+            and record.get("relative_chi2_at_target_wavelength_abs") is not None
         ),
-        key=lambda record: -float(record["chi2_at_target_wavelength_abs"]),
+        key=lambda record: -float(record["relative_chi2_at_target_wavelength_abs"]),
     )
     selected: list[tuple[str, str, Mapping[str, Any]]] = []
     reference = next(
@@ -1272,7 +1273,7 @@ def run_validation_study(
         )
         if source is None:
             continue
-        nominal_target = metrics13._finite(source.get("chi2_at_target_wavelength_abs"))
+        nominal_target = metrics13._finite(source.get("relative_chi2_at_target_wavelength_abs"))
         for case_id, kind, resolved in validation_cases(cfg, source):
             row = _run_side_case(
                 context,
@@ -1302,7 +1303,7 @@ def run_validation_study(
                     "nominal_chi2_at_target_wavelength_abs": nominal_target,
                 },
             )
-            value = metrics13._finite(row.get("chi2_at_target_wavelength_abs"))
+            value = metrics13._finite(row.get("relative_chi2_at_target_wavelength_abs"))
             if value is not None and nominal_target:
                 drift = abs(value - nominal_target) / abs(nominal_target)
                 row["relative_drift"] = drift
@@ -1395,7 +1396,7 @@ def load_prior_demo_best(
         best: dict[str, Any] | None = None
         for case in candidates:
             metrics = replay13.map_metrics(case.observables, cfg)
-            if metrics.get("chi2_at_target_wavelength_abs") is None:
+            if metrics.get("relative_chi2_at_target_wavelength_abs") is None:
                 continue
             parameters = design13.parameters_from_config(case.config)
             row = {
@@ -1408,8 +1409,8 @@ def load_prior_demo_best(
                 "trial_valid": case.validation.get("passed") is not False,
                 "note": f"from {run.name}",
             }
-            if best is None or float(row["chi2_at_target_wavelength_abs"]) > float(
-                best["chi2_at_target_wavelength_abs"]
+            if best is None or float(row["relative_chi2_at_target_wavelength_abs"]) > float(
+                best["relative_chi2_at_target_wavelength_abs"]
             ):
                 best = row
         if best is not None:
@@ -1550,10 +1551,10 @@ def write_run_artifacts(
                 "parameter_central_barrier_thickness_nm",
                 "parameter_grading_thickness_nm",
                 "parameter_grading_profile",
-                "peak_chi2_abs",
+                "relative_peak_chi2_abs",
                 "peak_wavelength_nm",
-                "chi2_at_target_wavelength_abs",
-                "detuning_nm",
+                "relative_chi2_at_target_wavelength_abs",
+                "signed_detuning_nm",
                 "maximum_boundary_probability",
                 "state_tracking_confidence",
             )
@@ -1680,6 +1681,28 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
     plan_record = experiment.plan
     print("\n".join(axsearch13.plan_report_lines(plan_record)))
     write_json_atomically(context.parent / "extracted" / "run_plan.json", plan_record)
+
+    # Section 11: say plainly whether anything feasible exists, and warn loudly
+    # if a modelled constraint cannot be resolved by the surrogate -- the defect
+    # that produced BoTorch's all-infeasible warning on 2026-07-31.
+    constraint_specs = feasibility13.build_constraints(cfg)
+    feasibility = feasibility13.feasibility_summary(records, constraint_specs)
+    spread = feasibility13.constraint_spread(records, constraint_specs)
+    unresolvable = feasibility13.unresolvable_modelled_constraints(spread)
+    write_json_atomically(
+        context.parent / "extracted" / "feasibility_summary.json",
+        {**feasibility, "unresolvable_modelled_constraints": unresolvable,
+         "constraint_modelling": [dict(row) for row in spread]},
+    )
+    print(f"  feasible trials             : {feasibility['feasible_count']} "
+          f"of {feasibility['completed_trials']} completed")
+    if feasibility["initial_design_all_infeasible"]:
+        print("  NOTE: the initial design contained no feasible point; "
+              "improvement among infeasible designs is not progress.")
+    if unresolvable:
+        print("  WARNING: modelled constraint(s) the surrogate cannot resolve, "
+              "which will make every observation infeasible: "
+              + ", ".join(unresolvable))
 
     validation = (
         run_validation_study(context, experiment, records)

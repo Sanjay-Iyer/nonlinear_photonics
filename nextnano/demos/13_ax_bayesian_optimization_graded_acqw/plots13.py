@@ -140,7 +140,7 @@ class PlotContext:
 
     cfg: Mapping[str, Any]
     records: Sequence[Mapping[str, Any]] = ()
-    objective_metric: str = "chi2_at_target_wavelength_abs"
+    objective_metric: str = "relative_chi2_at_target_wavelength_abs"
     objective_direction: str = "maximize"
     best_by_iteration: Sequence[Mapping[str, Any]] = ()
     surrogate_slices: Mapping[str, Sequence[Mapping[str, Any]]] = field(default_factory=dict)
@@ -552,10 +552,10 @@ def _optimization_progress(plots_dir: Path, context: PlotContext) -> None:
         step=True,
     )
     for filename, key, label in (
-        ("bo_chi2_at_1550_by_trial.png", "chi2_at_target_wavelength_abs", AXIS["chi2_target"]),
-        ("bo_peak_chi2_by_trial.png", "peak_chi2_abs", AXIS["peak_chi2"]),
+        ("bo_chi2_at_1550_by_trial.png", "relative_chi2_at_target_wavelength_abs", AXIS["chi2_target"]),
+        ("bo_peak_chi2_by_trial.png", "relative_peak_chi2_abs", AXIS["peak_chi2"]),
         ("bo_resonance_wavelength_by_trial.png", "peak_wavelength_nm", AXIS["peak_wavelength"]),
-        ("bo_detuning_from_1550_by_trial.png", "detuning_nm", AXIS["detuning"]),
+        ("bo_detuning_from_1550_by_trial.png", "signed_detuning_nm", AXIS["detuning"]),
     ):
         _series_plot(
             plots_dir / filename,
@@ -564,7 +564,7 @@ def _optimization_progress(plots_dir: Path, context: PlotContext) -> None:
             y_key=key,
             xlabel=AXIS["trial"],
             ylabel=label,
-            axhline=0.0 if key == "detuning_nm" else None,
+            axhline=0.0 if key == "signed_detuning_nm" else None,
             group_key="parameter_grading_profile",
         )
 
@@ -727,9 +727,9 @@ def _tradeoffs(plots_dir: Path, context: PlotContext) -> None:
     _scatter_coloured(
         plots_dir / "bo_peak_chi2_vs_detuning_pareto.png",
         records,
-        x_key="detuning_nm_abs",
-        y_key="peak_chi2_abs",
-        colour_key="chi2_at_target_wavelength_abs",
+        x_key="absolute_detuning_nm",
+        y_key="relative_peak_chi2_abs",
+        colour_key="relative_chi2_at_target_wavelength_abs",
         xlabel="|Detuning from 1550 nm| (nm)",
         ylabel=AXIS["peak_chi2"],
         colour_label=AXIS["chi2_target"],
@@ -738,9 +738,9 @@ def _tradeoffs(plots_dir: Path, context: PlotContext) -> None:
     _scatter_coloured(
         plots_dir / "bo_chi2_1550_vs_peak_chi2.png",
         records,
-        x_key="peak_chi2_abs",
-        y_key="chi2_at_target_wavelength_abs",
-        colour_key="detuning_nm_abs",
+        x_key="relative_peak_chi2_abs",
+        y_key="relative_chi2_at_target_wavelength_abs",
+        colour_key="absolute_detuning_nm",
         xlabel=AXIS["peak_chi2"],
         ylabel=AXIS["chi2_target"],
         colour_label="|Detuning from 1550 nm| (nm)",
@@ -750,7 +750,7 @@ def _tradeoffs(plots_dir: Path, context: PlotContext) -> None:
         plots_dir / "bo_chi2_1550_vs_boundary_probability.png",
         records,
         x_key="maximum_boundary_probability",
-        y_key="chi2_at_target_wavelength_abs",
+        y_key="relative_chi2_at_target_wavelength_abs",
         xlabel=AXIS["boundary"],
         ylabel=AXIS["chi2_target"],
         logy=False,
@@ -760,7 +760,7 @@ def _tradeoffs(plots_dir: Path, context: PlotContext) -> None:
         plots_dir / "bo_chi2_1550_vs_state_tracking_confidence.png",
         records,
         x_key="state_tracking_confidence",
-        y_key="chi2_at_target_wavelength_abs",
+        y_key="relative_chi2_at_target_wavelength_abs",
         xlabel=AXIS["confidence"],
         ylabel=AXIS["chi2_target"],
         group_key="parameter_grading_profile",
@@ -769,8 +769,8 @@ def _tradeoffs(plots_dir: Path, context: PlotContext) -> None:
         plots_dir / "bo_nonlinear_strength_vs_robustness_pareto.png",
         records,
         x_key="robustness_score",
-        y_key="chi2_at_target_wavelength_abs",
-        colour_key="peak_chi2_abs",
+        y_key="relative_chi2_at_target_wavelength_abs",
+        colour_key="relative_peak_chi2_abs",
         xlabel=AXIS["robustness"],
         ylabel=AXIS["chi2_target"],
         colour_label=AXIS["peak_chi2"],

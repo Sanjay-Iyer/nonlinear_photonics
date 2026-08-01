@@ -662,9 +662,9 @@ def ax_guide(cfg: Mapping[str, Any]) -> str:
         "## The objective",
         "",
         f"- current mode: `{bo.get('optimization_mode')}`",
-        f"- Mode A `target_wavelength` — maximize `chi2_at_target_wavelength_abs`, the",
+        f"- Mode A `target_wavelength` — maximize `relative_chi2_at_target_wavelength_abs`, the",
         f"  response exactly at {bo.get('target_wavelength_nm')} nm. The default.",
-        "- Mode B `intrinsic_peak` — maximize `peak_chi2_abs`, the response at whatever",
+        "- Mode B `intrinsic_peak` — maximize `relative_peak_chi2_abs`, the response at whatever",
         "  wavelength that structure happens to resonate at. Answers a different",
         "  question: which structure is intrinsically strongest.",
         "- Mode C `multi_objective` — Ax's multi-objective optimization over peak",
@@ -1124,10 +1124,10 @@ COMPARISON_COLUMNS: tuple[str, ...] = (
     "asymmetry_s",
     "grading_profile",
     "grading_thickness_nm",
-    "peak_chi2_abs",
+    "relative_peak_chi2_abs",
     "peak_wavelength_nm",
-    "chi2_at_target_wavelength_abs",
-    "detuning_nm",
+    "relative_chi2_at_target_wavelength_abs",
+    "signed_detuning_nm",
     "maximum_boundary_probability",
     "state_tracking_confidence",
     "robustness_score",
@@ -1174,8 +1174,8 @@ def comparison_rows(
     chosen: dict[str, Mapping[str, Any] | None] = {
         "demo11_abrupt_reference": demo11,
         "demo12_best_grid_graded": demo12,
-        "demo13_best_target_wavelength": pick("chi2_at_target_wavelength_abs"),
-        "demo13_best_intrinsic_peak": pick("peak_chi2_abs"),
+        "demo13_best_target_wavelength": pick("relative_chi2_at_target_wavelength_abs"),
+        "demo13_best_intrinsic_peak": pick("relative_peak_chi2_abs"),
         "demo13_most_robust": pick("robustness_score"),
         "demo13_final_validated": next(
             (
@@ -1220,10 +1220,10 @@ def comparison_rows(
                 "grading_thickness_nm": record.get(
                     "parameter_grading_thickness_nm", record.get("grading_thickness_nm")
                 ),
-                "peak_chi2_abs": record.get("peak_chi2_abs"),
+                "relative_peak_chi2_abs": record.get("relative_peak_chi2_abs"),
                 "peak_wavelength_nm": record.get("peak_wavelength_nm"),
-                "chi2_at_target_wavelength_abs": record.get("chi2_at_target_wavelength_abs"),
-                "detuning_nm": record.get("detuning_nm"),
+                "relative_chi2_at_target_wavelength_abs": record.get("relative_chi2_at_target_wavelength_abs"),
+                "signed_detuning_nm": record.get("signed_detuning_nm"),
                 "maximum_boundary_probability": record.get("maximum_boundary_probability"),
                 "state_tracking_confidence": record.get("state_tracking_confidence"),
                 "robustness_score": record.get("robustness_score"),
@@ -1244,42 +1244,42 @@ def verdict(rows: Sequence[Mapping[str, Any]]) -> str:
     target = by_role.get("Best valid Demo 13 target-wavelength BO design")
     peak = by_role.get("Best Demo 13 intrinsic-peak design")
     validated = by_role.get("Final locally validated Demo 13 design")
-    if reference is None or reference.get("chi2_at_target_wavelength_abs") is None:
+    if reference is None or reference.get("relative_chi2_at_target_wavelength_abs") is None:
         return (
             "No verdict is possible: the Demo 11 abrupt reference has not been "
             "computed in this bundle, so there is nothing to compare against."
         )
-    if target is None or target.get("chi2_at_target_wavelength_abs") is None:
+    if target is None or target.get("relative_chi2_at_target_wavelength_abs") is None:
         return (
             "No verdict is possible: no valid Demo 13 design has been computed in "
             "this bundle."
         )
     statements: list[str] = []
-    reference_target = float(reference["chi2_at_target_wavelength_abs"])
-    best_target = float(target["chi2_at_target_wavelength_abs"])
+    reference_target = float(reference["relative_chi2_at_target_wavelength_abs"])
+    best_target = float(target["relative_chi2_at_target_wavelength_abs"])
     ratio = best_target / reference_target if reference_target else float("inf")
     statements.append(
         f"Stronger 1550 nm design: {'yes' if best_target > reference_target else 'no'} "
         f"({best_target:.4g} versus {reference_target:.4g}, ratio {ratio:.3g})."
     )
-    if peak and peak.get("peak_chi2_abs") is not None and reference.get("peak_chi2_abs") is not None:
+    if peak and peak.get("relative_peak_chi2_abs") is not None and reference.get("relative_peak_chi2_abs") is not None:
         statements.append(
             "Stronger intrinsic design: "
-            f"{'yes' if float(peak['peak_chi2_abs']) > float(reference['peak_chi2_abs']) else 'no'} "
-            f"({float(peak['peak_chi2_abs']):.4g} versus {float(reference['peak_chi2_abs']):.4g})."
+            f"{'yes' if float(peak['relative_peak_chi2_abs']) > float(reference['relative_peak_chi2_abs']) else 'no'} "
+            f"({float(peak['relative_peak_chi2_abs']):.4g} versus {float(reference['relative_peak_chi2_abs']):.4g})."
         )
-    if target.get("detuning_nm") is not None and reference.get("detuning_nm") is not None:
+    if target.get("signed_detuning_nm") is not None and reference.get("signed_detuning_nm") is not None:
         statements.append(
             "Better wavelength-matched design: "
-            f"{'yes' if abs(float(target['detuning_nm'])) < abs(float(reference['detuning_nm'])) else 'no'} "
-            f"(|detuning| {abs(float(target['detuning_nm'])):.4g} nm versus "
-            f"{abs(float(reference['detuning_nm'])):.4g} nm)."
+            f"{'yes' if abs(float(target['signed_detuning_nm'])) < abs(float(reference['signed_detuning_nm'])) else 'no'} "
+            f"(|detuning| {abs(float(target['signed_detuning_nm'])):.4g} nm versus "
+            f"{abs(float(reference['signed_detuning_nm'])):.4g} nm)."
         )
-    if validated and validated.get("chi2_at_target_wavelength_abs") is not None:
+    if validated and validated.get("relative_chi2_at_target_wavelength_abs") is not None:
         statements.append(
             "The improvement survived Stage 5 validation "
             f"(validated design χ² at target = "
-            f"{float(validated['chi2_at_target_wavelength_abs']):.4g})."
+            f"{float(validated['relative_chi2_at_target_wavelength_abs']):.4g})."
         )
     else:
         statements.append(

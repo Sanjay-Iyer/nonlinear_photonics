@@ -167,23 +167,43 @@ bo:
 
   objectives:
     target_wavelength:
-      maximize: [chi2_at_target_wavelength_abs]
+      maximize: [relative_chi2_at_target_wavelength_abs]
     intrinsic_peak:
-      maximize: [peak_chi2_abs]
+      maximize: [relative_peak_chi2_abs]
     multi_objective:
-      maximize: [peak_chi2_abs, chi2_at_target_wavelength_abs, robustness_score]
-      minimize: [detuning_nm_abs]
+      maximize: [relative_peak_chi2_abs, relative_chi2_at_target_wavelength_abs, robustness_score]
+      minimize: [absolute_detuning_nm]
     weighted_score:
       maximize: [weighted_score]
       weights:
-        peak_chi2_abs: 0.25
-        chi2_at_target_wavelength_abs: 0.30
-        detuning_nm_abs: 0.15
+        relative_peak_chi2_abs: 0.25
+        relative_chi2_at_target_wavelength_abs: 0.30
+        absolute_detuning_nm: 0.15
         robustness_score: 0.20
         state_tracking_confidence: 0.10
 
+  # Which constraints Ax is TOLD about, as opposed to which are enforced.
+  #
+  # Every constraint below is evaluated on every trial regardless. This section
+  # only controls what enters the Gaussian-process model. The 2026-07-31
+  # licensed run showed why it must be controlled: constraining a metric whose
+  # observations sit on (or negligibly far from) its own threshold makes BoTorch
+  # report every observation infeasible, and it began doing so exactly when the
+  # first genuinely feasible design appeared. See AX_FEASIBILITY_ANALYSIS.md.
+  #
+  # Defaults: binary 0/1 validity flags are never modelled; continuous metrics
+  # that vary meaningfully are. Override only with evidence.
+  outcome_modelling:
+    never_model:
+      # Constant at ~3e-7 against a 1e-3 bound: passes by four orders of
+      # magnitude, so its standardized slack is indistinguishable from zero.
+      - orthonormality_error
+    always_model: []
+
   # Ax outcome constraints. Bounds are taken from the repository tolerances in
   # `analysis`, `validation` and `bound_states` below, not chosen independently.
+  # `maximum_detuning_nm` binds `absolute_detuning_nm`; the signed detuning is
+  # reported everywhere and constrained nowhere.
   outcome_constraints:
     maximum_detuning_nm: 15.0
     maximum_boundary_probability: 1.0e-3
@@ -282,6 +302,17 @@ state_tracking:
     asymmetry_s: 0.20
     central_barrier_thickness_nm: 2.0
     grading_thickness_nm: 3.0
+
+physical_qc:
+  # warn       -> trial stays usable, reported as valid_with_warning, and the
+  #               named failing test stays visible. Never a clean pass.
+  # constraint -> defer to the continuous maximum_boundary_probability
+  #               constraint, which Ax already models. Same physics, one voice.
+  # reject     -> scientifically_invalid: metrics kept, excluded from ranking,
+  #               Ax trial abandoned so the surrogate is not taught this region
+  #               scores well.
+  # fail_trial -> treated as a mechanical failure; no objective given to Ax.
+  bound_state_policy: warn
 
 bound_states:
   policy: warn

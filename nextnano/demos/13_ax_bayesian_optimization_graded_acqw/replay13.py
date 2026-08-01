@@ -229,9 +229,9 @@ def ingest(cases: Sequence[Demo12Case], cfg: Mapping[str, Any]) -> dict[str, Any
             "central_barrier_thickness_nm<-scientific.tunnel_barrier_nm; "
             "grading_thickness_nm<-grading.selected_thickness_nm; "
             "grading_profile<-grading.profile",
-            "metric_mapping": "chi2_at_target_wavelength_abs<-|chi2_relative_at_reference|; "
-            "peak_chi2_abs<-chi2_peak_magnitude; "
-            "detuning_nm<-chi2_peak_wavelength_nm - reference_wavelength_nm",
+            "metric_mapping": "relative_chi2_at_target_wavelength_abs<-|chi2_relative_at_reference|; "
+            "relative_peak_chi2_abs<-chi2_peak_magnitude; "
+            "signed_detuning_nm<-chi2_peak_wavelength_nm - reference_wavelength_nm",
             "used_by_ax": False,
             "not_used_reason": "" if compatible else "incompatible",
         }
@@ -248,7 +248,7 @@ def ingest(cases: Sequence[Demo12Case], cfg: Mapping[str, Any]) -> dict[str, Any
                 f"warm-start budget of {maximum} observations already filled"
             )
             continue
-        if entry["metrics"].get("chi2_at_target_wavelength_abs") is None:
+        if entry["metrics"].get("relative_chi2_at_target_wavelength_abs") is None:
             entry["row"]["not_used_reason"] = "no usable target-wavelength metric"
             continue
         entry["row"]["used_by_ax"] = True
@@ -329,11 +329,11 @@ def map_metrics(
     if "passed" in checks:
         flags["physical_qc_valid"] = int(bool(checks["passed"]))
     return {
-        "chi2_at_target_wavelength_abs": None if at_target is None else abs(at_target),
-        "peak_chi2_abs": None if peak is None else abs(peak),
+        "relative_chi2_at_target_wavelength_abs": None if at_target is None else abs(at_target),
+        "relative_peak_chi2_abs": None if peak is None else abs(peak),
         "peak_wavelength_nm": peak_wavelength,
-        "detuning_nm": detuning,
-        "detuning_nm_abs": None if detuning is None else abs(detuning),
+        "signed_detuning_nm": detuning,
+        "absolute_detuning_nm": None if detuning is None else abs(detuning),
         "maximum_boundary_probability": boundary,
         "state_tracking_confidence": confidence,
         "orthonormality_error": orthonormality,
@@ -375,7 +375,7 @@ def pool_from_ingest(ingested: Mapping[str, Any], cfg: Mapping[str, Any]) -> lis
             for key, value in row.items()
             if str(key).startswith("metric_")
         }
-        if metrics.get("chi2_at_target_wavelength_abs") is None:
+        if metrics.get("relative_chi2_at_target_wavelength_abs") is None:
             continue
         points.append(
             PoolPoint(
@@ -412,8 +412,8 @@ def synthetic_pool(cfg: Mapping[str, Any], *, points_per_dimension: int = 4) -> 
                 metrics={
                     name: row.get(name)
                     for name in (
-                        "chi2_at_target_wavelength_abs", "peak_chi2_abs",
-                        "peak_wavelength_nm", "detuning_nm", "detuning_nm_abs",
+                        "relative_chi2_at_target_wavelength_abs", "relative_peak_chi2_abs",
+                        "peak_wavelength_nm", "signed_detuning_nm", "absolute_detuning_nm",
                         "maximum_boundary_probability", "state_tracking_confidence",
                         "orthonormality_error", "origin_independence_valid",
                         "required_states_valid", "physical_qc_valid",
@@ -476,7 +476,7 @@ def replay_configuration(
         if all(point.metrics.get(name) is not None for point in pool)
     }
     constraint_keys = {
-        "maximum_detuning_nm": "detuning_nm_abs",
+        "maximum_detuning_nm": "absolute_detuning_nm",
         "maximum_boundary_probability": "maximum_boundary_probability",
         "minimum_state_tracking_confidence": "state_tracking_confidence",
         "maximum_orthonormality_error": "orthonormality_error",
@@ -575,7 +575,7 @@ def efficiency_comparison(
     *,
     evaluations: int,
     seed: int,
-    metric: str = "chi2_at_target_wavelength_abs",
+    metric: str = "relative_chi2_at_target_wavelength_abs",
     fraction_of_best: float = 0.95,
 ) -> dict[str, Any]:
     """How many evaluations each method needs to reach the best known design."""

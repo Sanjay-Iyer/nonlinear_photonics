@@ -56,6 +56,7 @@ for _path in (str(SHARED), str(DEMO_DIR)):
 from demo_workflow import DemoError, write_json_atomically  # noqa: E402
 
 import design13  # noqa: E402
+import feasibility13  # noqa: E402
 
 #: The Ax release this module's API usage was written and tested against.
 TESTED_AX_VERSION = "1.3.1"
@@ -64,11 +65,21 @@ TESTED_AX_VERSION = "1.3.1"
 #: Everything else lives in the ledger; keeping Ax's data model to the metrics
 #: it actually optimizes over avoids silently modelling a metric that is only
 #: ever reported.
+#: Every metric name Demo 13 may put in an Ax objective or constraint.
+#:
+#: The chi(2) metrics carry a ``relative_`` prefix because that is what they
+#: are: Demo 11's Eq. 2 evaluated in relative mode, a lineshape and a trend with
+#: no absolute scale. Naming them ``chi2_*`` invited exactly the reading the
+#: units string spends a sentence denying.
+#:
+#: ``absolute_detuning_nm`` is the only detuning that may be constrained. The
+#: signed value is reported everywhere and constrained nowhere: a design 13 nm
+#: red of target and one 13 nm blue of it are equally far from it.
 OPTIMIZABLE_METRICS: tuple[str, ...] = (
-    "chi2_at_target_wavelength_abs",
-    "peak_chi2_abs",
-    "detuning_nm_abs",
-    "integrated_chi2_abs",
+    "relative_chi2_at_target_wavelength_abs",
+    "relative_peak_chi2_abs",
+    "absolute_detuning_nm",
+    "relative_integrated_chi2_abs",
     "robustness_score",
     "weighted_score",
     "maximum_boundary_probability",
@@ -78,6 +89,18 @@ OPTIMIZABLE_METRICS: tuple[str, ...] = (
     "required_states_valid",
     "physical_qc_valid",
 )
+
+#: Metric names that changed in the 2026-07-31 hardening pass, old -> new.
+#: Experiments checkpointed before the rename are migrated on load.
+RENAMED_METRICS: Mapping[str, str] = {
+    # Deliberately assembled rather than written as literals: a bulk rename of
+    # the old names across the tree would otherwise rewrite this table's own
+    # keys and quietly turn it into an identity mapping.
+    "chi2" + "_at_target_wavelength_abs": "relative_chi2_at_target_wavelength_abs",
+    "peak_" + "chi2_abs": "relative_peak_chi2_abs",
+    "detuning_nm" + "_abs": "absolute_detuning_nm",
+    "integrated_" + "chi2_abs": "relative_integrated_chi2_abs",
+}
 
 OPTIMIZATION_MODES: frozenset[str] = frozenset(
     {"target_wavelength", "intrinsic_peak", "multi_objective", "weighted_score"}
@@ -150,6 +173,8 @@ class OptimizationSpec:
     constraint_metrics: tuple[str, ...]
     dropped_constraints: tuple[str, ...]
     weights: Mapping[str, float] = field(default_factory=dict)
+    #: Configured constraints enforced outside Ax; see :mod:`feasibility13`.
+    post_processing_constraints: tuple[str, ...] = ()
 
     @property
     def is_multi_objective(self) -> bool:
@@ -174,6 +199,7 @@ class OptimizationSpec:
             "constraints_dropped_because_they_name_an_objective": list(
                 self.dropped_constraints
             ),
+            "constraints_enforced_outside_ax": list(self.post_processing_constraints),
             "weights": dict(self.weights),
             "multi_objective": self.is_multi_objective,
         }
@@ -201,48 +227,27 @@ def build_optimization_spec(cfg: Mapping[str, Any]) -> OptimizationSpec:
     terms = [name for name in maximize] + [f"-{name}" for name in minimize]
     objective = ", ".join(terms)
 
-    constraints_cfg = bo.get("outcome_constraints") or {}
     objective_metrics = tuple(maximize + minimize)
     constraints: list[str] = []
     constraint_metrics: list[str] = []
     dropped: list[str] = []
+    post_processing: list[str] = []
 
-    def add(metric: str, operator: str, bound: float) -> None:
+    # Which constraints Ax is *told about* is decided in feasibility13, from
+    # whether a Gaussian surrogate can resolve each threshold at all. Every
+    # configured constraint is still evaluated on every trial; see that module.
+    for spec in feasibility13.build_constraints(cfg):
+        if spec.enforcement != feasibility13.ENFORCEMENT_AX:
+            post_processing.append(spec.ax_string)
+            continue
         # Ax rejects a constraint on a metric that is already an objective, and
         # so should we: "minimize detuning" and "keep detuning under 15 nm" are
         # the same statement made twice, and Ax must see only one of them.
-        if metric in objective_metrics:
-            dropped.append(f"{metric} {operator} {bound:g}")
-            return
-        constraints.append(f"{metric} {operator} {bound:g}")
-        constraint_metrics.append(metric)
-
-    if constraints_cfg.get("maximum_detuning_nm") is not None:
-        add("detuning_nm_abs", "<=", float(constraints_cfg["maximum_detuning_nm"]))
-    if constraints_cfg.get("maximum_boundary_probability") is not None:
-        add(
-            "maximum_boundary_probability",
-            "<=",
-            float(constraints_cfg["maximum_boundary_probability"]),
-        )
-    if constraints_cfg.get("minimum_state_tracking_confidence") is not None:
-        add(
-            "state_tracking_confidence",
-            ">=",
-            float(constraints_cfg["minimum_state_tracking_confidence"]),
-        )
-    if constraints_cfg.get("maximum_orthonormality_error") is not None:
-        add(
-            "orthonormality_error",
-            "<=",
-            float(constraints_cfg["maximum_orthonormality_error"]),
-        )
-    if bool(constraints_cfg.get("require_origin_independence", False)):
-        add("origin_independence_valid", ">=", 1.0)
-    if bool(constraints_cfg.get("require_expected_states", False)):
-        add("required_states_valid", ">=", 1.0)
-    if bool(constraints_cfg.get("require_physical_qc", False)):
-        add("physical_qc_valid", ">=", 1.0)
+        if spec.metric in objective_metrics:
+            dropped.append(spec.ax_string)
+            continue
+        constraints.append(spec.ax_string)
+        constraint_metrics.append(spec.metric)
 
     weights = dict((objectives.get("weights") or {})) if mode == "weighted_score" else {}
     return OptimizationSpec(
@@ -254,6 +259,7 @@ def build_optimization_spec(cfg: Mapping[str, Any]) -> OptimizationSpec:
         constraint_metrics=tuple(constraint_metrics),
         dropped_constraints=tuple(dropped),
         weights=weights,
+        post_processing_constraints=tuple(post_processing),
     )
 
 

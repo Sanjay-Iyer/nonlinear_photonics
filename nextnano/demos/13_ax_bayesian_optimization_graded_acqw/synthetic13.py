@@ -85,7 +85,7 @@ def _bump(value: float, centre: float, width: float) -> float:
 
 
 def objective_value(parameters: Mapping[str, Any], cfg: Mapping[str, Any]) -> float:
-    """The synthetic ``chi2_at_target_wavelength_abs`` surface."""
+    """The synthetic ``relative_chi2_at_target_wavelength_abs`` surface."""
 
     canonical = design13.canonicalize(parameters, cfg)
     value = 1.0
@@ -148,12 +148,12 @@ def evaluate(parameters: Mapping[str, Any], cfg: Mapping[str, Any]) -> dict[str,
     record: dict[str, Any] = {
         **{f"parameter_{name}": value for name, value in canonical.items()},
         "target_wavelength_nm": target,
-        "chi2_at_target_wavelength_abs": at_target,
-        "peak_chi2_abs": peak,
+        "relative_chi2_at_target_wavelength_abs": at_target,
+        "relative_peak_chi2_abs": peak,
         "peak_wavelength_nm": target + detuning,
-        "detuning_nm": detuning,
-        "detuning_nm_abs": abs(detuning),
-        "integrated_chi2_abs": at_target * 180.0,
+        "signed_detuning_nm": detuning,
+        "absolute_detuning_nm": abs(detuning),
+        "relative_integrated_chi2_abs": at_target * 180.0,
         "bandwidth_above_fraction_nm": 40.0 + 25.0 * _bump(grading, 1.8, 1.2),
         "maximum_boundary_probability": boundary,
         "left_boundary_probability": 0.5 * boundary,
@@ -178,18 +178,25 @@ def evaluate(parameters: Mapping[str, Any], cfg: Mapping[str, Any]) -> dict[str,
         "runtime_seconds": 0.0,
     }
 
-    constraints = (cfg.get("bo") or {}).get("outcome_constraints") or {}
-    violations: list[str] = []
-    maximum_boundary = constraints.get("maximum_boundary_probability")
-    if maximum_boundary is not None and boundary > float(maximum_boundary):
-        violations.append("boundary_probability")
-    minimum_confidence = constraints.get("minimum_state_tracking_confidence")
-    if minimum_confidence is not None and confidence < float(minimum_confidence):
-        violations.append("state_tracking_confidence")
-    maximum_detuning = constraints.get("maximum_detuning_nm")
-    if maximum_detuning is not None and abs(detuning) > float(maximum_detuning):
-        violations.append("detuning")
+    # Evaluated through the same constraint objects the real path uses, so the
+    # synthetic records carry identical violation names and a test written
+    # against one is valid against the other.
+    import feasibility13
+
+    specs = feasibility13.build_constraints(cfg)
+    violations = [
+        spec.name
+        for spec in specs
+        if spec.satisfied_by(record.get(spec.metric)) is False
+    ]
     record["constraint_violations"] = violations
+    record["ax_constraint_violations"] = [
+        spec.name
+        for spec in specs
+        if spec.enforcement == feasibility13.ENFORCEMENT_AX
+        and spec.satisfied_by(record.get(spec.metric)) is False
+    ]
+    record["feasible_under_ax_constraints"] = not record["ax_constraint_violations"]
     record["trial_valid"] = not violations
     record["objective_available"] = True
     record["trial_outcome_class"] = "valid" if not violations else "physically_invalid"
@@ -293,7 +300,7 @@ def _evaluate_for_comparison(
             **{f"parameter_{name}": value for name, value in dict(parameters).items()},
             "status": "failed",
             "failure_reason": str(exc),
-            "chi2_at_target_wavelength_abs": None,
+            "relative_chi2_at_target_wavelength_abs": None,
             "trial_valid": False,
             "synthetic": True,
             "data_label": SYNTHETIC_LABEL,
@@ -304,7 +311,7 @@ def _evaluate_for_comparison(
 def best_so_far(
     rows: Sequence[Mapping[str, Any]],
     *,
-    metric: str = "chi2_at_target_wavelength_abs",
+    metric: str = "relative_chi2_at_target_wavelength_abs",
     require_valid: bool = True,
 ) -> list[dict[str, Any]]:
     """Running best over an evaluation sequence, with the raw points kept.

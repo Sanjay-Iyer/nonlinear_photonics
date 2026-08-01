@@ -34,14 +34,48 @@ for _path in (str(SHARED), str(DEMO_DIR)):
         sys.path.insert(0, _path)
 
 import chi2 as chi2mod  # noqa: E402
+from demo_workflow import DemoError  # noqa: E402
 
 import design13  # noqa: E402
+import feasibility13  # noqa: E402
 
 #: How a trial ended, from Demo 13's point of view.
-OUTCOME_MECHANICAL_FAILURE = "mechanical_failure"
+#:
+#: These five are exhaustive and mutually exclusive. The distinction that
+#: matters most is between the middle two: a design that ran and is unusable is
+#: a *result*, and a run that never produced a number is not.
+#:
+#: ``valid``                 every configured check passed.
+#: ``valid_with_warning``    ran, usable, but a warn-policy check flagged it.
+#: ``scientifically_invalid`` ran and produced metrics, but fails a check whose
+#:                           policy rejects it. Metrics are kept.
+#: ``mechanically_failed``   solver crashed or output missing. No objective.
+#: ``not_evaluated``         never executed on this machine.
 OUTCOME_VALID = "valid"
-OUTCOME_INVALID = "physically_invalid"
-OUTCOME_NOT_RUN = "not_run_no_licensed_solver"
+OUTCOME_VALID_WITH_WARNING = "valid_with_warning"
+OUTCOME_INVALID = "scientifically_invalid"
+OUTCOME_MECHANICAL_FAILURE = "mechanically_failed"
+OUTCOME_NOT_RUN = "not_evaluated"
+
+TRIAL_OUTCOME_CLASSES: tuple[str, ...] = (
+    OUTCOME_VALID,
+    OUTCOME_VALID_WITH_WARNING,
+    OUTCOME_INVALID,
+    OUTCOME_MECHANICAL_FAILURE,
+    OUTCOME_NOT_RUN,
+)
+
+#: What ``physical_qc.bound_state_policy`` does with a bound-state QC failure.
+#:
+#: ``warn``       trial stays usable and is reported as valid_with_warning. The
+#:                warning is never presented as a clean pass.
+#: ``constraint`` leave the verdict to the continuous boundary-probability
+#:                constraint, which Ax already models.
+#: ``reject``     scientifically_invalid: metrics kept, excluded from ranking,
+#:                and the Ax trial is abandoned so the surrogate is not taught
+#:                that this region scores well.
+#: ``fail_trial`` treated as a mechanical failure: no objective given to Ax.
+BOUND_STATE_POLICIES: tuple[str, ...] = ("warn", "constraint", "reject", "fail_trial")
 
 #: Region roles of the Demo 12 layer stack, mapped onto the physical names the
 #: Demo 13 tables use. ``left_well`` is grown first and is the wide well for the
@@ -111,10 +145,12 @@ def spectrum_measures(
     }
     if inside.sum() < 2:
         record.update(
-            {"integrated_chi2_abs": None, "bandwidth_above_fraction_nm": None}
+            {"relative_integrated_chi2_abs": None, "bandwidth_above_fraction_nm": None}
         )
         return record
-    record["integrated_chi2_abs"] = float(np.trapezoid(values[inside], lam[inside]))
+    record["relative_integrated_chi2_abs"] = float(
+        np.trapezoid(values[inside], lam[inside])
+    )
     peak = float(np.max(values[inside]))
     if peak <= 0:
         record["bandwidth_above_fraction_nm"] = 0.0
@@ -440,16 +476,28 @@ def build_record(
     peak = _finite(observables.get("chi2_peak_magnitude"))
     peak_wavelength = _finite(observables.get("chi2_peak_wavelength_nm"))
     at_target = _finite(observables.get("chi2_relative_at_reference"))
-    detuning = None if peak_wavelength is None else float(peak_wavelength - target)
+    # Signed and absolute detuning are separate metrics with separate jobs. The
+    # signed value says which side of the target a resonance sits on and is
+    # reported everywhere; the absolute value is how far away it is and is the
+    # only one a "within N nm of target" constraint may ever bind.
+    signed_detuning = None if peak_wavelength is None else float(peak_wavelength - target)
     record.update(
         {
             "chi2_mode": observables.get("chi2_mode"),
-            "chi2_units": observables.get("chi2_units"),
-            "peak_chi2_abs": None if peak is None else abs(peak),
+            "relative_chi2_units": observables.get("chi2_units"),
+            "relative_peak_chi2_abs": None if peak is None else abs(peak),
             "peak_wavelength_nm": peak_wavelength,
-            "chi2_at_target_wavelength_abs": None if at_target is None else abs(at_target),
-            "detuning_nm": detuning,
-            "detuning_nm_abs": None if detuning is None else abs(detuning),
+            "relative_chi2_at_target_wavelength_abs": (
+                None if at_target is None else abs(at_target)
+            ),
+            "signed_detuning_nm": signed_detuning,
+            "absolute_detuning_nm": None if signed_detuning is None else abs(signed_detuning),
+            "detuning_side": (
+                None
+                if signed_detuning is None
+                else ("on_target" if signed_detuning == 0 else
+                      "red_of_target" if signed_detuning < 0 else "blue_of_target")
+            ),
         }
     )
 
@@ -459,7 +507,7 @@ def build_record(
     else:
         record.update(
             {
-                "integrated_chi2_abs": None,
+                "relative_integrated_chi2_abs": None,
                 "bandwidth_above_fraction_nm": None,
                 "integrated_wavelength_window_nm": None,
                 "bandwidth_fraction_of_peak": None,
@@ -485,62 +533,82 @@ def build_record(
         }
     )
 
-    constraints = (cfg.get("bo") or {}).get("outcome_constraints") or {}
+    # Every configured constraint is evaluated here, whether or not Ax was told
+    # about it. `trial_valid` therefore means the same thing as full physical
+    # feasibility, while `feasible_under_ax_constraints` records the narrower
+    # question the optimizer was actually asked. The first licensed run showed
+    # why both are needed: Ax was enforcing a detuning bound this record never
+    # checked, so an Ax-excluded design sat at the top of the ranked table.
+    specs = feasibility13.build_constraints(cfg)
     rejections: list[str] = []
-    if record["physical_qc_valid"] != 1:
-        rejections.extend(
-            f"physical_qc:{name}" for name in record["physical_qc_failed_tests"]
-        )
-    if record["required_states_valid"] != 1:
-        rejections.append("required_states")
-    if record["origin_independence_valid"] != 1:
-        rejections.append("origin_independence")
-    # Every configured outcome constraint is applied here, including the ones
-    # Ax also enforces. The first licensed run showed why: the six Sobol trials
-    # all landed 16-46 nm off target, Ax correctly reported "all training points
-    # are infeasible", and this table still called them valid because the
-    # detuning bound was checked by Ax and nowhere else. `trial_valid` has to
-    # mean the same thing as Ax feasibility, or the best-so-far curve credits a
-    # design the optimizer has excluded.
-    maximum_detuning = constraints.get("maximum_detuning_nm")
-    detuning = record.get("detuning_nm_abs")
-    if maximum_detuning is not None and detuning is not None and detuning > float(maximum_detuning):
-        rejections.append("detuning")
-    maximum_orthonormality = constraints.get("maximum_orthonormality_error")
-    orthonormality = record.get("orthonormality_error")
-    if (
-        maximum_orthonormality is not None
-        and orthonormality is not None
-        and orthonormality > float(maximum_orthonormality)
-    ):
-        rejections.append("orthonormality_error")
-    maximum_boundary = constraints.get("maximum_boundary_probability")
-    boundary = record.get("maximum_boundary_probability")
-    if maximum_boundary is not None and boundary is not None and boundary > float(maximum_boundary):
-        rejections.append("boundary_probability")
-    minimum_confidence = constraints.get("minimum_state_tracking_confidence")
-    confidence = record.get("state_tracking_confidence")
-    if (
-        minimum_confidence is not None
-        and confidence is not None
-        and confidence < float(minimum_confidence)
-    ):
-        rejections.append("state_tracking_confidence")
+    ax_rejections: list[str] = []
+    for spec in specs:
+        if spec.satisfied_by(record.get(spec.metric)) is False:
+            rejections.append(spec.name)
+            if spec.enforcement == feasibility13.ENFORCEMENT_AX:
+                ax_rejections.append(spec.name)
     if record.get("state_tracking_ambiguous"):
         rejections.append("state_tracking_ambiguous")
 
+    # The bound-state policy decides what a boundary-probability QC failure
+    # means, rather than that meaning being implicit in the code path taken.
+    policy = str(
+        (cfg.get("physical_qc") or {}).get("bound_state_policy", "warn")
+    )
+    if policy not in BOUND_STATE_POLICIES:
+        raise DemoError(
+            f"physical_qc.bound_state_policy must be one of {list(BOUND_STATE_POLICIES)}, "
+            f"got {policy!r}"
+        )
+    bound_state_failed = "bound_state_boundary_probability_small" in set(
+        record.get("physical_qc_failed_tests") or ()
+    )
+    warnings_raised: list[str] = []
+    if bound_state_failed:
+        if policy == "warn":
+            warnings_raised.append("bound_state_boundary_probability_small")
+            # A warn-policy failure must not masquerade as a clean pass, so the
+            # named test stays visible in physical_qc_failed_tests and the trial
+            # is reported as valid_with_warning rather than valid.
+            rejections = [name for name in rejections if name != "require_physical_qc"]
+        elif policy == "constraint":
+            # Defer entirely to the continuous boundary-probability constraint,
+            # which Ax already models and which is the same physics.
+            rejections = [name for name in rejections if name != "require_physical_qc"]
+        elif policy in {"reject", "fail_trial"} and "require_physical_qc" not in rejections:
+            rejections.append("require_physical_qc")
+
+    record["bound_state_policy"] = policy
+    record["qc_warnings"] = warnings_raised
     record["constraint_violations"] = rejections
+    record["ax_constraint_violations"] = ax_rejections
     record["trial_valid"] = not rejections
-    record["objective_available"] = record["chi2_at_target_wavelength_abs"] is not None
-    record["trial_outcome_class"] = OUTCOME_VALID if not rejections else OUTCOME_INVALID
+    record["feasible_under_ax_constraints"] = not ax_rejections
+    record["objective_available"] = (
+        record["relative_chi2_at_target_wavelength_abs"] is not None
+        and not (bound_state_failed and policy == "fail_trial")
+    )
+    if bound_state_failed and policy == "fail_trial":
+        record["trial_outcome_class"] = OUTCOME_MECHANICAL_FAILURE
+        record["failure_reason"] = (
+            "physical_qc.bound_state_policy is 'fail_trial' and the bound-state "
+            "boundary-probability check failed"
+        )
+    elif rejections:
+        record["trial_outcome_class"] = OUTCOME_INVALID
+    elif warnings_raised:
+        record["trial_outcome_class"] = OUTCOME_VALID_WITH_WARNING
+    else:
+        record["trial_outcome_class"] = OUTCOME_VALID
     record["rejection_reason"] = "; ".join(rejections)
+    record["warning_reason"] = "; ".join(warnings_raised)
     # A genuinely symmetric or off-resonant structure is a real, valid
     # observation with a near-zero response. Naming that case explicitly is what
     # keeps it from being read as a failure later.
     record["valid_low_response"] = bool(
         not rejections
-        and record["chi2_at_target_wavelength_abs"] is not None
-        and record["chi2_at_target_wavelength_abs"] < 1e-12
+        and record["relative_chi2_at_target_wavelength_abs"] is not None
+        and record["relative_chi2_at_target_wavelength_abs"] < 1e-12
     )
     return record
 

@@ -33,6 +33,7 @@ import grading12  # noqa: E402
 from demo_workflow import write_json_atomically, write_text_atomically  # noqa: E402
 
 import design13  # noqa: E402
+import feasibility13  # noqa: E402
 
 #: Unit of every column name Demo 13 writes. ``a.u.`` marks the relative chi(2)
 #: scale of Demo 11's Eq. 2: a lineshape and a trend, with no absolute
@@ -55,12 +56,12 @@ COLUMN_UNITS: Mapping[str, str] = {
     "parameter_grading_thickness_nm": "nm",
     "parameter_grading_profile": "category",
     "target_wavelength_nm": "nm",
-    "chi2_at_target_wavelength_abs": "a.u. (relative |chi2|)",
-    "peak_chi2_abs": "a.u. (relative |chi2|)",
+    "relative_chi2_at_target_wavelength_abs": "a.u. (relative |chi2|)",
+    "relative_peak_chi2_abs": "a.u. (relative |chi2|)",
     "peak_wavelength_nm": "nm",
-    "detuning_nm": "nm",
-    "detuning_nm_abs": "nm",
-    "integrated_chi2_abs": "a.u.*nm",
+    "signed_detuning_nm": "nm",
+    "absolute_detuning_nm": "nm",
+    "relative_integrated_chi2_abs": "a.u.*nm",
     "bandwidth_above_fraction_nm": "nm",
     "bandwidth_fraction_of_peak": "dimensionless",
     "integrated_wavelength_window_nm": "nm",
@@ -162,6 +163,7 @@ SUMMARY_TABLES: tuple[str, ...] = (
     "bo_run_plan_and_case_counts",
     "bo_demo12_warm_start_provenance",
     "bo_search_space_definition",
+    "bo_constraint_modelling_decisions",
 )
 
 #: Every table Demo 13 promises, with the meaning of one row.
@@ -187,6 +189,8 @@ TABLE_CATALOGUE: Mapping[str, str] = {
     "bo_run_plan_and_case_counts": "the planned and completed evaluation budget for this run",
     "bo_demo12_warm_start_provenance": "one candidate Demo 12 case, with its compatibility decision and whether Ax used it",
     "bo_search_space_definition": "one active search-space parameter",
+    "bo_constraint_feasibility_audit": "one (trial, constraint) pair, with the exact value, threshold, comparison and verdict, and whether Ax was told about it",
+    "bo_constraint_modelling_decisions": "one configured constraint, with its observed spread and why it is or is not modelled by the surrogate",
 }
 
 
@@ -306,8 +310,8 @@ _INPUT_COLUMNS = (
 
 _NONLINEAR_COLUMNS = (
     "trial_index", "iteration", "candidate_id", "chi2_mode", "chi2_units",
-    "peak_chi2_abs", "peak_wavelength_nm", "chi2_at_target_wavelength_abs",
-    "detuning_nm", "detuning_nm_abs", "integrated_chi2_abs",
+    "relative_peak_chi2_abs", "peak_wavelength_nm", "relative_chi2_at_target_wavelength_abs",
+    "signed_detuning_nm", "absolute_detuning_nm", "relative_integrated_chi2_abs",
     "integrated_wavelength_window_nm", "bandwidth_above_fraction_nm",
     "bandwidth_fraction_of_peak", "trial_valid", "status",
 )
@@ -435,8 +439,8 @@ def top_ranked_valid_designs(
                 for name in (
                     "parameter_asymmetry_s", "parameter_central_barrier_thickness_nm",
                     "parameter_grading_thickness_nm", "parameter_grading_profile",
-                    "peak_chi2_abs", "peak_wavelength_nm",
-                    "chi2_at_target_wavelength_abs", "detuning_nm",
+                    "relative_peak_chi2_abs", "peak_wavelength_nm",
+                    "relative_chi2_at_target_wavelength_abs", "signed_detuning_nm",
                     "maximum_boundary_probability", "state_tracking_confidence",
                     "orthonormality_error", "physical_qc_valid",
                 )
@@ -474,8 +478,8 @@ def invalid_and_failed_trials(records: Sequence[Mapping[str, Any]]) -> list[dict
                         "parameter_central_barrier_thickness_nm",
                         "parameter_grading_thickness_nm",
                         "parameter_grading_profile",
-                        "chi2_at_target_wavelength_abs",
-                        "peak_chi2_abs",
+                        "relative_chi2_at_target_wavelength_abs",
+                        "relative_peak_chi2_abs",
                     )
                 },
                 "output_directory_path": record.get("output_directory_path"),
@@ -499,9 +503,9 @@ def pareto_designs(
         objectives[name] = "minimize" if name in set(spec.minimized_metrics) else "maximize"
     if len(objectives) < 2:
         objectives = {
-            "peak_chi2_abs": "maximize",
-            "chi2_at_target_wavelength_abs": "maximize",
-            "detuning_nm_abs": "minimize",
+            "relative_peak_chi2_abs": "maximize",
+            "relative_chi2_at_target_wavelength_abs": "maximize",
+            "absolute_detuning_nm": "minimize",
         }
     usable = [
         dict(record)
@@ -525,8 +529,8 @@ def pareto_designs(
                 for name in (
                     "parameter_asymmetry_s", "parameter_central_barrier_thickness_nm",
                     "parameter_grading_thickness_nm", "parameter_grading_profile",
-                    "peak_chi2_abs", "chi2_at_target_wavelength_abs", "peak_wavelength_nm",
-                    "detuning_nm", "detuning_nm_abs", "robustness_score",
+                    "relative_peak_chi2_abs", "relative_chi2_at_target_wavelength_abs", "peak_wavelength_nm",
+                    "signed_detuning_nm", "absolute_detuning_nm", "robustness_score",
                     "maximum_boundary_probability", "state_tracking_confidence",
                 )
             },
@@ -618,6 +622,12 @@ def write_all(
     emit("bo_top_designs_fabrication_robustness", robustness_rows)
     emit("bo_random_grid_search_efficiency_comparison", efficiency_rows)
     emit("bo_search_space_definition", search_space_rows(cfg))
+    constraint_specs = feasibility13.build_constraints(cfg)
+    emit("bo_constraint_feasibility_audit", feasibility13.audit_rows(records, constraint_specs))
+    emit(
+        "bo_constraint_modelling_decisions",
+        feasibility13.constraint_spread(records, constraint_specs),
+    )
     emit("bo_demo12_warm_start_provenance", warm_start_rows)
     emit("bo_run_plan_and_case_counts", [dict(plan_record)] if plan_record else [])
     return written
