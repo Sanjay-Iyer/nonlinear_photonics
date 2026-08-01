@@ -128,9 +128,22 @@ PLOT_SET: tuple[tuple[str, str], ...] = (
     ("paper_measured_sh_intensity_comparison.png", "Measured SH intensity, plotted separately"),
 )
 
+#: Used only where the figure genuinely needs solver output this bundle lacks.
 PLACEHOLDER_REASON = (
     "No licensed nextnano++ output for this figure yet; raw points are never "
     "smoothed and never invented"
+)
+
+#: A surrogate figure has a completely different reason for being empty: the
+#: observations exist and the solver ran, but no predictive model could be
+#: fitted, or the points asked for are not valid in this search space. Saying
+#: "no licensed output" there is simply false, and it sent a reader looking for
+#: a solver problem that did not exist.
+PLACEHOLDER_REASON_NO_SURROGATE = (
+    "No surrogate prediction is available for this figure. This is a model "
+    "availability problem, not a missing-solver problem: see "
+    "extracted/analysis_model_reconstruction.json for the reconstruction status "
+    "and its reason."
 )
 
 
@@ -211,8 +224,50 @@ def _finish(fig: Any, path: Path) -> None:
     plotting.save_figure_formats(fig, path, formats=("png", "pdf"))
 
 
-def _placeholder(path: Path) -> None:
-    plotting.placeholder(path, path.stem, reason=PLACEHOLDER_REASON)
+def _placeholder(path: Path, reason: str = PLACEHOLDER_REASON) -> None:
+    plotting.placeholder(path, path.stem, reason=reason)
+
+
+def _surrogate_placeholder(path: Path, rows: Sequence[Mapping[str, Any]]) -> None:
+    """Placeholder for a surrogate figure, carrying the model's own reason.
+
+    Prefers the reason the prediction rows actually recorded over the generic
+    one, so the figure says *why this model could not predict here* rather than
+    inventing a story about missing licensed output.
+    """
+
+    reasons = [
+        str(row.get("reason", "")).strip()
+        for row in rows
+        if str(row.get("reason", "")).strip()
+    ]
+    detail = f" Reported reason: {reasons[0]}" if reasons else ""
+    plotting.placeholder(
+        path, path.stem, reason=PLACEHOLDER_REASON_NO_SURROGATE + detail
+    )
+
+
+def grading_axis(cfg: Mapping[str, Any]) -> tuple[str, str]:
+    """The grading coordinate a surrogate figure varies, and its honest label.
+
+    Under ``parameterization: fraction`` the searched coordinate is a
+    dimensionless fraction of the feasible maximum.  Plotting it on an axis
+    labelled "Grading thickness (nm)" -- which is what happened before, when
+    the key ``grading_thickness_nm`` was looked up and simply not found --
+    turns a number in [0, 1] into a nanometre count.  The realized thickness is
+    still carried in the CSV beside it, under its own name.
+    """
+
+    import design13
+    import grading13
+
+    name = design13.grading_parameter_name(cfg)
+    label = (
+        AXIS["grading"]
+        if name == "grading_thickness_nm"
+        else grading13.AXIS_PROPOSED_FRACTION
+    )
+    return name, label
 
 
 def _number(value: Any) -> float | None:
@@ -382,14 +437,27 @@ def _surface(
         for row in rows
     ]
     usable = [item for item in usable if None not in item[:3]]
-    _write_csv(path, [dict(row) for *_ignored, row in usable])
+    # Every requested row is written, not only the plottable ones. A CSV holding
+    # only the finite subset cannot explain why a figure is empty, and a reader
+    # counting its rows would conclude the surface had been drawn.
+    _write_csv(
+        path,
+        [
+            {**dict(row), "row_is_plottable": bool(
+                _number(row.get(x_key)) is not None
+                and _number(row.get(y_key)) is not None
+                and _number(row.get(z_key)) is not None
+            )}
+            for row in rows
+        ],
+    )
     if len(usable) < 4:
-        _placeholder(path)
+        _surrogate_placeholder(path, rows)
         return
     xs = sorted({item[0] for item in usable})
     ys = sorted({item[1] for item in usable})
     if len(xs) < 2 or len(ys) < 2:
-        _placeholder(path)
+        _surrogate_placeholder(path, rows)
         return
     grid = np.full((len(ys), len(xs)), np.nan)
     x_index = {value: index for index, value in enumerate(xs)}
@@ -643,11 +711,35 @@ def _parameter_sampling(plots_dir: Path, context: PlotContext) -> None:
     )
 
 
+def _observed_grading_coordinate(row: Mapping[str, Any], grading_key: str) -> float | None:
+    """The observed trial's value *on the same axis the surface is drawn on*.
+
+    Overlaying observations on a surrogate surface is only meaningful if both
+    use the same coordinate.  Under the fraction parameterization the surface's
+    vertical axis is the proposed fraction, so the overlay must be the trial's
+    proposed fraction -- not its realized thickness in nanometres, which is a
+    different quantity on a different scale and was what the code used to plot.
+    """
+
+    if grading_key == "grading_thickness_nm":
+        return _number(row.get("parameter_grading_thickness_nm"))
+    import grading13
+
+    view = grading13.try_from_record(row)
+    if view is None:
+        return None
+    return _number(view.proposed_grading_fraction)
+
+
 def _surrogate(plots_dir: Path, context: PlotContext) -> None:
+    grading_key, grading_label = grading_axis(context.cfg)
     observed_ag = [
         (x, y)
         for x, y in (
-            (_number(row.get("parameter_asymmetry_s")), _number(row.get("parameter_grading_thickness_nm")))
+            (
+                _number(row.get("parameter_asymmetry_s")),
+                _observed_grading_coordinate(row, grading_key),
+            )
             for row in context.completed
         )
         if x is not None and y is not None
@@ -657,7 +749,7 @@ def _surrogate(plots_dir: Path, context: PlotContext) -> None:
         for x, y in (
             (
                 _number(row.get("parameter_central_barrier_thickness_nm")),
-                _number(row.get("parameter_grading_thickness_nm")),
+                _observed_grading_coordinate(row, grading_key),
             )
             for row in context.completed
         )
@@ -669,10 +761,10 @@ def _surrogate(plots_dir: Path, context: PlotContext) -> None:
         plots_dir / "bo_surrogate_mean_asymmetry_vs_grading_thickness.png",
         slices.get("asymmetry_grading", ()),
         x_key="asymmetry_s",
-        y_key="grading_thickness_nm",
+        y_key=grading_key,
         z_key=f"{metric}_predicted_mean",
         xlabel=AXIS["asymmetry"],
-        ylabel=AXIS["grading"],
+        ylabel=grading_label,
         colour_label="Predicted " + AXIS["objective"].lower(),
         observed=observed_ag,
     )
@@ -680,10 +772,10 @@ def _surrogate(plots_dir: Path, context: PlotContext) -> None:
         plots_dir / "bo_surrogate_uncertainty_asymmetry_vs_grading_thickness.png",
         slices.get("asymmetry_grading", ()),
         x_key="asymmetry_s",
-        y_key="grading_thickness_nm",
+        y_key=grading_key,
         z_key=f"{metric}_predicted_standard_error",
         xlabel=AXIS["asymmetry"],
-        ylabel=AXIS["grading"],
+        ylabel=grading_label,
         colour_label="Predicted standard error (a.u.)",
         observed=observed_ag,
     )
@@ -691,10 +783,10 @@ def _surrogate(plots_dir: Path, context: PlotContext) -> None:
         plots_dir / "bo_acquisition_function_asymmetry_vs_grading_thickness.png",
         slices.get("asymmetry_grading", ()),
         x_key="asymmetry_s",
-        y_key="grading_thickness_nm",
+        y_key=grading_key,
         z_key="expected_improvement",
         xlabel=AXIS["asymmetry"],
-        ylabel=AXIS["grading"],
+        ylabel=grading_label,
         colour_label="Expected improvement (a.u.)",
         observed=observed_ag,
     )
@@ -702,10 +794,10 @@ def _surrogate(plots_dir: Path, context: PlotContext) -> None:
         plots_dir / "bo_surrogate_mean_barrier_vs_grading_thickness.png",
         slices.get("barrier_grading", ()),
         x_key="central_barrier_thickness_nm",
-        y_key="grading_thickness_nm",
+        y_key=grading_key,
         z_key=f"{metric}_predicted_mean",
         xlabel=AXIS["barrier"],
-        ylabel=AXIS["grading"],
+        ylabel=grading_label,
         colour_label="Predicted " + AXIS["objective"].lower(),
         observed=observed_bg,
     )
@@ -713,10 +805,10 @@ def _surrogate(plots_dir: Path, context: PlotContext) -> None:
         plots_dir / "bo_surrogate_uncertainty_barrier_vs_grading_thickness.png",
         slices.get("barrier_grading", ()),
         x_key="central_barrier_thickness_nm",
-        y_key="grading_thickness_nm",
+        y_key=grading_key,
         z_key=f"{metric}_predicted_standard_error",
         xlabel=AXIS["barrier"],
-        ylabel=AXIS["grading"],
+        ylabel=grading_label,
         colour_label="Predicted standard error (a.u.)",
         observed=observed_bg,
     )
@@ -797,10 +889,15 @@ def _interpretation(plots_dir: Path, context: PlotContext) -> None:
         rows=list(context.importance_rows),
         horizontal=True,
     )
+    # The grading curve is keyed by whatever the search space actually declares.
+    # Hard-coding `grading_thickness_nm` here meant that under the fraction
+    # parameterization the lookup missed, the row list came back empty, and the
+    # figure silently became a placeholder blaming the absent solver.
+    pd_grading_key, pd_grading_label = grading_axis(context.cfg)
     for filename, key, xlabel in (
         ("bo_partial_dependence_asymmetry.png", "asymmetry_s", AXIS["asymmetry"]),
         ("bo_partial_dependence_barrier_thickness.png", "central_barrier_thickness_nm", AXIS["barrier"]),
-        ("bo_partial_dependence_grading_thickness.png", "grading_thickness_nm", AXIS["grading"]),
+        ("bo_partial_dependence_grading_thickness.png", pd_grading_key, pd_grading_label),
     ):
         rows = list(context.partial_dependence.get(key, ()))
         path = plots_dir / filename
@@ -815,7 +912,7 @@ def _interpretation(plots_dir: Path, context: PlotContext) -> None:
         ]
         usable = [item for item in usable if item[0] is not None and item[1] is not None]
         if len(usable) < 2:
-            _placeholder(path)
+            _surrogate_placeholder(path, rows)
             continue
         fig, ax = _figure()
         if fig is None:
@@ -1244,10 +1341,15 @@ def _paper(plots_dir: Path, context: PlotContext) -> None:
     full = [float(value) for value in paper_cfg.get("full_range_nm", (1200.0, 1800.0))]
     telecom = [float(value) for value in paper_cfg.get("telecom_range_nm", (1450.0, 1650.0))]
     curves = list(context.paper_curves)
+    # A pm/V axis is only ever legitimate over a *calibrated* metric. Demo 13
+    # runs `metric.mode: relative`, whose values are an arbitrary-unit merit, so
+    # letting `paper_comparison.units` alone choose this label would put pm/V on
+    # a quantity that has no absolute scale.
+    calibrated = str((context.cfg.get("metric") or {}).get("mode", "relative")) != "relative"
     ylabel = (
-        AXIS["normalized_chi2"]
-        if str(paper_cfg.get("units", "normalized")) == "normalized"
-        else "Simulated |χ²| (pm/V)"
+        "Simulated |χ²| (pm/V)"
+        if calibrated and str(paper_cfg.get("units", "normalized")) != "normalized"
+        else AXIS["normalized_chi2"]
     )
     _curves(
         plots_dir / "paper_figure2d_simulation_comparison_full_range.png",

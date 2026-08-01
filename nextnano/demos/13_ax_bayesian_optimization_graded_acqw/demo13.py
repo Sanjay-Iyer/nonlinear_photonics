@@ -53,9 +53,11 @@ from demo_workflow import (  # noqa: E402
     write_text_atomically,
 )
 
+import analysis13  # noqa: E402
 import axsearch13  # noqa: E402
 import design13  # noqa: E402
 import feasibility13  # noqa: E402
+import grading13  # noqa: E402
 import metrics13  # noqa: E402
 import plots13  # noqa: E402
 import replay13  # noqa: E402
@@ -372,11 +374,24 @@ class Experiment:
         state_dir: Path,
         *,
         warm_start: Sequence[Mapping[str, Any]] = (),
+        read_only: bool = False,
     ) -> None:
+        """``read_only`` forbids every write into the experiment state directory.
+
+        Reanalysis of a finished licensed study must be able to prove it changed
+        nothing.  Without this flag the constructor alone rewrote
+        ``demo_yaml_snapshot.yaml`` and ``experiment_schema.json`` on every
+        load, and created an empty experiment if the directory was missing --
+        which would silently manufacture a brand-new study rather than report
+        that the requested one is not there.
+        """
+
         self.cfg = cfg
         self.state_dir = Path(state_dir)
-        self.state_dir.mkdir(parents=True, exist_ok=True)
-        self.ledger = axsearch13.Ledger(self.state_dir)
+        self.read_only = bool(read_only)
+        if not self.read_only:
+            self.state_dir.mkdir(parents=True, exist_ok=True)
+        self.ledger = axsearch13.Ledger(self.state_dir, read_only=self.read_only)
         self.spec = axsearch13.build_optimization_spec(cfg)
         self.versions = axsearch13.check_ax_version(cfg)
         self.snapshot_path = self.state_dir / "ax_experiment_snapshot.json"
@@ -385,6 +400,27 @@ class Experiment:
         self.warm_start_attachments: list[dict[str, Any]] = []
         self.schema_path = self.state_dir / "experiment_schema.json"
         resume = bool((cfg.get("workflow") or {}).get("resume", True))
+        if self.read_only and not self.snapshot_path.is_file():
+            # Creating the study here would produce an empty experiment named
+            # like the real one, and every report downstream would describe it
+            # as if it were the licensed run.
+            existing = (
+                sorted(
+                    path.name
+                    for path in self.state_dir.parent.iterdir()
+                    if path.is_dir() and (path / "ax_experiment_snapshot.json").is_file()
+                )
+                if self.state_dir.parent.is_dir()
+                else []
+            )
+            raise DemoError(
+                f"analysis mode found no Ax snapshot in {self.state_dir}. It will not "
+                "create one, because an empty experiment would then be reported as "
+                "though it were the completed study.\n"
+                f"Experiment directories that do hold a snapshot: "
+                + (", ".join(existing) if existing else "(none)")
+                + "\nSet workflow.experiment_state_dir to the one you meant."
+            )
         if resume and self.snapshot_path.is_file():
             self._check_schema_compatible(cfg)
             self.client = axsearch13.load_client(self.snapshot_path)
@@ -404,11 +440,12 @@ class Experiment:
                 )
                 write_json_atomically(self.warm_start_path, self.warm_start_attachments)
             self.checkpoint()
-        write_text_atomically(
-            self.state_dir / "demo_yaml_snapshot.yaml",
-            yaml.safe_dump(dict(cfg), sort_keys=True),
-        )
-        write_json_atomically(self.schema_path, experiment_schema(cfg))
+        if not self.read_only:
+            write_text_atomically(
+                self.state_dir / "demo_yaml_snapshot.yaml",
+                yaml.safe_dump(dict(cfg), sort_keys=True),
+            )
+            write_json_atomically(self.schema_path, experiment_schema(cfg))
 
     def _check_schema_compatible(self, cfg: Mapping[str, Any]) -> None:
         """Refuse to resume a snapshot whose search space no longer matches."""
@@ -443,7 +480,23 @@ class Experiment:
                 "directory is never modified."
             )
 
+    def _refuse_if_read_only(self, action: str) -> None:
+        """Turn "analysis must not mutate" from a convention into an exception.
+
+        A silent no-op would be worse than an error: the run would appear to
+        succeed while the caller believed it had generated or completed a
+        trial.
+        """
+
+        if self.read_only:
+            raise DemoError(
+                f"refusing to {action}: this experiment was opened read-only for "
+                "analysis. Reanalysis never generates candidates, never completes "
+                "or fails trials, and never rewrites the checkpoint."
+            )
+
     def checkpoint(self) -> None:
+        self._refuse_if_read_only("write the Ax checkpoint")
         axsearch13.save_client(self.client, self.snapshot_path)
 
     @property
@@ -454,6 +507,7 @@ class Experiment:
         return len(self.ledger.records())
 
     def generate(self, count: int) -> list[axsearch13.Candidate]:
+        self._refuse_if_read_only("generate candidates")
         candidates = axsearch13.generate_candidates(
             self.client,
             self.cfg,
@@ -465,14 +519,17 @@ class Experiment:
         return candidates
 
     def complete(self, trial_index: int, raw_data: Mapping[str, float]) -> None:
+        self._refuse_if_read_only("complete a trial")
         self.client.complete_trial(int(trial_index), raw_data=dict(raw_data))
         self.checkpoint()
 
     def fail(self, trial_index: int, reason: str) -> None:
+        self._refuse_if_read_only("fail a trial")
         self.client.mark_trial_failed(int(trial_index), failed_reason=str(reason)[:400])
         self.checkpoint()
 
     def abandon(self, trial_index: int, reason: str) -> None:
+        self._refuse_if_read_only("abandon a trial")
         try:
             self.client.mark_trial_abandoned(int(trial_index))
         except Exception:  # pragma: no cover - Ax version tolerant
@@ -983,16 +1040,79 @@ def _slice_base_point(
         point[grading] = float(fixed.get("grading_thickness_nm", 1.5))
     else:
         lower, upper = design13.graded_fraction_bounds(cfg)
+        # A fixed value carried over from the thickness parameterization is a
+        # nanometre count, not a fraction, and 1.5 is not even in [0, 1]. Only
+        # a value stored under the *fraction's own name* may be honoured.
         point[grading] = float(
             fixed.get(grading, min(max(0.5, lower), upper))
         )
     return point
 
 
+def _ax_encoded_slice_points(
+    cfg: Mapping[str, Any], points: Sequence[Mapping[str, Any]]
+) -> list[dict[str, Any]]:
+    """Encode canonical slice points for the hierarchical Ax search space.
+
+    Two failures this prevents, both of which silently emptied a figure:
+
+    * an abrupt point carrying the inactive grading children -- Ax rejects the
+      whole parameterization, not just the extra keys;
+    * a graded point missing one of them -- same outcome.
+
+    :func:`axsearch13.ax_parameters` already does the encoding; this exists so
+    every surrogate consumer goes through one place and the tests have one
+    thing to target.
+    """
+
+    return [axsearch13.ax_parameters(dict(point), cfg) for point in points]
+
+
+def _encode_search_point(
+    cfg: Mapping[str, Any], point: Mapping[str, Any]
+) -> dict[str, Any]:
+    """Express a point that is *already in Ax coordinates* for the Ax space.
+
+    :func:`axsearch13.ax_parameters` converts a **canonical** design -- one
+    carrying a realized ``grading_thickness_nm`` -- into Ax's encoding.  A
+    surrogate slice point is not that: under the fraction parameterization it
+    carries ``grading_fraction_of_feasible_max`` and no thickness at all, so
+    ``ax_parameters`` read a thickness of zero and encoded *every* slice point
+    onto the abrupt branch.  The grading axis of every surrogate figure was
+    therefore constant, which is a quieter failure than an empty plot.
+
+    Here the grading coordinate is taken at face value, and only the
+    hierarchical branch structure is imposed.
+    """
+
+    grading = design13.grading_parameter_name(cfg)
+    values: dict[str, Any] = {
+        "asymmetry_s": float(point["asymmetry_s"]),
+        "central_barrier_thickness_nm": float(point["central_barrier_thickness_nm"]),
+    }
+    for name in design13.enabled_optional_parameters(cfg):
+        if name in point:
+            values[name] = point[name]
+    if str(cfg["bo"]["search_space"].get("encoding", "hierarchical")) != "hierarchical":
+        values[grading] = float(point[grading])
+        values["grading_profile"] = str(point.get("grading_profile", "abrupt"))
+        return values
+
+    profile = str(point.get("grading_profile", "abrupt"))
+    if str(point.get("interface_mode", "graded")) == "abrupt" or profile == "abrupt":
+        values["interface_mode"] = "abrupt"
+        return values
+    values["interface_mode"] = "graded"
+    values[grading] = float(point[grading])
+    profiles = design13.graded_profiles(cfg)
+    values["grading_profile"] = profile if profile in profiles else profiles[0]
+    return values
+
+
 def _slice_points(
     cfg: Mapping[str, Any], x_name: str, y_name: str
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    """A 2-D grid of canonical designs and their Ax-encoded counterparts."""
+    """A 2-D grid of search-space points and their Ax-encoded counterparts."""
 
     slices = (cfg["bo"].get("surrogate_slices") or {})
     count = int(slices.get("grid_points", 21))
@@ -1001,15 +1121,56 @@ def _slice_points(
     for spec in design13.search_space_specs(cfg):
         if isinstance(spec, design13.RangeSpec):
             bounds[spec.name] = (spec.lower, spec.upper)
-    canonical_points: list[dict[str, Any]] = []
+    for name in (x_name, y_name):
+        if name not in bounds:
+            raise DemoError(
+                f"surrogate slice asked for {name!r}, which is not a range parameter "
+                f"of this search space (it has {sorted(bounds)}). This usually means "
+                "the plot still assumes the thickness parameterization."
+            )
+    search_points: list[dict[str, Any]] = []
     for x in np.linspace(*bounds[x_name], count):
         for y in np.linspace(*bounds[y_name], count):
             point = _slice_base_point(cfg, fixed)
             point[x_name] = float(x)
             point[y_name] = float(y)
-            canonical_points.append(point)
-    encoded = [axsearch13.ax_parameters(point, cfg) for point in canonical_points]
-    return canonical_points, encoded
+            search_points.append(point)
+    encoded = [_encode_search_point(cfg, point) for point in search_points]
+    return search_points, encoded
+
+
+def _grading_columns(record: Mapping[str, Any]) -> dict[str, Any]:
+    """Semantic grading columns for one ledger record, or a stated absence.
+
+    Delegates to :func:`tables13._grading_columns` so a plot's CSV and the
+    ranked-design table cannot end up describing the same trial with different
+    column names. Never invents a zero: a record too old or too sparse to say
+    what was built gets a reason instead of a number.
+    """
+
+    return tables13._grading_columns(record)
+
+
+def _realized_grading_columns(
+    cfg: Mapping[str, Any], point: Mapping[str, Any]
+) -> dict[str, Any]:
+    """Physical grading quantities for one search-space point.
+
+    A slice grid is drawn in Ax coordinates, but a reader wants to know what
+    structure each cell corresponds to.  Resolving that here means a figure can
+    label its axis with the coordinate it actually varied while the CSV still
+    carries the nanometres.
+    """
+
+    try:
+        view = grading13.from_parameters(dict(point), cfg)
+    except Exception as exc:  # pragma: no cover - defensive
+        return {"realized_grading_unavailable_reason": f"{type(exc).__name__}: {exc}"}
+    return {
+        key: value
+        for key, value in view.as_record().items()
+        if key != "source"
+    }
 
 
 def _expected_improvement(mean: float, sem: float, best: float) -> float:
@@ -1024,11 +1185,32 @@ def _expected_improvement(mean: float, sem: float, best: float) -> float:
 
 
 def surrogate_artifacts(
-    experiment: Experiment, records: Sequence[Mapping[str, Any]]
+    experiment: Experiment,
+    records: Sequence[Mapping[str, Any]],
+    model: analysis13.ReconstructedModel | None = None,
 ) -> dict[str, Any]:
-    """Surrogate slices, partial dependence, acquisition surface and importance."""
+    """Surrogate slices, partial dependence, acquisition surface and importance.
+
+    ``model`` is the refitted analysis surrogate.  It is passed in rather than
+    taken from ``experiment.client`` because a deserialized client has no
+    fitted adapter at all: that is exactly the defect that emptied every
+    surrogate figure of the completed licensed study.  When it is absent or
+    could not be fitted, every row still appears, carrying the real reason.
+    """
 
     cfg = experiment.cfg
+    if model is None:
+        model = analysis13.ReconstructedModel(
+            None,
+            None,
+            None,
+            {
+                "fit_status": "not_attempted",
+                "fit_status_reason": (
+                    "no analysis surrogate was reconstructed for this run"
+                ),
+            },
+        )
     metric = tables13.objective_metric_name(experiment.spec)
     best_record = _best_valid(records, experiment.spec)
     best_value = float(best_record.get(metric, 0.0) or 0.0)
@@ -1040,13 +1222,17 @@ def surrogate_artifacts(
         ("barrier_grading", ("central_barrier_thickness_nm",
                              design13.grading_parameter_name(cfg))),
     ):
-        canonical_points, encoded = _slice_points(cfg, x_name, y_name)
-        predictions = axsearch13.surrogate_predictions(experiment.client, encoded)
+        search_points, encoded = _slice_points(cfg, x_name, y_name)
+        predictions = model.predict(encoded)
         slice_rows: list[dict[str, Any]] = []
-        for point, prediction in zip(canonical_points, predictions):
+        for point, prediction in zip(search_points, predictions):
             row = {
                 "slice": name,
                 **{key: value for key, value in point.items()},
+                # The physical structure each Ax coordinate corresponds to, so a
+                # reader is never left to guess whether the grading column is a
+                # fraction or a length.
+                **_realized_grading_columns(cfg, point),
                 **{
                     f"fixed_{key}": value
                     for key, value in fixed.items()
@@ -1081,8 +1267,8 @@ def surrogate_artifacts(
             point = _slice_base_point(cfg, fixed)
             point[spec.name] = float(value)
             points.append(point)
-        predictions = axsearch13.surrogate_predictions(
-            experiment.client, [axsearch13.ax_parameters(point, cfg) for point in points]
+        predictions = model.predict(
+            [_encode_search_point(cfg, point) for point in points]
         )
         partial[spec.name] = [
             {
@@ -1093,7 +1279,14 @@ def surrogate_artifacts(
                 ),
                 "prediction_available": prediction.get("prediction_available", False),
                 "reason": prediction.get("reason", ""),
+                **_realized_grading_columns(cfg, point),
                 **{f"fixed_{key}": value for key, value in fixed.items() if key != spec.name},
+                "holding_note": (
+                    "one coordinate varied, the rest held at the configured fixed "
+                    "values; this is a slice through the surrogate, not an average "
+                    "over the search space, so it never mixes the abrupt and graded "
+                    "branches in a single curve"
+                ),
             }
             for point, prediction in zip(points, predictions)
         ]
@@ -1112,6 +1305,9 @@ def surrogate_artifacts(
                     "parameter_grading_thickness_nm", "parameter_grading_profile",
                 )
             },
+            # Proposed-versus-realized, so an acquisition history can be read
+            # without inferring the structure from the parameter columns.
+            **_grading_columns(record),
             "note": "Sobol proposals have no acquisition value; the field is empty for them",
         }
         for record in records
@@ -1121,7 +1317,9 @@ def surrogate_artifacts(
         "slice_rows": rows,
         "partial_dependence": partial,
         "acquisition_rows": acquisition_rows,
-        "importance": axsearch13.parameter_importance(experiment.client),
+        "importance": model.parameter_importance(),
+        "model_reconstruction": dict(model.record),
+        "grading_evidence": grading13.evidence_counts(records),
         "ax_frontier": axsearch13.pareto_frontier(experiment.client)
         if experiment.spec.is_multi_objective
         else [],
@@ -1168,13 +1366,22 @@ def physics_curves(
     state_dir: Path,
     *,
     top: int = 3,
+    baseline: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Spectra, composition, band edges and envelopes for the best designs."""
+    """Spectra, composition, band edges and envelopes for the best designs.
+
+    ``baseline`` is the Demo 11 abrupt reference, looked up from that demo's own
+    results.  It has to be passed in: Demo 13's ledger contains only Demo 13
+    trials, so the previous search for a record with ``design_role ==
+    "reference"`` inside ``records`` found nothing on a normal run, and every
+    figure named ``baseline_and_best_*`` was drawn with no baseline in it.
+    """
 
     spectra: list[dict[str, Any]] = []
     profiles: list[dict[str, Any]] = []
     band_edges: list[dict[str, Any]] = []
     envelopes: list[dict[str, Any]] = []
+    provenance: list[dict[str, Any]] = []
 
     ranked = sorted(
         (
@@ -1183,15 +1390,36 @@ def physics_curves(
             if str(record.get("status")) == "completed"
             and record.get("trial_valid")
             and record.get("relative_chi2_at_target_wavelength_abs") is not None
+            and math.isfinite(float(record["relative_chi2_at_target_wavelength_abs"]))
         ),
-        key=lambda record: -float(record["relative_chi2_at_target_wavelength_abs"]),
+        # Same deterministic tie-break as the ranked table, so the figures and
+        # the tables can never disagree about which trial is best.
+        key=lambda record: (
+            -float(record["relative_chi2_at_target_wavelength_abs"]),
+            int(record.get("trial_index", 0)),
+        ),
     )
     selected: list[tuple[str, str, Mapping[str, Any]]] = []
     reference = next(
         (record for record in records if record.get("design_role") == "reference"), None
     )
+    if reference is None and baseline is not None:
+        reference = baseline
     if reference is not None:
-        selected.append(("reference (abrupt)", "baseline", reference))
+        source = str(reference.get("source_demo") or "this experiment")
+        selected.append((f"reference (abrupt, {source})", "baseline", reference))
+    else:
+        provenance.append(
+            {
+                "role": "baseline",
+                "included": False,
+                "reason": (
+                    "no Demo 11 abrupt reference result was found under the results "
+                    "root, and Demo 13's own ledger holds no record marked as the "
+                    "reference design"
+                ),
+            }
+        )
     for position, record in enumerate(ranked[:top]):
         role = "best" if position == 0 else "top"
         selected.append((f"trial {record.get('trial_index')}", role, record))
@@ -1199,7 +1427,26 @@ def physics_curves(
     for label, role, record in selected:
         directory = record.get("output_directory_path")
         if not directory:
+            provenance.append(
+                {
+                    "role": role,
+                    "label": label,
+                    "trial_index": record.get("trial_index"),
+                    "included": False,
+                    "reason": "this record carries no output directory, so its raw "
+                    "solver output cannot be located",
+                }
+            )
             continue
+        provenance.append(
+            {
+                "role": role,
+                "label": label,
+                "trial_index": record.get("trial_index"),
+                "included": True,
+                "output_directory_path": str(directory),
+            }
+        )
         extracted = Path(str(directory)) / "extracted"
         spectrum = _normalized_spectrum(extracted)
         if spectrum is not None:
@@ -1216,6 +1463,10 @@ def physics_curves(
         "profiles": profiles,
         "band_edges": band_edges,
         "envelopes": envelopes,
+        # Which rows a `baseline_and_best_*` figure actually contains, and the
+        # stated reason for each one that is missing. Silence here was how a
+        # file named for the baseline came to be drawn without it.
+        "curve_provenance": provenance,
     }
 
 
@@ -1380,6 +1631,8 @@ def robustness_cases(
         "grading_thickness_nm": "grading.selected_thickness_nm",
         "aluminum_fraction": "scientific.aluminum_fraction",
     }
+    view = grading13.try_from_record(design)
+    realized_grading = view.realized_grading_thickness_nm if view is not None else None
     cases: list[tuple[str, str, float, dict[str, Any]]] = []
     for name, deltas in study.items():
         path = paths.get(str(name))
@@ -1390,12 +1643,55 @@ def robustness_cases(
             cursor: Any = resolved
             for part in path.split("."):
                 cursor = cursor[part]
-            new_value = float(cursor) + float(delta)
+            nominal = float(cursor)
+            new_value = nominal + float(delta)
             if new_value <= 0:
+                continue
+            # A fabrication tolerance perturbs a dimension. Adding grading to a
+            # design that realizes none does not perturb a width -- it changes
+            # the interface *mode*, producing a structurally different device
+            # and calling the difference "robustness". The winning v2 design is
+            # abrupt, so this is not hypothetical.
+            if str(name) == "grading_thickness_nm" and not realized_grading:
                 continue
             _set(resolved, path, new_value)
             cases.append((f"{name}{float(delta):+g}", str(name), float(delta), resolved))
     return cases
+
+
+def perturbation_fraction(
+    cfg: Mapping[str, Any], design: Mapping[str, Any], parameter: str, delta: float
+) -> float | None:
+    """A perturbation's size *relative to the dimension it perturbs*.
+
+    A +/-0.2 nm tolerance is 3 % of a 7 nm well and 40 % of a 0.5 nm barrier.
+    Averaging those into one robustness score hides the only sensitivity that
+    matters for a design sitting at the lower barrier bound.
+    """
+
+    paths = {
+        "narrow_well_nm": "scientific.thin_well_nm",
+        "wide_well_nm": "scientific.thick_well_nm",
+        "central_barrier_nm": "scientific.tunnel_barrier_nm",
+        "grading_thickness_nm": "grading.selected_thickness_nm",
+        "aluminum_fraction": "scientific.aluminum_fraction",
+    }
+    path = paths.get(str(parameter))
+    if path is None:
+        return None
+    base_parameters = {
+        key[len("parameter_"):]: value
+        for key, value in design.items()
+        if str(key).startswith("parameter_")
+    }
+    try:
+        cursor: Any = design13.resolve_config(base_parameters, cfg)
+        for part in path.split("."):
+            cursor = cursor[part]
+        nominal = float(cursor)
+    except (KeyError, TypeError, ValueError):
+        return None
+    return abs(float(delta)) / abs(nominal) if nominal else None
 
 
 def run_validation_study(
@@ -1445,6 +1741,7 @@ def run_validation_study(
             validation_rows.append(row)
         drifts: list[float] = []
         for case_id, parameter, delta, resolved in robustness_cases(cfg, source):
+            fraction = perturbation_fraction(cfg, source, parameter, delta)
             row = _run_side_case(
                 context,
                 state_dir,
@@ -1454,6 +1751,7 @@ def run_validation_study(
                     "trial_index": design["trial_index"],
                     "perturbed_parameter": parameter,
                     "perturbation": delta,
+                    "perturbation_fraction_of_nominal": fraction,
                     "case_id": case_id,
                     "nominal_chi2_at_target_wavelength_abs": nominal_target,
                 },
@@ -1462,6 +1760,14 @@ def run_validation_study(
             if value is not None and nominal_target:
                 drift = abs(value - nominal_target) / abs(nominal_target)
                 row["relative_drift"] = drift
+                # Sensitivity per unit *fractional* change, so a 40 % barrier
+                # perturbation and a 3 % well perturbation can be compared at
+                # all. The raw drift alone makes the thin barrier look robust
+                # only because the same 0.2 nm is a much larger relative change
+                # there.
+                row["relative_drift_per_fractional_change"] = (
+                    drift / fraction if fraction else None
+                )
                 drifts.append(drift)
             robustness_rows.append(row)
         if drifts:
@@ -1661,7 +1967,28 @@ def write_run_artifacts(
         synthetic=synthetic,
     )
 
-    curves = physics_curves(cfg, records, experiment.state_dir)
+    # The Demo 11 abrupt reference was already loaded above for the comparison
+    # table; it is the same design the `baseline_and_best_*` figures are named
+    # after, and passing it here is what actually puts it in them.
+    curves = physics_curves(
+        cfg, records, experiment.state_dir, baseline=demo11_best
+    )
+    write_json_atomically(
+        parent / "extracted" / "baseline_and_best_curve_provenance.json",
+        {
+            "rows": curves.get("curve_provenance", []),
+            "baseline_source": "11_paper_validation_interband_chi2_acqw case s1_ref",
+            "baseline_found": demo11_best is not None,
+            "demo12_reference_found": demo12_best is not None,
+            "demo12_note": (
+                "Demo 12 has no licensed results under this results root; its "
+                "comparison rows are reported as unavailable and are never inferred "
+                "from Demo 13 trials"
+            )
+            if demo12_best is None
+            else "Demo 12 licensed result located",
+        },
+    )
     context_plots = plots13.PlotContext(
         cfg=cfg,
         records=records,
@@ -1726,6 +2053,74 @@ def write_run_artifacts(
     return {"summary": summary, "comparison": comparison, "counts": counts}
 
 
+def validation_lifecycle(
+    *,
+    records: Sequence[Mapping[str, Any]],
+    plan_record: Mapping[str, Any],
+    mode: str,
+    solver_ran_this_process: bool,
+    model_available: bool,
+    validation: Mapping[str, Any],
+    dependency_report: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    """Five separable questions the single "is it validated?" flag used to blur.
+
+    The important one is the first: a run that reloads sixteen completed
+    licensed trials has licensed execution *behind* it even though this process
+    launched no solver.  Reading licensed completion from
+    ``result.solver_success`` -- which reflects only this invocation -- made the
+    validation report announce "no licensed nextnano++ solver ran on this
+    machine" for a study of sixteen premium trials.  It is read from the ledger
+    instead.
+
+    Synthetic trials are excluded: the Stage 1 surface completes trials without
+    a solver, and counting those as licensed execution would let a
+    no-licence machine claim a licensed run.
+    """
+
+    completed = [
+        record for record in records if str(record.get("status")) == "completed"
+    ]
+    licensed_completed = [
+        record for record in completed if not record.get("synthetic")
+    ]
+    lifecycle: dict[str, Any] = {
+        "licensed_execution_completed": bool(licensed_completed),
+        "licensed_trials_completed": len(licensed_completed),
+        "licensed_trials_expected": int(plan_record["num_initial_trials"])
+        + int(plan_record["num_iterations"]) * int(plan_record["batch_size"]),
+        "synthetic_trials_completed": len(completed) - len(licensed_completed),
+        # Reanalysis reloads completed records, so `solver_success` is true for
+        # all of them without nextnano having been invoked. The mode is what
+        # settles whether this process could have called it.
+        "solver_invoked_by_this_run": bool(solver_ran_this_process)
+        and mode != "analyze_existing_results",
+        "optimization_completed": bool(
+            plan_record.get("remaining_new_solver_runs", 1) == 0
+        ),
+        "reporting_completed": bool(model_available),
+        "stage5_physical_validation_completed": bool(
+            validation.get("enabled") and validation.get("solver_ran")
+        ),
+        "dependency_validation_complete": bool(
+            (dependency_report or {}).get(
+                "all_dependencies_physically_validated", False
+            )
+        ),
+        "dependencies_not_physically_validated": list(
+            (dependency_report or {}).get("dependencies_not_physically_validated", [])
+        ),
+    }
+    lifecycle["state"] = (
+        "physically_validated"
+        if lifecycle["stage5_physical_validation_completed"]
+        else "licensed_optimization_completed_validation_pending"
+        if lifecycle["licensed_execution_completed"]
+        else "implemented_dry_run"
+    )
+    return lifecycle
+
+
 def _lifecycle(record: Mapping[str, Any]) -> str:
     status = str(record.get("status"))
     if status == "rejected":
@@ -1775,6 +2170,8 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
     synthetic = mode == "synthetic_smoke_test"
     replay: dict[str, Any] | None = None
     loop_result: dict[str, Any] = {"events": [], "stop_reason": "mode did not run trials"}
+    state_manifest_before: dict[str, Any] | None = None
+    terminal_before: dict[str, str] = {}
 
     # Warm starting is a file read; the Stage 2 replay is a whole study. Only
     # demo12_replay pays for the second.
@@ -1801,9 +2198,19 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
         )
         loop_result = {"events": outcome["events"], "stop_reason": "synthetic study complete"}
     else:
+        # Reanalysis opens the finished study read-only: no checkpoint write, no
+        # ledger write, no candidate generation, and a hard error rather than a
+        # freshly invented experiment if the directory is not the one meant.
+        analysis_only = mode == "analyze_existing_results"
         experiment = Experiment(
-            cfg, state_dir, warm_start=ingested.get("observations", ())
+            cfg,
+            state_dir,
+            warm_start=ingested.get("observations", ()),
+            read_only=analysis_only,
         )
+        if analysis_only:
+            state_manifest_before = analysis13.state_manifest(state_dir)
+            terminal_before = analysis13.terminal_ledger_fingerprint(state_dir)
         for row in ingested.get("provenance_rows", []):
             row["ax_trial_index"] = None
         for row, attachment in zip(
@@ -1879,7 +2286,21 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
           f"{budget['preflight_invalid_proposals']} preflight-invalid, "
           f"{budget['duplicate_proposals']} duplicate")
 
-    surrogate = surrogate_artifacts(experiment, records)
+    # A deserialized Ax client has no fitted adapter, so the surrogate is
+    # rebuilt here -- from the completed observations, on a private copy of the
+    # client, without advancing the generation strategy and without writing
+    # anything back. Everything downstream that needs a prediction uses this.
+    model = analysis13.reconstruct_predictive_model(experiment.snapshot_path)
+    analysis13.write_reconstruction_report(context.parent / "extracted", model)
+    print(
+        f"  analysis surrogate          : {model.record.get('fit_status')} "
+        f"({model.record.get('model_class') or 'no adapter'}; "
+        f"{model.record.get('observations_used')} observations)"
+    )
+    if not model.available:
+        print(f"  NOTE: {model.reason}")
+
+    surrogate = surrogate_artifacts(experiment, records, model)
     artifacts = write_run_artifacts(
         context,
         experiment,
@@ -1936,6 +2357,19 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
         ],
     )
 
+    lifecycle = validation_lifecycle(
+        records=records,
+        plan_record=plan_record,
+        mode=mode,
+        solver_ran_this_process=any(result.solver_success for result in results),
+        model_available=model.available,
+        validation=validation,
+        dependency_report=context.dependency_report,
+    )
+    write_json_atomically(
+        context.parent / "extracted" / "validation_lifecycle.json", lifecycle
+    )
+
     manifest = sweeps.write_sweep_manifest(
         context.parent,
         cfg=cfg,
@@ -1970,28 +2404,98 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
             },
             "summary": artifacts["summary"],
             "synthetic_study": synthetic,
+            # The shared manifest's own `status` field answers "did THIS process
+            # run a solver". In analyze mode it is derived from reloaded records
+            # and so reads `completed` without a solver having been invoked.
+            # These two keys keep that from being read as a licensed run.
+            "validation_lifecycle": lifecycle,
             "licensed_result_claim": (
                 "not run"
-                if not any(result.solver_success for result in results)
-                else "see criterion-level validation report"
+                if not lifecycle["licensed_execution_completed"]
+                else "licensed trials completed; see the criterion-level validation "
+                "report and extracted/validation_lifecycle.json"
             ),
+            "solver_invoked_by_this_run": lifecycle["solver_invoked_by_this_run"],
         },
     )
-    write_json_atomically(
-        experiment.state_dir / "experiment_manifest.json",
-        {
-            "demo_id": cfg["demo_id"],
-            "experiment_name": (cfg.get("workflow") or {}).get("experiment_name"),
-            "ax": versions,
-            "optimization": experiment.spec.as_record(),
-            "run_plan": plan_record,
-            "last_run_bundle": str(context.parent),
-            "extraction_version": EXTRACTION_VERSION,
-            "updated_utc": dt.datetime.now(dt.timezone.utc).isoformat(),
-        },
-    )
+    experiment_manifest = {
+        "demo_id": cfg["demo_id"],
+        "experiment_name": (cfg.get("workflow") or {}).get("experiment_name"),
+        "ax": versions,
+        "optimization": experiment.spec.as_record(),
+        "run_plan": plan_record,
+        "last_run_bundle": str(context.parent),
+        "extraction_version": EXTRACTION_VERSION,
+        "updated_utc": dt.datetime.now(dt.timezone.utc).isoformat(),
+    }
+    if experiment.read_only:
+        # Even this bookkeeping file is a write into the protected directory.
+        # It goes into the run bundle instead, so the experiment state after a
+        # reanalysis is byte-for-byte what it was before.
+        write_json_atomically(
+            context.parent / "extracted" / "experiment_manifest_not_written.json",
+            {
+                **experiment_manifest,
+                "written_to_experiment_state_dir": False,
+                "reason": "analyze_existing_results opens the experiment read-only",
+            },
+        )
+    else:
+        write_json_atomically(
+            experiment.state_dir / "experiment_manifest.json", experiment_manifest
+        )
 
-    licensed = any(result.solver_success for result in results)
+    # Phase 1's promise, checked rather than asserted: reanalysis leaves the
+    # snapshot, the ledger, every trial record and every trial directory exactly
+    # as it found them.
+    if state_manifest_before is not None:
+        protection = {
+            "experiment_state_dir": str(state_dir),
+            "workflow_mode": mode,
+            "manifest_before": state_manifest_before,
+            "verification": analysis13.verify_state_manifest(
+                state_dir, state_manifest_before
+            ),
+            "terminal_records_before": len(terminal_before),
+            "terminal_records_changed": sorted(
+                index
+                for index, digest in analysis13.terminal_ledger_fingerprint(
+                    state_dir
+                ).items()
+                if terminal_before.get(index) != digest
+            ),
+            "terminal_records_removed": sorted(
+                set(terminal_before)
+                - set(analysis13.terminal_ledger_fingerprint(state_dir))
+            ),
+            "ax_snapshot_modified": bool(
+                model.record.get("original_experiment_state_modified")
+            ),
+            "generation_strategy_advanced": bool(
+                model.record.get("generation_strategy_advanced")
+            ),
+            "new_trials_generated": bool(model.record.get("new_trials_generated")),
+        }
+        protection["experiment_state_unchanged"] = bool(
+            protection["verification"]["unchanged"]
+            and not protection["terminal_records_changed"]
+            and not protection["terminal_records_removed"]
+            and not protection["ax_snapshot_modified"]
+            and not protection["generation_strategy_advanced"]
+            and not protection["new_trials_generated"]
+        )
+        write_json_atomically(
+            context.parent / "extracted" / "experiment_state_protection.json", protection
+        )
+        verdict = "unchanged" if protection["experiment_state_unchanged"] else "MODIFIED"
+        print(f"  experiment state            : {verdict} after reanalysis")
+        if not protection["experiment_state_unchanged"]:
+            print(
+                "  WARNING: reanalysis changed the protected experiment state; see "
+                "extracted/experiment_state_protection.json"
+            )
+
+    licensed = lifecycle["licensed_execution_completed"]
     sweeps.write_validation_report(
         context.parent,
         cfg=cfg,
@@ -2020,13 +2524,25 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
             (
                 "licensed trials completed",
                 True if licensed else None,
-                "no licensed nextnano++ solver ran on this machine"
+                "no licensed nextnano++ trial exists in this experiment"
                 if not licensed
-                else f"{sum(1 for r in results if r.solver_success)} completed",
+                else f"{lifecycle['licensed_trials_completed']} of "
+                f"{lifecycle['licensed_trials_expected']} completed in the "
+                "experiment ledger"
+                + (
+                    "; this run reloaded them and called no solver"
+                    if not lifecycle["solver_invoked_by_this_run"]
+                    else ""
+                ),
+            ),
+            (
+                "an analysis surrogate was reconstructed for the reports",
+                True if model.available else False,
+                str(model.record.get("fit_status_reason") or "")[:240],
             ),
             (
                 "top designs passed Stage 5 validation",
-                True if validation.get("solver_ran") and validation.get("enabled") else None,
+                True if lifecycle["stage5_physical_validation_completed"] else None,
                 "run workflow.mode: validate_top_designs on the licensed machine",
             ),
         ],
@@ -2037,6 +2553,10 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
             "zero objective.",
             "The highest Ax objective is a proposed optimum until Stage 5 passes.",
             f"Workflow mode for this run: {mode}.",
+            f"Validation lifecycle state: {lifecycle['state']}.",
+            "The objective is a RELATIVE nonlinear-optical merit in arbitrary units. "
+            "It is not calibrated chi(2) in pm/V, and ratios between designs are "
+            "ratios on that relative scale.",
         ],
         unvalidated_syntax=[
             "inherits Demo 12's unvalidated ternary_linear/ternary_constant "

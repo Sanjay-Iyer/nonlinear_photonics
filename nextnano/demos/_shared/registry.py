@@ -29,6 +29,14 @@ STATUSES: tuple[str, ...] = (
     "licensed_run_pending",
     "solver_passed",
     "parser_passed",
+    # An optimization demo can finish its whole licensed campaign -- solver,
+    # parser, objective, checkpointing -- and still have proved nothing about
+    # the physics of the design it picked, because the convergence and
+    # robustness study that would do that has not run. Before this status
+    # existed such a demo had to be described either as a dry run, which
+    # understated sixteen premium trials, or as physically validated, which
+    # overstated them.
+    "licensed_optimization_completed_validation_pending",
     "physically_validated",
 )
 
@@ -37,7 +45,12 @@ PHYSICALLY_TRUSTED: frozenset[str] = frozenset({"physically_validated"})
 
 #: Statuses that justify describing a demo's *plumbing* as exercised for real.
 SOLVER_TRUSTED: frozenset[str] = frozenset(
-    {"solver_passed", "parser_passed", "physically_validated"}
+    {
+        "solver_passed",
+        "parser_passed",
+        "licensed_optimization_completed_validation_pending",
+        "physically_validated",
+    }
 )
 
 _DEMO_KEYS = {

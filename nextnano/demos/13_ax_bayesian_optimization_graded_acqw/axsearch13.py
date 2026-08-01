@@ -773,10 +773,13 @@ class Ledger:
     """
 
     root: Path
+    #: Opened for reanalysis: creates nothing and writes nothing.
+    read_only: bool = False
 
     def __post_init__(self) -> None:
         self.root = Path(self.root)
-        (self.root / "trials").mkdir(parents=True, exist_ok=True)
+        if not self.read_only:
+            (self.root / "trials").mkdir(parents=True, exist_ok=True)
 
     @property
     def index_path(self) -> Path:
@@ -801,16 +804,34 @@ class Ledger:
         return json.loads(path.read_text(encoding="utf-8"))
 
     def write(self, record: Mapping[str, Any], *, allow_update: bool = False) -> Path:
+        """Append or update one trial record.
+
+        A **terminal** record -- completed, failed or rejected -- is never
+        rewritten, and ``allow_update`` does not unlock it.  History that can be
+        overwritten by passing a flag is not history, and the one caller that
+        passes the flag only ever means to finish a trial left *pending* by a
+        machine without a licensed solver.  So the terminal check sits outside
+        the ``allow_update`` branch rather than inside it, where it used to let
+        a completed licensed trial be overwritten.
+
+        Updating a non-terminal record is ordinary: that is how a pending trial
+        becomes a completed one, and the JSONL index keeps both entries.
+        """
+
+        if self.read_only:
+            raise DemoError(
+                f"refusing to write ledger record for trial {record.get('trial_index')}: "
+                "this ledger was opened read-only for analysis"
+            )
         trial_index = int(record["trial_index"])
         path = self._path(trial_index)
         existing = self.record(trial_index)
-        if existing is not None and not allow_update:
-            if str(existing.get("status")) in TERMINAL_STATUSES:
-                raise DemoError(
-                    f"trial {trial_index} already has a terminal ledger record "
-                    f"({existing.get('status')}); Demo 13 never rewrites completed "
-                    "trial history"
-                )
+        if existing is not None and str(existing.get("status")) in TERMINAL_STATUSES:
+            raise DemoError(
+                f"trial {trial_index} already has a terminal ledger record "
+                f"({existing.get('status')}); Demo 13 never rewrites completed "
+                "trial history"
+            )
         payload = dict(record)
         payload.setdefault("recorded_utc", dt.datetime.now(dt.timezone.utc).isoformat())
         write_json_atomically(path, payload)

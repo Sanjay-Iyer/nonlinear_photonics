@@ -653,12 +653,29 @@ def test_consecutive_checkpoints_do_not_share_a_temporary_path(fast_cfg, tmp_pat
 
 
 def test_ledger_records_are_immutable_once_terminal(tmp_path):
+    """A terminal record cannot be rewritten, with or without ``allow_update``.
+
+    ``allow_update`` used to unlock terminal records too, which meant a single
+    keyword could overwrite a completed licensed trial -- exactly the history
+    the ledger exists to protect. It now only covers the pending case below.
+    """
+
     ledger = axsearch13.Ledger(tmp_path)
     ledger.write({"trial_index": 0, "status": "completed"})
     with pytest.raises(demo_workflow.DemoError):
         ledger.write({"trial_index": 0, "status": "failed"})
-    ledger.write({"trial_index": 0, "status": "failed"}, allow_update=True)
-    assert ledger.record(0)["status"] == "failed"
+    with pytest.raises(demo_workflow.DemoError, match="never rewrites"):
+        ledger.write({"trial_index": 0, "status": "failed"}, allow_update=True)
+    assert ledger.record(0)["status"] == "completed"
+
+
+def test_pending_ledger_records_may_still_be_finished(tmp_path):
+    """The legitimate update: a machine with a solver finishes a pending trial."""
+
+    ledger = axsearch13.Ledger(tmp_path)
+    ledger.write({"trial_index": 0, "status": "pending_no_solver"})
+    ledger.write({"trial_index": 0, "status": "completed"}, allow_update=True)
+    assert ledger.record(0)["status"] == "completed"
 
 
 def test_ledger_index_is_append_only(tmp_path):
@@ -1977,8 +1994,16 @@ def test_registry_declares_demo13(cfg):
         (DEMO.parent / "demo_registry.yaml").read_text(encoding="utf-8")
     )
     record = registry["demos"][cfg["demo_id"]]
-    assert record["status"] == "implemented_dry_run"
-    assert record["licensed_validation"] is None
+    # The 16-trial licensed campaign completed on 2026-07-31, so the demo is no
+    # longer a dry run. It is not physically validated either: Stage 5 has not
+    # run, so the status must sit between those two claims and not at either.
+    assert record["status"] == "licensed_optimization_completed_validation_pending"
+    # Licensed execution is now recorded, and it must describe the objective
+    # honestly: a relative merit in arbitrary units, not pm/V.
+    evidence = record["licensed_validation"]["evidence"]
+    assert "16/16 trials completed" in evidence
+    assert "not calibrated chi(2)" in evidence
+    # Stage 5 is still owed, so validation must remain pending.
     assert record["pending_licensed_checks"]
     assert "12_graded_interface_coupled_quantum_well_optimization" in record["depends_on"]
 

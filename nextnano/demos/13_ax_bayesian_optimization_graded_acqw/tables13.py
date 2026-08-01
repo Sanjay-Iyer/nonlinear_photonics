@@ -34,6 +34,7 @@ from demo_workflow import write_json_atomically, write_text_atomically  # noqa: 
 
 import design13  # noqa: E402
 import feasibility13  # noqa: E402
+import grading13  # noqa: E402
 
 #: Unit of every column name Demo 13 writes. ``a.u.`` marks the relative chi(2)
 #: scale of Demo 11's Eq. 2: a lineshape and a trend, with no absolute
@@ -53,8 +54,28 @@ COLUMN_UNITS: Mapping[str, str] = {
     "output_directory_path": "path",
     "parameter_asymmetry_s": "dimensionless",
     "parameter_central_barrier_thickness_nm": "nm",
+    # The REALIZED width, written by design13.canonicalize. Correctly nm.
     "parameter_grading_thickness_nm": "nm",
     "parameter_grading_profile": "category",
+    # The semantic grading columns from grading13. The distinction that matters
+    # is the first one: a fraction of the feasible maximum is dimensionless, and
+    # labelling it nm is how a number in [0, 1] came to be read as a length.
+    # `grading_fraction_of_feasible_max` already has a richer entry further down
+    # this map; it is deliberately not repeated here.
+    "proposed_grading_fraction": "fraction of the feasible maximum in [0,1]",
+    "maximum_feasible_grading_nm": "nm",
+    "proposed_grading_thickness_nm_unsnapped": "nm",
+    "realized_grading_thickness_nm": "nm",
+    "proposed_interface_mode": "category",
+    "realized_interface_mode": "category",
+    "proposed_grading_profile": "category",
+    "realized_grading_profile": "category",
+    "collapsed_to_abrupt": "boolean",
+    "is_genuinely_graded": "boolean",
+    "grading_unavailable_reason": "text",
+    "objective_scale_note": "text",
+    "perturbation_fraction_of_nominal": "dimensionless",
+    "relative_drift_per_fractional_change": "dimensionless",
     "target_wavelength_nm": "nm",
     "relative_chi2_at_target_wavelength_abs": "a.u. (relative |chi2|)",
     "relative_peak_chi2_abs": "a.u. (relative |chi2|)",
@@ -243,6 +264,13 @@ def unit_for(column: str) -> str:
         ("_probability", "probability"),
         ("_seconds", "s"),
         ("_count", "count"),
+        # A fraction is dimensionless. Falling through to "unspecified" is how a
+        # ratio ends up beside a column of nanometres with nothing to tell them
+        # apart -- which is the whole failure this demo is being hardened
+        # against.
+        ("_fraction", "dimensionless"),
+        ("_fraction_of_feasible_max", "dimensionless"),
+        ("_fraction_of_nominal", "dimensionless"),
         ("_predicted_mean", "metric units"),
         ("_predicted_standard_error", "metric units"),
     ):
@@ -450,6 +478,27 @@ def best_so_far_by_iteration(
     return rows
 
 
+def _grading_columns(record: Mapping[str, Any]) -> dict[str, Any]:
+    """Semantic grading columns for a table row, or a stated absence.
+
+    ``source`` is dropped: it describes where :mod:`grading13` read the numbers
+    from, which is provenance for a debugger rather than a column of a results
+    table.
+    """
+
+    view = grading13.try_from_record(record)
+    if view is None:
+        return {
+            "realized_grading_thickness_nm": None,
+            "realized_interface_mode": grading13.UNKNOWN,
+            "grading_unavailable_reason": (
+                "this ledger record carries no realized grading thickness under any "
+                "known field name"
+            ),
+        }
+    return {key: value for key, value in view.as_record().items() if key != "source"}
+
+
 def top_ranked_valid_designs(
     records: Sequence[Mapping[str, Any]], spec: Any, *, limit: int = 20
 ) -> list[dict[str, Any]]:
@@ -461,8 +510,19 @@ def top_ranked_valid_designs(
         if str(record.get("status")) == "completed"
         and record.get("trial_valid")
         and record.get(metric) is not None
+        and math.isfinite(float(record[metric]))
     ]
-    ordered = sorted(valid, key=lambda row: float(row[metric]), reverse=not minimize)
+    # Deterministic on ties. Sorting by objective alone leaves equal-objective
+    # trials in whatever order the ledger happened to yield, so two runs over
+    # the same completed study could disagree about which design is "rank 1".
+    # The trial index breaks the tie: earlier trial wins, always.
+    ordered = sorted(
+        valid,
+        key=lambda row: (
+            float(row[metric]) if minimize else -float(row[metric]),
+            int(row.get("trial_index", 0)),
+        ),
+    )
     return [
         {
             "rank": index,
@@ -481,9 +541,15 @@ def top_ranked_valid_designs(
                     "orthonormality_error", "physical_qc_valid",
                 )
             },
+            # Realized-versus-proposed, so a reader ranking designs is never
+            # left guessing whether `parameter_grading_thickness_nm` was what
+            # Ax asked for or what the mesh built.
+            **_grading_columns(record),
             "validated": False,
             "validation_note": "Ax objective only; Stage 5 local, mesh, state-count "
             "and padding checks have not been applied to this row",
+            "objective_scale_note": "relative nonlinear-optical merit in arbitrary "
+            "units; not calibrated chi(2) in pm/V",
         }
         for index, record in enumerate(ordered[:limit], start=1)
     ]

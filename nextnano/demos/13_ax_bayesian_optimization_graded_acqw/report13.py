@@ -523,17 +523,28 @@ def plots_guide(cfg: Mapping[str, Any]) -> str:
     ]
     lines += [f"- `{name}` = `{value}`" for name, value in dict(fixed).items()] or ["- (none configured)"]
     lines += ["", "---", ""]
+    # The surrogate figures are drawn over the *search-space* grading coordinate,
+    # which under `parameterization: fraction` is dimensionless. Their guide
+    # entries say "Grading thickness (nm)" as a static string, so leaving them
+    # alone would have the prose contradict the axis the code now draws.
+    _, grading_label = plots13.grading_axis(cfg)
     for filename, short in plots13.PLOT_SET:
         entry = PLOT_GUIDE.get(filename)
         lines += [f"## `{filename}`", ""]
         if entry is None:  # pragma: no cover - guarded by a test
             lines += [f"_{short}_ — no guide entry; this is a bug.", ""]
             continue
+        y_axis = entry["y"]
+        if entry["data"] is _SURROGATE and y_axis == plots13.AXIS["grading"]:
+            y_axis = (
+                f"{grading_label} — the realized thickness in nm is carried in the "
+                "CSV as `realized_grading_thickness_nm`"
+            )
         lines += [
             f"**Question.** {entry['question']}",
             "",
             f"- x-axis: {entry['x']}",
-            f"- y-axis: {entry['y']}",
+            f"- y-axis: {y_axis}",
             f"- colour / marker / line: {entry['encoding']}",
             f"- data type: {entry['data']}",
             f"- CSV: `plot_data/{Path(filename).stem}.csv`",
@@ -700,8 +711,8 @@ def ax_guide(cfg: Mapping[str, Any]) -> str:
         "happily spend five licensed nextnano runs on them.",
         "",
         "- **hierarchical** (default) — a root choice `interface_mode` ∈ {abrupt,",
-        "  graded}. Only the `graded` branch has `grading_thickness_nm` and",
-        "  `grading_profile` at all, so the duplicate cannot be expressed. Ax 1.3.1",
+        f"  graded}}. Only the `graded` branch has `{design13.grading_parameter_name(cfg)}`",
+        "  and `grading_profile` at all, so the duplicate cannot be expressed. Ax 1.3.1",
         "  requires such a space to be a tree, which is why the branch is on",
         "  `interface_mode` rather than directly on `grading_profile`.",
         "- **flat** — the plain four-parameter space. Duplicates are prevented instead",
@@ -1260,7 +1271,15 @@ def verdict(rows: Sequence[Mapping[str, Any]]) -> str:
     ratio = best_target / reference_target if reference_target else float("inf")
     statements.append(
         f"Stronger 1550 nm design: {'yes' if best_target > reference_target else 'no'} "
-        f"({best_target:.4g} versus {reference_target:.4g}, ratio {ratio:.3g})."
+        f"({best_target:.4g} versus {reference_target:.4g}, ratio {ratio:.3g} on the "
+        "relative arbitrary-unit scale)."
+    )
+    # A ratio of relative merits is not a measured enhancement factor. Saying so
+    # once, here, keeps the headline number from being quoted as one.
+    statements.append(
+        "That ratio compares two Demo 11 Eq. 2 relative susceptibilities computed "
+        "the same way; it is not a calibrated chi(2) ratio in pm/V and not an "
+        "experimentally measured enhancement."
     )
     if peak and peak.get("relative_peak_chi2_abs") is not None and reference.get("relative_peak_chi2_abs") is not None:
         statements.append(

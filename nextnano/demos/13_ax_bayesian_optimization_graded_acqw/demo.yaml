@@ -44,18 +44,25 @@ workflow:
   # run_pending_candidates | closed_loop | analyze_existing_results |
   # validate_top_designs
   #
-  # Currently set to run_pending_candidates: this executes the candidate whose
-  # input has already been generated and then stops, WITHOUT proposing more. It
-  # is the one-trial licensed probe that proves deck -> solver -> extraction ->
-  # alloy validation -> QC -> Ax completion -> checkpoint before 15 more trials
-  # are committed to it. Change to closed_loop once that trial looks right; the
-  # study then continues from where it stopped and repeats nothing.
-  mode: closed_loop
+  # Currently set to analyze_existing_results: the 16-trial licensed campaign in
+  # `experiment_state_dir` is COMPLETE. This mode reloads it, rebuilds the
+  # reports and the analysis surrogate, and calls no solver. It opens the
+  # experiment read-only, so it cannot generate a candidate, complete or fail a
+  # trial, rewrite the checkpoint, or touch a ledger record.
+  #
+  # Do not set this back to closed_loop unless you intend to spend licensed
+  # solver time continuing that study.
+  mode: analyze_existing_results
   resume: true
   # Directory (under the results root) holding the Ax snapshot and the immutable
   # trial ledger. Kept outside any single run directory so a run never destroys
   # optimization history.
-  experiment_state_dir: demo13_ax_experiment
+  #
+  # This MUST name the completed licensed study. Analysis mode refuses to create
+  # a missing experiment directory -- an empty study reported as though it were
+  # the licensed one is the worst possible failure here -- and lists the
+  # directories that do hold a snapshot instead.
+  experiment_state_dir: demo13_ax_experiment_v2
   experiment_name: demo13_graded_acqw_bo
 
 simulation:
@@ -260,10 +267,18 @@ bo:
 
   surrogate_slices:
     grid_points: 25
+    # Held-fixed coordinates for a slice. Each key must name a parameter the
+    # search space ACTUALLY has: under `parameterization: fraction` there is no
+    # `grading_thickness_nm` to hold fixed, and 1.5 is not even a legal value of
+    # the fraction that replaced it. A key that names no live parameter is
+    # ignored, which is how a slice silently reverted to its default.
     fixed_values:
       asymmetry_s: 0.46
       central_barrier_thickness_nm: 1.8
-      grading_thickness_nm: 1.5
+      # Dimensionless, in [0.05, 1.0]. NOT nanometres. The realized width is
+      # this fraction of the largest grade the candidate's geometry can build,
+      # and is reported next to it in every slice CSV.
+      grading_fraction_of_feasible_max: 0.5
       grading_profile: linear
 
 validation_study:
