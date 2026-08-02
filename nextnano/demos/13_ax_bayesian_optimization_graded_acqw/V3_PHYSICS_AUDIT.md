@@ -160,3 +160,30 @@ calculation, not on solver evidence.
 7. a balanced paired campaign before any grading claim.
 
 **Signed: PASS WITH WARNINGS.**
+
+## 2026-08-02 targeted continuation
+
+No repository-wide audit was repeated. The state-energy, anchor, detuning and
+heavy-hole-gap paths were rechecked after their fixes.
+
+- Electron and heavy-hole energies now come from the live solver observables or
+  the extracted per-band state tables. Missing/malformed data fail only that
+  trial; synthetic index energies require an explicit test opt-in.
+- Energy provenance is `solver`, `parsed historical output`, `synthetic test`,
+  or `unavailable` and reaches trial/anchor tables.
+- Stage 5 now consumes `state_tracking.anchor_case` through a fixed-reference,
+  non-chaining assignment. Confidence, margin, ambiguity, overlap matrices and
+  sign alignment are retained. Stage 5 was not run.
+- The read-only reporting projection preserves historical stored fields and
+  recomputes detuning and heavy-hole spacings from primary data. t0021 projects
+  to blue / -13 nm / 7.114712776 meV; t0022 to blue / -16 nm /
+  6.605210033 meV. The protected ledger hash remained unchanged.
+- Requested electron/hole state counts, mesh, both paddings, broadening, target
+  wavelength, tracking thresholds, grading geometry and Stage 5 convergence
+  settings have direct consumers and documented units. Physics-changing live
+  settings are checkpoint identity fields with exact v3 compatibility defaults.
+
+The unresolved validation gates listed above remain unresolved; in particular,
+t0021 is still the best observed feasible trial, not a validated optimum.
+
+**Targeted continuation verdict: PASS WITH WARNINGS (validation not run).**

@@ -343,6 +343,12 @@ def total_well_thickness_nm(cfg: Mapping[str, Any]) -> float:
     return float(scientific["thick_well_nm"]) + float(scientific["thin_well_nm"])
 
 
+def target_wavelength_nm(cfg: Mapping[str, Any]) -> float:
+    """The single authoritative optimization/reference wavelength."""
+
+    return float((cfg.get("bo") or {}).get("target_wavelength_nm", 1550.0))
+
+
 def resolve_config(parameters: Mapping[str, Any], cfg: Mapping[str, Any]) -> dict[str, Any]:
     """Build the fully resolved configuration one trial will be rendered from.
 
@@ -353,6 +359,13 @@ def resolve_config(parameters: Mapping[str, Any], cfg: Mapping[str, Any]) -> dic
 
     canonical = physical_design(canonicalize(parameters, cfg))
     resolved = copy.deepcopy(dict(cfg))
+    target = target_wavelength_nm(cfg)
+    # Demo 11 evaluates Eq. 2 from metric.reference_wavelength_nm while Demo 13
+    # reports detuning from chi2.reference_wavelength_nm.  Both are resolved
+    # from the BO target here so changing one documented input changes the
+    # calculation and its reported constraint together.
+    _set(resolved, "metric.reference_wavelength_nm", target)
+    _set(resolved, "chi2.reference_wavelength_nm", target)
 
     total = total_well_thickness_nm(cfg)
     thick, thin = chi2mod.well_widths_from_asymmetry(canonical["asymmetry_s"], total)

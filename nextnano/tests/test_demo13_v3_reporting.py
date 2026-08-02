@@ -29,6 +29,7 @@ import axsearch13  # noqa: E402
 import demo13  # noqa: E402
 import demo_workflow  # noqa: E402
 import design13  # noqa: E402
+import derived13  # noqa: E402
 
 pytestmark = pytest.mark.filterwarnings("ignore")
 
@@ -379,7 +380,8 @@ def test_a_snapshot_predating_a_schema_field_stays_loadable(cfg, tmp_path):
     state = tmp_path / "state"
     state.mkdir()
     stored = dict(demo13.experiment_schema(cfg))
-    stored.pop("grading_fraction_spans_feasible_interval")
+    for field in demo13.SCHEMA_FIELD_DEFAULTS:
+        stored.pop(field)
     (state / "experiment_schema.json").write_text(json.dumps(stored), encoding="utf-8")
 
     # The schema check is exercised directly: building a real Experiment would
@@ -394,6 +396,10 @@ def test_a_snapshot_predating_a_schema_field_stays_loadable(cfg, tmp_path):
     variant["bo"]["search_space"]["grading_fraction_spans_feasible_interval"] = True
     with pytest.raises(demo_workflow.DemoError, match="search space has changed"):
         demo13.Experiment._check_schema_compatible(stub, variant)
+    target_variant = copy.deepcopy(cfg)
+    target_variant["bo"]["target_wavelength_nm"] = 1600.0
+    with pytest.raises(demo_workflow.DemoError, match="search space has changed"):
+        demo13.Experiment._check_schema_compatible(stub, target_variant)
 
 
 # ---------------------------------------------------------------------------
@@ -588,3 +594,72 @@ def test_the_hole_anticrossing_gap_is_the_smallest_spacing():
     record = metrics13.electronic_structure({"heavy_hole_energies_eV": holes})
     assert record["heavy_hole_anticrossing_gap_meV"] == pytest.approx(4.06, abs=0.01)
     assert record["heavy_hole_anticrossing_gap_meV"] > 0
+    assert all(gap > 0 for gap in record["heavy_hole_level_gaps_meV"])
+
+
+@pytest.mark.parametrize(
+    "trial_index,peak,stored_gap,energies,expected_gap",
+    [
+        (21, 1537.0, -53.889720636000064,
+         [1.448176548074, 1.418727540169, 1.411612827393, 1.357723106757],
+         7.114712776),
+        (22, 1534.0, -52.21666051000007,
+         [1.448377463443, 1.418132384307, 1.411527174274, 1.359310513764],
+         6.605210033),
+    ],
+)
+def test_real_v3_sign_corrections_are_read_only(
+    cfg, trial_index, peak, stored_gap, energies, expected_gap
+):
+    historical = {
+        "trial_index": trial_index,
+        "target_wavelength_nm": 1550.0,
+        "peak_wavelength_nm": peak,
+        "signed_detuning_nm": peak - 1550.0,
+        "absolute_detuning_nm": abs(peak - 1550.0),
+        "detuning_side": "red_of_target",
+        "heavy_hole_energies_eV": energies,
+        "heavy_hole_anticrossing_gap_meV": stored_gap,
+        "heavy_hole_level_gaps_meV": [-1.0, -2.0, stored_gap],
+        "electron_energies_eV": [2.9, 3.0],
+    }
+    before = copy.deepcopy(historical)
+    view = derived13.corrected_record(historical, cfg)
+
+    assert historical == before
+    assert view["stored_detuning_side"] == "red_of_target"
+    assert view["corrected_detuning_side"] == "blue_of_target"
+    assert view["detuning_side"] == "blue_of_target"
+    assert view["stored_heavy_hole_gap_meV"] == stored_gap
+    assert view["corrected_heavy_hole_gap_meV"] == pytest.approx(expected_gap)
+    assert view["heavy_hole_anticrossing_gap_meV"] == pytest.approx(expected_gap)
+    assert view["derived_value_status"] == "corrected"
+    assert view["state_tracking_energy_provenance"] == "parsed historical output"
+
+
+def test_unrecomputable_historical_values_are_unavailable_not_zero(cfg):
+    view = derived13.corrected_record(
+        {"detuning_side": "red_of_target", "heavy_hole_anticrossing_gap_meV": -9.0},
+        cfg,
+    )
+    assert view["detuning_side"] is None
+    assert view["heavy_hole_anticrossing_gap_meV"] is None
+    assert view["derived_value_status"] == "unavailable"
+
+
+def test_derived_status_detects_each_corrected_field(cfg):
+    base = {
+        "target_wavelength_nm": 1550.0,
+        "peak_wavelength_nm": 1537.0,
+        "signed_detuning_nm": -13.0,
+        "detuning_side": "blue_of_target",
+        "absolute_detuning_nm": 99.0,
+        "heavy_hole_energies_eV": [1.45, 1.42, 1.41],
+        "heavy_hole_anticrossing_gap_meV": 10.0,
+        "heavy_hole_level_gaps_meV": [30.0, 999.0],
+    }
+    before = copy.deepcopy(base)
+    view = derived13.corrected_record(base, cfg)
+    assert base == before
+    assert view["detuning_derived_value_status"] == "corrected"
+    assert view["heavy_hole_gap_derived_value_status"] == "corrected"

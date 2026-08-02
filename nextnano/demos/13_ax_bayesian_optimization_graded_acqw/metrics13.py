@@ -220,7 +220,8 @@ def electronic_structure(observables: Mapping[str, Any]) -> dict[str, Any]:
     record["electron_level_gaps_meV"] = gaps
     record["anticrossing_gap_meV"] = min(gaps) if gaps else None
     hole_gaps = [
-        (holes[index + 1] - holes[index]) * 1000.0 for index in range(len(holes) - 1)
+        abs(holes[index + 1] - holes[index]) * 1000.0
+        for index in range(len(holes) - 1)
     ]
     record["heavy_hole_level_gaps_meV"] = hole_gaps
     # Hole energies DECREASE with index, so every signed gap is negative and a
@@ -231,7 +232,7 @@ def electronic_structure(observables: Mapping[str, Any]) -> dict[str, Any]:
     # at or inside the 5 meV broadening, so the one diagnostic that would have
     # surfaced a hole near-degeneracy was reporting its opposite.
     record["heavy_hole_anticrossing_gap_meV"] = (
-        min(abs(gap) for gap in hole_gaps) if hole_gaps else None
+        min(hole_gaps) if hole_gaps else None
     )
 
     # Intersubband e1->e2 dipole and oscillator strength. Both follow directly
@@ -460,7 +461,7 @@ def build_record(
     """Assemble one trial's complete record from Demo 11's observables."""
 
     canonical = design13.canonicalize(parameters, cfg)
-    target = float((cfg.get("chi2") or {}).get("reference_wavelength_nm", 1550.0))
+    target = design13.target_wavelength_nm(cfg)
     record: dict[str, Any] = {
         **{f"parameter_{name}": value for name, value in canonical.items()},
         "target_wavelength_nm": target,
@@ -561,6 +562,20 @@ def build_record(
             "state_tracking_ambiguous": bool(tracking_record.get("ambiguous", False)),
             "state_tracking_reference_trial": tracking_record.get("reference_trial"),
             "state_tracking_method": tracking_record.get("method"),
+            "state_tracking_error": tracking_record.get("state_tracking_error"),
+            # Whether the energies behind the assignment above were solved for or
+            # invented. Only a unit test can produce anything but "solver" here,
+            # and carrying the answer into the trial record is what stops a
+            # plumbing run from being read as a physical one later.
+            "state_tracking_energy_provenance": tracking_record.get(
+                "energy_provenance", "unavailable"
+            ),
+            "state_tracking_energy_provenance_by_band": dict(
+                tracking_record.get("energy_provenance_by_band") or {}
+            ),
+            "state_tracking_synthetic_energy_bands": list(
+                tracking_record.get("synthetic_energy_bands") or ()
+            ),
         }
     )
 

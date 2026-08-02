@@ -773,6 +773,21 @@ def analyse_case(
             extracted / "electron_states.csv",
             {key: np.asarray([row.get(key) for row in rows]) for key in rows[0]},
         )
+    # The heavy-hole band has no region-resolved state table -- `_hole_states`
+    # returns bare arrays -- but its energies are still solver output, and a
+    # reader that only has this directory (a transferred bundle, a re-analysis on
+    # another machine) otherwise has no way to recover them. Demo 13's state
+    # tracker refuses to run without them rather than substituting an index
+    # sequence, so writing them is what makes an extracted directory
+    # self-sufficient. Energies descend with index; the order is the solver's and
+    # is not re-sorted, because it is what pairs an energy with its envelope.
+    write_csv(
+        extracted / "heavy_hole_states.csv",
+        {
+            "state": np.arange(1, h_energies.size + 1),
+            "energy_eV": np.asarray(h_energies, dtype=float),
+        },
+    )
     np.savetxt(
         extracted / "envelopes.csv",
         np.column_stack(

@@ -6,6 +6,25 @@ What every important result number means, and how to avoid over-reading it.
 
 **Units.** Every chi(2) number in this demo is a *relative* merit in arbitrary units (`a.u. (relative |chi2|)`). It is a lineshape and a trend with no absolute calibration. It is **never pm/V**, and values are only comparable between designs computed with the same mesh and settings.
 
+## Historical corrections and state identity
+
+The protected v3 ledger is never rewritten. It preserves the values originally
+stored in `stored_*` columns, while every current table, ranking, and plot uses
+the matching `corrected_*` value recomputed from peak/target wavelengths or the
+heavy-hole energy array. If primary data are absent, the corrected value is
+`unavailable`, never zero; `derived_value_status` and
+`derived_value_provenance` say exactly what happened.
+
+State energies carry one of four provenance labels: `solver`, `parsed historical output`,
+`synthetic test`, or `unavailable`. Synthetic index energies are
+permitted only by an explicit test opt-in and are never scientific evidence.
+Stage 5 assigns every case directly to `state_tracking.anchor_case`, so shuffling
+case order cannot change its reference. Near a crossing or avoided crossing,
+energy order can swap while the physical envelope continues smoothly; labels
+therefore follow overlap (with real energy continuity only as a secondary cost),
+and a small assignment margin is reported as ambiguous rather than smoothed
+away.
+
 ## The four things that decide whether a design is any good
 
 1. **Objective** — `relative_chi2_at_target_wavelength_abs`, higher is better.

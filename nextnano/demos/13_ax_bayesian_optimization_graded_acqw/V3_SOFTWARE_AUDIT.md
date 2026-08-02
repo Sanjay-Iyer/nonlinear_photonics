@@ -136,3 +136,22 @@ rather than inventing a zero. Refused proposals report
    recomputed from fraction × maximum. Newer runs should record it directly.
 
 **Signed: PASS WITH WARNINGS.**
+
+## 2026-08-02 targeted continuation
+
+- `tracking13.load_trial_states` is the only authority for state-energy loading
+  and refuses fabricated scientific fallbacks.
+- `demo13.validation_anchor_tracking` makes the configured anchor reachable from
+  the prepared Stage 5 production path and writes a separate anchor summary and
+  table; it never writes into the optimization experiment.
+- `derived13.corrected_records` is the single detached correction boundary for
+  historical reports. It is idempotent and never mutates ledger records.
+- `bo.target_wavelength_nm` is now the authoritative target resolved into both
+  Demo 11 extraction and Demo 13 reporting. Checkpoint identity covers the
+  audited physics/extraction settings while old v3 snapshots remain compatible
+  only at their stored defaults.
+- Independent narrow audit: **PASS**. Focused boundary: 67 tests passed; the
+  immutable v3 ledger SHA256 was unchanged.
+
+The older statement that `anchor_case` is read by no code is superseded by this
+addendum. Stage 5 remains prepared and unauthorized.

@@ -57,6 +57,7 @@ import accounting13  # noqa: E402
 import analysis13  # noqa: E402
 import axsearch13  # noqa: E402
 import design13  # noqa: E402
+import derived13  # noqa: E402
 import feasibility13  # noqa: E402
 import grading13  # noqa: E402
 import metrics13  # noqa: E402
@@ -66,6 +67,7 @@ import report13  # noqa: E402
 import synthetic13  # noqa: E402
 import tables13  # noqa: E402
 import tracking13  # noqa: E402
+import anchor13  # noqa: E402
 
 
 def _load_demo(name: str, path: Path):
@@ -84,7 +86,7 @@ demo11 = demo12.demo11
 
 #: Extraction contract version. Bumped when the meaning of a recorded metric
 #: changes, so old and new trial records can never be silently mixed.
-EXTRACTION_VERSION = "demo13-metrics-1"
+EXTRACTION_VERSION = "demo13-metrics-2"
 
 #: Bumped whenever the Ax *search space* changes shape. A snapshot written under
 #: one schema cannot be resumed under another -- the parameter names differ --
@@ -137,6 +139,21 @@ def experiment_schema(cfg: Mapping[str, Any]) -> dict[str, Any]:
         "active_region_grid_spacing_nm": float(
             cfg["numerical"]["active_region_grid_spacing_nm"]
         ),
+        "target_wavelength_nm": design13.target_wavelength_nm(cfg),
+        "metric_broadening_meV": float(cfg["metric"]["broadening_meV"]),
+        "number_of_electron_states": int(cfg["numerical"]["number_of_electron_states"]),
+        "number_of_hole_states": int(cfg["numerical"]["number_of_hole_states"]),
+        "domain_padding_nm": float(cfg["numerical"]["domain_padding_nm"]),
+        "quantum_region_padding_nm": float(cfg["numerical"]["quantum_region_padding_nm"]),
+        "tracking_minimum_confidence": float(
+            cfg["state_tracking"]["minimum_confidence"]
+        ),
+        "tracking_minimum_assignment_margin": float(
+            cfg["state_tracking"]["minimum_assignment_margin"]
+        ),
+        "tracking_energy_continuity_weight": float(
+            cfg["state_tracking"]["energy_continuity_weight"]
+        ),
     }
 
 #: Sentinel: this schema field has no "before it existed" default, so a snapshot
@@ -150,6 +167,18 @@ SCHEMA_FIELD_DEFAULTS: Mapping[str, Any] = {
     # v3 ran with the fraction spanning [0, maximum]; the interval mapping is
     # opt-in and postdates the v3 snapshot.
     "grading_fraction_spans_feasible_interval": False,
+    # Physics/extraction settings added to the schema after v3 was completed.
+    # These are their exact v3 values, so the immutable snapshot remains
+    # loadable only under the calculation that produced it.
+    "target_wavelength_nm": 1550.0,
+    "metric_broadening_meV": 5.0,
+    "number_of_electron_states": 4,
+    "number_of_hole_states": 4,
+    "domain_padding_nm": 0.0,
+    "quantum_region_padding_nm": 6.0,
+    "tracking_minimum_confidence": 0.60,
+    "tracking_minimum_assignment_margin": 0.15,
+    "tracking_energy_continuity_weight": 0.05,
 }
 
 RUN_MODES: frozenset[str] = frozenset(
@@ -446,14 +475,37 @@ def _tracking_for(
 ) -> tuple[dict[str, Any], tracking13.TrialStates | None]:
     if not result.solver_success:
         return {}, None
-    states = tracking13.load_trial_states(
-        trial_index, design13.canonicalize(parameters, cfg), result.run_dir / "extracted"
-    )
+    # The solver's own energies, in hand from this trial's analysis. Passing them
+    # is what keeps the heavy-hole branch off an index sequence; see
+    # tracking13.StateEnergyError for why that substitution is not neutral.
+    try:
+        states = tracking13.load_trial_states(
+            trial_index,
+            design13.canonicalize(parameters, cfg),
+            result.run_dir / "extracted",
+            observables=result.observables,
+        )
+    except tracking13.StateEnergyError as exc:
+        # Scoped to this trial rather than fatal to the campaign: licensed solver
+        # time already spent on the other trials is not thrown away. The trial
+        # still cannot complete, because a null confidence is a null value for a
+        # constrained metric and `metrics13.ax_raw_data` refuses to report it.
+        result.warnings.append(f"state tracking unavailable: {exc}")
+        return (
+            {
+                "state_tracking_confidence": None,
+                "method": "unavailable: real state energies missing",
+                "state_tracking_error": str(exc),
+                "energy_provenance": tracking13.UNAVAILABLE_ENERGY_LABEL,
+            },
+            None,
+        )
     if states is None:
         return (
             {
                 "state_tracking_confidence": None,
                 "method": "unavailable: no envelopes.csv for this trial",
+                "energy_provenance": tracking13.UNAVAILABLE_ENERGY_LABEL,
             },
             None,
         )
@@ -918,7 +970,11 @@ def closed_loop(
         if raw is None:
             reason = (
                 "completed but produced no defensible objective: "
-                + (record.get("rejection_reason") or "missing metric")
+                + (
+                    record.get("state_tracking_error")
+                    or record.get("rejection_reason")
+                    or "missing metric"
+                )
             )
             experiment.fail(candidate.trial_index, reason)
             return _record_trial(
@@ -2025,6 +2081,23 @@ def run_validation_study(
             f"({state_dir}). Set validation_study.output_state_dir to a separate "
             "directory."
         )
+    anchor_spec = anchor13.resolve_anchor_spec(cfg)
+    anchor_row: dict[str, Any] | None = None
+    if anchor_spec.source == "reference_design":
+        anchor_resolved = design13.resolve_config(anchor_spec.parameters, cfg)
+        anchor_row = _run_side_case(
+            context,
+            state_dir,
+            "anchor_reference_abrupt",
+            anchor_resolved,
+            extra={
+                "trial_index": -1,
+                "check_kind": "state_tracking_anchor",
+                "case_id": "anchor_reference_abrupt",
+                "anchor_case": anchor_spec.name,
+            },
+        )
+        validation_rows.append(anchor_row)
     for design in top:
         source = next(
             (
@@ -2048,6 +2121,7 @@ def run_validation_study(
                     "check_kind": kind,
                     "case_id": case_id,
                     "nominal_chi2_at_target_wavelength_abs": nominal_target,
+                    "historical_tracked_state_labels": source.get("tracked_state_labels"),
                 },
             )
             validation_rows.append(row)
@@ -2088,13 +2162,137 @@ def run_validation_study(
                 if int(record.get("trial_index", -1)) == int(design["trial_index"]):
                     record["robustness_score"] = score
                     record["robustness_worst_case_relative_drift"] = max(drifts)
+    if anchor_spec.source == "trial":
+        anchor_row = next(
+            (
+                row for row in validation_rows
+                if int(row.get("trial_index", -2)) == int(anchor_spec.trial_index)
+                and row.get("case_id") == "nominal"
+            ),
+            None,
+        )
+    anchor_tracking = validation_anchor_tracking(
+        cfg,
+        anchor_spec,
+        anchor_row,
+        [row for row in validation_rows if row.get("case_id") == "nominal"],
+    )
+    write_json_atomically(state_dir / "anchor_state_tracking.json", anchor_tracking)
     return {
         "enabled": True,
         "validation_rows": validation_rows,
         "robustness_rows": robustness_rows,
         "designs_checked": [row.get("trial_index") for row in top],
         "solver_ran": bool(context.machine.run_solver),
+        "anchor_tracking": anchor_tracking,
+        "anchor_tracking_rows": anchor13.anchor_rows(anchor_tracking),
     }
+
+
+def _parameters_from_validation_row(row: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        str(key)[len("parameter_"):]: value
+        for key, value in row.items()
+        if str(key).startswith("parameter_")
+    }
+
+
+def validation_anchor_tracking(
+    cfg: Mapping[str, Any],
+    spec: anchor13.AnchorSpec,
+    anchor_row: Mapping[str, Any] | None,
+    case_rows: Sequence[Mapping[str, Any]],
+) -> dict[str, Any]:
+    """Production Stage 5 entry point for fixed-anchor state assignment.
+
+    The function reads only Stage 5 side-case outputs.  It never reaches into
+    the protected optimization directory and therefore cannot rewrite v3.
+    Planned/no-solver runs return a stated unavailable result; malformed
+    completed data raise because silently weakening this validation gate would
+    be worse than stopping it.
+    """
+
+    if not anchor_row or str(anchor_row.get("status")) != "completed":
+        return {
+            **spec.as_record(),
+            "records": [],
+            "fingerprints": {},
+            "anchored_cases": 0,
+            "method": "fixed_anchor_overlap_assignment",
+            "order_independent": True,
+            "energy_provenance": tracking13.UNAVAILABLE_ENERGY_LABEL,
+            "derived_value_status": "unavailable",
+            "unavailable_reason": "anchor side case has not completed with solver output",
+        }
+
+    anchor_parameters = _parameters_from_validation_row(anchor_row)
+    anchor_states, bound_spec = anchor13.load_anchor_states(
+        spec,
+        Path(str(anchor_row["output_directory_path"])) / "extracted",
+        anchor_parameters,
+        cfg,
+        observables=anchor_row,
+    )
+    cases: list[tracking13.TrialStates] = []
+    historical_labels: dict[int, Any] = {}
+    for row in case_rows:
+        if str(row.get("status")) != "completed":
+            continue
+        trial_index = int(row.get("trial_index", -1))
+        states = tracking13.load_trial_states(
+            trial_index,
+            design13.canonicalize(_parameters_from_validation_row(row), cfg),
+            Path(str(row["output_directory_path"])) / "extracted",
+            observables=row,
+        )
+        if states is None:
+            raise anchor13.AnchorError(
+                f"nominal validation case for t{trial_index:04d} has no envelopes"
+            )
+        cases.append(states)
+        historical_labels[trial_index] = row.get("historical_tracked_state_labels")
+
+    summary = anchor13.assign_all_to_anchor(cases, anchor_states, cfg, spec=bound_spec)
+    confidence_constraint = next(
+        (
+            constraint
+            for constraint in feasibility13.build_constraints(cfg)
+            if constraint.metric == "state_tracking_confidence"
+        ),
+        None,
+    )
+    minimum_confidence = (
+        float(confidence_constraint.threshold)
+        if confidence_constraint is not None
+        else 0.80
+    )
+    minimum_margin = float(
+        (cfg.get("state_tracking") or {}).get("minimum_assignment_margin", 0.15)
+    )
+    for record in summary.get("records", []):
+        old = historical_labels.get(int(record["trial_index"]))
+        record["historical_tracked_state_labels"] = old
+        record["labels_match_historical"] = (
+            None if old is None else old == record.get("tracked_labels")
+        )
+    summary.update(
+        {
+            "acceptance_minimum_confidence": minimum_confidence,
+            "acceptance_minimum_assignment_margin": minimum_margin,
+            "acceptance_passed": bool(cases) and all(
+                record.get("state_tracking_confidence") is not None
+                and float(record["state_tracking_confidence"]) >= minimum_confidence
+                and record.get("assignment_margin") is not None
+                and float(record["assignment_margin"]) >= minimum_margin
+                and not record.get("ambiguous")
+                and not record.get("ambiguous_under_threshold")
+                and record.get("labels_match_historical") is not False
+                for record in summary.get("records", [])
+            ),
+            "derived_value_status": "available",
+        }
+    )
+    return summary
 
 
 def _run_side_case(
@@ -2214,6 +2412,7 @@ def write_run_artifacts(
     """Tables, figures and guides for one run bundle."""
 
     cfg = context.cfg
+    records = derived13.corrected_records(records, cfg)
     parent = context.parent
     results_root = context.machine.results_root
     demo11_best = load_prior_demo_best(
@@ -2273,6 +2472,7 @@ def write_run_artifacts(
         comparison_rows=comparison,
         validation_rows=validation.get("validation_rows", []),
         robustness_rows=validation.get("robustness_rows", []),
+        anchor_tracking_rows=validation.get("anchor_tracking_rows", []),
         efficiency_rows=efficiency.get("summary", []),
         warm_start_rows=((replay or {}).get("ingested") or {}).get("provenance_rows", []),
         plan_record=plan_record,
@@ -2553,7 +2753,7 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
         elif mode in {"analyze_existing_results", "validate_top_designs"}:
             loop_result = {"events": [], "stop_reason": f"{mode} does not generate candidates"}
 
-    records = experiment.ledger.records()
+    records = derived13.corrected_records(experiment.ledger.records(), cfg)
     if replay is None:
         replay = {
             "demo12_run_dir": ingested.get("demo12_run_dir"),
@@ -2597,7 +2797,7 @@ def main(demo_dir: Path, machine_path: Path | None = None) -> int:
         else {"enabled": False, "validation_rows": [], "robustness_rows": [], "solver_ran": False}
     )
     if validation.get("enabled"):
-        records = experiment.ledger.records()
+        records = derived13.corrected_records(experiment.ledger.records(), cfg)
 
     # The one authoritative count. Everything that reports a number -- console,
     # both manifests, the validation report, the results overview, the budget

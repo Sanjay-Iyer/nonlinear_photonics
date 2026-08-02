@@ -25,7 +25,7 @@ Demo 13 from optimizing a labelling artifact.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 import sys
 from typing import Any, Mapping, Sequence
@@ -39,11 +39,50 @@ for _path in (str(SHARED), str(DEMO11_DIR), str(DEMO_DIR)):
     if _path not in sys.path:
         sys.path.insert(0, _path)
 
+from demo_workflow import DemoError  # noqa: E402
+
 import tracking11  # noqa: E402
 
 import design13  # noqa: E402
 
 BANDS: tuple[str, ...] = ("electron", "heavy_hole")
+
+#: Where each band's real solver energies are found in a Demo 11 observables
+#: mapping. These are the only accepted sources in scientific mode.
+BAND_ENERGY_KEY: Mapping[str, str] = {
+    "electron": "electron_energies_eV",
+    "heavy_hole": "heavy_hole_energies_eV",
+}
+
+#: Per-band on-disk fallback written by ``demo11.analyse_case``.
+BAND_ENERGY_TABLE: Mapping[str, str] = {
+    "electron": "electron_states.csv",
+    "heavy_hole": "heavy_hole_states.csv",
+}
+
+#: The four public provenance labels.  Keep these short and stable: they are
+#: written into trial, tracking and anchor records and are part of the audit
+#: vocabulary used by the guides.
+SOLVER_ENERGY_LABEL = "solver"
+HISTORICAL_ENERGY_LABEL = "parsed historical output"
+SYNTHETIC_ENERGY_LABEL = "synthetic test"
+UNAVAILABLE_ENERGY_LABEL = "unavailable"
+
+
+class StateEnergyError(DemoError):
+    """Real solver energies were required for state tracking and not found.
+
+    Raised rather than substituting an index sequence.  The substitution is not
+    neutral: :func:`tracking11._energy_penalty` normalizes the energy gap by the
+    spread of the energies it is given, so feeding ``np.arange(n)`` to *both*
+    sides of a comparison produces a penalty matrix that is exactly zero on the
+    diagonal and grows with ``|i - j|``.  That is an **identity-preferring
+    prior**, not an absence of information: at the configured
+    ``energy_continuity_weight`` of 0.05 a genuine adjacent-state swap has to
+    beat the identity assignment by an overlap margin of 0.0167 before the
+    tracker will report it.  Suppressing exactly the reordering this module
+    exists to detect is worse than refusing to run.
+    """
 
 
 @dataclass(frozen=True)
@@ -57,6 +96,15 @@ class TrialStates:
     electron_envelopes: np.ndarray
     heavy_hole_energies_eV: np.ndarray
     heavy_hole_envelopes: np.ndarray
+    #: Bands whose energies are an index sequence rather than solver output.
+    #: Empty for every scientific trial; non-empty only under an explicit
+    #: unit-test opt-in, and propagated into the tracking record so no reader can
+    #: mistake such a run for a physical one.
+    synthetic_energy_bands: tuple[str, ...] = field(default=())
+    #: Per-band source. Older hand-constructed test fixtures leave this empty;
+    #: those retain the pre-existing assumption that their supplied arrays are
+    #: solver-like data unless ``synthetic_energy_bands`` says otherwise.
+    energy_provenance_by_band: Mapping[str, str] = field(default_factory=dict)
 
     def band(self, name: str) -> tuple[np.ndarray, np.ndarray]:
         if name == "electron":
@@ -87,6 +135,19 @@ def track_against(
     """
 
     settings = _settings(cfg)
+    # Any band whose energies were faked on either side of the comparison taints
+    # the whole record: the assignment cost mixes both points' energies.
+    synthetic_bands = tuple(
+        sorted(
+            set(current.synthetic_energy_bands)
+            | set(() if reference is None else reference.synthetic_energy_bands)
+        )
+    )
+    provenance_by_band = {
+        band: _combined_energy_provenance(current, reference, band)
+        for band in BANDS
+    }
+    provenance = _combined_provenance(provenance_by_band.values())
     record: dict[str, Any] = {
         "trial_index": current.trial_index,
         "reference_trial": None if reference is None else reference.trial_index,
@@ -96,6 +157,9 @@ def track_against(
         "rows": [],
         "diagnostics": {},
         "ambiguous": False,
+        "synthetic_energy_bands": list(synthetic_bands),
+        "energy_provenance": provenance,
+        "energy_provenance_by_band": provenance_by_band,
     }
     if reference is None:
         record.update(
@@ -188,6 +252,34 @@ def track_against(
     return record
 
 
+def _state_energy_provenance(states: TrialStates, band: str) -> str:
+    if band in states.synthetic_energy_bands:
+        return SYNTHETIC_ENERGY_LABEL
+    return str(states.energy_provenance_by_band.get(band) or SOLVER_ENERGY_LABEL)
+
+
+def _combined_provenance(values: Sequence[str]) -> str:
+    sources = {str(value) for value in values}
+    for label in (
+        UNAVAILABLE_ENERGY_LABEL,
+        SYNTHETIC_ENERGY_LABEL,
+        HISTORICAL_ENERGY_LABEL,
+        SOLVER_ENERGY_LABEL,
+    ):
+        if label in sources:
+            return label
+    return UNAVAILABLE_ENERGY_LABEL
+
+
+def _combined_energy_provenance(
+    current: TrialStates, reference: TrialStates | None, band: str
+) -> str:
+    values = [_state_energy_provenance(current, band)]
+    if reference is not None:
+        values.append(_state_energy_provenance(reference, band))
+    return _combined_provenance(values)
+
+
 def choose_reference(
     current_parameters: Mapping[str, Any],
     history: Sequence[TrialStates],
@@ -232,10 +324,23 @@ def track_sequence(
         for record in records
         if record.get("state_tracking_confidence") is not None
     ]
+    synthetic_bands = sorted(
+        {
+            str(band)
+            for record in records
+            for band in (record.get("synthetic_energy_bands") or ())
+        }
+    )
+    provenances = [
+        str(record.get("energy_provenance") or UNAVAILABLE_ENERGY_LABEL)
+        for record in records
+    ]
     return {
         "records": records,
         "rows": rows,
         "minimum_confidence": min(confidences) if confidences else None,
+        "synthetic_energy_bands": synthetic_bands,
+        "energy_provenance": _combined_provenance(provenances),
         "ambiguous_trials": [
             int(record["trial_index"]) for record in records if record.get("ambiguous")
         ],
@@ -249,14 +354,36 @@ def track_sequence(
 
 
 def load_trial_states(
-    trial_index: int, parameters: Mapping[str, Any], extracted_dir: Path
+    trial_index: int,
+    parameters: Mapping[str, Any],
+    extracted_dir: Path,
+    *,
+    observables: Mapping[str, Any] | None = None,
+    allow_synthetic_energies: bool = False,
 ) -> TrialStates | None:
-    """Read one trial's envelopes from the artifacts Demo 11 already wrote.
+    """Read one trial's envelopes and its **real** state energies.
 
     ``envelopes.csv`` is written by ``demo11.analyse_case`` as
     ``z_nm, psi_e1..psi_eN, psi_hh1..psi_hhM``. Reading it back rather than
     re-parsing the solver output keeps the tracker on exactly the arrays the
     chi(2) evaluation used.
+
+    Energies come from ``observables`` when the caller has them in hand -- the
+    live loop always does, because ``demo11.analyse_case`` returns
+    ``electron_energies_eV`` and ``heavy_hole_energies_eV`` -- and otherwise
+    from the per-band state table on disk.  If neither supplies a band's
+    energies the trial is refused with :class:`StateEnergyError` rather than
+    tracked against an index sequence; see that class for why the substitution
+    is not neutral.
+
+    ``allow_synthetic_energies`` exists **only** for unit tests that exercise
+    the assignment plumbing without a solver.  It labels every band it fakes,
+    and that label is carried into the tracking record and into the trial
+    record, so a synthetic run can never be read as a physical one.
+
+    Returns ``None`` when there are no envelopes to track at all, which is the
+    "this trial produced no wavefunctions" case and is distinct from "this trial
+    produced wavefunctions whose energies I refuse to invent".
     """
 
     path = Path(extracted_dir) / "envelopes.csv"
@@ -274,31 +401,118 @@ def load_trial_states(
     if not electron_columns or not hole_columns:
         return None
 
-    energies_path = Path(extracted_dir) / "electron_states.csv"
-    electron_energies = _energies_from_state_table(energies_path, len(electron_columns))
-    hole_energies = np.arange(len(hole_columns), dtype=float)
+    synthetic: list[str] = []
+    energies: dict[str, np.ndarray] = {}
+    provenance_by_band: dict[str, str] = {}
+    for band, count in (
+        ("electron", len(electron_columns)),
+        ("heavy_hole", len(hole_columns)),
+    ):
+        values, provenance = _band_energies(
+            band,
+            count,
+            observables=observables,
+            extracted_dir=Path(extracted_dir),
+            allow_synthetic_energies=allow_synthetic_energies,
+        )
+        if values is None:
+            synthetic.append(band)
+            values = np.arange(count, dtype=float)
+        energies[band] = values
+        provenance_by_band[band] = provenance
+
     return TrialStates(
         trial_index=int(trial_index),
         parameters=dict(parameters),
         z_nm=data[:, 0],
-        electron_energies_eV=electron_energies,
+        electron_energies_eV=energies["electron"],
         electron_envelopes=data[:, electron_columns],
-        heavy_hole_energies_eV=hole_energies,
+        heavy_hole_energies_eV=energies["heavy_hole"],
         heavy_hole_envelopes=data[:, hole_columns],
+        synthetic_energy_bands=tuple(synthetic),
+        energy_provenance_by_band=provenance_by_band,
     )
 
 
-def _energies_from_state_table(path: Path, count: int) -> np.ndarray:
-    """Electron energies, falling back to an index when the table is absent.
+def _band_energies(
+    band: str,
+    count: int,
+    *,
+    observables: Mapping[str, Any] | None,
+    extracted_dir: Path,
+    allow_synthetic_energies: bool,
+) -> tuple[np.ndarray | None, str]:
+    """One band's solver energies, or ``None`` to signal a labelled fake.
 
-    The energy term is only a tie-breaker in the assignment cost, so a missing
-    table degrades tracking to pure overlap rather than failing the trial. The
-    fallback is deliberately an increasing sequence, which contributes no
-    information and cannot fake continuity.
+    Order is preserved exactly as the solver reported it: electron energies
+    ascend and heavy-hole energies descend, and neither is re-sorted here.  The
+    assignment cost only ever uses ``|E_i - E_j|`` normalized by the spread, so
+    a descending band is handled correctly and re-sorting would destroy the
+    correspondence between an energy and its envelope column.
+    """
+
+    values = _energies_from_observables(observables, band, count)
+    if values is not None:
+        return values, SOLVER_ENERGY_LABEL
+    values = _energies_from_state_table(
+        extracted_dir / BAND_ENERGY_TABLE[band], count
+    )
+    if values is not None:
+        return values, HISTORICAL_ENERGY_LABEL
+    if allow_synthetic_energies:
+        return None, SYNTHETIC_ENERGY_LABEL
+    raise StateEnergyError(
+        f"state tracking needs real {band} energies for this trial and found "
+        f"neither observables[{BAND_ENERGY_KEY[band]!r}] with {count} finite "
+        f"values nor {extracted_dir / BAND_ENERGY_TABLE[band]}. Refusing to "
+        "track against an index sequence: that biases the assignment toward the "
+        "identity permutation and hides the state reordering this check exists "
+        "to find. Pass allow_synthetic_energies=True only from a unit test."
+    )
+
+
+def _finite_energies(values: Any, count: int) -> np.ndarray | None:
+    """``count`` finite floats from a sequence, or ``None`` if unavailable.
+
+    A short, non-numeric or non-finite band is rejected outright rather than
+    padded. Padding would silently change which envelope column an energy
+    belongs to, which is the same class of error as fabricating the energies.
+    """
+
+    if not isinstance(values, (list, tuple, np.ndarray)):
+        return None
+    numbers: list[float] = []
+    for value in values:
+        try:
+            number = float(value)
+        except (TypeError, ValueError):
+            return None
+        if not np.isfinite(number):
+            return None
+        numbers.append(number)
+    if len(numbers) < count:
+        return None
+    return np.asarray(numbers[:count], dtype=float)
+
+
+def _energies_from_observables(
+    observables: Mapping[str, Any] | None, band: str, count: int
+) -> np.ndarray | None:
+    if not isinstance(observables, Mapping):
+        return None
+    return _finite_energies(observables.get(BAND_ENERGY_KEY[band]), count)
+
+
+def _energies_from_state_table(path: Path, count: int) -> np.ndarray | None:
+    """One band's energies from its state table, or ``None`` when unusable.
+
+    Returns ``None`` -- never an index sequence -- so the caller decides what a
+    missing table means. Only :func:`_band_energies` may make that decision, and
+    in scientific mode it raises.
     """
 
     if not path.is_file():
-        return np.arange(count, dtype=float)
+        return None
     import csv
 
     values: list[float] = []
@@ -308,6 +522,4 @@ def _energies_from_state_table(path: Path, count: int) -> np.ndarray:
                 values.append(float(row["energy_eV"]))
             except (KeyError, TypeError, ValueError):
                 continue
-    if len(values) < count:
-        return np.arange(count, dtype=float)
-    return np.asarray(values[:count], dtype=float)
+    return _finite_energies(values, count)

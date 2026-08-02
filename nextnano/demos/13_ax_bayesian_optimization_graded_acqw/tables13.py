@@ -33,6 +33,7 @@ import grading12  # noqa: E402
 from demo_workflow import write_json_atomically, write_text_atomically  # noqa: E402
 
 import design13  # noqa: E402
+import derived13  # noqa: E402
 import feasibility13  # noqa: E402
 import grading13  # noqa: E402
 import metrics13  # noqa: E402
@@ -83,6 +84,12 @@ COLUMN_UNITS: Mapping[str, str] = {
     "peak_wavelength_nm": "nm",
     "signed_detuning_nm": "nm",
     "absolute_detuning_nm": "nm",
+    "stored_signed_detuning_nm": "nm",
+    "corrected_signed_detuning_nm": "nm",
+    "stored_absolute_detuning_nm": "nm",
+    "corrected_absolute_detuning_nm": "nm",
+    "stored_detuning_side": "category",
+    "corrected_detuning_side": "category",
     "relative_integrated_chi2_abs": "a.u.*nm",
     "bandwidth_above_fraction_nm": "nm",
     "bandwidth_fraction_of_peak": "dimensionless",
@@ -99,6 +106,15 @@ COLUMN_UNITS: Mapping[str, str] = {
     "heavy_hole_anticrossing_gap_meV": "meV",
     "electron_level_gaps_meV": "meV",
     "heavy_hole_level_gaps_meV": "meV",
+    "stored_heavy_hole_gap_meV": "meV",
+    "corrected_heavy_hole_gap_meV": "meV",
+    "stored_heavy_hole_level_gaps_meV": "meV",
+    "corrected_heavy_hole_level_gaps_meV": "meV",
+    "derived_value_status": "category",
+    "derived_value_provenance": "text",
+    "state_tracking_energy_provenance": "category",
+    "state_tracking_energy_provenance_by_band": "category by band",
+    "state_tracking_error": "text",
     "overlap_e1_hh1": "dimensionless",
     "overlap_e2_hh2": "dimensionless",
     "z_e1_e1_nm": "nm",
@@ -239,6 +255,7 @@ TABLE_CATALOGUE: Mapping[str, str] = {
     "bo_parameter_importance": "one parameter's first-order Sobol sensitivity for one modelled metric",
     "bo_pareto_optimal_designs": "one nondominated design under the active multi-objective set",
     "bo_top_designs_local_validation_results": "one local-refinement, mesh, state-count or padding check on a top design",
+    "bo_anchor_state_tracking_assignments": "one anchored (trial, band, state) assignment with overlap, margin, sign alignment, ambiguity and energy provenance",
     "bo_top_designs_fabrication_robustness": "one fabrication perturbation applied to a top design",
     "bo_random_grid_search_efficiency_comparison": "one search method, with the evaluations it needed to reach the best known design",
     "bo_run_plan_and_case_counts": "the planned and completed evaluation budget for this run",
@@ -378,7 +395,11 @@ _INPUT_COLUMNS = (
 _NONLINEAR_COLUMNS = (
     "trial_index", "iteration", "candidate_id", "chi2_mode", "chi2_units",
     "relative_peak_chi2_abs", "peak_wavelength_nm", "relative_chi2_at_target_wavelength_abs",
-    "signed_detuning_nm", "absolute_detuning_nm", "relative_integrated_chi2_abs",
+    "stored_signed_detuning_nm", "corrected_signed_detuning_nm",
+    "stored_absolute_detuning_nm", "corrected_absolute_detuning_nm",
+    "stored_detuning_side", "corrected_detuning_side",
+    "signed_detuning_nm", "absolute_detuning_nm", "detuning_side",
+    "derived_value_status", "derived_value_provenance", "relative_integrated_chi2_abs",
     "integrated_wavelength_window_nm", "bandwidth_above_fraction_nm",
     "bandwidth_fraction_of_peak", "trial_valid", "status",
 )
@@ -386,8 +407,11 @@ _NONLINEAR_COLUMNS = (
 _ELECTRONIC_COLUMNS = (
     "trial_index", "iteration", "candidate_id", "E_e1_eV", "E_e2_eV", "E_hh1_eV",
     "E_hh2_eV", "transition_e1_hh1_eV", "transition_e2_hh2_eV",
-    "anticrossing_gap_meV", "heavy_hole_anticrossing_gap_meV",
-    "electron_level_gaps_meV", "heavy_hole_level_gaps_meV", "overlap_e1_hh1",
+    "anticrossing_gap_meV", "stored_heavy_hole_gap_meV",
+    "corrected_heavy_hole_gap_meV", "heavy_hole_anticrossing_gap_meV",
+    "electron_level_gaps_meV", "stored_heavy_hole_level_gaps_meV",
+    "corrected_heavy_hole_level_gaps_meV", "heavy_hole_level_gaps_meV",
+    "derived_value_status", "derived_value_provenance", "overlap_e1_hh1",
     "overlap_e2_hh2", "z_e1_e1_nm", "z_e1_e2_nm", "z_e2_e2_nm", "z_hh1_hh1_nm",
     "z_hh1_hh2_nm", "z_hh2_hh2_nm", "electron_hole_centroid_separation_nm",
     "intersubband_dipole_e1_e2_e_nm", "intersubband_oscillator_strength_e1_e2",
@@ -403,7 +427,9 @@ _LOCALIZATION_COLUMNS = (
     "maximum_boundary_probability", "raw_solver_state_index",
     "raw_state_indices", "tracked_state_labels", "state_tracking_confidence",
     "state_tracking_margin", "state_tracking_ambiguous",
-    "state_tracking_reference_trial", "state_tracking_method", "status",
+    "state_tracking_reference_trial", "state_tracking_method",
+    "state_tracking_energy_provenance", "state_tracking_energy_provenance_by_band",
+    "state_tracking_error", "status",
 )
 
 _QC_COLUMNS = (
@@ -709,6 +735,7 @@ def write_all(
     comparison_rows: Sequence[Mapping[str, Any]] = (),
     validation_rows: Sequence[Mapping[str, Any]] = (),
     robustness_rows: Sequence[Mapping[str, Any]] = (),
+    anchor_tracking_rows: Sequence[Mapping[str, Any]] = (),
     efficiency_rows: Sequence[Mapping[str, Any]] = (),
     warm_start_rows: Sequence[Mapping[str, Any]] = (),
     plan_record: Mapping[str, Any] | None = None,
@@ -720,6 +747,11 @@ def write_all(
 ) -> list[str]:
     """Write the complete table set and return the filenames written."""
 
+    # Defensive reporting boundary: callers may hand this function immutable
+    # historical ledger records directly.  Work only on detached corrected
+    # projections so every table, ranking and feasibility audit sees the same
+    # current conventions without rewriting history.
+    records = derived13.corrected_records(records, cfg)
     note = (
         "SYNTHETIC — NOT LICENSED NEXTNANO OUTPUT. Generated by the Stage 1 "
         "solver-free smoke test."
@@ -749,6 +781,7 @@ def write_all(
     emit("bo_pareto_optimal_designs", pareto_designs(records, spec, ax_frontier=ax_frontier))
     emit("bo_top_designs_local_validation_results", validation_rows)
     emit("bo_top_designs_fabrication_robustness", robustness_rows)
+    emit("bo_anchor_state_tracking_assignments", anchor_tracking_rows)
     emit("bo_random_grid_search_efficiency_comparison", efficiency_rows)
     emit("bo_search_space_definition", search_space_rows(cfg))
     constraint_specs = feasibility13.build_constraints(cfg)

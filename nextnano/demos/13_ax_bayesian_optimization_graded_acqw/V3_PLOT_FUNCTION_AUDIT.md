@@ -134,3 +134,16 @@ Every figure has `plot_data/<stem>.csv`; every table has `<name>.units.json`.
 **Verdict: PASS WITH WARNINGS.** Three residuals are documented above; none
 produces a false statement in the regenerated bundle, but items 1 and 2 leave a
 figure that is easier to over-read than its CSV.
+
+## 2026-08-02 targeted continuation
+
+Only artifacts affected by detuning, heavy-hole gaps and state tracking were
+rechecked. Plot contexts and table generation receive detached corrected
+records. Detuning plots therefore use the recomputed signed value; electronic
+and nonlinear tables expose stored and corrected fields side by side; tracking
+tables include energy provenance and the Stage 5 anchor assignment rows. A
+missing correction remains unavailable and is not coerced to zero. Ranking
+continues to exclude infeasible trials, so t0021 is the best observed feasible
+trial and is not labelled a validated optimum.
+
+**Targeted continuation verdict: PASS.**

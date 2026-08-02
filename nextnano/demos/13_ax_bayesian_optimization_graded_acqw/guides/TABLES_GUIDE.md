@@ -8,6 +8,25 @@ Every table is a **projection of the immutable trial ledger**, rebuilt from it o
 
 **Units.** Every chi(2) number in this demo is a *relative* merit in arbitrary units (`a.u. (relative |chi2|)`). It is a lineshape and a trend with no absolute calibration. It is **never pm/V**, and values are only comparable between designs computed with the same mesh and settings.
 
+## Historical corrections and state identity
+
+The protected v3 ledger is never rewritten. It preserves the values originally
+stored in `stored_*` columns, while every current table, ranking, and plot uses
+the matching `corrected_*` value recomputed from peak/target wavelengths or the
+heavy-hole energy array. If primary data are absent, the corrected value is
+`unavailable`, never zero; `derived_value_status` and
+`derived_value_provenance` say exactly what happened.
+
+State energies carry one of four provenance labels: `solver`, `parsed historical output`,
+`synthetic test`, or `unavailable`. Synthetic index energies are
+permitted only by an explicit test opt-in and are never scientific evidence.
+Stage 5 assigns every case directly to `state_tracking.anchor_case`, so shuffling
+case order cannot change its reference. Near a crossing or avoided crossing,
+energy order can swap while the physical envelope continues smoothly; labels
+therefore follow overlap (with real energy continuity only as a secondary cost),
+and a small assignment margin is reported as ambiguous rather than smoothed
+away.
+
 **No table silently drops a trial.** Invalid and refused proposals have their own tables *and* stay in the complete history with their reason.
 
 ---
@@ -23,6 +42,12 @@ One row = one proposed candidate, with the acquisition value Ax reported for it.
 One row = one Ax trial, with every input parameter, physical output, QC metric, objective, constraint, status and provenance path.
 
 - **Units sidecar:** `bo_all_trials_parameters_and_outcomes.units.json`
+
+## `bo_anchor_state_tracking_assignments.csv`
+
+One row = one anchored (trial, band, state) assignment with overlap, margin, sign alignment, ambiguity and energy provenance.
+
+- **Units sidecar:** `bo_anchor_state_tracking_assignments.units.json`
 
 ## `bo_best_objective_so_far_by_iteration.csv`
 

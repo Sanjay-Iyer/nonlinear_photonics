@@ -33,6 +33,7 @@ import demo13  # noqa: E402
 import demo_workflow  # noqa: E402
 import design13  # noqa: E402
 import grading13  # noqa: E402
+import metrics13  # noqa: E402
 
 pytestmark = pytest.mark.filterwarnings("ignore")
 
@@ -176,6 +177,28 @@ def test_schema_records_bounds_and_mesh_not_only_names(cfg):
     assert schema["range_bounds"]["central_barrier_thickness_nm"] == [0.85, 2.5]
     assert schema["minimum_resolvable_grading_nm"] == pytest.approx(0.80)
     assert schema["active_region_grid_spacing_nm"] == pytest.approx(0.05)
+    assert schema["target_wavelength_nm"] == pytest.approx(1550.0)
+    assert schema["metric_broadening_meV"] == pytest.approx(5.0)
+    assert schema["number_of_electron_states"] == 4
+    assert schema["number_of_hole_states"] == 4
+    assert schema["tracking_minimum_assignment_margin"] == pytest.approx(0.15)
+
+
+def test_bo_target_is_the_single_resolved_solver_and_reporting_target(cfg):
+    changed = copy.deepcopy(cfg)
+    changed["bo"]["target_wavelength_nm"] = 1600.0
+    resolved = design13.resolve_config(design13.reference_parameters(changed), changed)
+    assert resolved["metric"]["reference_wavelength_nm"] == pytest.approx(1600.0)
+    assert resolved["chi2"]["reference_wavelength_nm"] == pytest.approx(1600.0)
+    record = metrics13.build_record(
+        parameters=design13.reference_parameters(changed),
+        cfg=changed,
+        observables={"chi2_peak_wavelength_nm": 1590.0},
+        validation={},
+        status="completed",
+    )
+    assert record["target_wavelength_nm"] == pytest.approx(1600.0)
+    assert record["signed_detuning_nm"] == pytest.approx(-10.0)
 
 
 def test_a_v2_shaped_experiment_refuses_to_resume_under_v3(cfg, tmp_path):

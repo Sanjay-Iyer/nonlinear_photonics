@@ -223,7 +223,15 @@ def test_the_required_input_parameters_are_documented():
         "bo.outcome_constraints.maximum_boundary_probability",
         "bo.outcome_constraints.minimum_state_tracking_confidence",
         "numerical.number_of_electron_states",
+        "numerical.number_of_hole_states",
         "numerical.domain_padding_nm",
+        "numerical.quantum_region_padding_nm", "metric.broadening_meV",
+        "state_tracking.minimum_confidence",
+        "state_tracking.minimum_assignment_margin",
+        "state_tracking.energy_continuity_weight",
+        "state_tracking.ambiguity_threshold", "state_tracking.anchor_case",
+        "validation_study.state_count_convergence",
+        "validation_study.domain_padding_nm",
         "bo.num_initial_trials", "bo.num_iterations", "bo.batch_size",
         "bo.random_seed", "workflow.mode", "workflow.experiment_state_dir",
         "simulation.run_solver", "validation_study.enabled",
@@ -262,6 +270,20 @@ def test_guides_never_call_relative_chi2_pm_per_volt(guide_text):
             assert re.search(r"never|not\b|Never|NOT|\*\*no\*\*", window), (
                 f"{name}: 'pm/V' appears without a denial near it"
             )
+
+
+def test_affected_guides_explain_corrections_and_anchor_tracking(guide_text):
+    for name in (
+        "PLOTS_GUIDE.md", "TABLES_GUIDE.md", "INPUT_PARAMETERS_GUIDE.md",
+        "OUTPUT_RESULTS_GUIDE.md", "TROUBLESHOOTING_GUIDE.md",
+        "WORK_LAPTOP_GUIDE.md",
+    ):
+        text = guide_text[name]
+        assert "stored_*" in text and "corrected_*" in text
+        assert "parsed historical output" in text and "synthetic test" in text
+        assert "state_tracking.anchor_case" in text
+        assert "crossing or avoided crossing" in text
+        assert "unavailable`, never zero" in text
 
 
 def test_guides_do_not_present_v2_results_as_current(guide_text):

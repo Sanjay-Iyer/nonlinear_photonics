@@ -6,6 +6,25 @@ Everything you can change, what it does, and whether changing it makes an existi
 
 **Checkpoint invalidation.** Some settings define *what the search space is*. Changing one means the stored trials describe a different problem, so Demo 13 refuses to resume and tells you to start a new experiment directory. That refusal is a safety feature.
 
+## Historical corrections and state identity
+
+The protected v3 ledger is never rewritten. It preserves the values originally
+stored in `stored_*` columns, while every current table, ranking, and plot uses
+the matching `corrected_*` value recomputed from peak/target wavelengths or the
+heavy-hole energy array. If primary data are absent, the corrected value is
+`unavailable`, never zero; `derived_value_status` and
+`derived_value_provenance` say exactly what happened.
+
+State energies carry one of four provenance labels: `solver`, `parsed historical output`,
+`synthetic test`, or `unavailable`. Synthetic index energies are
+permitted only by an explicit test opt-in and are never scientific evidence.
+Stage 5 assigns every case directly to `state_tracking.anchor_case`, so shuffling
+case order cannot change its reference. Near a crossing or avoided crossing,
+energy order can swap while the physical envelope continues smoothly; labels
+therefore follow overlap (with real energy continuity only as a secondary cost),
+and a small assignment margin is reported as ambiguous rather than smoothed
+away.
+
 **The geometry rule that surprises people.** The widest grade a design can build is `central barrier thickness - minimum_flat_region_nm`. With a 0.10 nm flat region and a 0.80 nm minimum resolvable grade, an **abrupt** design may use the full 0.85 nm barrier, but a **genuinely graded** design needs a barrier of at least **0.90 nm**. Between 0.85 and 0.90 nm the graded branch is empty and such proposals are refused.
 
 ---
@@ -186,6 +205,61 @@ Everything you can change, what it does, and whether changing it makes an existi
 - **Interacts with:** most fragile at the thinnest barrier
 - **Invalidates an existing checkpoint:** yes
 
+## `state_tracking.minimum_confidence`
+
+**Minimum overlap for one nearest-neighbour state match.**
+
+- **Type:** tracking threshold
+- **Units:** overlap in [0,1]
+- **Raising it:** more assignments marked ambiguous
+- **Lowering it:** accepts weaker identity evidence
+- **Interacts with:** the separate 0.80 BO outcome constraint decides trial feasibility
+- **Invalidates an existing checkpoint:** yes
+
+## `state_tracking.minimum_assignment_margin`
+
+**Minimum best-versus-runner-up overlap separation.**
+
+- **Type:** tracking threshold
+- **Units:** overlap difference
+- **Raising it:** more near-crossing assignments rejected
+- **Lowering it:** accepts less decisive matches
+- **Interacts with:** used by both live nearest-neighbour and fixed-anchor acceptance
+- **Invalidates an existing checkpoint:** yes
+
+## `state_tracking.energy_continuity_weight`
+
+**Weight of real energy continuity as a secondary assignment cost.**
+
+- **Type:** tracking setting
+- **Units:** dimensionless
+- **Raising it:** energy order influences ties more
+- **Lowering it:** overlap dominates more completely
+- **Interacts with:** energies must be real solver or parsed output; fabricated indices are forbidden
+- **Invalidates an existing checkpoint:** yes
+
+## `state_tracking.ambiguity_threshold`
+
+**Stricter fixed-anchor margin used to accept a validation conclusion.**
+
+- **Type:** Stage 5 tracking threshold
+- **Units:** overlap difference
+- **Raising it:** more anchored cases are inconclusive
+- **Lowering it:** accepts tighter alternatives
+- **Interacts with:** does not change the immutable optimization observations
+- **Invalidates an existing checkpoint:** no
+
+## `state_tracking.anchor_case`
+
+**The one fixed design every Stage 5 case is assigned against.**
+
+- **Type:** Stage 5 tracking setting
+- **Units:** case name
+- **Raising it:** n/a
+- **Lowering it:** n/a
+- **Interacts with:** reference_abrupt is order independent; a missing or mismatched anchor stops the check
+- **Invalidates an existing checkpoint:** no
+
 ## `numerical.number_of_electron_states`
 
 **How many electron states the solver is asked for.**
@@ -197,6 +271,28 @@ Everything you can change, what it does, and whether changing it makes an existi
 - **Interacts with:** Demo 11's window convergence is on record as FAILED, so this must be checked in Stage 5
 - **Invalidates an existing checkpoint:** yes
 
+## `numerical.number_of_hole_states`
+
+**How many heavy-hole states the solver is asked for.**
+
+- **Type:** fixed simulation setting
+- **Units:** count
+- **Raising it:** safer hole-state sum, slower
+- **Lowering it:** risks truncation and missed near-degeneracy
+- **Interacts with:** each energy must stay paired with its envelope for tracking
+- **Invalidates an existing checkpoint:** yes
+
+## `numerical.quantum_region_padding_nm`
+
+**Padding around the active quantum region used to select states.**
+
+- **Type:** fixed simulation setting
+- **Units:** nm
+- **Raising it:** includes more surrounding material
+- **Lowering it:** risks clipping state character
+- **Interacts with:** distinct from outer domain padding
+- **Invalidates an existing checkpoint:** yes
+
 ## `numerical.domain_padding_nm`
 
 **Extra material outside the active region.**
@@ -206,6 +302,17 @@ Everything you can change, what it does, and whether changing it makes an existi
 - **Raising it:** less edge leakage, slower
 - **Lowering it:** risks boundary artifacts
 - **Interacts with:** tested against boundary probability in Stage 5
+- **Invalidates an existing checkpoint:** yes
+
+## `metric.broadening_meV`
+
+**Homogeneous linewidth in the relative chi(2) denominator.**
+
+- **Type:** fixed physics setting
+- **Units:** meV
+- **Raising it:** smooths and broadens resonances
+- **Lowering it:** sharpens them
+- **Interacts with:** changes objective magnitude and how near-degenerate gaps are interpreted
 - **Invalidates an existing checkpoint:** yes
 
 ## `bo.num_initial_trials`
@@ -305,5 +412,27 @@ Everything you can change, what it does, and whether changing it makes an existi
 - **Raising it:** coarser check
 - **Lowering it:** finer, slower
 - **Interacts with:** this is the Stage 5 gate: everything else is conditional on it
+- **Invalidates an existing checkpoint:** no
+
+## `validation_study.state_count_convergence`
+
+**Electron and hole state counts used for convergence checks.**
+
+- **Type:** Stage 5 setting
+- **Units:** count
+- **Raising it:** tests a larger state window
+- **Lowering it:** tests truncation sensitivity
+- **Interacts with:** fixed-anchor labels must remain stable across the window
+- **Invalidates an existing checkpoint:** no
+
+## `validation_study.domain_padding_nm`
+
+**Outer-domain paddings used for convergence checks.**
+
+- **Type:** Stage 5 setting
+- **Units:** nm
+- **Raising it:** larger validation domain
+- **Lowering it:** smaller validation domain
+- **Interacts with:** maximum boundary probability must remain below its bound
 - **Invalidates an existing checkpoint:** no
 

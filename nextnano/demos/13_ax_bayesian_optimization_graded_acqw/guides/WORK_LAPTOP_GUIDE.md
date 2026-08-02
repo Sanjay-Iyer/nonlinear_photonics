@@ -33,7 +33,7 @@ git rev-parse HEAD
 ## 4. Activate the environment — SAFE
 
 ```powershell
-conda activate llm
+conda activate NMIP
 ```
 
 ## 5. Confirm the pinned Ax version — SAFE
@@ -47,7 +47,7 @@ Expect Ax `1.3.1`.
 ## 6. Run the focused Demo 13 tests — SAFE
 
 ```powershell
-python -m pytest .\nextnano\tests\test_demo13_v3_accounting.py .\nextnano\tests\test_demo13_v3_reporting.py .\nextnano\tests\test_demo13_guides.py -q
+python -m pytest .\nextnano\tests\test_demo13_state_energies_and_anchor.py .\nextnano\tests\test_demo13_v3_accounting.py .\nextnano\tests\test_demo13_v3_reporting.py .\nextnano\tests\test_demo13_guides.py -q
 ```
 
 ## 7. Run the whole nextnano suite — SAFE
@@ -118,14 +118,33 @@ This is read-only with respect to the experiment. It copies generated inputs, lo
 
 ## Stage 5 — PREPARED, NOT AUTHORIZED
 
-> **SPENDS SOLVER TIME — approximately 42 licensed runs. Do not run without explicit authorization.**
+> **SPENDS SOLVER TIME — approximately 43 licensed runs, including the fixed anchor. Do not run without explicit authorization.**
 
 Stage 5 is fully specified in `V3_STAGE5_EXECUTION_PLAN.md`. Before it may run:
 
 1. this reanalysis must pass with all four hashes unchanged;
 2. the working tree must be clean;
 3. `validation_study.output_state_dir` must point somewhere **other than** `demo13_ax_experiment_v3` — the configuration is rejected otherwise;
-4. the mesh gate (2 runs on t0021) must pass before the other 40.
+4. the mesh gate (2 runs on t0021) must pass before the remaining cases.
+
+## Historical corrections and state identity
+
+The protected v3 ledger is never rewritten. It preserves the values originally
+stored in `stored_*` columns, while every current table, ranking, and plot uses
+the matching `corrected_*` value recomputed from peak/target wavelengths or the
+heavy-hole energy array. If primary data are absent, the corrected value is
+`unavailable`, never zero; `derived_value_status` and
+`derived_value_provenance` say exactly what happened.
+
+State energies carry one of four provenance labels: `solver`, `parsed historical output`,
+`synthetic test`, or `unavailable`. Synthetic index energies are
+permitted only by an explicit test opt-in and are never scientific evidence.
+Stage 5 assigns every case directly to `state_tracking.anchor_case`, so shuffling
+case order cannot change its reference. Near a crossing or avoided crossing,
+energy order can swap while the physical envelope continues smoothly; labels
+therefore follow overlap (with real energy continuity only as a secondary cost),
+and a small assignment margin is reported as ambiguous rather than smoothed
+away.
 
 The launch command is deliberately **not** written out here. Read the execution plan, confirm the gates, and set `workflow.mode` yourself.
 
