@@ -582,6 +582,90 @@ def search_space_specs(cfg: Mapping[str, Any]) -> list[RangeSpec | ChoiceSpec]:
     return specs
 
 
+#: How close to a bound counts as *on* it, relative to the range width. An
+#: optimizer that stops within a thousandth of a bound is reporting that the
+#: bound binds, not that it found an interior optimum.
+SEARCH_BOUND_RELATIVE_TOLERANCE = 1e-3
+
+
+def parameters_at_search_bounds(
+    parameters: Mapping[str, Any], cfg: Mapping[str, Any]
+) -> list[dict[str, Any]]:
+    """Which of this design's coordinates sit on an edge of the search space.
+
+    A design on a bound is a statement about the *search space*, not about the
+    physics: the optimizer wanted to keep going and was not allowed to.  Saying
+    so has to be computed, because a hardcoded sentence about one campaign's
+    winner keeps being printed after the winner changes.  v3's best feasible
+    trial sits on the central-barrier lower bound; a future campaign's may sit
+    on a different bound or none, and this reports whichever is true.
+    """
+
+    full = canonicalize(parameters, cfg)
+    canonical = physical_design(full)
+    # Under `parameterization: fraction` the Ax coordinate is
+    # `grading_fraction_of_feasible_max`, which the *physical* design does not
+    # carry -- it carries the realized nanometre width. Looking only at the
+    # physical design reported a design pinned on the fraction bound as
+    # interior, which is the same false claim this function exists to prevent.
+    lookup: dict[str, Any] = dict(canonical)
+    proposed = full.get("_proposed_grading_fraction")
+    if proposed is not None:
+        lookup[grading_parameter_name(cfg)] = proposed
+    elif "grading_fraction_of_feasible_max" in dict(parameters):
+        lookup["grading_fraction_of_feasible_max"] = dict(parameters)[
+            "grading_fraction_of_feasible_max"
+        ]
+
+    rows: list[dict[str, Any]] = []
+    for spec in search_space_specs(cfg):
+        if not isinstance(spec, RangeSpec):
+            continue
+        if spec.name not in lookup:
+            continue
+        try:
+            value = float(lookup[spec.name])
+        except (TypeError, ValueError):
+            continue
+        width = float(spec.upper) - float(spec.lower)
+        if width <= 0:
+            continue
+        tolerance = width * SEARCH_BOUND_RELATIVE_TOLERANCE
+        if abs(value - float(spec.lower)) <= tolerance:
+            side = "lower"
+        elif abs(value - float(spec.upper)) <= tolerance:
+            side = "upper"
+        else:
+            continue
+        rows.append(
+            {
+                "parameter": spec.name,
+                "value": value,
+                "bound": side,
+                "lower": float(spec.lower),
+                "upper": float(spec.upper),
+            }
+        )
+    return rows
+
+
+def describe_search_bounds(
+    parameters: Mapping[str, Any], cfg: Mapping[str, Any]
+) -> str:
+    """One sentence naming every bound this design sits on, or saying none."""
+
+    rows = parameters_at_search_bounds(parameters, cfg)
+    if not rows:
+        return "no search-space bound"
+    parts = [
+        f"the {row['parameter']} **{row['bound']} bound** "
+        f"({row['value']:g} nm)" if row["parameter"].endswith("_nm")
+        else f"the {row['parameter']} **{row['bound']} bound** ({row['value']:g})"
+        for row in rows
+    ]
+    return ", ".join(parts)
+
+
 def enabled_optional_parameters(cfg: Mapping[str, Any]) -> list[str]:
     return [
         name

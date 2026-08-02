@@ -61,6 +61,41 @@ DEFAULT_CATEGORIES: tuple[str, ...] = (
 #: feasible design and the feasible Sobol reference.
 PRIORITY_TRIALS: tuple[str, ...] = ("t0021", "t0022", "t0017", "t0005")
 
+#: Files whose absence makes a downstream check impossible, and the check each
+#: one blocks.  Reported per trial whether or not they were found, because the
+#: whole point of this bundle is to establish what is *missing*: a manifest that
+#: lists only what it copied cannot tell you the alloy profiles never arrived.
+REQUIRED_FILES: Mapping[str, str] = {
+    "extracted/envelopes.csv": "fixed-anchor state tracking",
+    "extracted/electron_states.csv": "electron state energies for tracking",
+    "extracted/heavy_hole_states.csv": "heavy-hole state energies for tracking",
+    "demo_resolved.yaml": "trial-to-source verification",
+}
+
+#: Files that would be useful but that Demo 13 does not emit, listed separately
+#: so their absence is reported as *structural* rather than as a solver failure.
+#: `requested_composition_profile.csv` is written by ``demo12._write_requested_profile``;
+#: Demo 13 analyses every trial with ``demo11.analyse_case``, which does not
+#: write it. Reporting it as "required" made every bundle on every machine --
+#: including the licensed one -- print a missing-file line that an operator would
+#: reasonably read as the solver having failed.
+KNOWN_ABSENT_FILES: Mapping[str, str] = {
+    "extracted/requested_composition_profile.csv": (
+        "not written by Demo 13 (demo11.analyse_case does not emit it); the "
+        "realized alloy profile must come from the native solver output instead"
+    ),
+}
+
+#: Geometry the run directory's resolved config must agree with the ledger on
+#: before its files are accepted as that trial's output.
+VERIFIED_GEOMETRY: Mapping[str, str] = {
+    "scientific.thick_well_nm": "resolved_wide_well_nm",
+    "scientific.thin_well_nm": "resolved_narrow_well_nm",
+    "scientific.tunnel_barrier_nm": "resolved_central_barrier_nm",
+}
+
+GEOMETRY_TOLERANCE_NM = 1e-6
+
 MAX_REASONABLE_BYTES = 500 * 1024 * 1024
 
 
@@ -113,6 +148,132 @@ def genuinely_graded_trials(state_dir: Path) -> list[str]:
     return graded
 
 
+def _source_fingerprint(root: Path) -> dict[str, tuple[int, int]]:
+    """Path -> (size, mtime_ns) for everything under ``root``.
+
+    Cheap enough to run twice around a copy, and enough to detect any write:
+    a new file, a removed one, or a changed one.
+    """
+
+    root = Path(root)
+    if not root.is_dir():
+        return {}
+    fingerprint: dict[str, tuple[int, int]] = {}
+    for path in sorted(root.rglob("*")):
+        try:
+            info = path.stat()
+        except OSError:
+            continue
+        fingerprint[str(path)] = (info.st_size, info.st_mtime_ns)
+    return fingerprint
+
+
+def ledger_records(state_dir: Path) -> dict[str, dict[str, Any]]:
+    """Latest ledger record per candidate id. Read-only."""
+
+    ledger = Path(state_dir) / "trial_ledger.jsonl"
+    if not ledger.is_file():
+        return {}
+    latest: dict[str, dict[str, Any]] = {}
+    for line in ledger.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        try:
+            record = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        candidate = record.get("candidate_id")
+        if candidate:
+            latest[str(candidate)] = record
+    return latest
+
+
+def _dotted(mapping: Mapping[str, Any], path: str) -> Any:
+    cursor: Any = mapping
+    for part in path.split("."):
+        if not isinstance(cursor, Mapping) or part not in cursor:
+            return None
+        cursor = cursor[part]
+    return cursor
+
+
+def verify_trial_source(
+    run_dir: Path, record: Mapping[str, Any] | None
+) -> dict[str, Any]:
+    """Check this run directory really holds *this* trial's output.
+
+    A directory named ``t0021`` is not proof that it contains trial 21: a
+    re-run, a partial copy or a rename produces the same name over different
+    physics, and a bundle built from the wrong directory would be worse than no
+    bundle at all. The resolved geometry is compared against the ledger, which
+    is the immutable record of what that trial actually was.
+    """
+
+    verdict: dict[str, Any] = {
+        "verified": False,
+        "reason": "",
+        "compared": {},
+    }
+    if record is None:
+        verdict["reason"] = "no ledger record for this trial id"
+        return verdict
+    config_path = Path(run_dir) / "demo_resolved.yaml"
+    if not config_path.is_file():
+        verdict["reason"] = f"no demo_resolved.yaml in {run_dir}"
+        return verdict
+    try:
+        import yaml
+
+        config = yaml.safe_load(config_path.read_text(encoding="utf-8")) or {}
+    except Exception as exc:  # pragma: no cover - defensive
+        verdict["reason"] = f"unreadable demo_resolved.yaml: {exc}"
+        return verdict
+
+    mismatches: list[str] = []
+    for dotted, ledger_key in VERIFIED_GEOMETRY.items():
+        found = _dotted(config, dotted)
+        expected = record.get(ledger_key)
+        verdict["compared"][dotted] = {"run_dir": found, "ledger": expected}
+        if found is None or expected is None:
+            mismatches.append(f"{dotted}: missing on one side")
+            continue
+        try:
+            if abs(float(found) - float(expected)) > GEOMETRY_TOLERANCE_NM:
+                mismatches.append(
+                    f"{dotted}: run dir {float(found):g} nm vs ledger "
+                    f"{float(expected):g} nm"
+                )
+        except (TypeError, ValueError):
+            mismatches.append(f"{dotted}: non-numeric")
+    verdict["verified"] = not mismatches
+    verdict["reason"] = "; ".join(mismatches) if mismatches else "geometry matches ledger"
+    return verdict
+
+
+def required_file_report(run_dir: Path) -> list[dict[str, Any]]:
+    """Presence of every file a downstream check needs, present or not."""
+
+    rows = [
+        {
+            "relative_path": relative,
+            "blocks": blocks,
+            "present": (Path(run_dir) / relative).is_file(),
+            "expected": True,
+        }
+        for relative, blocks in REQUIRED_FILES.items()
+    ]
+    rows += [
+        {
+            "relative_path": relative,
+            "blocks": reason,
+            "present": (Path(run_dir) / relative).is_file(),
+            "expected": False,
+        }
+        for relative, reason in KNOWN_ABSENT_FILES.items()
+    ]
+    return rows
+
+
 def _matches(run_dir: Path, categories: Iterable[str]) -> dict[str, list[Path]]:
     found: dict[str, list[Path]] = {}
     for category in categories:
@@ -163,8 +324,13 @@ def build_bundle(
         "unavailable": [],
         "total_files": 0,
         "total_bytes": 0,
-        "source_modified": False,
+        # Measured below, not asserted. As a literal this field published what
+        # looked like evidence of read-only behaviour and proved nothing -- a
+        # test asserting it would have passed while the script scribbled over
+        # the campaign.
+        "source_modified": None,
     }
+    source_before = _source_fingerprint(runs_root)
     if not runs_root.is_dir():
         manifest["unavailable"].append(
             {
@@ -178,6 +344,7 @@ def build_bundle(
         )
         return manifest
 
+    records = ledger_records(state_dir)
     for trial in trials:
         run_dir = runs_root / trial
         if not run_dir.is_dir():
@@ -185,8 +352,33 @@ def build_bundle(
                 {"what": trial, "reason": f"no run directory at {run_dir}"}
             )
             continue
+        verification = verify_trial_source(run_dir, records.get(trial))
+        required = required_file_report(run_dir)
+        for item in required:
+            if item["present"] or not item.get("expected", True):
+                # A file Demo 13 never writes is not a missing result, and
+                # listing it as one reads as a solver failure.
+                continue
+            manifest["unavailable"].append(
+                {
+                    "what": f"{trial}/{item['relative_path']}",
+                    "reason": f"required for {item['blocks']}",
+                }
+            )
+        if not verification["verified"]:
+            manifest["unavailable"].append(
+                {
+                    "what": f"{trial} (source verification)",
+                    "reason": verification["reason"],
+                }
+            )
         found = _matches(run_dir, categories)
-        entry: dict[str, Any] = {"files": [], "empty_categories": []}
+        entry: dict[str, Any] = {
+            "files": [],
+            "empty_categories": [],
+            "source_verification": verification,
+            "required_files": required,
+        }
         for category, paths in found.items():
             if not paths:
                 entry["empty_categories"].append(category)
@@ -214,6 +406,8 @@ def build_bundle(
                 manifest["total_files"] += 1
                 manifest["total_bytes"] += size
         manifest["trials"][trial] = entry
+
+    manifest["source_modified"] = _source_fingerprint(runs_root) != source_before
 
     if manifest["total_bytes"] > MAX_REASONABLE_BYTES:
         manifest["size_warning"] = (
@@ -288,6 +482,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     print(f"categories : {', '.join(categories)}")
     print(f"{verb:11}: {manifest['total_files']} files, "
           f"{manifest['total_bytes'] / 1e6:.2f} MB")
+    for trial, entry in manifest["trials"].items():
+        verification = entry.get("source_verification") or {}
+        mark = "OK " if verification.get("verified") else "!! "
+        print(f"  {mark}{trial} source: {verification.get('reason', 'not checked')}")
     for item in manifest["unavailable"]:
         print(f"  UNAVAILABLE {item['what']}: {item['reason']}")
     if manifest.get("size_warning"):

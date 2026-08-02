@@ -224,7 +224,10 @@ def test_the_cli_dry_run_exits_zero(fake_experiment, tmp_path, capsys):
 def test_stage5_defaults_to_its_own_directory(cfg, tmp_path):
     target = demo13.stage5_state_dir(cfg, tmp_path)
     assert target.name != cfg["workflow"]["experiment_state_dir"]
-    assert target.name == "demo13_ax_experiment_v3_stage5"
+    # Renamed from `demo13_ax_experiment_v3_stage5`: a Stage 5 directory whose
+    # name is the campaign's plus a suffix invites exactly the confusion the
+    # isolation check exists to prevent, and sorts next to it in every listing.
+    assert target.name == "demo13_stage5_v3_validation"
 
 
 def test_stage5_pointed_at_the_experiment_is_rejected(cfg):

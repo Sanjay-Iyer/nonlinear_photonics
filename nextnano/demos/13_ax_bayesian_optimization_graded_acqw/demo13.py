@@ -68,6 +68,7 @@ import synthetic13  # noqa: E402
 import tables13  # noqa: E402
 import tracking13  # noqa: E402
 import anchor13  # noqa: E402
+import validation13  # noqa: E402
 
 
 def _load_demo(name: str, path: Path):
@@ -254,30 +255,39 @@ def stage5_state_dir(cfg: Mapping[str, Any], results_root: Path) -> Path:
     """Where Stage 5 writes. Never the optimization experiment.
 
     Defaults to ``<experiment>_stage5`` beside it, so the isolation holds even
-    when nothing is configured.
+    when nothing is configured.  The settings themselves come from
+    :mod:`validation13`, which is the one place Stage 5 numbers are defined.
     """
 
-    study = cfg.get("validation_study") or {}
     workflow = cfg.get("workflow") or {}
-    configured = study.get("output_state_dir")
+    # Same construction as `experiment_state_dir`, including the demo-id
+    # segment. Without it Stage 5 landed a level up, beside *other demos'*
+    # result folders, and the "is this the experiment directory?" comparison was
+    # between two differently-built paths -- so it could never be equal and the
+    # check passed vacuously.
+    root = Path(results_root) / str(cfg["demo_id"])
+    configured = validation13.settings(cfg).output_state_dir
     if configured:
-        return Path(results_root) / str(configured)
+        return root / str(configured)
     experiment = str(workflow.get("experiment_state_dir", "demo13_ax_experiment"))
-    return Path(results_root) / f"{experiment}_stage5"
+    return root / f"{experiment}_stage5"
 
 
 def _validate_stage5_isolation(cfg: Mapping[str, Any]) -> None:
     """Refuse a configuration that would let Stage 5 write into the campaign.
 
-    Stage 5 adds mesh, state-count, padding and perturbation cases around the
-    best designs.  Those are side calculations, not optimization trials, and the
-    optimization experiment holds the immutable record of a licensed campaign.
-    Sharing one directory means a Stage 5 bug can reach the ledger that proves
-    what was spent -- so the configuration is rejected rather than trusted.
+    Startup-time name check only: the results root is not known here.  The
+    load-bearing check is :func:`validation13.assert_isolated`, which runs on
+    the resolved destination path in :func:`run_validation_study` and catches
+    symlinks, aliases, containment and any directory holding a checkpoint or
+    ledger. This one exists so an obviously wrong YAML fails before anything
+    else happens.
     """
 
-    study = cfg.get("validation_study") or {}
-    configured = study.get("output_state_dir")
+    # Surfaces a malformed gate (wrong case count, reference mesh repeated,
+    # unnamed anchor) at startup rather than at the first paid solver call.
+    resolved = validation13.settings(cfg)
+    configured = resolved.output_state_dir
     if not configured:
         return
     experiment = str((cfg.get("workflow") or {}).get("experiment_state_dir", ""))
@@ -288,6 +298,15 @@ def _validate_stage5_isolation(cfg: Mapping[str, Any]) -> None:
             "robustness cases; the optimization experiment holds the immutable "
             "ledger of a licensed campaign. Point Stage 5 at its own directory, "
             f"for example {experiment}_stage5."
+        )
+    # Case-folded, matching `is_protected_experiment_dir`: on Windows a
+    # differently-cased name is the same directory.
+    if str(configured).strip().casefold() in {
+        name.casefold() for name in validation13.PROTECTED_EXPERIMENT_NAMES
+    }:
+        raise DemoError(
+            f"validation_study.output_state_dir={configured!r} names a protected "
+            "optimization experiment. Stage 5 must write to its own directory."
         )
 
 
@@ -2052,6 +2071,369 @@ def perturbation_fraction(
     return abs(float(delta)) / abs(nominal) if nominal else None
 
 
+def stage5_gate_plan(
+    cfg: Mapping[str, Any], records: Sequence[Mapping[str, Any]]
+) -> dict[str, Any]:
+    """What the two-case gate *would* run. Pure: no solver, no writes.
+
+    This is the function ``--check`` and the dry-run tests call, so what a
+    reviewer inspects before authorizing paid time is built by the same code
+    that will spend it.
+    """
+
+    resolved = validation13.settings(cfg)
+    gate = resolved.gate
+    design = validation13.gate_design_record(cfg, records)
+    cases = validation13.gate_cases(cfg, design)
+    return {
+        **gate.as_record(),
+        "design_candidate_id": str(design.get("candidate_id")),
+        "design_trial_index": design.get("trial_index"),
+        "design_parameters": {
+            key[len("parameter_"):]: value
+            for key, value in design.items()
+            if str(key).startswith("parameter_")
+        },
+        "reference_mesh_nm": gate.reference_mesh_nm,
+        "planned_cases": [
+            {
+                "case_id": case_id,
+                "check_kind": kind,
+                "active_region_grid_spacing_nm": float(
+                    config["numerical"]["active_region_grid_spacing_nm"]
+                ),
+                "resolved_wide_well_nm": float(config["scientific"]["thick_well_nm"]),
+                "resolved_narrow_well_nm": float(config["scientific"]["thin_well_nm"]),
+                "resolved_central_barrier_nm": float(
+                    config["scientific"]["tunnel_barrier_nm"]
+                ),
+                "grading_profile": str(config["grading"]["profile"]),
+                "grading_selected_thickness_nm": float(
+                    config["grading"]["selected_thickness_nm"]
+                ),
+            }
+            for case_id, kind, config in cases
+        ],
+        "planned_case_count": len(cases),
+        "solver_calls_planned": len(cases),
+    }
+
+
+def _gate_anchor_extracted_dir(
+    record: Mapping[str, Any],
+    cfg: Mapping[str, Any] | None = None,
+    results_root: Path | None = None,
+) -> Path | None:
+    """The historical anchor trial's extracted directory, read-only.
+
+    The gate anchors on a *completed licensed trial*, not on a freshly computed
+    reference: computing one would be a third paid case, and the gate is two by
+    definition. That directory lives inside the protected campaign and is only
+    ever opened for reading.
+
+    Resolved **relative to this machine first**. ``output_directory_path`` is an
+    absolute path recorded on whichever machine ran the campaign -- for v3 it is
+    a work-laptop path under ``C:\\Code\\optics\\...`` -- so following it alone
+    is a portability trap that fails on any other checkout.
+    """
+
+    candidate = str(record.get("candidate_id") or "")
+    if cfg is not None and results_root is not None and candidate:
+        local = (
+            experiment_state_dir(cfg, results_root) / "runs" / candidate / "extracted"
+        )
+        if local.is_dir():
+            return local
+    directory = record.get("output_directory_path")
+    if not directory:
+        return None
+    extracted = Path(str(directory)) / "extracted"
+    return extracted if extracted.is_dir() else None
+
+
+def run_stage5_gate(
+    context: sweeps.RunContext,
+    state_dir: Path,
+    records: Sequence[Mapping[str, Any]],
+) -> dict[str, Any]:
+    """The first paid Stage 5 action: exactly two new-mesh cases, anchored.
+
+    Passing means every gate case assigns to the anchor with acceptable
+    confidence and margin, keeps the anchor's state labels, and reproduces the
+    reference-mesh physics within the configured tolerances.  A gate that could
+    not be evaluated reports ``gate_passed: None`` and says why -- it never
+    reports a pass it did not establish.
+    """
+
+    cfg = context.cfg
+    plan = stage5_gate_plan(cfg, records)
+    design = validation13.gate_design_record(cfg, records)
+    resolved = validation13.settings(cfg)
+    spec = anchor13.resolve_anchor_spec(
+        {**cfg, "state_tracking": {
+            **(cfg.get("state_tracking") or {}),
+            "anchor_case": resolved.gate.anchor_case,
+        }}
+    )
+
+    gate_rows: list[dict[str, Any]] = []
+    for position, (case_id, kind, config) in enumerate(
+        validation13.gate_cases(cfg, design), start=1
+    ):
+        gate_rows.append(
+            _run_side_case(
+                context,
+                state_dir,
+                case_id,
+                config,
+                extra={
+                    # Distinct per case. Sharing the design's index collapsed both
+                    # cases into one entry of `assign_all_to_anchor`'s fingerprint
+                    # dict, so the order-independence guarantee did not hold and
+                    # `ambiguous_trials` could not say which mesh was ambiguous.
+                    "trial_index": -position,
+                    "design_trial_index": design.get("trial_index"),
+                    "check_kind": kind,
+                    "case_id": case_id,
+                    "gate_case": True,
+                    "anchor_case": spec.name,
+                    "reference_mesh_nm": resolved.gate.reference_mesh_nm,
+                    "active_region_grid_spacing_nm": float(
+                        config["numerical"]["active_region_grid_spacing_nm"]
+                    ),
+                    "historical_tracked_state_labels": design.get(
+                        "tracked_state_labels"
+                    ),
+                },
+            )
+        )
+
+    anchor_extracted = _gate_anchor_extracted_dir(
+        design, cfg, context.machine.results_root
+    )
+    anchor_tracking: dict[str, Any] = {}
+    unavailable: str | None = None
+    if anchor_extracted is None:
+        unavailable = (
+            "the anchor trial's extracted output is not present on this machine. "
+            "The gate assigns against the completed "
+            f"{design.get('candidate_id')} and does not recompute it, so its "
+            "solver output must exist at "
+            f"{experiment_state_dir(cfg, context.machine.results_root)}"
+            f"\\runs\\{design.get('candidate_id')}\\extracted. Run the gate on the "
+            "machine that executed the campaign."
+        )
+    elif not any(str(row.get("status")) == "completed" for row in gate_rows):
+        unavailable = "no gate case completed with solver output"
+    else:
+        anchor_states, bound = anchor13.load_anchor_states(
+            spec,
+            anchor_extracted,
+            plan["design_parameters"],
+            cfg,
+            observables=design,
+        )
+        cases: list[tracking13.TrialStates] = []
+        for row in gate_rows:
+            if str(row.get("status")) != "completed":
+                continue
+            states = tracking13.load_trial_states(
+                int(row.get("trial_index", -1)),
+                design13.canonicalize(_parameters_from_validation_row(row), cfg),
+                Path(str(row["output_directory_path"])) / "extracted",
+                observables=row,
+            )
+            if states is None:
+                # A completed case with no envelopes cannot be anchored. Dropping
+                # it silently turned a two-case gate into a one-case gate with no
+                # signal, so the whole gate is unavailable instead.
+                unavailable = (
+                    f"gate case {row.get('case_id')} completed but produced no "
+                    "envelopes, so it cannot be assigned against the anchor"
+                )
+                break
+            cases.append(states)
+        if unavailable is None:
+            anchor_tracking = anchor13.assign_all_to_anchor(
+                cases, anchor_states, cfg, spec=bound
+            )
+            _merge_anchor_results_into_rows(anchor_tracking, gate_rows, design)
+
+    comparison = _gate_comparison(design, gate_rows)
+    passed = _gate_verdict(
+        anchor_tracking, comparison, unavailable, cfg=cfg, expected_cases=len(gate_rows)
+    )
+    result = {
+        **plan,
+        "gate_rows": gate_rows,
+        "anchor_tracking": anchor_tracking,
+        "anchor_tracking_rows": anchor13.anchor_rows(anchor_tracking)
+        if anchor_tracking
+        else [],
+        "comparison": comparison,
+        "gate_passed": passed,
+        "gate_unavailable_reason": unavailable,
+        "solver_ran": bool(context.machine.run_solver),
+    }
+    write_json_atomically(state_dir / "stage5_gate_result.json", result)
+    write_json_atomically(state_dir / "stage5_schema.json", validation13.stage5_schema(cfg))
+    return result
+
+
+def _merge_anchor_results_into_rows(
+    anchor_tracking: Mapping[str, Any],
+    gate_rows: Sequence[dict[str, Any]],
+    design: Mapping[str, Any],
+) -> None:
+    """Write the anchored tracking results back onto each gate row.
+
+    ``_run_side_case`` builds its record with ``tracking=None``, so a gate row
+    left alone carries ``state_tracking_confidence: None`` and
+    ``tracked_state_labels: None``. Three of the eleven compared fields --
+    including the gate's headline question, "does the state assignment survive a
+    mesh change?" -- were therefore reported as ``0.99`` versus ``None`` while
+    the real answer sat unused in ``anchor_tracking``.
+
+    ``labels_match_historical`` is set here for the same reason
+    :func:`validation_anchor_tracking` sets it: nothing else does, and
+    :func:`_gate_verdict` checks it.
+    """
+
+    historical = design.get("tracked_state_labels")
+    by_index = {
+        int(record.get("trial_index", 0)): record
+        for record in anchor_tracking.get("records", ())
+    }
+    for row in gate_rows:
+        record = by_index.get(int(row.get("trial_index", 0)))
+        if record is None:
+            continue
+        record["historical_tracked_state_labels"] = historical
+        record["labels_match_historical"] = (
+            None if historical is None else historical == record.get("tracked_labels")
+        )
+        row["state_tracking_confidence"] = record.get("state_tracking_confidence")
+        row["state_tracking_margin"] = record.get("assignment_margin")
+        row["tracked_state_labels"] = record.get("tracked_labels")
+        row["state_tracking_ambiguous"] = bool(
+            record.get("ambiguous") or record.get("ambiguous_under_threshold")
+        )
+        row["state_tracking_method"] = record.get("method")
+        row["labels_match_historical"] = record.get("labels_match_historical")
+
+
+def _gate_comparison(
+    reference: Mapping[str, Any], gate_rows: Sequence[Mapping[str, Any]]
+) -> list[dict[str, Any]]:
+    """Reference-mesh value beside each new-mesh value, field by field."""
+
+    rows: list[dict[str, Any]] = []
+    for row in gate_rows:
+        for field_name in validation13.GATE_COMPARISON_FIELDS:
+            reference_value = reference.get(field_name)
+            gate_value = row.get(field_name)
+            numeric_reference = metrics13._finite(reference_value)
+            numeric_gate = metrics13._finite(gate_value)
+            relative = None
+            if (
+                numeric_reference is not None
+                and numeric_gate is not None
+                and numeric_reference != 0
+            ):
+                relative = abs(numeric_gate - numeric_reference) / abs(numeric_reference)
+            rows.append(
+                {
+                    "case_id": row.get("case_id"),
+                    "active_region_grid_spacing_nm": row.get(
+                        "active_region_grid_spacing_nm"
+                    ),
+                    "field": field_name,
+                    "reference_mesh_value": reference_value,
+                    "gate_mesh_value": gate_value,
+                    "relative_change": relative,
+                    "status": row.get("status"),
+                }
+            )
+    return rows
+
+
+def _gate_verdict(
+    anchor_tracking: Mapping[str, Any],
+    comparison: Sequence[Mapping[str, Any]],
+    unavailable: str | None,
+    *,
+    cfg: Mapping[str, Any] | None = None,
+    expected_cases: int | None = None,
+) -> bool | None:
+    """``True``/``False``/``None``. ``None`` means "not established", never "fine".
+
+    Tests all three things the gate claims: that every case anchored with
+    acceptable confidence and margin, that the anchor's state labels held, and
+    that the reference-mesh physics is reproduced within the configured
+    tolerances. The earlier version checked none of them -- it passed a 60 %
+    shift in chi(2), it passed a reordered label set because
+    ``labels_match_historical`` was never populated on this path, and it passed
+    a gate that had silently lost one of its two cases.
+    """
+
+    if unavailable:
+        return None
+    records = list(anchor_tracking.get("records", ())) if anchor_tracking else []
+    if not records:
+        return None
+    if expected_cases is not None and len(records) != int(expected_cases):
+        return None
+    if not comparison or not all(row.get("status") == "completed" for row in comparison):
+        return False
+
+    labels_held = all(
+        record.get("labels_match_historical") is True for record in records
+    )
+    unambiguous = not anchor_tracking.get("ambiguous_trials")
+
+    minimum_confidence, minimum_margin = _gate_acceptance_thresholds(cfg)
+    tracked_well = all(
+        record.get("state_tracking_confidence") is not None
+        and float(record["state_tracking_confidence"]) >= minimum_confidence
+        and record.get("assignment_margin") is not None
+        and float(record["assignment_margin"]) >= minimum_margin
+        for record in records
+    )
+
+    tolerances = validation13.gate_tolerances(cfg or {})
+    within_tolerance = True
+    for row in comparison:
+        tolerance = tolerances.get(str(row.get("field")))
+        if tolerance is None:
+            continue
+        change = row.get("relative_change")
+        if change is None or float(change) > float(tolerance):
+            within_tolerance = False
+            break
+
+    return bool(labels_held and unambiguous and tracked_well and within_tolerance)
+
+
+def _gate_acceptance_thresholds(cfg: Mapping[str, Any] | None) -> tuple[float, float]:
+    """The same confidence and margin bounds the campaign itself enforces."""
+
+    if not cfg:
+        return 0.80, 0.15
+    constraint = next(
+        (
+            spec
+            for spec in feasibility13.build_constraints(cfg)
+            if spec.metric == "state_tracking_confidence"
+        ),
+        None,
+    )
+    minimum_confidence = float(constraint.threshold) if constraint is not None else 0.80
+    minimum_margin = float(
+        (cfg.get("state_tracking") or {}).get("minimum_assignment_margin", 0.15)
+    )
+    return minimum_confidence, minimum_margin
+
+
 def run_validation_study(
     context: sweeps.RunContext, experiment: Experiment, records: Sequence[Mapping[str, Any]]
 ) -> dict[str, Any]:
@@ -2062,25 +2444,84 @@ def run_validation_study(
     """
 
     cfg = context.cfg
-    study = cfg.get("validation_study") or {}
-    if not bool(study.get("enabled", False)):
+    resolved_settings = validation13.settings(cfg)
+    if not resolved_settings.enabled:
         return {"enabled": False, "validation_rows": [], "robustness_rows": []}
-    top = tables13.top_ranked_valid_designs(
-        records, experiment.spec, limit=int(study.get("top_designs", 3))
-    )
     validation_rows: list[dict[str, Any]] = []
     robustness_rows: list[dict[str, Any]] = []
     # Stage 5 writes into its OWN directory, never inside the optimization
     # experiment. The experiment holds the immutable ledger of a licensed
     # campaign; validation cases are side calculations and must not be able to
-    # reach it, even through a bug.
+    # reach it, even through a bug. The resolved-path check catches symlinks,
+    # aliases, containment, and any directory holding a checkpoint or ledger.
     state_dir = stage5_state_dir(cfg, context.machine.results_root)
+    validation13.assert_isolated(
+        state_dir,
+        cfg,
+        context.machine.results_root,
+        experiment_dir=experiment.state_dir,
+    )
+    validation13.assert_resume_schema_matches(state_dir, cfg)
     if state_dir.resolve() == experiment.state_dir.resolve():
         raise DemoError(
             "Stage 5 resolved to the optimization experiment directory "
             f"({state_dir}). Set validation_study.output_state_dir to a separate "
             "directory."
         )
+
+    # The gate comes first and is the whole of the first paid Stage 5 action.
+    # The full campaign is roughly forty licensed cases; generating it before
+    # knowing whether two meshes even agree is the expensive mistake.
+    gate = resolved_settings.gate
+    if gate.enabled:
+        gate_result = run_stage5_gate(context, state_dir, records)
+        validation_rows.extend(gate_result["gate_rows"])
+        # STOP. The gate result must be reviewed by a human in a *later*
+        # invocation, never consumed by the process that produced it: otherwise
+        # a passing gate falls straight through into the ~60-case campaign in
+        # the same command, and the handoff's promise that this step "runs two
+        # licensed calculations and nothing else" is false.
+        write_json_atomically(
+            state_dir / "stage5_schema.json", validation13.stage5_schema(cfg)
+        )
+        return {
+            "enabled": True,
+            "gate": gate_result,
+            "validation_rows": validation_rows,
+            "robustness_rows": [],
+            "designs_checked": [],
+            "full_campaign_generated": False,
+            "full_campaign_blocked_reason": (
+                "the gate ran in this invocation; the full campaign requires a "
+                "separate, separately authorized run after the gate result has "
+                "been reviewed"
+            ),
+            "solver_ran": bool(context.machine.run_solver),
+            "anchor_tracking": gate_result.get("anchor_tracking", {}),
+            "anchor_tracking_rows": gate_result.get("anchor_tracking_rows", []),
+        }
+    gate_result = {"gate_enabled": False, "gate_rows": [], "gate_passed": None}
+    allowed, reason = validation13.full_campaign_allowed(cfg, state_dir)
+    if not allowed:
+        write_json_atomically(
+            state_dir / "stage5_schema.json", validation13.stage5_schema(cfg)
+        )
+        return {
+            "enabled": True,
+            "gate": gate_result,
+            "validation_rows": validation_rows,
+            "robustness_rows": [],
+            "designs_checked": [],
+            "full_campaign_generated": False,
+            "full_campaign_blocked_reason": reason,
+            "solver_ran": bool(context.machine.run_solver),
+            "anchor_tracking": gate_result.get("anchor_tracking", {}),
+            "anchor_tracking_rows": gate_result.get("anchor_tracking_rows", []),
+        }
+
+    top = tables13.top_ranked_valid_designs(
+        records, experiment.spec, limit=resolved_settings.top_designs
+    )
     anchor_spec = anchor13.resolve_anchor_spec(cfg)
     anchor_row: dict[str, Any] | None = None
     if anchor_spec.source == "reference_design":
@@ -3128,7 +3569,9 @@ def check(demo_dir: Path, machine_path: Path | None = None) -> int:
     machine = load_machine_config(machine_path)
     versions = axsearch13.check_ax_version(cfg)
     state_dir = experiment_state_dir(cfg, machine.results_root)
-    ledger = axsearch13.Ledger(state_dir) if state_dir.is_dir() else None
+    # read_only: `Ledger.__post_init__` creates `trials/` otherwise, so a
+    # command advertised as writing nothing would mutate a protected campaign.
+    ledger = axsearch13.Ledger(state_dir, read_only=True) if state_dir.is_dir() else None
     plan_record = (
         axsearch13.plan(cfg, ledger)
         if ledger is not None
@@ -3164,4 +3607,84 @@ def check(demo_dir: Path, machine_path: Path | None = None) -> int:
             + (f"[{row['lower']}, {row['upper']}]" if row["type"] == "range" else str(row["values"]))
         )
     print("\n".join(axsearch13.plan_report_lines(plan_record)))
+    return 0
+
+
+def stage5_check(demo_dir: Path, machine_path: Path | None = None) -> int:
+    """``--stage5-check``: print exactly what the paid gate would run, run nothing.
+
+    Everything a reviewer needs before authorizing licensed time, produced by
+    the same functions that will spend it: the destination and its isolation
+    verdict, the anchor, the two meshes, the resolved geometry of each case, and
+    whether the full campaign is still blocked.
+    """
+
+    from demo_workflow import load_demo_config, load_machine_config
+
+    cfg = load_demo_config(demo_dir)
+    validate_demo13_config(cfg)
+    machine = load_machine_config(machine_path)
+    resolved = validation13.settings(cfg)
+    state_dir = stage5_state_dir(cfg, machine.results_root)
+
+    print(f"Stage 5 destination : {state_dir}")
+    try:
+        validation13.assert_isolated(
+            state_dir,
+            cfg,
+            machine.results_root,
+            experiment_dir=experiment_state_dir(cfg, machine.results_root),
+        )
+        validation13.assert_resume_schema_matches(state_dir, cfg)
+        print("Isolation           : OK (not, inside, or containing any campaign)")
+    except validation13.Stage5Error as exc:
+        print(f"Isolation           : REFUSED - {exc}")
+        return 2
+
+    experiment = experiment_state_dir(cfg, machine.results_root)
+    # read_only: see `check()`. This command prints "Nothing was written".
+    ledger = (
+        axsearch13.Ledger(experiment, read_only=True) if experiment.is_dir() else None
+    )
+    records = ledger.records() if ledger is not None else []
+    if not records:
+        print(f"Gate                : cannot plan - no ledger at {experiment}")
+        return 2
+    try:
+        plan = stage5_gate_plan(cfg, records)
+    except validation13.Stage5Error as exc:
+        print(f"Gate                : REFUSED - {exc}")
+        return 2
+
+    print(f"Gate design/anchor  : {plan['design_candidate_id']} / {plan['gate_anchor_case']}")
+    print(f"Reference mesh      : {plan['gate_reference_mesh_nm']:g} nm (already computed, not re-run)")
+    print(f"Paid solver calls   : {plan['solver_calls_planned']}")
+    for case in plan["planned_cases"]:
+        print(
+            f"  {case['case_id']:<24} mesh {case['active_region_grid_spacing_nm']:g} nm  "
+            f"wide {case['resolved_wide_well_nm']:.6f} nm  "
+            f"narrow {case['resolved_narrow_well_nm']:.6f} nm  "
+            f"barrier {case['resolved_central_barrier_nm']:g} nm  "
+            f"{case['grading_profile']} {case['grading_selected_thickness_nm']:g} nm"
+        )
+    anchor_record = validation13.gate_design_record(cfg, records)
+    anchor_extracted = _gate_anchor_extracted_dir(
+        anchor_record, cfg, machine.results_root
+    )
+    print(
+        f"Anchor output       : "
+        + (
+            str(anchor_extracted)
+            if anchor_extracted
+            else (
+                "MISSING at "
+                f"{experiment / 'runs' / str(anchor_record.get('candidate_id'))/ 'extracted'}"
+                " - the gate anchors on the completed trial and does not recompute "
+                "it; run on the machine that executed the campaign"
+            )
+        )
+    )
+    allowed, reason = validation13.full_campaign_allowed(cfg, state_dir)
+    print(f"Full campaign       : {'ALLOWED' if allowed else 'BLOCKED'} - {reason}")
+    print("Nothing was written and no solver was called.")
     return 0

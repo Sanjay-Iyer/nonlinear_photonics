@@ -2019,7 +2019,10 @@ def test_validation_and_robustness_cases_are_planned_from_the_yaml(cfg):
         for _case_id, kind, config in checks
         if kind == "mesh_convergence"
     }
-    assert meshes == {0.05, 0.10}
+    # The campaign's own 0.05 nm mesh is no longer re-run: it is already
+    # computed, and licensed time is spent only on meshes that are new. These
+    # are the same two the Stage 5 gate establishes first.
+    assert meshes == {0.025, 0.10}
     perturbations = demo13.robustness_cases(cfg, design)
     assert {parameter for _case, parameter, _delta, _config in perturbations} == {
         "narrow_well_nm", "wide_well_nm", "central_barrier_nm",

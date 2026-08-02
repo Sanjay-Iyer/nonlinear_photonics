@@ -116,16 +116,26 @@ This is read-only with respect to the experiment. It copies generated inputs, lo
 
 ---
 
-## Stage 5 — PREPARED, NOT AUTHORIZED
+## Stage 5 — GATE PREPARED, CAMPAIGN NOT AUTHORIZED
 
-> **SPENDS SOLVER TIME — approximately 43 licensed runs, including the fixed anchor. Do not run without explicit authorization.**
+Stage 5 now runs in two steps, and only the first is prepared.
 
-Stage 5 is fully specified in `V3_STAGE5_EXECUTION_PLAN.md`. Before it may run:
+**Step one: the mesh gate.** Exactly **2 licensed runs** — `t0021` recomputed at 0.025 nm and 0.1 nm, each assigned against `t0021` itself. The campaign's own 0.05 nm mesh is **not** re-run: it is already computed, and the gate spends licensed time only on meshes that are new.
+
+**Step two: the full campaign** — roughly 69 licensed runs. It is **not generated** until `stage5_gate_result.json` records `gate_passed: true`; `validation13.full_campaign_allowed` refuses otherwise.
+
+Before the gate may run:
 
 1. this reanalysis must pass with all four hashes unchanged;
 2. the working tree must be clean;
-3. `validation_study.output_state_dir` must point somewhere **other than** `demo13_ax_experiment_v3` — the configuration is rejected otherwise;
-4. the mesh gate (2 runs on t0021) must pass before the remaining cases.
+3. `validation_study.output_state_dir` must be `demo13_stage5_v3_validation` — any directory that is, contains, or lies inside a campaign directory (or holds a checkpoint or ledger) is rejected on the resolved path, so a symlink or `..` alias cannot get around it;
+4. the anchor trial's `extracted/` output must be present — the gate assigns against the **completed** `t0021` and does not recompute it. Collect it with `bundle_raw_trials.py` (step 14) first.
+
+Inspect the gate before authorizing it — this writes nothing and calls no solver:
+
+```powershell
+python .\nextnano\demos\13_ax_bayesian_optimization_graded_acqw\run_demo13.py --stage5-check
+```
 
 ## Historical corrections and state identity
 
@@ -146,7 +156,7 @@ therefore follow overlap (with real energy continuity only as a secondary cost),
 and a small assignment margin is reported as ambiguous rather than smoothed
 away.
 
-The launch command is deliberately **not** written out here. Read the execution plan, confirm the gates, and set `workflow.mode` yourself.
+The launch command is deliberately **not** written out here. Read `guides/WORK_LAPTOP_FINAL_HANDOFF.md`, confirm the gates, and set `workflow.mode` yourself.
 
 ## Commands that spend solver time — recognise these
 

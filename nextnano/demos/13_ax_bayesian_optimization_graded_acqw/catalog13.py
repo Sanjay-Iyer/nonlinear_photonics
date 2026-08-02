@@ -574,11 +574,57 @@ PARAMETER_NOTES: tuple[Mapping[str, Any], ...] = (
      "increase": "n/a", "decrease": "n/a",
      "interacts": "Stage 5 must write to its own directory, never the protected "
                   "v3 experiment"},
-    {"path": "validation_study.mesh_convergence_nm", "kind": "Stage 5 setting",
-     "plain": "Which mesh spacings to re-run a top design at.",
+    {"path": "validation_study.output_state_dir", "kind": "Stage 5 setting",
+     "plain": "Where Stage 5 writes. Never a campaign directory.",
+     "units": "directory name", "invalidates_checkpoint": False,
+     "increase": "n/a", "decrease": "n/a",
+     "interacts": "resolved under the demo results folder beside the campaign; "
+                  "refused if it is, contains, or lies inside any directory "
+                  "holding a BO checkpoint or ledger"},
+    {"path": "validation_study.gate.enabled", "kind": "Stage 5 gate",
+     "plain": "Whether the two-case mesh gate runs before the full campaign.",
+     "units": "boolean", "invalidates_checkpoint": False,
+     "increase": "n/a", "decrease": "n/a",
+     "interacts": "when true the full campaign is not generated until "
+                  "stage5_gate_result.json records gate_passed: true"},
+    {"path": "validation_study.gate.design", "kind": "Stage 5 gate",
+     "plain": "The completed trial the gate recomputes at new meshes.",
+     "units": "candidate id", "invalidates_checkpoint": False,
+     "increase": "n/a", "decrease": "n/a",
+     "interacts": "must name a completed trial in the ledger; looked up by id, "
+                  "not by rank, so the gate stays reproducible when ranking moves"},
+    {"path": "validation_study.gate.anchor_case", "kind": "Stage 5 gate",
+     "plain": "The fixed design every gate case is assigned against.",
+     "units": "candidate id", "invalidates_checkpoint": False,
+     "increase": "n/a", "decrease": "n/a",
+     "interacts": "distinct from state_tracking.anchor_case, which is the "
+                  "campaign-level abrupt reference; the gate asks whether the "
+                  "design's own identities survive a mesh change"},
+    {"path": "validation_study.gate.reference_mesh_nm", "kind": "Stage 5 gate",
+     "plain": "The mesh the campaign already ran, used only for comparison.",
+     "units": "nm", "invalidates_checkpoint": False,
+     "increase": "n/a", "decrease": "n/a",
+     "interacts": "never re-run; a gate that repeats it is rejected, because the "
+                  "gate spends licensed time only on meshes that are new"},
+    {"path": "validation_study.gate.mesh_convergence_nm", "kind": "Stage 5 gate",
+     "plain": "The two new meshes the first paid Stage 5 action computes.",
      "units": "nm", "invalidates_checkpoint": False,
      "increase": "coarser check", "decrease": "finer, slower",
-     "interacts": "this is the Stage 5 gate: everything else is conditional on it"},
+     "interacts": "must be exactly two values and must exclude the reference "
+                  "mesh; this is the entire first paid action"},
+    {"path": "validation_study.gate.require_gate_before_full_campaign",
+     "kind": "Stage 5 gate",
+     "plain": "Whether the ~69-case campaign waits for the gate to pass.",
+     "units": "boolean", "invalidates_checkpoint": False,
+     "increase": "n/a", "decrease": "n/a",
+     "interacts": "setting this false allows the full campaign without a passing "
+                  "gate and is not the shipped configuration"},
+    {"path": "validation_study.mesh_convergence_nm", "kind": "Stage 5 setting",
+     "plain": "Which mesh spacings the FULL campaign re-runs a top design at.",
+     "units": "nm", "invalidates_checkpoint": False,
+     "increase": "coarser check", "decrease": "finer, slower",
+     "interacts": "part of the full campaign, which is blocked until the gate "
+                  "under validation_study.gate passes; not itself the gate"},
     {"path": "validation_study.state_count_convergence", "kind": "Stage 5 setting",
      "plain": "Electron and hole state counts used for convergence checks.",
      "units": "count", "invalidates_checkpoint": False,

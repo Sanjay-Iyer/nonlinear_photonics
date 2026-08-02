@@ -39,6 +39,25 @@ UNITS_WARNING = (
     "comparable between designs computed with the same mesh and settings."
 )
 
+def _stage5_settings():
+    """Stage 5 numbers for the guides, from the one place they are defined.
+
+    Read at import so every guide quotes the live configuration rather than a
+    sentence someone remembered to update. ``validation13`` owns these values;
+    a guide that disagreed with a run was the failure this closes.
+    """
+
+    import demo_workflow
+    import validation13
+
+    return validation13.settings(demo_workflow.load_demo_config(DEMO_DIR)), validation13
+
+
+_STAGE5, _validation13 = _stage5_settings()
+_gate = _STAGE5.gate
+_stage5_dir = _STAGE5.output_state_dir
+_full_campaign_cases = _validation13._full_campaign_case_estimate(_STAGE5)
+
 #: The v3 headline, stated once and reused, so the guides cannot disagree.
 V3_STATUS = (
     "**Current result (experiment v3).** 23 proposals, 7 refused before the "
@@ -300,6 +319,37 @@ def output_results_guide() -> str:
         ]
     lines += [
         "---", "",
+        "## Stage 5 gate output — `stage5_gate_result.json`", "",
+        "Written by the two-case mesh gate, the first (and so far only "
+        f"authorized) paid Stage 5 action: `{_gate.design}` recomputed at "
+        + " nm and ".join(f"{value:g}" for value in _gate.mesh_convergence_nm)
+        + f" nm, each assigned against `{_gate.anchor_case}`. The campaign's own "
+        f"{_gate.reference_mesh_nm:g} nm mesh is the comparison baseline and is "
+        "never re-run.",
+        "",
+        "| Field | Meaning |",
+        "|---|---|",
+        "| `gate_passed` | `true` only when every gate case assigns to the anchor "
+        "without ambiguity and keeps the anchor's state labels. **`null` means the "
+        "gate could not be evaluated — never read it as a pass.** |",
+        "| `gate_unavailable_reason` | Why `gate_passed` is `null`, when it is. |",
+        "| `planned_case_count` / `solver_calls_planned` | Both must be 2. |",
+        "| `comparison` | One row per (case, field): the reference-mesh value, the "
+        "new-mesh value and the relative change. |",
+        "| `anchor_tracking` | Fixed-anchor assignment: overlap matrices, "
+        "assignments, confidence, margins, ambiguity, `labels_match_historical`. |",
+        "| `gate_rows` | The full per-case trial records, same shape as a trial. |",
+        "",
+        "Fields compared across the mesh change: "
+        + ", ".join(f"`{name}`" for name in _validation13.GATE_COMPARISON_FIELDS)
+        + ".",
+        "",
+        "**A passing gate does not validate the design.** It establishes that the "
+        "mesh does not change the answer. Everything else Stage 5 checks — local "
+        "sensitivity, state-count and padding convergence, fabrication robustness "
+        "— has not run, and the full campaign stays blocked until the gate result "
+        "is reviewed.",
+        "", "---", "",
         "## Statements this data supports, and statements it does not", "",
         "| Statement | Supported? |",
         "|---|---|",
@@ -401,22 +451,44 @@ def work_laptop_guide() -> str:
         "Until these files are transferred, every statement about the shape of a "
         "graded interface rests on arithmetic, not on solver output.",
         "", "---", "",
-        "## Stage 5 — PREPARED, NOT AUTHORIZED", "",
-        "> **SPENDS SOLVER TIME — approximately 43 licensed runs, including the fixed anchor. Do not run "
-        "without explicit authorization.**",
+        "## Stage 5 — GATE PREPARED, CAMPAIGN NOT AUTHORIZED", "",
+        f"Stage 5 now runs in two steps, and only the first is prepared.",
         "",
-        "Stage 5 is fully specified in `V3_STAGE5_EXECUTION_PLAN.md`. Before it "
-        "may run:",
+        f"**Step one: the mesh gate.** Exactly **{_gate.case_count} licensed runs** — "
+        f"`{_gate.design}` recomputed at "
+        + " nm and ".join(f"{value:g}" for value in _gate.mesh_convergence_nm)
+        + f" nm, each assigned against `{_gate.anchor_case}` itself. The campaign's "
+        f"own {_gate.reference_mesh_nm:g} nm mesh is **not** re-run: it is already "
+        "computed, and the gate spends licensed time only on meshes that are new.",
+        "",
+        f"**Step two: the full campaign** — roughly {_full_campaign_cases} licensed "
+        "runs. It is **not generated** until "
+        "`stage5_gate_result.json` records `gate_passed: true`; "
+        "`validation13.full_campaign_allowed` refuses otherwise.",
+        "",
+        "Before the gate may run:",
         "",
         "1. this reanalysis must pass with all four hashes unchanged;",
         "2. the working tree must be clean;",
-        "3. `validation_study.output_state_dir` must point somewhere **other than** "
-        "`demo13_ax_experiment_v3` — the configuration is rejected otherwise;",
-        "4. the mesh gate (2 runs on t0021) must pass before the remaining cases.",
+        f"3. `validation_study.output_state_dir` must be `{_stage5_dir}` — any "
+        "directory that is, contains, or lies inside a campaign directory (or "
+        "holds a checkpoint or ledger) is rejected on the resolved path, so a "
+        "symlink or `..` alias cannot get around it;",
+        f"4. the anchor trial's `extracted/` output must be present — the gate "
+        f"assigns against the **completed** `{_gate.anchor_case}` and does not "
+        "recompute it. Collect it with `bundle_raw_trials.py` (step 14) first.",
+        "",
+        "Inspect the gate before authorizing it — this writes nothing and calls "
+        "no solver:",
+        "",
+        "```powershell",
+        "python .\\nextnano\\demos\\13_ax_bayesian_optimization_graded_acqw\\run_demo13.py --stage5-check",
+        "```",
         "", DERIVED_AND_TRACKING_NOTE,
         "",
-        "The launch command is deliberately **not** written out here. Read the "
-        "execution plan, confirm the gates, and set `workflow.mode` yourself.",
+        "The launch command is deliberately **not** written out here. Read "
+        "`guides/WORK_LAPTOP_FINAL_HANDOFF.md`, confirm the gates, and set "
+        "`workflow.mode` yourself.",
         "",
         "## Commands that spend solver time — recognise these", "",
         "| Setting | Effect |",

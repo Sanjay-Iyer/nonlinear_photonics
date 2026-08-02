@@ -220,6 +220,25 @@ away.
 
 ---
 
+## Stage 5 gate output — `stage5_gate_result.json`
+
+Written by the two-case mesh gate, the first (and so far only authorized) paid Stage 5 action: `t0021` recomputed at 0.025 nm and 0.1 nm, each assigned against `t0021`. The campaign's own 0.05 nm mesh is the comparison baseline and is never re-run.
+
+| Field | Meaning |
+|---|---|
+| `gate_passed` | `true` only when every gate case assigns to the anchor without ambiguity and keeps the anchor's state labels. **`null` means the gate could not be evaluated — never read it as a pass.** |
+| `gate_unavailable_reason` | Why `gate_passed` is `null`, when it is. |
+| `planned_case_count` / `solver_calls_planned` | Both must be 2. |
+| `comparison` | One row per (case, field): the reference-mesh value, the new-mesh value and the relative change. |
+| `anchor_tracking` | Fixed-anchor assignment: overlap matrices, assignments, confidence, margins, ambiguity, `labels_match_historical`. |
+| `gate_rows` | The full per-case trial records, same shape as a trial. |
+
+Fields compared across the mesh change: `tracked_state_labels`, `state_tracking_confidence`, `state_tracking_ambiguous`, `heavy_hole_anticrossing_gap_meV`, `relative_chi2_at_target_wavelength_abs`, `peak_wavelength_nm`, `signed_detuning_nm`, `absolute_detuning_nm`, `maximum_boundary_probability`, `physical_qc_valid`, `feasible_under_ax_constraints`.
+
+**A passing gate does not validate the design.** It establishes that the mesh does not change the answer. Everything else Stage 5 checks — local sensitivity, state-count and padding convergence, fabrication robustness — has not run, and the full campaign stays blocked until the gate result is reviewed.
+
+---
+
 ## Statements this data supports, and statements it does not
 
 | Statement | Supported? |

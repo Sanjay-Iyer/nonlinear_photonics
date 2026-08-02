@@ -403,15 +403,92 @@ away.
 - **Interacts with:** Stage 5 must write to its own directory, never the protected v3 experiment
 - **Invalidates an existing checkpoint:** no
 
+## `validation_study.output_state_dir`
+
+**Where Stage 5 writes. Never a campaign directory.**
+
+- **Type:** Stage 5 setting
+- **Units:** directory name
+- **Raising it:** n/a
+- **Lowering it:** n/a
+- **Interacts with:** resolved under the demo results folder beside the campaign; refused if it is, contains, or lies inside any directory holding a BO checkpoint or ledger
+- **Invalidates an existing checkpoint:** no
+
+## `validation_study.gate.enabled`
+
+**Whether the two-case mesh gate runs before the full campaign.**
+
+- **Type:** Stage 5 gate
+- **Units:** boolean
+- **Raising it:** n/a
+- **Lowering it:** n/a
+- **Interacts with:** when true the full campaign is not generated until stage5_gate_result.json records gate_passed: true
+- **Invalidates an existing checkpoint:** no
+
+## `validation_study.gate.design`
+
+**The completed trial the gate recomputes at new meshes.**
+
+- **Type:** Stage 5 gate
+- **Units:** candidate id
+- **Raising it:** n/a
+- **Lowering it:** n/a
+- **Interacts with:** must name a completed trial in the ledger; looked up by id, not by rank, so the gate stays reproducible when ranking moves
+- **Invalidates an existing checkpoint:** no
+
+## `validation_study.gate.anchor_case`
+
+**The fixed design every gate case is assigned against.**
+
+- **Type:** Stage 5 gate
+- **Units:** candidate id
+- **Raising it:** n/a
+- **Lowering it:** n/a
+- **Interacts with:** distinct from state_tracking.anchor_case, which is the campaign-level abrupt reference; the gate asks whether the design's own identities survive a mesh change
+- **Invalidates an existing checkpoint:** no
+
+## `validation_study.gate.reference_mesh_nm`
+
+**The mesh the campaign already ran, used only for comparison.**
+
+- **Type:** Stage 5 gate
+- **Units:** nm
+- **Raising it:** n/a
+- **Lowering it:** n/a
+- **Interacts with:** never re-run; a gate that repeats it is rejected, because the gate spends licensed time only on meshes that are new
+- **Invalidates an existing checkpoint:** no
+
+## `validation_study.gate.mesh_convergence_nm`
+
+**The two new meshes the first paid Stage 5 action computes.**
+
+- **Type:** Stage 5 gate
+- **Units:** nm
+- **Raising it:** coarser check
+- **Lowering it:** finer, slower
+- **Interacts with:** must be exactly two values and must exclude the reference mesh; this is the entire first paid action
+- **Invalidates an existing checkpoint:** no
+
+## `validation_study.gate.require_gate_before_full_campaign`
+
+**Whether the ~69-case campaign waits for the gate to pass.**
+
+- **Type:** Stage 5 gate
+- **Units:** boolean
+- **Raising it:** n/a
+- **Lowering it:** n/a
+- **Interacts with:** setting this false allows the full campaign without a passing gate and is not the shipped configuration
+- **Invalidates an existing checkpoint:** no
+
 ## `validation_study.mesh_convergence_nm`
 
-**Which mesh spacings to re-run a top design at.**
+**Which mesh spacings the FULL campaign re-runs a top design at.**
 
 - **Type:** Stage 5 setting
 - **Units:** nm
 - **Raising it:** coarser check
 - **Lowering it:** finer, slower
-- **Interacts with:** this is the Stage 5 gate: everything else is conditional on it
+- **Interacts with:** part of the full campaign, which is blocked until the gate under validation_study.gate passes; not itself the gate
 - **Invalidates an existing checkpoint:** no
 
 ## `validation_study.state_count_convergence`

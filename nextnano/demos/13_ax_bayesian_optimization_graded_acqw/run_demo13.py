@@ -1,7 +1,8 @@
 """Run Demo 13 from demo.yaml; ordinary scientific settings need no CLI flags.
 
-    python run_demo13.py            # run the mode configured in demo.yaml
-    python run_demo13.py --check    # report environment and budget, run nothing
+    python run_demo13.py                 # run the mode configured in demo.yaml
+    python run_demo13.py --check         # report environment and budget, run nothing
+    python run_demo13.py --stage5-check  # report the paid Stage 5 gate, run nothing
 """
 
 from pathlib import Path
@@ -18,6 +19,9 @@ from sweeps import demo_cli  # noqa: E402
 
 
 if __name__ == "__main__":
+    # Checked before --check so the more specific flag wins; both are read-only.
+    if "--stage5-check" in sys.argv[1:]:
+        raise SystemExit(demo_cli(DEMO_DIR, demo13.stage5_check))
     if "--check" in sys.argv[1:]:
         raise SystemExit(demo_cli(DEMO_DIR, demo13.check))
     raise SystemExit(demo_cli(DEMO_DIR, demo13.main))
