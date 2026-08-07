@@ -262,6 +262,54 @@ def run_preflight(
         }
         return f"{len(solver14.MOCK_BEHAVIOURS)} behaviours available"
 
+    def analysis_config_is_compatible() -> str:
+        """The check that would have caught the first licensed gate failure.
+
+        That run spent a real solver call and then died in
+        ``demo11.build_stack`` on ``cfg["scientific"]``. Building the adapter
+        output for a representative trial and validating every field Demo 11
+        reads costs nothing and moves that failure to before the solve.
+        """
+
+        import adapter14
+
+        params = {
+            "asymmetry_s": 0.42, "nominal_central_barrier_thickness_nm": 1.8,
+            "gaas_to_algaas_grading_width_10_90_nm": 1.0,
+            "algaas_to_gaas_grading_width_10_90_nm": 1.0,
+            "grading_profile": "erf",
+        }
+        geometry = demo14.geometry_for(cfg, params)
+        profile = demo14.build_grading(cfg, params, geometry)
+        derived = adapter14.build_demo11_analysis_config_from_demo14(
+            cfg, geometry, profile
+        )
+        # build_stack is the exact function that raised. Calling it proves the
+        # structure section is not merely present but usable.
+        import demo11
+
+        stack = demo11.build_stack(derived)
+        intervals = stack.intervals()
+        for region in ("left_well", "centre_barrier", "right_well"):
+            assert region in intervals, f"layer stack has no {region}"
+        window = stack.quantum_region_nm(
+            float(derived["numerical"]["quantum_region_padding_nm"])
+        )
+        assert window[1] > window[0], f"degenerate quantum window {window}"
+        # And the stack must describe the structure Demo 14 actually renders.
+        total = float(stack.total_thickness_nm)  # a property, not a method
+        rendered = geometry.domain_nm[1] - geometry.domain_nm[0]
+        assert abs(total - rendered) < 1e-6, (
+            f"Demo 11 stack is {total} nm but Demo 14 renders {rendered} nm; "
+            "region probabilities and the state-selection window would describe "
+            "a structure that was never solved"
+        )
+        return (
+            f"{len(adapter14.REQUIRED_DEMO11_SECTIONS)} sections, build_stack OK, "
+            f"stack {total:.2f} nm == deck {rendered:.2f} nm, "
+            f"window {window[0]:.2f}-{window[1]:.2f} nm"
+        )
+
     def solver_timeout_is_finite() -> str:
         timeout = float(cfg["nextnano"]["solver_timeout_seconds"])
         assert 0 < timeout < 86400, timeout
@@ -283,6 +331,8 @@ def run_preflight(
         ("JSON serialization is strict", json_serialization_is_strict),
         ("mock solver covers every failure mode", mock_solver_covers_every_behaviour),
         ("solver timeout is finite", solver_timeout_is_finite),
+        ("Demo 14 -> absolute-chi2 analysis config compatible",
+         analysis_config_is_compatible),
     ]
     for name, fn in checks:
         results.append(_check(name, fn))

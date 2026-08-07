@@ -840,7 +840,11 @@ def analyse_real_trial(
 
     import demo11  # noqa: PLC0415 - imported lazily; Demo 11 pulls in a lot
 
-    demo11_cfg = _demo11_config(cfg, geometry)
+    import adapter14
+
+    demo11_cfg = adapter14.build_demo11_analysis_config_from_demo14(
+        cfg, geometry, profile
+    )
     observables, validation = demo11.analyse_case(
         demo11_cfg, layout["nextnano_output"], layout["parsed"], layout["plots"]
     )
@@ -864,40 +868,3 @@ def analyse_real_trial(
         if source in metrics and "chi2_xzx_abs_at_1550_pm_per_V" not in metrics:
             metrics["chi2_xzx_abs_at_1550_pm_per_V"] = metrics[source]
     return metrics
-
-
-def _demo11_config(cfg: Mapping[str, Any], geometry: Geometry) -> dict[str, Any]:
-    """Project the Demo 14 config into the shape Demo 11's analyser expects."""
-
-    settings = physics14.settings_from_config(cfg)
-    return {
-        "structure": {
-            "thick_well_nm": geometry.thick_well_nm,
-            "thin_well_nm": geometry.thin_well_nm,
-            "central_barrier_thickness_nm": geometry.barrier_nm,
-            "aluminium_fraction": float(cfg["materials"]["barrier_al_fraction"]),
-            "period_barrier_nm": float(cfg["geometry"]["period_barrier_nm"]),
-        },
-        "numerical": {
-            "quantum_region_padding_nm": float(cfg["geometry"]["quantum_region_padding_nm"]),
-            "number_of_electron_states": int(cfg["states"]["number_of_electron_states"]),
-            "number_of_hole_states": int(cfg["states"]["number_of_hole_states"]),
-            "active_region_grid_spacing_nm": float(
-                cfg["mesh"]["active_region_grid_spacing_nm"]
-            ),
-        },
-        "outputs": {
-            "parser_profile": str(cfg["nextnano"]["parser_profile"]),
-            "bandedge_columns": dict(cfg["nextnano"]["bandedge_columns"]),
-        },
-        "metric": {
-            **settings.as_record(),
-            "broad_wavelength_nm": list(cfg["chi2"]["broad_wavelength_nm"]),
-            "broad_wavelength_points": int(cfg["chi2"]["broad_wavelength_points"]),
-            "focused_wavelength_nm": list(cfg["chi2"]["focused_wavelength_nm"]),
-            "focused_wavelength_points": int(cfg["chi2"]["focused_wavelength_points"]),
-            "reference_wavelength_nm": float(cfg["chi2"]["target_wavelength_nm"]),
-        },
-        "validation": dict(cfg["constraints"]),
-        "analysis": {},
-    }

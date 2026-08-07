@@ -1,0 +1,19 @@
+﻿Folder PATH listing for volume Windows
+Volume serial number is 3437-CED4
+C:\CODE\OPTICS\NEXTNANO\NONLINEAR_PHOTONICS\NEXTNANO\DEMOS\11_PAPER_VALIDATION_INTERBAND_CHI2_ACQW
+|   acqw_paper.in.j2
+|   demo.yaml
+|   demo11.py
+|   paper_targets.yaml
+|   README.md
+|   report11.py
+|   run.py
+|   tracking11.py
+|   __main__.py
+|   
+\---__pycache__
+        demo11.cpython-312.pyc
+        report11.cpython-312.pyc
+        tracking11.cpython-312.pyc
+        __main__.cpython-312.pyc
+        

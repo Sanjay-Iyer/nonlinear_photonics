@@ -1,0 +1,958 @@
+﻿Folder PATH listing for volume Windows
+Volume serial number is 3437-CED4
+C:\CODE\OPTICS\NEXTNANO\2026_07_03
+|   Open nextnanomat.bat
+|   
++---documentation
+|   |   documentation_nextnano++_3.0.0.pdf
+|   |   documentation_nextnano.MSB_1.0.0.pdf
+|   |   documentation_nextnano.NEGF_2025-12-20.pdf
+|   |   documentation_nextnano3_2.7.2.pdf
+|   |   documentation_nextnanomat_5.6.4.6.pdf
+|   |   documentation_nextnano_software_2026-01.pdf
+|   |   EULA.pdf
+|   |   EULA.rtf
+|   |   README_Windows.txt
+|   |   SLA.pdf
+|   |   
+|   +---copyright
+|   |       copyright_notice_nextnano++.pdf
+|   |       copyright_notice_nextnano3.pdf
+|   |       copyright_notice_nextnanomat.pdf
+|   |       
+|   \---Digital-Accessibility
+|           Digital Accessibility Statement - Evaluation Report.pdf
+|           Digital Accessibility Statement.pdf
+|           
++---License
+|       Iyer_fingerprint.txt
+|       License_nnp.lic
+|       
++---license_activator
+|       nextnanoLicenseActivator.exe
+|       
++---My input files
++---nextnano++
+|   +---bin
+|   |   |   libiomp5md.dll
+|   |   |   nextnano++_Intel_64bit.exe
+|   |   |   nextnano++_Intel_64bit_i8.exe
+|   |   |   
+|   |   \---pn_junction_GaAs_1D_demo
+|   |       |   bias_points.log
+|   |       |   grid_x.dat
+|   |       |   job_done.txt
+|   |       |   pn_junction_GaAs_1D_demo.nnp
+|   |       |   simulation_database.txt
+|   |       |   simulation_info.txt
+|   |       |   simulation_input.txt
+|   |       |   summary.log
+|   |       |   variables_database.txt
+|   |       |   variables_input.txt
+|   |       |   
+|   |       +---bias_00000
+|   |       |       bandedges.dat
+|   |       |       bias_points.log
+|   |       |       density_acceptor_ionized.dat
+|   |       |       density_donor_ionized.dat
+|   |       |       density_electron.dat
+|   |       |       density_hole.dat
+|   |       |       electric_field.dat
+|   |       |       potential.dat
+|   |       |       total_charges.txt
+|   |       |       
+|   |       \---Structure
+|   |               alloy_composition.dat
+|   |               density_acceptor.dat
+|   |               density_donor.dat
+|   |               density_fixed_charge.dat
+|   |               density_intrinsic.dat
+|   |               materials.dat
+|   |               material_indices.txt
+|   |               regions_all.dat
+|   |               regions_material.dat
+|   |               
+|   +---bin 32bit
+|   |       libiomp5md.dll
+|   |       nextnano++_Microsoft_32bit_serial.exe
+|   |       
+|   +---database
+|   |       database.nnp
+|   |       database_optional.nnp
+|   |       
+|   +---examples
+|   |   |   1DAlGaAs_GaAs.nnp
+|   |   |   1Ddeformation_potentials_no_strain.nnp
+|   |   |   1Ddeformation_potentials_strain.nnp
+|   |   |   1Ddiode.nnp
+|   |   |   1DInGaAs_QW.nnp
+|   |   |   1Dpiezo_Al0.33In0.67As_In0.32Ga0.68As_111.nnp
+|   |   |   1Dpiezo_Al0.70In0.30As_In0.53Ga0.47As_100.nnp
+|   |   |   1Dpiezo_Al0.70In0.30As_In0.53Ga0.47As_311.nnp
+|   |   |   1DPoisson_linear.nnp
+|   |   |   1DQuantumConfinedStarkEffect.nnp
+|   |   |   1DSiGe_Si_Schaeffler_SemicondSciTechnol1997.nnp
+|   |   |   1DstrainN11.nnp
+|   |   |   1Dsuperlattice_dispersion_4nm.nnp
+|   |   |   1Dsuperlattice_dispersion_6nm.nnp
+|   |   |   1Dsuperlattice_dispersion_bulk_GaAs.nnp
+|   |   |   1D_DUV_LED_HirayamaJAP2005_EBL.nnp
+|   |   |   1D_DUV_LED_HirayamaJAP2005_SL.nnp
+|   |   |   1D_Ge_60nm_8kp_absorption.nnp
+|   |   |   1D_Ge_GeSi_Asymmetric2Well_NewPaper_NonTunnelBarrier.nnp
+|   |   |   1D_Ge_GeSi_Asymmetric2Well_NewPaper_TunnelBarrier.nnp
+|   |   |   1D_Ge_GeSi_QCSE_GaoAIPA2017_8kp.nnp
+|   |   |   1D_UV_LED_KozodoyAPL1999.nnp
+|   |   |   2DBulkGaAs_LandauLevels.nnp
+|   |   |   2DDGMOSFET.nnp
+|   |   |   2DEG_Si_MOSFET_1D.nnp
+|   |   |   2DGaAs_AlGaAs_circle.nnp
+|   |   |   2DGaAs_AlGaAs_hexagon.nnp
+|   |   |   2DGaAs_BiParabolicEllipticQD_Austing.nnp
+|   |   |   2DGaAs_BiParabolicQW_3meV_FockDarwin.nnp
+|   |   |   2DGaAs_BiParabolicQW_4meV_GovernalePRB1998.nnp
+|   |   |   2DQuantumCorral.nnp
+|   |   |   2D_CBR_QPC.nnp
+|   |   |   2D_Hexagonal_Nanowire_2DEG.nnp
+|   |   |   3DGaNAlGaN_QW_strain_freestanding.nnp
+|   |   |   3Dpyramid_QD.nnp
+|   |   |   AlGaInP_on_GaAs_1D.nnp
+|   |   |   bulk_n_Si_current_1D.nnp
+|   |   |   bulk_n_Si_current_2D.nnp
+|   |   |   DoubleGateMOSFET_2D_025grid.nnp
+|   |   |   DoubleGateMOSFET_2D_025grid_equilibrium.nnp
+|   |   |   DoubleGateMOSFET_3D_025grid.nnp
+|   |   |   Greg_Snider_MANUAL_1D.nnp
+|   |   |   Greg_Snider_MANUAL_1D_analytic.nnp
+|   |   |   Greg_Snider_MANUAL_2D.nnp
+|   |   |   Greg_Snider_MANUAL_2D_analytic.nnp
+|   |   |   HEMT_1D.nnp
+|   |   |   HEMT_2D.nnp
+|   |   |   HEMT_3D.nnp
+|   |   |   LaserDiode_InGaAs_1D_cl.nnp
+|   |   |   LaserDiode_InGaAs_1D_qm.nnp
+|   |   |   MOS_CV_5nmSiO2_5nmCont_Dop1e16_QM_1D.nnp
+|   |   |   MOS_CV_5nmSiO2_5nmCont_Dop1e16_QM_1D_fine_grid.nnp
+|   |   |   MOS_CV_5nmSiO2_5nmCont_Dop1e16_QM_2D.nnp
+|   |   |   MOS_CV_5nmSiO2_5nmCont_Dop1e16_QM_2D_periodic_x.nnp
+|   |   |   nin-resistor_Si_Sabathil_JCE_2002_1D.nnp
+|   |   |   nMOSFET_2D_Dop-16-20_Schottky_Class_VG-2.0_Pinch-off.nnp
+|   |   |   nMOSFET_2D_Dop-16-20_Schottky_noQM.nnp
+|   |   |   nMOSFET_2D_Dop-16-20_Schottky_QM.nnp
+|   |   |   nMOSFET_2D_Dop-16-20_Schottky_QM_decomposition.nnp
+|   |   |   NW_core-shell_wz_2D.nnp
+|   |   |   NW_core-shell_zb_2D.nnp
+|   |   |   NW_core-shell_zb_2D_nnp-quantum.nnp
+|   |   |   piezo-pyro-charges_wz_GaN-AlGaN-AlN_1D_strain-piezo-pyro.nnp
+|   |   |   QPC_1D.nnp
+|   |   |   QPC_2D.nnp
+|   |   |   QPC_3D.nnp
+|   |   |   QWIP(Levine-J.Phys74-1993).nnp
+|   |   |   SET_Scholze_IEEE2000_1D.nnp
+|   |   |   SET_Scholze_IEEE2000_3D_cl.nnp
+|   |   |   SET_Scholze_IEEE2000_3D_top_gates_cl.nnp
+|   |   |   Superlattice_N_Wells.nnp
+|   |   |   T2SL_H-if_zb_III-V_Livneh_PRB_2012_1D_absorption.nnp
+|   |   |   T2SL_H-if_zb_III-V_Livneh_PRB_2012_1D_bandstructure.nnp
+|   |   |   T2SL_InAs-GaInSb_Grein_JAP_1995_1D.nnp
+|   |   |   UVC-LED_wz_III-N_1D.nnp
+|   |   |   wurtzite_1D.nnp
+|   |   |   wurtzite_1D_Nface.nnp
+|   |   |   
+|   |   +---art_simulations
+|   |   |       2024_christmas_HEMT.nnp
+|   |   |       
+|   |   +---basics
+|   |   |       1D_el_transport_Si_n_dop.nnp
+|   |   |       basics_1D_doping_adding.nnp
+|   |   |       basics_1D_doping_analytic.nnp
+|   |   |       basics_1D_doping_constant_np.nnp
+|   |   |       basics_1D_doping_constant_p.nnp
+|   |   |       basics_1D_doping_heterostructure.nnp
+|   |   |       basics_1D_doping_predefined.nnp
+|   |   |       basics_1D_doping_replacing.nnp
+|   |   |       basics_1D_finite_periodic_double.nnp
+|   |   |       basics_1D_finite_periodic_simple.nnp
+|   |   |       basics_1D_hello_world.nnp
+|   |   |       basics_1D_variables.nnp
+|   |   |       contacts_1D_ohmic_charge_neutral_GaAs.nnp
+|   |   |       contacts_1D_schottky_barrier_GaAs.nnp
+|   |   |       contacts_1D_zero_field_surface_acceptors_GaAs.nnp
+|   |   |       contacts_1D_zero_field_surface_charges_GaAs.nnp
+|   |   |       contacts_2D_schottky_barrier_GaAs.nnp
+|   |   |       import-dat_1D.nnp
+|   |   |       import-dat_1D_potential.dat
+|   |   |       import-dat_1D_quaternary.dat
+|   |   |       import-dat_1D_strain.dat
+|   |   |       import-dat_1D_ternary.dat
+|   |   |       import-dat_2D.nnp
+|   |   |       import-dat_2D_potential.dat
+|   |   |       import-dat_2D_quaternary.dat
+|   |   |       import-dat_2D_strain.dat
+|   |   |       import-dat_2D_ternary.dat
+|   |   |       import-dat_3D.nnp
+|   |   |       import-dat_3D_potential.dat
+|   |   |       import-dat_3D_quaternary.dat
+|   |   |       import-dat_3D_strain.dat
+|   |   |       import-dat_3D_ternary.dat
+|   |   |       Interpolation_A(x)B(1-x)C_1D_cubic.nnp
+|   |   |       Interpolation_A(x)B(1-x)C_1D_linear_quadratic.nnp
+|   |   |       Interpolation_In(x)Ga(1-x)As_1D_cubic.nnp
+|   |   |       Interpolation_In(x)Ga(1-x)As_1D_linear_quadratic.nnp
+|   |   |       piezo-pyro-charges_wz_GaN-AlGaN-AlN_1D_strain-piezo-pyro.nnp
+|   |   |       piezo-pyro-charges_wz_GaN-AlN_1D_offsets.nnp
+|   |   |       piezo-pyro-charges_wz_GaN-AlN_1D_pyro.nnp
+|   |   |       piezo-pyro-charges_wz_GaN-AlN_1D_strain-piezo-pyro.nnp
+|   |   |       piezo-pyro-charges_wz_GaN-AlN_1D_strain-piezo.nnp
+|   |   |       piezo-pyro-charges_wz_GaN-AlN_1D_strain-pyro.nnp
+|   |   |       piezo-pyro-charges_wz_GaN-AlN_1D_strain.nnp
+|   |   |       Romanov2006_AlGaN_theta.nnp
+|   |   |       Romanov2006_InGaN_theta.nnp
+|   |   |       Romanov2006_InGaN_theta_2nd.nnp
+|   |   |       shapes_2D.nnp
+|   |   |       shapes_3D.nnp
+|   |   |       
+|   |   +---demo
+|   |   |       DoubleQuantumWell_6nm_demo.nnp
+|   |   |       Greg_Snider_MANUAL_1D_demo.nnp
+|   |   |       pn_junction_GaAs_1D_demo.nnp
+|   |   |       
+|   |   +---electronic_band_structures
+|   |   |       1Dwell_GaAs_AlAs.nnp
+|   |   |       1Dwell_GaSb_AlSb.nnp
+|   |   |       1Dwell_InGaAs_InP.nnp
+|   |   |       2DGaN_quantum_wire.nnp
+|   |   |       band-structure-2DHG_Si_Wang_2004_1D.nnp
+|   |   |       band-structure-2DHG_Si_Wang_2004_1D_biax_comp_strain.dat
+|   |   |       band-structure-2DHG_Si_Wang_2004_1D_biax_tens_strain.dat
+|   |   |       band-structure-2DHG_Si_Wang_2004_1D_uniax_strain.dat
+|   |   |       band-structure-kp_inv-layer-Si_Fischetti_2003_1D_(001).nnp
+|   |   |       band-structure-kp_inv-layer-Si_Fischetti_2003_1D_(001)_compressive.nnp
+|   |   |       band-structure-kp_inv-layer-Si_Fischetti_2003_1D_(001)_tensile.nnp
+|   |   |       band-structure-kp_inv-layer-Si_Fischetti_2003_1D_(011).nnp
+|   |   |       band-structure-kp_inv-layer-Si_Fischetti_2003_1D_(111).nnp
+|   |   |       bulk_6x6kp_dispersion_ZnO.nnp
+|   |   |       bulk_kp_dispersion_GaAs.nnp
+|   |   |       bulk_kp_dispersion_GaAs_strained.nnp
+|   |   |       bulk_kp_dispersion_GaN_strained_compressive_0.nnp
+|   |   |       bulk_kp_dispersion_GaN_strained_compressive_90.nnp
+|   |   |       bulk_kp_dispersion_GaN_strained_tensile_0.nnp
+|   |   |       bulk_kp_dispersion_GaN_strained_tensile_90.nnp
+|   |   |       bulk_kp_dispersion_GaN_unstrained_0.nnp
+|   |   |       bulk_kp_dispersion_GaN_unstrained_90.nnp
+|   |   |       electronic-band-structure-all-kp-bulk_zb_IV_1D.nnp
+|   |   |       
+|   |   +---numerics
+|   |   |       large-3D-systems-poisson_2D.nnp
+|   |   |       large-3D-systems-poisson_3D.nnp
+|   |   |       large-3D-systems-poisson_3D_reduced.nnp
+|   |   |       large-3D-systems-reduction_1D.nnp
+|   |   |       large-3D-systems-reduction_2D.nnp
+|   |   |       large-3D-systems-reduction_3D.nnp
+|   |   |       large-3D-systems-schroedinger_3D_final.nnp
+|   |   |       large-3D-systems-schroedinger_3D_initial.nnp
+|   |   |       
+|   |   +---p-n_junctions_and_solar_cells
+|   |   |       1DCascadeSolarCell.nnp
+|   |   |       1DGaAs_SolarCell.nnp
+|   |   |       1DGaAs_SolarCell_complex_refractive_index.nnp
+|   |   |       1DGaAs_SolarCell_computed_absorption.nnp
+|   |   |       1DGaAs_SolarCell_import_generation.nnp
+|   |   |       1DGaAs_SolarCell_import_generation_1_sun.dat
+|   |   |       pn-junction-dark_GaAs_Nelson_2003_1D.nnp
+|   |   |       pn-junction-illuminated_GaAs_Nelson_2003_1D.nnp
+|   |   |       pn_junction_GaAs_1D.nnp
+|   |   |       pn_junction_GaAs_2D.nnp
+|   |   |       pn_junction_GaAs_3D.nnp
+|   |   |       pn_junction_GaAs_ForwardBias_1D.nnp
+|   |   |       pn_junction_GaAs_ForwardBias_2D.nnp
+|   |   |       pn_junction_GaAs_ForwardBias_3D.nnp
+|   |   |       
+|   |   +---quantum_cascade_lasers
+|   |   |       1DQCL_AlGaAs_Sirtori_APL73_1998.nnp
+|   |   |       1DQCL_Andrea_Friedrich_NoInjector_InGaAs_APL86_2005_kp.nnp
+|   |   |       1DQCL_Andrea_Friedrich_NoInjector_InGaAs_APL86_2005_sg.nnp
+|   |   |       1DQCL_Rochat_APL81_2002.nnp
+|   |   |       1DQCL_simple.nnp
+|   |   |       1DQCL_THz_MIT_Sandia_SemicScTech20_2005.nnp
+|   |   |       1DQuantumCascadeLaser.nnp
+|   |   |       1DQuantumCascadeLaserSiGe.nnp
+|   |   |       InterbandCascadeLaser_MidIR_Vurgaftman_NatureComm2011_8band_2periods.nnp
+|   |   |       InterbandCascadeLaser_MidIR_Vurgaftman_NatureComm2011_8band_NoField_1period_Lawaetz.nnp
+|   |   |       InterbandCascadeLaser_MidIR_Vurgaftman_NatureComm2011_8band_NoField_1period_Vurgaftman.nnp
+|   |   |       InterbandCascadeLaser_MidIR_Vurgaftman_NatureComm2011_sg.nnp
+|   |   |       InterbandCascadeLaser_MidIR_Vurgaftman_NatureComm2011_sg_6band.nnp
+|   |   |       InterbandCascadeLaser_MidIR_Vurgaftman_NatureComm2011_sg_arpack.nnp
+|   |   |       InterbandCascadeLaser_MidIR_Vurgaftman_NatureComm2011_sg_field.nnp
+|   |   |       InterbandCascadeLaser_MidIR_Vurgaftman_NatureComm2011_sg_qp.nnp
+|   |   |       THzQCL_Andrews_Vienna_MatSciEng2008.nnp
+|   |   |       THzQCL_Andrews_Vienna_MatSciEng2008_electric_field.nnp
+|   |   |       THzQCL_Andrews_Vienna_MatSciEng2008_no_repeat.nnp
+|   |   |       
+|   |   +---quantum_dots
+|   |   |       3DInAsGaAsQDPyramid_PryorPRB1998_10nm.nnp
+|   |   |       3DQD_molecule_cuboid_asymmetric.nnp
+|   |   |       3DQD_molecule_cuboid_asymmetric_no_sweep.nnp
+|   |   |       3DQD_molecule_cuboid_asymmetric_no_sweep_40kVcm.nnp
+|   |   |       3Dspherical_infinite_dot_GaAs_inter.nnp
+|   |   |       3Dspherical_infinite_dot_GaAs_intra.nnp
+|   |   |       3DsphericSiQD_d5nm_6bandkp.nnp
+|   |   |       QD-CdSe-ellipsoidal_zb_II-IV_Ferreira_BJP_2006_3D.nnp
+|   |   |       QD_GaN_Andreev_PRB_2000_1D_band-offsets.nnp
+|   |   |       QD_GaN_Andreev_PRB_2000_1D_strain-PzPr-poisson-1b.nnp
+|   |   |       QD_GaN_Andreev_PRB_2000_1D_strain-PzPr-poisson-6kp.nnp
+|   |   |       QD_GaN_Andreev_PRB_2000_1D_strain.nnp
+|   |   |       QD_GaN_Andreev_PRB_2000_3D.nnp
+|   |   |       
+|   |   +---quantum_mechanics
+|   |   |       1DGaAs_triangular_well.nnp
+|   |   |       DoubleQuantumWell_6nm.nnp
+|   |   |       hydrogen-atom_3D.nnp
+|   |   |       quantum_confinement_1D_harmonic_oscillator.nnp
+|   |   |       quantum_confinement_1D_infinite_well.nnp
+|   |   |       quantum_confinement_3D_box.nnp
+|   |   |       QW_finite_1D.nnp
+|   |   |       QW_infinite_1D.nnp
+|   |   |       QW_large_1D.nnp
+|   |   |       Superlattice_1D.nnp
+|   |   |       
+|   |   +---quantum_wells
+|   |   |       1DInAs_GaSb_BGQW_k_parallel.nnp
+|   |   |       1DInAs_GaSb_BGQW_k_zero.nnp
+|   |   |       1DSirtoriPRB1994_OneWell_kp_quantum-only.nnp
+|   |   |       1DSirtoriPRB1994_OneWell_kp_self-consistent.nnp
+|   |   |       1DSirtoriPRB1994_OneWell_sg_quantum-only.nnp
+|   |   |       1DSirtoriPRB1994_OneWell_sg_self-consistent.nnp
+|   |   |       1DSirtoriPRB1994_ThreeCoupledWells_kp_quantum-only.nnp
+|   |   |       1DSirtoriPRB1994_ThreeCoupledWells_kp_self-consistent.nnp
+|   |   |       1DSirtoriPRB1994_ThreeCoupledWells_sg_quantum-only.nnp
+|   |   |       1DSirtoriPRB1994_ThreeCoupledWells_sg_self-consistent.nnp
+|   |   |       1DSirtoriPRB1994_TwoCoupledWells_kp_quantum-only.nnp
+|   |   |       1DSirtoriPRB1994_TwoCoupledWells_kp_self-consistent.nnp
+|   |   |       1DSirtoriPRB1994_TwoCoupledWells_sg_quantum-only.nnp
+|   |   |       1DSirtoriPRB1994_TwoCoupledWells_sg_self-consistent.nnp
+|   |   |       1D_exciton_binding_energy_infinite_QW.nnp
+|   |   |       1D_gain_strained_qw.nnp
+|   |   |       1D_Ge_GeSi_QCSE_Lever2010_8kp_exciton.nnp
+|   |   |       1D_IntersubbandAbsorption_InfiniteWell_GaAs_Chuang_Gamma.nnp
+|   |   |       1D_IntersubbandAbsorption_InfiniteWell_GaAs_Chuang_kp.nnp
+|   |   |       1D_IntersubbandAbsorption_InfiniteWell_GaAs_Chuang_sg.nnp
+|   |   |       absorption_InGaAs-QW_Dumitras_PRB_2002_1D.nnp
+|   |   |       AlGaAs_QW_Frankenberger_Doping_schottky07.nnp
+|   |   |       AlGaAs_QW_Frankenberger_Doping_schottky07_fast.nnp
+|   |   |       AlGaAs_QW_Frankenberger_Simple.nnp
+|   |   |       AlGaAs_QW_Frankenberger_Simple_fast.nnp
+|   |   |       Freestanding-QW_wz_III-V_Povolotskyi_PSS_2005_3D.nnp
+|   |   |       PL_non-resonant_QW_III-V.nnp
+|   |   |       PL_resonant_QW_III-V_double.nnp
+|   |   |       PL_resonant_QW_III-V_double.py
+|   |   |       PL_resonant_QW_III-V_single.nnp
+|   |   |       PL_resonant_QW_III-V_single.py
+|   |   |       QWIP_Gunapala_JAP_1991.nnp
+|   |   |       QWIP_singleQW_GaAs_AlGaAs.nnp
+|   |   |       QWIP_singleQW_InAs_AlSb.nnp
+|   |   |       single-QW_env-overlap-int_zb_III-V_1D.nnp
+|   |   |       wz_III-N_AlGaN-QW_bands_Park_JJAP_2000_1D.nnp
+|   |   |       zb_III-V_GaAs_excitonic-absorption_1D.nnp
+|   |   |       
+|   |   +---quantum_wires
+|   |   |       2Dcircular_infinite_wire_GaAs_inter.nnp
+|   |   |       2Dcircular_infinite_wire_GaAs_intra.nnp
+|   |   |       T-QWR_zb_III-V_Schuster_PhD_2005_1D_strained-QW.nnp
+|   |   |       T-QWR_zb_III-V_Schuster_PhD_2005_2D.nnp
+|   |   |       T-QWR_zb_III-V_Schuster_PhD_2005_2D_strained.nnp
+|   |   |       
+|   |   +---templates
+|   |   |       new_input_wz_1D.nnp
+|   |   |       new_input_wz_2D.nnp
+|   |   |       new_input_wz_3D.nnp
+|   |   |       new_input_zb_1D.nnp
+|   |   |       new_input_zb_2D.nnp
+|   |   |       new_input_zb_3D.nnp
+|   |   |       
+|   |   +---transistors
+|   |   |       DG-MOSFET_I-V_zb_IV_2D_classical.nnp
+|   |   |       DG-MOSFET_I-V_zb_IV_2D_quantum.nnp
+|   |   |       DG-MOSFET_I-V_zb_IV_3D_classical.nnp
+|   |   |       wz_III-N_AlGaN_FET-2DEG_Jogai_JAP_2003_1D.nnp
+|   |   |       wz_III-N_AlGaN_FET-2DEG_Jogai_JAP_2003_2D.nnp
+|   |   |       wz_III-N_AlGaN_FET-2DEG_Jogai_JAP_2003_3D.nnp
+|   |   |       wz_III-N_GaN_HEMT_Dogmus_JPE_2018_2D.nnp
+|   |   |       zb_III-V_InGaAs-AlGaAs_2DEG_occupation_1D.nnp
+|   |   |       
+|   |   +---transmission
+|   |   |       1D_GaAs_conductance.nnp
+|   |   |       2D_transmission_QPC.nnp
+|   |   |       2D_transmission_QPC_potential_of_2DEG.fld
+|   |   |       2D_transmission_QPC_potential_of_2DEG_1.fld
+|   |   |       2D_transmission_QPC_potential_of_2DEG_2.fld
+|   |   |       transmission-barrier_1D.nnp
+|   |   |       transmission-double-barrier_Birner_JCEL_2009_1D.nnp
+|   |   |       transmission-nanowire_GaAs_3D.nnp
+|   |   |       transmission-quantum-well_1D.nnp
+|   |   |       transmission-step_1D.nnp
+|   |   |       transmission_CBR_Mamaluy_JAP_2003_2D.nnp
+|   |   |       
+|   |   +---tricks_and_hacks
+|   |   |       2D_GDS_workflow_transmission_in_2DEG.nnp
+|   |   |       3D_GDS_workflow_gdsfile.gds
+|   |   |       3D_GDS_workflow_script.py
+|   |   |       3D_GDS_workflow_template.nnp
+|   |   |       calculate_CV.py
+|   |   |       CapacitanceBySplines_2021_Nov.py
+|   |   |       Jupyter_Notebook_GDS-workflow.ipynb
+|   |   |       MIS_CV_1nmSiO2_1D.nnp
+|   |   |       MIS_CV_3nmSiO2_1D.nnp
+|   |   |       MIS_CV_3nmSiO2_metal_1D.nnp
+|   |   |       zb-substrate-in-wz-system_GaN-AlN-Si_1D.nnp
+|   |   |       
+|   |   \---workshop
+|   |       +---General
+|   |       |   |   Workshop.pdf
+|   |       |   |   
+|   |       |   +---10_spectra_with_fermis_golden_rule
+|   |       |   |       10_quantum_dot.nnp
+|   |       |   |       10_quantum_well.nnp
+|   |       |   |       10_quantum_wire.nnp
+|   |       |   |       10_superlattice.nnp
+|   |       |   |       
+|   |       |   +---11_everything_together
+|   |       |   |       11_laser_diode.nnp
+|   |       |   |       
+|   |       |   +---1_defining_the_structure
+|   |       |   |       1_doped_heterostructure.nnp
+|   |       |   |       1_quantum_dot.nnp
+|   |       |   |       1_quantum_well.nnp
+|   |       |   |       1_quantum_wire.nnp
+|   |       |   |       
+|   |       |   +---2_introducing_strain
+|   |       |   |       2_doped_heterostructure.nnp
+|   |       |   |       2_quantum_dot.nnp
+|   |       |   |       2_quantum_well.nnp
+|   |       |   |       2_quantum_wire.nnp
+|   |       |   |       
+|   |       |   +---3_solving_the_poisson_equation
+|   |       |   |       3_doped_heterostructure.nnp
+|   |       |   |       3_pn_junction.nnp
+|   |       |   |       3_quantum_well.nnp
+|   |       |   |       3_schottky_barrier.nnp
+|   |       |   |       
+|   |       |   +---4_piezoelectric_effects
+|   |       |   |       4_GaN 2DEG.nnp
+|   |       |   |       4_quantum_dot.nnp
+|   |       |   |       4_quantum_well.nnp
+|   |       |   |       4_quantum_wire.nnp
+|   |       |   |       
+|   |       |   +---5_current_poisson-IV_curves
+|   |       |   |       5_gunn_diode.nnp
+|   |       |   |       5_laser_diode.nnp
+|   |       |   |       5_pn_junction.nnp
+|   |       |   |       
+|   |       |   +---6_schroedinger_equation
+|   |       |   |       6_quantum_dot.nnp
+|   |       |   |       6_quantum_well.nnp
+|   |       |   |       6_quantum_wire.nnp
+|   |       |   |       6_superlattice_1-band.nnp
+|   |       |   |       6_superlattice_8kp.nnp
+|   |       |   |       
+|   |       |   +---7_schroedinger-poisson
+|   |       |   |       7_GaN 2DEG.nnp
+|   |       |   |       7_quantum_dot.nnp
+|   |       |   |       7_quantum_well.nnp
+|   |       |   |       7_quantum_wire.nnp
+|   |       |   |       7_superlattice.nnp
+|   |       |   |       
+|   |       |   +---8_schroedinger_current_poisson
+|   |       |   |       8_laser_diode.nnp
+|   |       |   |       
+|   |       |   \---9_semiclassical_optical_spectra
+|   |       |           9_laser_diode.nnp
+|   |       |           9_solar_cell.nnp
+|   |       |           GenerationRateLight_vs_Position_sun1.dat
+|   |       |           
+|   |       \---Quantum Dots
+|   |               1_schematics_numbers.png
+|   |               1_single_band_no_var_cond.nnp
+|   |               2_schematics_labels.png
+|   |               2_single_band_no_cond.nnp
+|   |               3_six_band_no_cond.nnp
+|   |               4_eight_band_opt_no_cond.nnp#
+|   |               5a_plot_wavefunction.py
+|   |               5b_sweep_an_input_file.py
+|   |               5_all_combined.nnp
+|   |               5_execute_an_input_file.py
+|   |               6a_run_evolution.py
+|   |               6b_plot_evolution_results.py
+|   |               6_all_combined_evo.nnp
+|   |               iNOW Workshop.pptx
+|   |               nn_formatting.py
+|   |               plotting_utils.py
+|   |               
+|   +---keywords
+|   |       keywords_nnp.xml
+|   |       
+|   \---scripts
+|           nextnano++_free.bat
+|           nextnano++_Intel_64bit.bat
+|           nextnano++_update_input_files_from_2.4.27_to_3.0.0.ps1
+|           
++---nextnano.MSB
+|   +---bin
+|   |       libiomp5md.dll
+|   |       nextnano.MSB_Intel.exe
+|   |       
+|   +---database
+|   |       materials.msb
+|   |       
+|   +---examples
+|   |   |   1Ddeformation_potentials_no_strain_MSB.msb
+|   |   |   1Ddeformation_potentials_strain_MSB.msb
+|   |   |   1Dpiezo_Al0.70In0.30As_In0.53Ga0.47As_311_growth_along_z_direction.msb
+|   |   |   1D_Transmission_DoubleBarrier_CBR_paper.msb
+|   |   |   MidIR_QCL_YuSlivkenRazeghi_SST2010_2Injectors.msb
+|   |   |   MIR_QCL_Vizbaras_InGaAsAlInAs_IEEEPhotonTechLett_2009.msb
+|   |   |   nin_resistor_CBRpaper_asymmetric.msb
+|   |   |   nin_resistor_CBRpaper_symmetric.msb
+|   |   |   nin_resistor_CBRpaper_symmetric_TemperatureGradient.msb
+|   |   |   nin_resistor_PhDthesis_PeterGreck.msb
+|   |   |   QW_InGaAs_ballistic.msb
+|   |   |   QW_InGaAs_scattering.msb
+|   |   |   README.txt
+|   |   |   RTD_PhDthesis_PeterGreck.msb
+|   |   |   THz_QCL_Fathololoumi_OpticsExpress2012.msb
+|   |   |   
+|   |   \---database_customized
+|   |           Materials_1D_Transmission_DoubleBarrier_CBR_paper.msb
+|   |           Materials_MIR_QCL_Vizbaras_InGaAsAlInAs_IEEEPhotonTechLett_2009.msb
+|   |           Materials_QW_InGaAs.msb
+|   |           
+|   \---keywords
+|           keywords_msb.html
+|           keywords_msb.xml
+|           
++---nextnano3
+|   +---bin
+|   |       libiomp5md.dll
+|   |       nextnano3_gcc_Windows.exe
+|   |       nextnano3_Intel_ifx.exe
+|   |       
+|   +---database
+|   |   |   database.nn3
+|   |   |   database_free.nn3
+|   |   |   
+|   |   +---NEGF files
+|   |   |       BesselI.dat
+|   |   |       BesselI_mapping.dat
+|   |   |       BesselY_real.dat
+|   |   |       BesselY_real_mapping.dat
+|   |   |       elliptic_imag.dat
+|   |   |       elliptic_mapping.dat
+|   |   |       elliptic_real.dat
+|   |   |       
+|   |   +---Solar cell files
+|   |   |   +---absorption
+|   |   |   |       AbsorptionCoefficient_GaAs_300K.dat
+|   |   |   |       AbsorptionCoefficient_GaN_300K.dat
+|   |   |   |       AbsorptionCoefficient_Ge_300K.dat
+|   |   |   |       AbsorptionCoefficient_In20Ga80N_300K.dat
+|   |   |   |       AbsorptionCoefficient_InN_300K.dat
+|   |   |   |       AbsorptionCoefficient_InP_300K.dat
+|   |   |   |       AbsorptionCoefficient_Si_300K.dat
+|   |   |   |       
+|   |   |   +---reflectivity
+|   |   |   |       Reflectivity_Al0.80Ga0.20As.dat
+|   |   |   |       Reflectivity_Si_PolishedSiliconWafer.dat
+|   |   |   |       
+|   |   |   \---solar spectra
+|   |   |           ASTME490.dat
+|   |   |           ASTMG173_AM10.dat
+|   |   |           ASTMG173_AM15.dat
+|   |   |           ASTMG173_AM15G.dat
+|   |   |           References.txt
+|   |   |           
+|   |   \---Tight-binding files
+|   |           README.txt
+|   |           states.in
+|   |           TB_distance_parameters.in
+|   |           TB_material_parameters.in
+|   |           TB_material_parameters_JancuPRB1998.in
+|   |           TB_material_parameters_SawamuraOME2018.in
+|   |           
+|   +---examples
+|   |   |   1DCascadeSolarCell_nn3.nn3
+|   |   |   1Ddeformation_potentials_no_strain_nn3.nn3
+|   |   |   1Ddeformation_potentials_strain_nn3.nn3
+|   |   |   1DGaAs_AlGaAs_10nmQW_Lifetime_nn3_TEST.nn3
+|   |   |   1DGaAs_mobility_WalukiewiczFig2.nn3
+|   |   |   1DGaAs_mobility_WalukiewiczFig3.nn3
+|   |   |   1DGaAs_SolarCell_nn3.nn3
+|   |   |   1DGaAs_SolarCell_nn3_import_generation.nn3
+|   |   |   1DGaAs_triangular_well_nn3.nn3
+|   |   |   1DGaN_AlGaN_QW_k_parallel_nn3.nn3
+|   |   |   1DGaN_AlGaN_QW_k_zero_nn3.nn3
+|   |   |   1DInAs_GaSb_BGQW_k_parallel_nn3.nn3
+|   |   |   1DInAs_GaSb_BGQW_k_zero_nn3.nn3
+|   |   |   1DInAs_InGaSb_SL_k_parallel_k_superlattice_nn3.nn3
+|   |   |   1DInAs_InGaSb_SL_k_parallel_nn3.nn3
+|   |   |   1DInAs_InGaSb_SL_k_superlattice_nn3.nn3
+|   |   |   1DInAs_InGaSb_SL_k_zero_nn3.nn3
+|   |   |   1DInGaAs_mobility_WalukiewiczFig8.nn3
+|   |   |   1DInSb_mobility_ShaoFig3.nn3
+|   |   |   1DInvertedHEMT_nn3.nn3
+|   |   |   1Dn_doped_bulk_GaAs.nn3
+|   |   |   1Dn_doped_bulk_Ge_a.nn3
+|   |   |   1Dn_doped_bulk_Ge_a_compensated.nn3
+|   |   |   1Dn_doped_bulk_Ge_a_compensated_two_donors_case_a.nn3
+|   |   |   1Dn_doped_bulk_Ge_a_compensated_two_donors_case_b.nn3
+|   |   |   1Dn_doped_bulk_Ge_b.nn3
+|   |   |   1Dn_doped_bulk_Si.nn3
+|   |   |   1Dpiezo_Al0.33In0.67As_In0.32Ga0.68As_111_nn3.nn3
+|   |   |   1Dpiezo_Al0.70In0.30As_In0.53Ga0.47As_100_nn3.nn3
+|   |   |   1Dpiezo_Al0.70In0.30As_In0.53Ga0.47As_100_nn3_growth_along_z_direction.nn3
+|   |   |   1Dpiezo_Al0.70In0.30As_In0.53Ga0.47As_311_nn3.nn3
+|   |   |   1Dpiezo_Al0.70In0.30As_In0.53Ga0.47As_311_nn3_growth_along_z_direction.nn3
+|   |   |   1DPoisson_linear_nn3.nn3
+|   |   |   1DQuantumConfinedStarkEffect_nn3.nn3
+|   |   |   1DQW_interband_matrixelements_finite_nn3.nn3
+|   |   |   1DQW_interband_matrixelements_infinite_nn3.nn3
+|   |   |   1DQW_intraband_matrixelements_infinite_nn3.nn3
+|   |   |   1DSiGe_Si_Schaeffler_SemicondSciTechnol1997_nn3.nn3
+|   |   |   1DSirtoriPRB1994_OneWell_kp_quantum-only_nn3.nn3
+|   |   |   1DSirtoriPRB1994_OneWell_kp_self-consistent_nn3.nn3
+|   |   |   1DSirtoriPRB1994_OneWell_sg_quantum-only_nn3.nn3
+|   |   |   1DSirtoriPRB1994_OneWell_sg_self-consistent_nn3.nn3
+|   |   |   1DSirtoriPRB1994_ThreeCoupledWells_kp_quantum-only_nn3.nn3
+|   |   |   1DSirtoriPRB1994_ThreeCoupledWells_kp_self-consistent_nn3.nn3
+|   |   |   1DSirtoriPRB1994_ThreeCoupledWells_sg_quantum-only_nn3.nn3
+|   |   |   1DSirtoriPRB1994_ThreeCoupledWells_sg_self-consistent_nn3.nn3
+|   |   |   1DSirtoriPRB1994_TwoCoupledWells_kp_quantum-only_nn3.nn3
+|   |   |   1DSirtoriPRB1994_TwoCoupledWells_kp_self-consistent_nn3.nn3
+|   |   |   1DSirtoriPRB1994_TwoCoupledWells_sg_quantum-only_nn3.nn3
+|   |   |   1DSirtoriPRB1994_TwoCoupledWells_sg_self-consistent_nn3.nn3
+|   |   |   1DstrainN11_nn3.nn3
+|   |   |   1Dsuperlattice_dispersion_4nm_nn3.nn3
+|   |   |   1Dsuperlattice_dispersion_6nm_nn3.nn3
+|   |   |   1Dsuperlattice_dispersion_bulk_GaAs_nn3.nn3
+|   |   |   1Dwell_GaAs_AlAs_nn3.nn3
+|   |   |   1Dwell_GaAs_AlAs_nn3_2Dplot.nn3
+|   |   |   1Dwell_GaSb_AlSb_nn3.nn3
+|   |   |   1Dwell_InGaAs_InP_nn3.nn3
+|   |   |   1D_exciton_binding_energy_infinite_QW_nn3.nn3
+|   |   |   1D_Ge_GeSi_Asymmetric2Well_Fig2a_nn3.nn3
+|   |   |   1D_Ge_GeSi_Asymmetric2Well_Fig2b_nn3.nn3
+|   |   |   1D_Ge_GeSi_Asymmetric2Well_Fig2d_nn3.nn3
+|   |   |   1D_Ge_GeSi_Asymmetric2Well_Fig2e_nn3.nn3
+|   |   |   1D_Ge_GeSi_Asymmetric2Well_Fig4b_nn3.nn3
+|   |   |   1D_Ge_GeSi_Asymmetric2Well_NewPaper_NonTunnelBarrier_nn3.nn3
+|   |   |   1D_Ge_GeSi_Asymmetric2Well_NewPaper_TunnelBarrier_nn3.nn3
+|   |   |   1D_Ge_GeSi_QCSE_Lever2010_square_nn3.nn3
+|   |   |   1D_graphene_FermiLevel_sweep.nn3
+|   |   |   1D_graphene_FermiLevel_sweep_fluctuation.nn3
+|   |   |   1D_graphene_intrinsic_1overTsweep.nn3
+|   |   |   1D_graphene_intrinsic_Tsweep.nn3
+|   |   |   1D_HgTe_CdTe_QW_TBcomparison_kp.nn3
+|   |   |   1D_HgTe_CdTe_QW_TBcomparison_kp_QWwidth_Novik.nn3
+|   |   |   1D_HgTe_CdTe_QW_TBcomparison_TB.nn3
+|   |   |   1D_InterbandAbsorption_InfiniteWell_sg_nn3.nn3
+|   |   |   1D_IntersubbandAbsorption_InfiniteWell_GaAs_Chuang_kp_nn3.nn3
+|   |   |   1D_IntersubbandAbsorption_InfiniteWell_GaAs_Chuang_sg_nn3.nn3
+|   |   |   1D_nin_asymmetric_CBRpaper.nn3
+|   |   |   1D_nin_symmetric_CBRpaper.nn3
+|   |   |   1D_nin_symmetric_CBRpaper_TemperatureGradient.nn3
+|   |   |   1D_simple_GaAs_QW.nn3
+|   |   |   2DBulkGaAs_LandauLevels_nn3.nn3
+|   |   |   2Dcircular_infinite_wire_GaAs_intra_nn3.nn3
+|   |   |   2DGaAs_AlGaAs_circle_nn3.nn3
+|   |   |   2DGaAs_AlGaAs_hexagon_nn3.nn3
+|   |   |   2DGaAs_BiParabolicEllipticQD_Austing_nn3.nn3
+|   |   |   2DGaAs_BiParabolicQW_3meV_FockDarwin_nn3.nn3
+|   |   |   2DGaAs_BiParabolicQW_4meV_GovernalePRB1998_nn3.nn3
+|   |   |   2DGaN_nanowire_nn3.nn3
+|   |   |   2DQuantumCorral_nn3.nn3
+|   |   |   2DTshapedQuantumWireCEO.nn3
+|   |   |   2Dwire_excitonCdTe_1x30nm_010nm_050nmgrid.nn3
+|   |   |   2Dwire_excitonCdTe_30x30nm_050nmgrid.nn3
+|   |   |   2D_Hexagonal_Nanowire_2DEG_nn3.nn3
+|   |   |   3DGaNAlGaN_QW_strain_freestanding_nn3.nn3
+|   |   |   3DInAsGaAsQDPyramid_PryorPRB1998_10nm_nn3.nn3
+|   |   |   3DQD_molecule_cuboid_asymmetric_nn3.nn3
+|   |   |   3DQD_molecule_cuboid_asymmetric_nn3_no_sweep.nn3
+|   |   |   3DQD_molecule_cuboid_asymmetric_nn3_no_sweep_40kVcm.nn3
+|   |   |   3DsphericCdSeQD_ArtificialAtom_radius.nn3
+|   |   |   3DsphericSiQD_d5nm_6bandkp_nn3.nn3
+|   |   |   3D_wave_functions_cubic_QD_nn3.nn3
+|   |   |   3D_wave_functions_cuboid_QD_nn3.nn3
+|   |   |   AlGaInP_on_GaAs_1D_as_in_tutorial_nn3.nn3
+|   |   |   AlGaInP_on_GaAs_1D_as_in_tutorial_no_bowing_nn3.nn3
+|   |   |   AlGaInP_on_GaAs_1D_nn3.nn3
+|   |   |   band-structure-kp_inv-layer-Si_Fischetti_2003_1D_(001)_compressive_nn3.nn3
+|   |   |   band-structure-kp_inv-layer-Si_Fischetti_2003_1D_(001)_nn3.nn3
+|   |   |   band-structure-kp_inv-layer-Si_Fischetti_2003_1D_(001)_tensile_nn3.nn3
+|   |   |   band-structure-kp_inv-layer-Si_Fischetti_2003_1D_(011)_nn3.nn3
+|   |   |   band-structure-kp_inv-layer-Si_Fischetti_2003_1D_(111)_nn3.nn3
+|   |   |   bulk_6x6kp_dispersion_CdSe_nn3.nn3
+|   |   |   bulk_6x6kp_dispersion_CdS_nn3.nn3
+|   |   |   bulk_6x6kp_dispersion_ZnO_nn3.nn3
+|   |   |   bulk_6x6kp_dispersion_ZnS_nn3.nn3
+|   |   |   Bulk_Bandstructure_Pseudopotential_empty_lattice.nn3
+|   |   |   Bulk_Bandstructure_Pseudopotential_GaAs.nn3
+|   |   |   Bulk_Bandstructure_Pseudopotential_Si.nn3
+|   |   |   bulk_kp_dispersion_GaAs_InAs_InP_InSb_30band_nn3.nn3
+|   |   |   bulk_kp_dispersion_GaAs_nn3.nn3
+|   |   |   bulk_kp_dispersion_GaAs_nn3_3D.nn3
+|   |   |   bulk_kp_dispersion_GaAs_nn3_strained.nn3
+|   |   |   bulk_kp_dispersion_GaN_strained_compressive_0_nn3.nn3
+|   |   |   bulk_kp_dispersion_GaN_strained_compressive_90_nn3.nn3
+|   |   |   bulk_kp_dispersion_GaN_strained_tensile_0_nn3.nn3
+|   |   |   bulk_kp_dispersion_GaN_strained_tensile_90_3D_nn3.nn3
+|   |   |   bulk_kp_dispersion_GaN_strained_tensile_90_nn3.nn3
+|   |   |   bulk_kp_dispersion_GaN_unstrained_nn3.nn3
+|   |   |   bulk_kp_dispersion_Ge_GeSn_Sn_30band_nn3.nn3
+|   |   |   bulk_kp_dispersion_Si_SiGe_Ge_30band_nn3.nn3
+|   |   |   bulk_n_Si_current_1D_nn3.nn3
+|   |   |   bulk_n_Si_current_1D_simba_nn3.nn3
+|   |   |   bulk_n_Si_current_2D_nn3.nn3
+|   |   |   DoubleGateMOSFET_2D_nn3_025grid_equilibrium.nn3
+|   |   |   DoubleGateMOSFET_2D_nn3_05grid.nn3
+|   |   |   DoubleGateMOSFET_3D_nn3_05grid.nn3
+|   |   |   DoubleQuantumWell_6nm_nn3.nn3
+|   |   |   EPJQT2022_2D_ABI_nn3.nn3
+|   |   |   EPJQT2022_2D_AB_nn3.nn3
+|   |   |   EPJQT2022_2D_TCW_nn3.nn3
+|   |   |   GenerationRateLight_vs_Position_sun1.dat
+|   |   |   Greg_Snider_MANUAL_1D_nn3.nn3
+|   |   |   Greg_Snider_MANUAL_1D_nn3_analytic.nn3
+|   |   |   Greg_Snider_MANUAL_2D_nn3.nn3
+|   |   |   HEMT_1D_nn3.nn3
+|   |   |   HEMT_2D_nn3.nn3
+|   |   |   HEMT_3D_nn3.nn3
+|   |   |   Jogai_AlGaNGaN_FET_JAP2003_GaNcap_Fig4_1D_nn3.nn3
+|   |   |   Jogai_AlGaNGaN_FET_JAP2003_GaNcap_Fig4_2D_nn3.nn3
+|   |   |   Jogai_AlGaNGaN_FET_JAP2003_GaNcap_Fig6Fig5_1D_nn3.nn3
+|   |   |   Jogai_AlGaNGaN_FET_JAP2003_GaNcap_Fig6Fig5_2D_nn3.nn3
+|   |   |   Jogai_AlGaNGaN_FET_JAP2003_noGaNcap_Fig2Fig3_1D_nn3.nn3
+|   |   |   Jogai_AlGaNGaN_FET_JAP2003_noGaNcap_Fig2Fig3_2D_nn3.nn3
+|   |   |   Jogai_AlGaNGaN_FET_JAP2003_noGaNcap_Fig4Fig1Fig7_1D_nn3.nn3
+|   |   |   Jogai_AlGaNGaN_FET_JAP2003_noGaNcap_Fig4Fig1Fig7_2D_nn3.nn3
+|   |   |   MIS_CV_1nmSiO2_1D_nn3.nn3
+|   |   |   MIS_CV_3nmSiO2_1D_nn3.nn3
+|   |   |   MIS_CV_3nmSiO2_metal_1D_nn3.nn3
+|   |   |   MIS_CV_3nmSiO2_metal_2D_nn3.nn3
+|   |   |   NW_core-shell_wz_2D_nn3.nn3
+|   |   |   NW_core-shell_zb_2D_nn3 - quantum.nn3
+|   |   |   NW_core-shell_zb_2D_nn3.nn3
+|   |   |   parabola_half-parabola_nn3.nn3
+|   |   |   pn_junction_GaAs_1D_nn3.nn3
+|   |   |   pn_junction_GaAs_1D_QM_nn3.nn3
+|   |   |   pn_junction_GaAs_2D_nn3.nn3
+|   |   |   pn_junction_GaAs_3D_nn3.nn3
+|   |   |   pn_junction_GaAs_ForwardBias_1D_nn3.nn3
+|   |   |   QWIP_GaAs_AlGaAs_SL_Gunapala_JAP1991_nn3.nn3
+|   |   |   Romanov2006_InGaN_theta_nn3.nn3
+|   |   |   Romanov2006_InGaN_theta_nn3_2nd.nn3
+|   |   |   SET_Scholze_IEEE2000_1D_nn3.nn3
+|   |   |   SET_Scholze_IEEE2000_3D_cl_nn3.nn3
+|   |   |   SET_Scholze_IEEE2000_3D_top_gates_cl_nn3.nn3
+|   |   |   Si_nin_resistor_classical_1D_nn3.nn3
+|   |   |   Si_nin_resistor_quantum_1D_nn3.nn3
+|   |   |   TB_distance_parameters_no_strain_HgTeCdTe.in
+|   |   |   TB_material_parameters_no_strain_HgTeCdTe.in
+|   |   |   THzQCL_Andrews_Vienna_MatSciEng2008_nn3.nn3
+|   |   |   TightBinding_bulk_graphene.nn3
+|   |   |   TightBinding_GaAs.nn3
+|   |   |   TightBinding_GaAs_Vogl.nn3
+|   |   |   TightBinding_Si.nn3
+|   |   |   wurtzite_1D_nn3.nn3
+|   |   |   wurtzite_1D_nn3_Nface.nn3
+|   |   |   wurtzite_1D_nn3_noStrain_noPiezo_noPyro_noPoisson.nn3
+|   |   |   
+|   |   +---basics
+|   |   |       1DSchottky_barrier_GaAs_nn3.nn3
+|   |   |       1DSchottky_barrier_GaAs_ohmic_nn3.nn3
+|   |   |       1DSchottky_barrier_GaAs_SchottkyBarrier0V_nn3.nn3
+|   |   |       1DSchottky_barrier_GaAs_surface_density_nn3.nn3
+|   |   |       1DSchottky_barrier_GaAs_surface_states_acceptor_nn3.nn3
+|   |   |       2DSchottky_barrier_GaAs_nn3.nn3
+|   |   |       basics_1D_doping_constant_np_nn3.nn3
+|   |   |       basics_1D_doping_constant_p_nn3.nn3
+|   |   |       basics_1D_doping_heterostructure_nn3.nn3
+|   |   |       basics_1D_finite_periodic_double_nn3.nn3
+|   |   |       basics_1D_finite_periodic_simple_nn3.nn3
+|   |   |       basics_1D_hello_world_nn3.nn3
+|   |   |       basics_1D_variables_nn3.nn3
+|   |   |       
+|   |   +---demo
+|   |   |       DoubleQuantumWell_6nm_nn3_demo.nn3
+|   |   |       Greg_Snider_MANUAL_1D_nn3_demo.nn3
+|   |   |       pn_junction_GaAs_1D_nn3_demo.nn3
+|   |   |       
+|   |   +---education
+|   |   |   \---lecture_on_quantum_mechanics
+|   |   |           DoubleQuantumWell_nn3.nn3
+|   |   |           nextnano3_QuantumMechanics_Examples.pdf
+|   |   |           ParabolicQW_infinite_analytic_1D_nn3.nn3
+|   |   |           ParabolicQW_infinite_analytic_anharmonic_1D_nn3.nn3
+|   |   |           ParabolicQW_infinite_analytic_half_1D_nn3.nn3
+|   |   |           QW_finite_1D_nn3.nn3
+|   |   |           QW_infinite_1D_nn3.nn3
+|   |   |           QW_large_1D_nn3.nn3
+|   |   |           QW_triangular_1D_nn3.nn3
+|   |   |           Superlattice_1D_nn3.nn3
+|   |   |           Transmission_Barrier_1D_nn3.nn3
+|   |   |           Transmission_Double_Barrier_1D_nn3.nn3
+|   |   |           Transmission_Double_Barrier_1D_nn3.py
+|   |   |           Transmission_Double_Barrier_1D_nn3_Sweep.py
+|   |   |           Transmission_FowlerNordheim_1D_nn3.nn3
+|   |   |           Transmission_FowlerNordheim_1D_nn3_current.nn3
+|   |   |           Transmission_Quantum_Well_1D_nn3.nn3
+|   |   |           Transmission_Step_1D_nn3.nn3
+|   |   |           
+|   |   +---electrolyte
+|   |   |       GouyChapman_template_1D.nn3
+|   |   |       GouyChapman_template_2D.nn3
+|   |   |       GouyChapman_template_3D.nn3
+|   |   |       NaI_PMF_hydrophilic_1D_10mM.nn3
+|   |   |       NaI_PMF_hydrophilic_1D_10mM_z.nn3
+|   |   |       NaI_PMF_hydrophilic_1D_1M.nn3
+|   |   |       NaI_PMF_hydrophilic_2D_10mM.nn3
+|   |   |       NaI_PMF_hydrophobic_1D_10mM.nn3
+|   |   |       NaI_PMF_hydrophobic_1D_1M.nn3
+|   |   |       
+|   |   +---quantum_cascade_lasers
+|   |   |       1DQCL_AlGaAs_Sirtori_APL73_1998_no_doping.nn3
+|   |   |       1DQCL_Andrea_Friedrich_NoInjector_InGaAs_APL86_2005_77K_kp.nn3
+|   |   |       1DQCL_Andrea_Friedrich_NoInjector_InGaAs_APL86_2005_77K_sg.nn3
+|   |   |       1DQCL_Paiella_APL_92_101112.nn3
+|   |   |       1DQCL_Rochat_APL81_2002.nn3
+|   |   |       1DQCL_simple_nn3.nn3
+|   |   |       1DQCL_simple_nn3_Fermi-linear.nn3
+|   |   |       1DQCL_THz_MIT_Sandia_SemicScTech20_2005.nn3
+|   |   |       1DQuantumCascadeLaserSiGe_nn3.nn3
+|   |   |       1DQuantumCascadeLaser_nn3.nn3
+|   |   |       
+|   |   +---quantum_dots
+|   |   |       3DcubicQD_biexciton.nn3
+|   |   |       3DcubicQD_exciton.nn3
+|   |   |       QD_GaN_Andreev_PRB_2000_1D_nn3_band-offsets.nn3
+|   |   |       QD_GaN_Andreev_PRB_2000_1D_nn3_strain-PzPr-poisson-1b.nn3
+|   |   |       QD_GaN_Andreev_PRB_2000_1D_nn3_strain-PzPr-poisson-6kp.nn3
+|   |   |       QD_GaN_Andreev_PRB_2000_1D_nn3_strain.nn3
+|   |   |       QD_GaN_Andreev_PRB_2000_3D_nn3.nn3
+|   |   |       QD_GaN_Andreev_PRB_2000_3D_nn3_WL-only.nn3
+|   |   |       
+|   |   +---templates
+|   |   |       new_input_wz_1D_nn3.nn3
+|   |   |       new_input_wz_2D_nn3.nn3
+|   |   |       new_input_wz_3D_nn3.nn3
+|   |   |       new_input_zb_1D_nn3.nn3
+|   |   |       new_input_zb_2D_nn3.nn3
+|   |   |       new_input_zb_3D_nn3.nn3
+|   |   |       
+|   |   +---transmission
+|   |   |       1D_GaAs_conductance_nn3.nn3
+|   |   |       1D_lead_modes_20nm.nn3
+|   |   |       1D_quantum_tunneling_GaAs_nn3.nn3
+|   |   |       1D_transmission_GaAs_analytic_nn3.nn3
+|   |   |       2D_CBR_MamaluySabathilJAP2003.nn3
+|   |   |       2D_CBR_MamaluySabathilJAP2003_holes.nn3
+|   |   |       2D_CBR_QPC_nn3.nn3
+|   |   |       transmission-nanowire_GaAs_3D_nn3.nn3
+|   |   |       Transmission_Double_Barrier_1D_DwellTime_YamamotoPSSB1998.nn3
+|   |   |       Transmission_Double_Barrier_1D_DwellTime_YamamotoPSSB1998_isolated.nn3
+|   |   |       
+|   |   \---tricks_and_hacks
+|   |           InterbandTunneling_Duboz2019_nn3.nn3
+|   |           InterbandTunneling_Duboz2019_nn3.py
+|   |           
+|   +---keywords
+|   |       database_keywords.val
+|   |       keywords.val
+|   |       keywords_nn3.html
+|   |       keywords_nn3.xml
+|   |       
+|   \---scripts
+|           nextnano3_free.bat
+|           nextnano3_free_gcc.bat
+|           
++---nextnanomat
+|   +---bin
+|   |   |   Autofac.dll
+|   |   |   Ijwhost.dll
+|   |   |   Licensing.deps.json
+|   |   |   Licensing.dll
+|   |   |   Licensing.runtimeconfig.json
+|   |   |   MedallionShell.dll
+|   |   |   Microsoft.WindowsAPICodePack.Core.dll
+|   |   |   Microsoft.WindowsAPICodePack.Shell.dll
+|   |   |   nextnanomat.deps.json
+|   |   |   nextnanomat.dll
+|   |   |   nextnanomat.dll.config
+|   |   |   nextnanomat.exe
+|   |   |   nextnanomat.runtimeconfig.json
+|   |   |   NLog.dll
+|   |   |   PostSharp.dll
+|   |   |   PostSharp.Patterns.Common.dll
+|   |   |   PostSharp.Patterns.Diagnostics.Backends.NLog.dll
+|   |   |   PostSharp.Patterns.Diagnostics.dll
+|   |   |   System.Configuration.ConfigurationManager.dll
+|   |   |   System.Diagnostics.EventLog.dll
+|   |   |   System.Management.dll
+|   |   |   
+|   |   \---runtimes
+|   |       \---win
+|   |           \---lib
+|   |               \---net8.0
+|   |                       System.Diagnostics.EventLog.dll
+|   |                       System.Management.dll
+|   |                       
+|   +---keywords
+|   |       keywords_msb.xml
+|   |       keywords_negf.xml
+|   |       keywords_nn3.xml
+|   |       keywords_nnp.xml
+|   |       
+|   \---scripts
+|           nn_ParaView_GUI.py
+|           nn_ParaView_Integration.py
+|           nn_ParaView_Plotter.py
+|           __init__.py
+|           
++---Output
+|   \---pn_junction_GaAs_1D_demo
+|       |   bias_points.log
+|       |   grid_x.dat
+|       |   job_done.txt
+|       |   pn_junction_GaAs_1D_demo.log
+|       |   pn_junction_GaAs_1D_demo.nnp
+|       |   simulation_database.txt
+|       |   simulation_info.txt
+|       |   simulation_input.txt
+|       |   summary.log
+|       |   variables_database.txt
+|       |   variables_input.txt
+|       |   
+|       +---bias_00000
+|       |       bandedges.dat
+|       |       bias_points.log
+|       |       density_acceptor_ionized.dat
+|       |       density_donor_ionized.dat
+|       |       density_electron.dat
+|       |       density_hole.dat
+|       |       electric_field.dat
+|       |       potential.dat
+|       |       total_charges.txt
+|       |       
+|       \---Structure
+|               alloy_composition.dat
+|               density_acceptor.dat
+|               density_donor.dat
+|               density_fixed_charge.dat
+|               density_intrinsic.dat
+|               materials.dat
+|               material_indices.txt
+|               regions_all.dat
+|               regions_material.dat
+|               
+\---syntax_converters
+        nn3-nnp_syntax_converter.exe
+        

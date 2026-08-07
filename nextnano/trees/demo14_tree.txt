@@ -1,0 +1,31 @@
+﻿Folder PATH listing for volume Windows
+Volume serial number is 3437-CED4
+C:\CODE\OPTICS\NEXTNANO\NONLINEAR_PHOTONICS\NEXTNANO\DEMOS\14_ABSOLUTE_CHI2_GRADED_ACQW_BO
+|   analysis14.py
+|   bundle14.py
+|   campaign14.py
+|   demo.yaml
+|   demo14.py
+|   DEMO14_AUDIT.md
+|   DEMO15_SCOPE.md
+|   gate14.py
+|   graded_acqw14.in.j2
+|   grading14.py
+|   physics14.py
+|   preflight14.py
+|   runlog14.py
+|   run_demo14.py
+|   solver14.py
+|   WORK_LAPTOP_COMMANDS.md
+|   
+\---__pycache__
+        bundle14.cpython-312.pyc
+        campaign14.cpython-312.pyc
+        demo14.cpython-312.pyc
+        gate14.cpython-312.pyc
+        grading14.cpython-312.pyc
+        physics14.cpython-312.pyc
+        preflight14.cpython-312.pyc
+        runlog14.cpython-312.pyc
+        solver14.cpython-312.pyc
+        

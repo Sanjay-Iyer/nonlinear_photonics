@@ -175,9 +175,55 @@ def compare_equivalence(
     }
 
 
+def _load_stage(path: Path) -> dict[str, Any]:
+    if not Path(path).is_file():
+        return {}
+    try:
+        return json.loads(Path(path).read_text(encoding="utf-8"))
+    except Exception:
+        return {}
+
+
+def _write_stage(
+    path: Path, case: str, stage: str, solver: Mapping[str, Any] | None,
+    *, error: str | None = None, metrics: Mapping[str, Any] | None = None,
+) -> None:
+    """Record how far this case got, so a rerun knows what is already paid for."""
+
+    existing = _load_stage(path)
+    payload = {
+        "case": case,
+        "stage": stage,
+        "solver": dict(solver) if solver else existing.get("solver"),
+        "error": error,
+        "metrics": dict(metrics) if metrics else None,
+        "updated_utc": runlog14.utc_now(),
+        "history": (existing.get("history") or []) + [
+            {"stage": stage, "at": runlog14.utc_now()}
+        ],
+    }
+    runlog14.write_json_atomic(Path(path), payload)
+
+
+def _unavailable_payload(
+    prepared: Mapping[str, Any], results: Mapping[str, Any],
+    stages: Mapping[str, Any], reason: str,
+) -> dict[str, Any]:
+    return {
+        # Never `false`: the gate did not fail its comparison, it could not be
+        # evaluated. Those are different verdicts and only `true` unblocks a run.
+        "gate_passed": None,
+        "gate_unavailable_reason": reason,
+        "cases": prepared["cases"],
+        "case_stages": dict(stages),
+        "results": dict(results),
+        "generated_utc": runlog14.utc_now(),
+    }
+
+
 def run_startup_gate(
     cfg: Mapping[str, Any], *, results_root: Path, machine: Any | None,
-    config_path: Path | None = None,
+    config_path: Path | None = None, reuse: bool = False,
 ) -> int:
     """Execute both gates on the licensed machine and record a verdict."""
 
@@ -223,20 +269,56 @@ def run_startup_gate(
         return 3
 
     results: dict[str, Any] = {}
+    stages: dict[str, Any] = {}
     for name, case in prepared["cases"].items():
         case_dir = Path(case["directory"])
-        logger.info("Running %s ...", name)
+        stage_file = case_dir / "case_stage.json"
+        previous = _load_stage(stage_file)
+
+        # --- solve, or reuse a solve already paid for ----------------------
+        invocation_record: dict[str, Any] | None = None
         try:
-            invocation = solver14.execute_real(
-                executable=Path(machine.executable),
-                database=Path(machine.database) if getattr(machine, "database", None) else None,
-                license_path=Path(machine.license) if getattr(machine, "license", None) else None,
-                deck=Path(case["deck"]),
-                output_dir=case_dir / "nextnano_output",
-                threads=int(cfg["nextnano"].get("threads", 1)),
-                timeout_seconds=float(cfg["nextnano"]["solver_timeout_seconds"]),
-                logs_dir=case_dir / "logs",
+            if reuse and previous.get("stage") in (
+                "SOLVER_COMPLETED", "ANALYSIS_FAILED", "ANALYSIS_COMPLETED"
+            ):
+                invocation_record = previous.get("solver")
+                logger.info(
+                    "Reusing the existing %s solve (%s); no solver call.",
+                    name, previous.get("stage"),
+                )
+            else:
+                logger.info("Running %s ...", name)
+                invocation_record = solver14.execute_real(
+                    executable=Path(machine.executable),
+                    database=Path(machine.database)
+                    if getattr(machine, "database", None) else None,
+                    license_path=Path(machine.license)
+                    if getattr(machine, "license", None) else None,
+                    deck=Path(case["deck"]),
+                    output_dir=case_dir / "nextnano_output",
+                    threads=int(cfg["nextnano"].get("threads", 1)),
+                    timeout_seconds=float(cfg["nextnano"]["solver_timeout_seconds"]),
+                    logs_dir=case_dir / "logs",
+                ).as_record()
+            # Persisted BEFORE analysis. The first licensed gate lost this record
+            # because it was only written after analysis succeeded -- so the one
+            # thing that proved a paid call had happened went missing at exactly
+            # the moment it mattered.
+            _write_stage(stage_file, name, "SOLVER_COMPLETED", invocation_record)
+        except Exception as exc:
+            logger.exception("%s solver stage failed", name)
+            _write_stage(stage_file, name, "SOLVER_FAILED", invocation_record,
+                         error=f"{type(exc).__name__}: {exc}")
+            stages[name] = _load_stage(stage_file)
+            payload = _unavailable_payload(
+                prepared, results, stages,
+                f"{name} solver stage failed: {type(exc).__name__}: {exc}",
             )
+            runlog14.write_json_atomic(destination / GATE_RESULT_NAME, payload)
+            return 4
+
+        # --- analyse -------------------------------------------------------
+        try:
             metrics = demo14.analyse_real_trial(
                 cfg, {
                     "root": case_dir,
@@ -245,18 +327,24 @@ def run_startup_gate(
                     "plots": case_dir / "plots",
                 }, prepared["geometry"], prepared["profile"],
             )
-            results[name] = {"metrics": metrics, "solver": invocation.as_record()}
+            results[name] = {"metrics": metrics, "solver": invocation_record}
+            _write_stage(stage_file, name, "ANALYSIS_COMPLETED", invocation_record,
+                         metrics=metrics)
         except Exception as exc:
-            logger.exception("%s failed", name)
-            payload = {
-                "gate_passed": None,
-                "gate_unavailable_reason": f"{name} failed: {type(exc).__name__}: {exc}",
-                "cases": prepared["cases"],
-                "results": results,
-                "generated_utc": runlog14.utc_now(),
-            }
+            logger.exception("%s analysis stage failed", name)
+            _write_stage(stage_file, name, "ANALYSIS_FAILED", invocation_record,
+                         error=f"{type(exc).__name__}: {exc}")
+            stages[name] = _load_stage(stage_file)
+            payload = _unavailable_payload(
+                prepared, results, stages,
+                f"{name} analysis failed AFTER a successful solve: "
+                f"{type(exc).__name__}: {exc}. The raw output is intact -- re-run "
+                f"with --gate --reuse-existing once the cause is fixed, so the "
+                f"licensed calculation is not repeated.",
+            )
             runlog14.write_json_atomic(destination / GATE_RESULT_NAME, payload)
             return 4
+        stages[name] = _load_stage(stage_file)
 
     comparison = compare_equivalence(
         results["gate_a_native_linear"]["metrics"],
@@ -272,6 +360,7 @@ def run_startup_gate(
         "import_equivalence": comparison,
         "paper_reference": paper,
         "cases": prepared["cases"],
+        "case_stages": stages,
         "results": results,
         "solver_calls_planned": 2,
         "generated_utc": runlog14.utc_now(),

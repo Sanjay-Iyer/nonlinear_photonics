@@ -190,6 +190,15 @@ def execute_real(
             f"nextnano++ exceeded {timeout_seconds} s and was terminated. Partial "
             f"output preserved under {output_dir}."
         )
+    if invocation.return_code != 0:
+        # Previously this returned normally and analysis ran on the wreckage of a
+        # failed solve, so a solver failure surfaced later as an unrelated parser
+        # error. The exit code is the solver's own verdict and is believed here.
+        raise SolverTechnicalFailure(
+            f"nextnano++ exited with code {invocation.return_code}. "
+            f"stdout: {invocation.stdout_path}  stderr: {invocation.stderr_path}. "
+            f"Raw output preserved under {output_dir}."
+        )
     return invocation
 
 

@@ -126,6 +126,17 @@ executed. If the solver reads an imported profile differently than we intend,
 24 of the 30 campaign trials silently solve the wrong material and still produce
 plausible pm/V numbers. Two runs to de-risk twenty-four.
 
+### If a previous gate already solved but failed in post-processing
+
+```bash
+python nextnano/demos/14_absolute_chi2_graded_acqw_bo/run_demo14.py --gate --reuse-existing
+```
+
+This re-analyses the existing raw output **without calling the solver again**. It
+reads each case's `case_stage.json` and reuses any case recorded as
+`SOLVER_COMPLETED`, `ANALYSIS_FAILED` or `ANALYSIS_COMPLETED`. A licensed
+calculation is never repeated because Python post-processing crashed.
+
 ### What PASS looks like
 
 ```

@@ -1,0 +1,36 @@
+﻿Folder PATH listing for volume Windows
+Volume serial number is 004D0045 3437:CED4
+C:\CODE\OPTICS\NEXTNANO\NONLINEAR_PHOTONICS\NEXTNANO\RESULTS\DEMO_RUNS\DEMO_RUNS\14_ABSOLUTE_CHI2_GRADED_ACQW_BO\DEMO14_STARTUP_GATE
+|   demo14_startup_gate_result.json
+|   equivalence_profile.json
+|   
++---debug_bundle
++---environment
++---gate_a_native_linear
+|   +---logs
+|   |       stderr.txt
+|   |       stdout.txt
+|   |       
+|   +---nextnano_input
+|   |       case.in
+|   |       
+|   \---nextnano_output
++---gate_b_imported_linear
+|   +---logs
+|   +---nextnano_input
+|   |       al_profile.dat
+|   |       case.in
+|   |       
+|   \---nextnano_output
++---logs
+|       errors.log
+|       run.log
+|       run_debug.log
+|       warnings.log
+|       
++---optimization
+|   \---checkpoints
++---plots
++---summaries
++---trials
+\---validation

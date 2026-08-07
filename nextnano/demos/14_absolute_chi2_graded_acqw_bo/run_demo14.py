@@ -53,8 +53,16 @@ def resolve_machine():
 
 
 def _results_root():
+    """The demo-run root. ``machine.results_root`` ALREADY ends in ``demo_runs``.
+
+    ``DEFAULT_RESULTS_ROOT = nextnano/results/demo_runs``, and
+    ``sweeps.prepare_run`` joins ``machine.results_root / demo_id`` directly.
+    Appending another ``demo_runs`` here produced the
+    ``results/demo_runs/demo_runs/14_...`` path the first licensed gate wrote to.
+    """
+
     machine = resolve_machine()
-    return Path(machine.results_root) / "demo_runs", machine
+    return Path(machine.results_root), machine
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -79,6 +87,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--verbose", action="store_true")
     parser.add_argument("--force-no-gate", action="store_true",
                         help="launch the campaign without a passing startup gate")
+    parser.add_argument(
+        "--reuse-existing", action="store_true",
+        help="with --gate: re-analyse an existing solve instead of calling the "
+             "solver again. Use after a post-processing failure so the licensed "
+             "calculation is not repeated.",
+    )
     args = parser.parse_args(argv)
 
     config_path = Path(args.config) if args.config else DEMO_DIR / "demo.yaml"
@@ -139,7 +153,8 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.gate:
         return gate14.run_startup_gate(
-            cfg, results_root=results_root, machine=machine, config_path=config_path
+            cfg, results_root=results_root, machine=machine,
+            config_path=config_path, reuse=bool(args.reuse_existing),
         )
 
     if args.run:

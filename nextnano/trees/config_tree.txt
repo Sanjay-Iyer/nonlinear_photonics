@@ -1,0 +1,19 @@
+﻿Folder PATH listing for volume Windows
+Volume serial number is 3437-CED4
+C:\CODE\OPTICS\NEXTNANO\NONLINEAR_PHOTONICS\NEXTNANO\CONFIG
+|   paths.local.yaml
+|   paths.local.yaml.example
+|   
++---machines
+|       nextnano_machine.example.yaml
+|       
++---models
+|       .gitkeep
+|       
++---parsers
+|       nextnano_pp_3_0_0.yaml
+|       
+\---sweeps
+        .gitkeep
+        example_sweep.yaml
+        
