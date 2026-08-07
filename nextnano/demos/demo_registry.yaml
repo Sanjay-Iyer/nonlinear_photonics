@@ -453,3 +453,56 @@ demos:
       - Answer whether grading helps with a balanced paired campaign. v3 evaluated five genuinely graded designs (erf 3, sigmoid 1, cosine 1, linear 0) and none was feasible, so the present data cannot decide it.
     unvalidated_syntax:
       - inherits Demo 12's unvalidated ternary_linear/ternary_constant alloy-composition output layout
+
+  14_absolute_chi2_graded_acqw_bo:
+    title: Absolute chi(2) in pm/V with graded-interface Bayesian optimization
+    # Demo 14 advances Demo 13's RELATIVE arbitrary-unit merit to an ABSOLUTE
+    # susceptibility in pm/V, and replaces the 16-sublayer staircase with
+    # continuous composition profiles. The absolute model itself is the Demo 11
+    # implementation in _shared/chi2.py running in mode: absolute -- what Demo 14
+    # adds is the two constants it needs, an independent cross-check of both the
+    # unit formulation and the k-space quadrature, and a production run harness.
+    #
+    # NOT YET LICENSED-VALIDATED. Three of the four grading families reach
+    # nextnano++ through ternary_import, a path no nextnano++ instance in this
+    # project has executed: the free home build parses such decks and then
+    # refuses them. The licensed startup gate exists precisely to close that gap
+    # before the campaign spends 30 trials on it.
+    status: licensed_run_pending
+    depends_on:
+      - 13_ax_bayesian_optimization_graded_acqw
+      - 11_paper_validation_interband_chi2_acqw
+    introduces:
+      - absolute chi(2) reported in pm/V using the Ramesh Eq. 3 prefactor, never a relative merit
+      - r_e_hh = 0.751 nm (7.51 Angstrom, VASP/HSE06) verified verbatim from Ramesh 2023
+      - N_z from a named counting convention with the period/well ambiguity reported as a sensitivity
+      - an independent angular-frequency implementation cross-checking the shipped energy form
+      - an independent Cartesian (kx, ky) quadrature cross-checking the radial k reduction
+      - continuous composition profiles via native ternary_linear and imported ternary_import
+      - a common 10-90 percent interface width shared by linear, fermi, erf and cosine
+      - peak-referenced realized widths with a nullable nominal-referenced companion
+      - a grading parameterization that is feasible by construction, with no subresolution rejection
+      - a production run harness with six log streams, structured events and atomic checkpointing
+      - a deterministic mock solver covering seven failure modes, marked unmistakably non-scientific
+      - a licensed startup gate comparing native ternary_linear against an equivalent ternary_import
+    home_syntax_check: input_generation_and_free_parser_parse_only
+    home_solver_check: not_attempted_free_build_cannot_execute_imports
+    licensed_validation:
+      date: null
+      solver: null
+      evidence: >-
+        None yet. Everything solver-free has been exercised on the home laptop:
+        94 Demo 14 tests pass, covering the grading renderer over thousands of
+        sampled geometries, the absolute chi(2) cross-checks, and a full mock
+        campaign with resume and every failure mode. No licensed nextnano++ run
+        has been performed, so no pm/V number produced by this demo has yet been
+        computed from a real solve.
+    pending_licensed_checks:
+      - Run the startup gate first; it builds one linear profile natively and as an imported table and requires the two solves to agree. This is the only evidence that ternary_import does what we assume, and 24 of 30 campaign trials depend on it.
+      - Run the paper-reference case (7.1/1.8/2.9 nm) and compare against 2340 / 1200 / 1363 pm/V and the ~1520 nm resonance. A disagreement is a scientific finding, not a gate failure; only a technically invalid result blocks the campaign.
+      - Confirm nextnano++ realizes an imported alloy profile on the same coordinate convention the renderer assumes (absolute x, not region-relative), since a silent mismatch would still produce plausible pm/V values.
+      - Establish whether erf is available in the nextnano++ analytic_function expression language; the free parser accepts arbitrary function strings, so a passing --parse proves nothing.
+      - Demo 13 Stage 5 mesh convergence has still not run, so the 0.05 nm production mesh Demo 14 inherits is itself unvalidated.
+    unvalidated_syntax:
+      - ternary_import and import{ file{} } parse against nextnano++ 3.0.0 but have never been executed by any nextnano++ build in this project
+      - the analytic_function alloy route is unverified; --parse does not validate function-string contents

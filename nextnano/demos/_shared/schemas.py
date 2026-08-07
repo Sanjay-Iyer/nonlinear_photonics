@@ -758,6 +758,39 @@ DEMO13_SCHEMA = DemoSchema(
     ),
 )
 
+# Demo 14 replaces Demo 13's relative merit with an absolute pm/V susceptibility
+# and its staircase renderer with continuous composition profiles, so its config
+# shares almost no section names with Demo 13's. The cross-section relationships
+# (trial budget, absolute-mode constants, search-space bounds) are checked by
+# demo14.validate_config(), which states them far more clearly than a scalar
+# schema can.
+DEMO14_SCHEMA = DemoSchema(
+    top_level=frozenset(
+        {
+            "experiment",
+            "materials",
+            "geometry",
+            "grading",
+            "nextnano",
+            "mesh",
+            "states",
+            "chi2",
+            "k_parallel",
+            "optimization",
+            "constraints",
+            "failure_policy",
+            "logging",
+            "checkpointing",
+            "plotting",
+            "paper_reference",
+            "startup_gate",
+            "workflow",
+            "paths",
+        }
+    ),
+)
+
+
 DEMO_SCHEMAS: Mapping[str, DemoSchema] = {
     "01": LEGACY_SCHEMA,
     "02": LEGACY_SCHEMA,
@@ -772,6 +805,7 @@ DEMO_SCHEMAS: Mapping[str, DemoSchema] = {
     "11": DEMO11_SCHEMA,
     "12": DEMO12_SCHEMA,
     "13": DEMO13_SCHEMA,
+    "14": DEMO14_SCHEMA,
 }
 
 

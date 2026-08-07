@@ -129,8 +129,9 @@ PLOT_NOTES: Mapping[str, Mapping[str, str]] = {
     },
     "bo_chi2_1550_vs_boundary_probability.png": {
         "population": "completed",
-        "v3": "Boundary probability is ~3e-5 everywhere, far inside its 1e-3 "
-              "bound. This constraint never bound.",
+        "v3": "Fifteen trials sit at 1.8e-5 to 3.4e-5, far inside the 1e-3 "
+              "bound, but t0006 reaches 1.91e-3 and violates it. This "
+              "constraint bound exactly once, on the one quasi-bound design.",
     },
     "bo_chi2_1550_vs_state_tracking_confidence.png": {
         "population": "completed",
@@ -294,7 +295,9 @@ METRIC_NOTES: Mapping[str, Mapping[str, str]] = {
         "direction": "lower is better",
         "definition": "Max over states of the probability inside the outer 5% of the domain.",
         "caution": "Distinct from total_boundary_probability, which sums over states. "
-                   "~3e-5 in v3, so this constraint never bound.",
+                   "In v3 it spans 1.8e-5 to 1.91e-3: near-constant for fifteen "
+                   "trials, but it caught t0006 above the 1e-3 bound. Not an "
+                   "inert constraint.",
     },
     "state_tracking_confidence": {
         "plain": "How sure the code is that it followed the same physical state.",
@@ -470,7 +473,8 @@ PARAMETER_NOTES: tuple[Mapping[str, Any], ...] = (
      "plain": "How much of a state may leak to the simulation edge.",
      "units": "probability", "invalidates_checkpoint": True,
      "increase": "accepts less-confined states", "decrease": "stricter confinement",
-     "interacts": "nearly constant in v3, so it carries no information for the model"},
+     "interacts": "spans 1.8e-5 to 1.91e-3 in v3 and rejected t0006; the only "
+                  "constraint that caught a quasi-bound design"},
     {"path": "bo.outcome_constraints.minimum_state_tracking_confidence",
      "kind": "QC threshold",
      "plain": "How confident the state matching must be.",

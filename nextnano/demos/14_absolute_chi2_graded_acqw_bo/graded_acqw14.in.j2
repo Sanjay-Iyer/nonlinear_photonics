@@ -1,0 +1,66 @@
+# Demo 14: absolute chi(2) graded GaAs/Al(x)Ga(1-x)As asymmetric coupled
+# quantum well, one Bayesian-optimization trial.
+#
+# Grading is expressed as a continuous composition profile x_Al(x):
+#   * linear interfaces use the native ternary_linear{} grammar;
+#   * fermi / erf / cosine are generated in Python and supplied through
+#     import{ file{} } + ternary_import{}.
+# There is no 16-sublayer staircase. Growth coordinate is x, confirmed against
+# keywords_nnp.xml for nextnano++ 3.0.0.
+#
+# The import block below is empty for linear designs and populated otherwise;
+# demo14.render_deck substitutes it.
+
+global{
+    simulate1D{}
+    temperature = {{temperature_K}}
+    substrate{ name = "GaAs" }
+    crystal_zb{ x_hkl = [1, 0, 0]  y_hkl = [0, 1, 0] }
+}
+
+{{import_block}}
+
+contacts{ fermi{ name = qw_contact  bias = 0.0 } }
+
+grid{
+    xgrid{
+{{grid_lines}}
+    }
+}
+
+structure{
+    output_region_index{ boxes = no }
+    output_material_index{ boxes = no }
+    output_alloy_composition{ boxes = no }
+{{structure_regions}}
+}
+
+classical{
+    Gamma{}
+    HH{}
+    LH{}
+    SO{}
+    output_bandedges{ averaged = no }
+    output_bandgap{}
+}
+
+quantum{
+    region{
+        name = "{{quantum_region_name}}"
+        x = [{{quantum_start_nm}}, {{quantum_end_nm}}]
+        no_density = yes
+        boundary{ x = dirichlet }
+        Gamma{ num_ev = {{number_of_electron_states}} }
+        HH{ num_ev = {{number_of_hole_states}} }
+        output_states{ max_num = {{output_state_count}} envelopes = yes probabilities = yes }
+        transition_energies{ Gamma_HH{} }
+        overlap_integrals{ Gamma_HH{} }
+        dipole_moment_matrix_elements{
+            polarization{ name = "{{dipole_polarization_name}}" re = [1, 0, 0] }
+            Gamma{}
+            HH{}
+        }
+    }
+}
+
+run{ quantum{} }

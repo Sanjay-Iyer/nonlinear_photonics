@@ -191,7 +191,7 @@ away.
 - **Units:** probability
 - **Raising it:** accepts less-confined states
 - **Lowering it:** stricter confinement
-- **Interacts with:** nearly constant in v3, so it carries no information for the model
+- **Interacts with:** spans 1.8e-5 to 1.91e-3 in v3 and rejected t0006; the only constraint that caught a quasi-bound design
 - **Invalidates an existing checkpoint:** yes
 
 ## `bo.outcome_constraints.minimum_state_tracking_confidence`

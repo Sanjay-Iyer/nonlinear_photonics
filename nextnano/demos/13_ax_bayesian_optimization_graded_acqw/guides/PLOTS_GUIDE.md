@@ -354,7 +354,7 @@ away.
 
 **What it cannot tell you.** The constraint bound is applied by Ax separately; this plot shows the raw relationship including rejected points.
 
-**In v3.** Boundary probability is ~3e-5 everywhere, far inside its 1e-3 bound. This constraint never bound.
+**In v3.** Fifteen trials sit at 1.8e-5 to 3.4e-5, far inside the 1e-3 bound, but t0006 reaches 1.91e-3 and violates it. This constraint bound exactly once, on the one quasi-bound design.
 
 ## `bo_chi2_1550_vs_state_tracking_confidence.png`
 

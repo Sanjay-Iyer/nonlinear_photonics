@@ -81,7 +81,7 @@ away.
 - **Units:** probability
 - **Direction:** lower is better
 - **How it is computed:** Max over states of the probability inside the outer 5% of the domain.
-- **Caution:** Distinct from total_boundary_probability, which sums over states. ~3e-5 in v3, so this constraint never bound.
+- **Caution:** Distinct from total_boundary_probability, which sums over states. In v3 it spans 1.8e-5 to 1.91e-3: near-constant for fifteen trials, but it caught t0006 above the 1e-3 bound. Not an inert constraint.
 
 ## `maximum_feasible_grading_nm`
 
