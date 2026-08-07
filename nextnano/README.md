@@ -13,6 +13,10 @@ script file (`Path(__file__).resolve().parents[1]`), so the two laptops can
 keep the repository at **different absolute paths** and nothing moves. The only
 per-machine data is one gitignored YAML file.
 
+> [`WORK_LAPTOP_PATHS.txt`](docs/WORK_LAPTOP_PATHS.txt) and
+> [`WORK_LAPTOP_PATHS.json`](docs/WORK_LAPTOP_PATHS.json) are the authoritative
+> deployment-path references for licensed work-laptop execution.
+
 **→ The full cycle, commands, and error-correction loop are in
 [docs/WORKFLOW.md](docs/WORKFLOW.md). Start there.**
 

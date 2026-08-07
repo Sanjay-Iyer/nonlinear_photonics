@@ -1,0 +1,19 @@
+﻿{
+    "WORK_LAPTOP_NEXTNANO_ROOT":  "C:\\Code\\optics\\nextnano",
+    "REPO_ROOT":  "C:\\Code\\optics\\nextnano\\nonlinear_photonics",
+    "NEXTNANO_REPO_ROOT":  "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\nextnano",
+    "NEXTNANO_PORTABLE_ROOT":  "C:\\Code\\optics\\nextnano\\2026_07_03",
+    "NEXTNANO_EXE":  "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\bin\\nextnano++_Intel_64bit.exe",
+    "NEXTNANO_DATABASE":  "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\database\\database.nnp",
+    "NEXTNANO_LICENSE":  "C:\\Code\\optics\\nextnano\\2026_07_03\\License\\License_nnp.lic",
+    "MACHINE_CONFIG_DIR":  "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\nextnano\\config\\machines",
+    "MACHINE_CONFIG_EXAMPLE":  "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\nextnano\\config\\machines\\nextnano_machine.example.yaml",
+    "MACHINE_CONFIG_LOCAL":  "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\nextnano\\config\\machines\\nextnano_machine.local.yaml",
+    "DEMOS_ROOT":  "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\nextnano\\demos",
+    "DEMO_16C":  "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\nextnano\\demos\\16C_minimal_linear_grading_validation",
+    "DEMO_16D":  "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\nextnano\\demos\\16D_acqw_linear_grading_geometry_validation",
+    "TESTS_ROOT":  "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\nextnano\\tests",
+    "REPO_RESULTS_ROOT":  "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\nextnano\\results",
+    "DEMO_RUNS_ROOT":  "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\nextnano\\results\\demo_runs",
+    "SHORT_RESULTS_ROOT":  "C:\\nn_results"
+}

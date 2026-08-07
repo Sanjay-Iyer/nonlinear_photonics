@@ -1,0 +1,130 @@
+﻿============================================================
+NEXTNANO WORK LAPTOP - AUTHORITATIVE PATH MANIFEST
+Generated: 2026-08-07 18:27:37
+Computer: RXDN5018731W
+User: iyersn
+============================================================
+
+IMPORTANT:
+2026_07_03 = portable licensed nextnano++ installation
+nonlinear_photonics = Git repository
+DO NOT CONFUSE THESE TWO DIRECTORIES.
+
+The coding LLM should use these paths exactly on this work laptop.
+
+WORK_LAPTOP_NEXTNANO_ROOT
+  PATH   : C:\Code\optics\nextnano
+  EXISTS : True
+
+REPO_ROOT
+  PATH   : C:\Code\optics\nextnano\nonlinear_photonics
+  EXISTS : True
+
+NEXTNANO_REPO_ROOT
+  PATH   : C:\Code\optics\nextnano\nonlinear_photonics\nextnano
+  EXISTS : True
+
+NEXTNANO_PORTABLE_ROOT
+  PATH   : C:\Code\optics\nextnano\2026_07_03
+  EXISTS : True
+
+NEXTNANO_EXE
+  PATH   : C:\Code\optics\nextnano\2026_07_03\nextnano++\bin\nextnano++_Intel_64bit.exe
+  EXISTS : True
+
+NEXTNANO_DATABASE
+  PATH   : C:\Code\optics\nextnano\2026_07_03\nextnano++\database\database.nnp
+  EXISTS : True
+
+NEXTNANO_LICENSE
+  PATH   : C:\Code\optics\nextnano\2026_07_03\License\License_nnp.lic
+  EXISTS : True
+
+MACHINE_CONFIG_DIR
+  PATH   : C:\Code\optics\nextnano\nonlinear_photonics\nextnano\config\machines
+  EXISTS : True
+
+MACHINE_CONFIG_EXAMPLE
+  PATH   : C:\Code\optics\nextnano\nonlinear_photonics\nextnano\config\machines\nextnano_machine.example.yaml
+  EXISTS : True
+
+MACHINE_CONFIG_LOCAL
+  PATH   : C:\Code\optics\nextnano\nonlinear_photonics\nextnano\config\machines\nextnano_machine.local.yaml
+  EXISTS : False
+
+DEMOS_ROOT
+  PATH   : C:\Code\optics\nextnano\nonlinear_photonics\nextnano\demos
+  EXISTS : True
+
+DEMO_16C
+  PATH   : C:\Code\optics\nextnano\nonlinear_photonics\nextnano\demos\16C_minimal_linear_grading_validation
+  EXISTS : True
+
+DEMO_16D
+  PATH   : C:\Code\optics\nextnano\nonlinear_photonics\nextnano\demos\16D_acqw_linear_grading_geometry_validation
+  EXISTS : True
+
+TESTS_ROOT
+  PATH   : C:\Code\optics\nextnano\nonlinear_photonics\nextnano\tests
+  EXISTS : True
+
+REPO_RESULTS_ROOT
+  PATH   : C:\Code\optics\nextnano\nonlinear_photonics\nextnano\results
+  EXISTS : True
+
+DEMO_RUNS_ROOT
+  PATH   : C:\Code\optics\nextnano\nonlinear_photonics\nextnano\results\demo_runs
+  EXISTS : True
+
+SHORT_RESULTS_ROOT
+  PATH   : C:\nn_results
+  EXISTS : True
+
+============================================================
+PYTHON
+============================================================
+C:\Users\iyersn\AppData\Local\miniforge3\envs\llm\python.exe
+3.12.13 | packaged by conda-forge | (main, Mar  5 2026, 16:36:12) [MSC v.1944 64 bit (AMD64)]
+
+============================================================
+CONDA
+============================================================
+Conda executable: Conda
+
+Conda environments:
+
+# conda environments:
+#
+# * -> active
+# + -> frozen
+base                     C:\Users\iyersn\AppData\Local\miniforge3
+LLM                  *   C:\Users\iyersn\AppData\Local\miniforge3\envs\LLM
+air                      C:\Users\iyersn\AppData\Local\miniforge3\envs\air
+
+
+============================================================
+GIT REPOSITORY
+============================================================
+Git top level:
+C:/Code/optics/nextnano/nonlinear_photonics
+
+Git branch:
+main
+
+Git remote:
+origin	https://github.com/Sanjay-Iyer/nonlinear_photonics (fetch)
+origin	https://github.com/Sanjay-Iyer/nonlinear_photonics (push)
+
+============================================================
+LOCAL MACHINE CONFIG
+============================================================
+MISSING: C:\Code\optics\nextnano\nonlinear_photonics\nextnano\config\machines\nextnano_machine.local.yaml
+
+============================================================
+AVAILABLE DEMO 16 DIRECTORIES
+============================================================
+C:\Code\optics\nextnano\nonlinear_photonics\nextnano\demos\16B_simple_acqw_grading_validation
+C:\Code\optics\nextnano\nonlinear_photonics\nextnano\demos\16C_minimal_linear_grading_validation
+C:\Code\optics\nextnano\nonlinear_photonics\nextnano\demos\16D_acqw_linear_grading_geometry_validation
+C:\Code\optics\nextnano\nonlinear_photonics\nextnano\demos\16_acqw_renderer_stress_validation
+
