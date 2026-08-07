@@ -1,0 +1,99 @@
+demo: 16C_minimal_linear_grading_validation
+purpose: Prove that changing a linear AlGaAs grading width in Python changes the alloy
+  composition profile nextnano++ actually constructs.
+total_cases: 4
+grading_profile: linear
+grading_families_supported:
+- linear
+deterministic: true
+random_seed: null
+fixed_geometry:
+  thick_well_nm: 7.1
+  central_barrier_nm: 1.8
+  thin_well_nm: 2.9
+  total_well_thickness_nm: 10.0
+  asymmetry_s: 0.41999999999999993
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+grading_width_bounds_nm:
+- 0.4
+- 1.4
+width_to_interface_map:
+  outer_left_algaas_to_gaas: right_grading_width_nm
+  central_gaas_to_algaas: left_grading_width_nm
+  central_algaas_to_gaas: right_grading_width_nm
+  outer_right_gaas_to_algaas: left_grading_width_nm
+physics_cases:
+- case_01
+- case_03
+cases:
+- case_id: case_01
+  name: near_abrupt_minimum_grading
+  purpose: Sharpest interface the production renderer accepts (0.4 nm 10-90 on both
+    sides). The near-abrupt end of the comparison.
+  left_grading_width_nm: 0.4
+  right_grading_width_nm: 0.4
+  physics: true
+  grading_profile: linear
+  derived_thick_well_nm: 7.1
+  derived_central_barrier_nm: 1.8
+  derived_thin_well_nm: 2.9000000000000004
+  asymmetry_s: 0.41999999999999993
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  symmetric_grading: true
+  linear_ramp_span_nm: 0.5
+  non_overlap_margin_nm: 1.3
+- case_id: case_02
+  name: medium_grading
+  purpose: 0.70 nm on both sides. An intermediate linear transition, halfway between
+    cases 01 and 03.
+  left_grading_width_nm: 0.7
+  right_grading_width_nm: 0.7
+  physics: false
+  grading_profile: linear
+  derived_thick_well_nm: 7.1
+  derived_central_barrier_nm: 1.8
+  derived_thin_well_nm: 2.9000000000000004
+  asymmetry_s: 0.41999999999999993
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  symmetric_grading: true
+  linear_ramp_span_nm: 0.875
+  non_overlap_margin_nm: 0.925
+- case_id: case_03
+  name: wider_grading
+  purpose: 1.00 nm on both sides. Visibly softer than case 01 and still clearly non-overlapping
+    across the 1.8 nm barrier (0.55 nm of margin).
+  left_grading_width_nm: 1.0
+  right_grading_width_nm: 1.0
+  physics: true
+  grading_profile: linear
+  derived_thick_well_nm: 7.1
+  derived_central_barrier_nm: 1.8
+  derived_thin_well_nm: 2.9000000000000004
+  asymmetry_s: 0.41999999999999993
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  symmetric_grading: true
+  linear_ramp_span_nm: 1.25
+  non_overlap_margin_nm: 0.55
+- case_id: case_04
+  name: asymmetric_grading
+  purpose: 0.40 nm left, 1.00 nm right, same geometry as every other case. Proves
+    the two central interfaces are controlled independently -- and, because the two
+    outer interfaces take the same widths by interface TYPE, the asymmetry appears
+    mirrored at the outer barriers too.
+  left_grading_width_nm: 0.4
+  right_grading_width_nm: 1.0
+  physics: false
+  grading_profile: linear
+  derived_thick_well_nm: 7.1
+  derived_central_barrier_nm: 1.8
+  derived_thin_well_nm: 2.9000000000000004
+  asymmetry_s: 0.41999999999999993
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  symmetric_grading: false
+  linear_ramp_span_nm: 0.875
+  non_overlap_margin_nm: 0.925

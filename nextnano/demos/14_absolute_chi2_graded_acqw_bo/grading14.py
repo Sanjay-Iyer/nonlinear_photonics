@@ -719,6 +719,31 @@ def _imported_regions(
     }
 
 
+def render_imported_blocks(
+    profile: CompositionProfile,
+    *,
+    import_name: str = "al_profile",
+    material_name: str = "Al(x)Ga(1-x)As",
+    reason: str = "",
+) -> dict[str, Any]:
+    """The imported-table rendering of ``profile``, whatever family it came from.
+
+    :func:`render_structure_blocks` already chooses this path for fermi/erf/cosine
+    and for overlapped linear grades. This exposes the *same* renderer
+    unconditionally, so a linear profile that would natively use
+    ``ternary_linear{}`` can also be handed to nextnano++ as a table.
+
+    That is not an alternative implementation -- it is the production importer,
+    called deliberately. Demo 17's native-vs-imported equivalence experiment needs
+    both renderings of one profile, and generating the second one anywhere else
+    would compare Demo 17's importer against nextnano++ rather than Demo 14's.
+    """
+
+    return _imported_regions(
+        profile, import_name=import_name, material_name=material_name, reason=reason
+    )
+
+
 def render_structure_blocks(
     profile: CompositionProfile,
     *,

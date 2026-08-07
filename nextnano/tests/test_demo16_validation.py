@@ -354,3 +354,73 @@ def test_results_root_has_no_duplicate_demo_runs():
     parts = list(Path(root).parts)
     assert not [a for a, b in zip(parts, parts[1:]) if a == b]
     assert parts.count("demo_runs") == 1
+
+
+# --- parser output classification -----------------------------------------
+#
+# The work-laptop run reported "Checking database for errors..." as the reason
+# for all 20 failures. That is a PROGRESS line; the extractor matched "error" as
+# a substring and returned the first hit, hiding the real message. These tests
+# pin the classification so a diagnosis can never again be a status line.
+
+
+def test_benign_progress_lines_are_not_treated_as_failures():
+    for line in (
+        "Checking database for errors...",
+        "Checking input file for errors...",
+        "NOTE: This version of nextnano++ does not need a license file. "
+        "License file ignored.",
+        "In case you have a paid license, please download the corresponding "
+        "licensed version of nextnano++.",
+    ):
+        lowered = line.lower()
+        assert any(b in lowered for b in demo16._BENIGN_LINES), line
+        assert not any(
+            m in lowered for m in demo16._FATAL_MARKERS
+        ), f"benign line matched a fatal marker: {line}"
+
+
+def test_real_failures_are_still_detected():
+    for line, expected in (
+        ("Too many instances of 'ternary_linear'.", "too many instances"),
+        ("Terminating program !!", "terminating program"),
+        ("Validation error in line 43 at group:", "validation error"),
+        ("ERROR: license expired", "license expired"),
+        ("Unexpected group 'output_imports'.", "unexpected group"),
+    ):
+        assert any(m in line.lower() for m in demo16._FATAL_MARKERS), line
+
+
+def test_failure_reason_skips_progress_lines_and_names_the_real_error():
+    stdout = (
+        "Reading input file (case.in)...\n"
+        "Checking database for errors...\n"
+        "Validation error in line 43 at group:\n"
+        "'structure/region'.\n"
+        "Too many instances of 'ternary_linear'.\n"
+        "Terminating program !!\n"
+    )
+    reason = demo16._failure_reason(stdout, "", 1)
+    assert "Checking database for errors" not in reason, (
+        "the reason is a progress line, not a diagnosis"
+    )
+    assert "Too many instances" in reason or "Validation error" in reason
+
+
+def test_failure_reason_shows_the_tail_when_nothing_names_itself_an_error():
+    """A binary that dies quietly must still produce a usable message."""
+
+    stdout = "Reading environment...\nChecking database for errors...\n"
+    reason = demo16._failure_reason(stdout, "", 3)
+    assert "exit 3" in reason
+    assert "last output" in reason
+
+
+def test_license_is_forwarded_to_the_parser():
+    """The licensed build will not start without -l, even for --parse."""
+
+    import inspect
+
+    source = inspect.getsource(demo16.parse_deck)
+    assert '"-l"' in source, "parse_deck does not pass the licence file"
+    assert "license_path" in inspect.signature(demo16.parse_deck).parameters

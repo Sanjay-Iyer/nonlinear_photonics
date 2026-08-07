@@ -41,6 +41,16 @@ def database_for(exe: Path | None) -> Path | None:
     return None
 
 
+def license_for(machine: Any | None) -> Path | None:
+    """The licence file, when the resolved machine has one.
+
+    The licensed build will not start without it even for --parse.
+    """
+
+    path = getattr(machine, "license", None) if machine else None
+    return Path(path) if path and Path(path).is_file() else None
+
+
 def parser_executable(machine: Any | None) -> Path | None:
     configured = getattr(machine, "executable", None) if machine else None
     if configured and Path(configured).is_file():
@@ -272,6 +282,7 @@ def run_preflight(verbose: bool = False) -> int:
             "would not mean the renderer produces parseable decks"
         )
         database = database_for(exe)
+        licence = license_for(machine)
         cases = cases16.load_cases(cases_path)
         picked = [next(c for c in cases if c.grading_profile == p)
                   for p in cases16.PROFILES]
@@ -280,7 +291,8 @@ def run_preflight(verbose: bool = False) -> int:
             for case in picked:
                 _g, profile, blocks, deck = demo16.build_case(cfg, case)
                 result = demo16.parse_deck(
-                    exe, database, Path(tmp) / case.case_id, deck, blocks["datafile"]
+                    exe, database, Path(tmp) / case.case_id, deck,
+                    blocks["datafile"], license_path=licence,
                 )
                 assert result["passed"], (
                     f"{case.case_id} ({case.grading_profile}): "

@@ -330,11 +330,70 @@ def build_case(cfg: Mapping[str, Any], case: cases16.ValidationCase):
     return geometry, profile, blocks, deck
 
 
+#: Benign progress lines that contain the substring "error". Matching these as
+#: failures reported "Checking database for errors..." as the reason for every
+#: case, which is a status message, not a diagnosis.
+_BENIGN_LINES = (
+    "checking database for errors",
+    "checking input file for errors",
+    "no errors",
+    "0 errors",
+    # The free build says this whenever -l is supplied. It is a notice, not a
+    # failure, and matching the bare word "license" turned it into one.
+    "does not need a license file",
+    "license file ignored",
+    "please download the corresponding licensed version",
+)
+
+#: Substrings that genuinely indicate a refused deck. Deliberately specific:
+#: "license" alone matches the free build's benign notice, and "error" alone
+#: matches "Checking database for errors...", which is a progress line.
+_FATAL_MARKERS = (
+    "terminating program", "validation error", "fatal error",
+    "too many instances", "unexpected group", "syntax error",
+    "license expired", "license error", "invalid license",
+    "no license", "license not found", "could not find license",
+)
+
+
+def _failure_reason(stdout: str, stderr: str, return_code: int) -> str:
+    """A diagnosis, not the first line that happens to contain 'error'."""
+
+    interesting: list[str] = []
+    for line in (stdout + "\n" + stderr).splitlines():
+        stripped = line.strip()
+        lowered = stripped.lower()
+        if not stripped or any(b in lowered for b in _BENIGN_LINES):
+            continue
+        if any(m in lowered for m in _FATAL_MARKERS) or "error" in lowered:
+            interesting.append(stripped)
+    if interesting:
+        return " | ".join(interesting[:3])
+    # Nothing named itself an error: show where the output stopped, which is the
+    # only useful signal when a binary dies quietly.
+    tail = [ln.strip() for ln in (stdout + "\n" + stderr).splitlines() if ln.strip()]
+    return f"exit {return_code}; last output: " + " | ".join(tail[-3:])
+
+
 def parse_deck(
     exe: Path, database: Path | None, case_dir: Path, deck_text: str,
     datafile: str, import_name: str = "al_profile",
+    license_path: Path | None = None,
+    runmode: str = "--parse", stage: str = "parser", timeout: float = 180.0,
 ) -> dict[str, Any]:
-    """Write the deck and run ``--parse``. No physics, no licence consumed."""
+    """Write the deck and run ``--parse``. No physics, no licence consumed.
+
+    The licensed build still needs its licence *file* to start at all, even
+    though ``--parse`` performs no computation against it. Omitting ``-l`` makes
+    it stop immediately after the database check -- which is what made all 20
+    cases fail on the work laptop while passing on the free build.
+
+    ``runmode`` and ``stage`` exist so the *same* wrapper -- one argv layout, one
+    fatal-marker set, one artifact convention -- also serves ``--structure``,
+    which parses and then builds the structure without solving. Demo 16B uses it
+    that way for its Level 2. Both default to the Level 1 behaviour, so a Demo 16
+    call is unchanged.
+    """
 
     deck_dir = case_dir / "nextnano_input"
     deck_dir.mkdir(parents=True, exist_ok=True)
@@ -343,52 +402,61 @@ def parse_deck(
     if datafile:
         runlog14.write_text_atomic(deck_dir / f"{import_name}.dat", datafile)
 
-    argv = [str(exe), "--parse"]
+    argv = [str(exe), str(runmode)]
     if database:
         argv += ["-d", str(database)]
-    argv += ["-o", str(case_dir / "parser" / "out"), "case.in"]
-    (case_dir / "parser").mkdir(parents=True, exist_ok=True)
+    if license_path:
+        argv += ["-l", str(license_path)]
+    argv += ["-o", str(case_dir / stage / "out"), "case.in"]
+    (case_dir / stage).mkdir(parents=True, exist_ok=True)
 
     completed = subprocess.run(
         argv, cwd=str(deck_dir), capture_output=True, text=True,
-        timeout=180, check=False,
+        timeout=float(timeout), check=False,
     )
     stdout, stderr = completed.stdout or "", completed.stderr or ""
-    runlog14.write_text_atomic(case_dir / "parser" / "stdout.txt", stdout)
-    runlog14.write_text_atomic(case_dir / "parser" / "stderr.txt", stderr)
+    runlog14.write_text_atomic(case_dir / stage / "stdout.txt", stdout)
+    runlog14.write_text_atomic(case_dir / stage / "stderr.txt", stderr)
 
     combined = (stdout + stderr).lower()
-    fatal = [m for m in ("terminating program", "validation error", "fatal error",
-                         "too many instances", "unexpected group") if m in combined]
-    passed = "parsing completed" in combined and not fatal
+    fatal = [
+        m for m in _FATAL_MARKERS
+        if any(m in ln.lower() and not any(b in ln.lower() for b in _BENIGN_LINES)
+               for ln in (stdout + "\n" + stderr).splitlines())
+    ]
+    # ``--parse`` stops after "Parsing completed"; ``--structure`` goes further
+    # and announces its own finish. Either banner, together with a zero exit and
+    # no fatal marker, is the runmode's success verdict.
+    completed_ok = (
+        "parsing completed" in combined
+        or "runmode structure only - finished" in combined
+    )
+    passed = completed_ok and not fatal and completed.returncode == 0
     reason = None
     if not passed:
-        reason = next(
-            (line.strip() for line in (stdout + stderr).splitlines()
-             if any(m in line.lower() for m in
-                    ("error", "too many", "unexpected", "terminating"))),
-            f"exit {completed.returncode}",
-        )
+        reason = _failure_reason(stdout, stderr, completed.returncode)
     return {
         "passed": passed,
+        "runmode": str(runmode),
         "parser_command": argv,
         "return_code": completed.returncode,
         "fatal_markers": fatal,
+        "output_dir": str(case_dir / stage / "out"),
         "deck_path": str(deck),
         "deck_sha256": runlog14.sha256_file(deck),
         "profile_path": str(deck_dir / f"{import_name}.dat") if datafile else None,
         "profile_sha256": (
             runlog14.sha256_file(deck_dir / f"{import_name}.dat") if datafile else None
         ),
-        "stdout_path": str(case_dir / "parser" / "stdout.txt"),
-        "stderr_path": str(case_dir / "parser" / "stderr.txt"),
+        "stdout_path": str(case_dir / stage / "stdout.txt"),
+        "stderr_path": str(case_dir / stage / "stderr.txt"),
         "failure_reason": reason,
     }
 
 
 def validate_case_level1(
     cfg: Mapping[str, Any], case: cases16.ValidationCase, case_dir: Path,
-    exe: Path | None, database: Path | None,
+    exe: Path | None, database: Path | None, license_path: Path | None = None,
 ) -> CaseOutcome:
     """Render, measure the authoritative profile, and parse."""
 
@@ -453,7 +521,8 @@ def validate_case_level1(
         outcome.status = "syntax_unchecked"
     else:
         outcome.level1 = parse_deck(
-            exe, database, case_dir, deck, blocks["datafile"]
+            exe, database, case_dir, deck, blocks["datafile"],
+            license_path=license_path,
         )
         outcome.status = "syntax_passed" if outcome.level1["passed"] else "syntax_failed"
         if not outcome.level1["passed"]:

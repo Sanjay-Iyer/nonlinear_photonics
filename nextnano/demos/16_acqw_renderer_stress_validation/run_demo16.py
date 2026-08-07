@@ -75,6 +75,7 @@ def run_syntax(verbose: bool = False) -> int:
         machine = None
     exe = preflight16.parser_executable(machine)
     database = preflight16.database_for(exe) if exe else None
+    licence = preflight16.license_for(machine)
 
     root, run_id = new_run_dir()
     print("=" * 78)
@@ -83,6 +84,8 @@ def run_syntax(verbose: bool = False) -> int:
     print(f"  RUN ID     : {run_id}")
     print(f"  RUN DIR    : {root}")
     print(f"  PARSER     : {exe or '<none found>'}")
+    print(f"  DATABASE   : {database or '<none>'}")
+    print(f"  LICENSE    : {licence or '<none needed>'}")
     print(f"  CASES      : {len(cases)}")
     print("  NOTE       : --parse performs no physics and consumes no licence.")
     print("=" * 78)
@@ -90,7 +93,9 @@ def run_syntax(verbose: bool = False) -> int:
     outcomes = []
     for case in cases:
         case_dir = root / "cases" / f"{case.case_id}_{case.name}"
-        outcome = demo16.validate_case_level1(cfg, case, case_dir, exe, database)
+        outcome = demo16.validate_case_level1(
+            cfg, case, case_dir, exe, database, license_path=licence
+        )
         outcomes.append(outcome)
         mark = {"syntax_passed": "PASS", "syntax_failed": "FAIL",
                 "structure_failed": "STRUCT-FAIL", "render_failed": "RENDER-FAIL",

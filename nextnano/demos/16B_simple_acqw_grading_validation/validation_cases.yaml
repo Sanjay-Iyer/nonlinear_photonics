@@ -1,0 +1,183 @@
+demo: 16B_simple_acqw_grading_validation
+total_cases: 8
+grading_profile: linear
+grading_families_supported:
+- linear
+deterministic: true
+random_seed: null
+bounds:
+  asymmetry_s:
+  - 0.3
+  - 0.55
+  nominal_central_barrier_thickness_nm:
+  - 0.85
+  - 2.5
+  gaas_to_algaas_grading_width_10_90_nm:
+  - 0.4
+  - 1.4
+  algaas_to_gaas_grading_width_10_90_nm:
+  - 0.4
+  - 1.4
+fixed:
+  total_well_thickness_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  target_wavelength_nm: 1550.0
+  broadening_meV: 5.0
+paper_asymmetry_s: 0.41999999999999993
+physics_cases:
+- case_01
+- case_04
+- case_05
+cases:
+- case_id: case_01
+  name: paper_reference
+  purpose: 7.1 / 1.8 / 2.9 nm, converted to asymmetry through the authoritative formula.
+    The primary reference structure.
+  asymmetry_s: 0.41999999999999993
+  nominal_central_barrier_thickness_nm: 1.8
+  gaas_to_algaas_grading_width_10_90_nm: 1.0
+  algaas_to_gaas_grading_width_10_90_nm: 1.0
+  grading_profile: linear
+  physics: true
+  physics_label: A
+  derived_thick_well_nm: 7.1
+  derived_thin_well_nm: 2.9000000000000004
+  total_well_thickness_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  minimum_layer_nm: 1.8
+  linear_ramp_span_nm: 1.25
+  non_overlap_margin_nm: 0.55
+- case_id: case_02
+  name: near_abrupt_baseline
+  purpose: Smallest grading width the production renderer accepts (0.4 nm). The near-abrupt
+    end of the comparison; grading14 has no abrupt branch at all.
+  asymmetry_s: 0.41999999999999993
+  nominal_central_barrier_thickness_nm: 1.8
+  gaas_to_algaas_grading_width_10_90_nm: 0.4
+  algaas_to_gaas_grading_width_10_90_nm: 0.4
+  grading_profile: linear
+  physics: false
+  physics_label: ''
+  derived_thick_well_nm: 7.1
+  derived_thin_well_nm: 2.9000000000000004
+  total_well_thickness_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  minimum_layer_nm: 1.8
+  linear_ramp_span_nm: 0.5
+  non_overlap_margin_nm: 1.3
+- case_id: case_03
+  name: moderate_grading
+  purpose: Moderate everything. The basic graded reference structure.
+  asymmetry_s: 0.41999999999999993
+  nominal_central_barrier_thickness_nm: 1.8
+  gaas_to_algaas_grading_width_10_90_nm: 0.9
+  algaas_to_gaas_grading_width_10_90_nm: 0.9
+  grading_profile: linear
+  physics: false
+  physics_label: ''
+  derived_thick_well_nm: 7.1
+  derived_thin_well_nm: 2.9000000000000004
+  total_well_thickness_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  minimum_layer_nm: 1.8
+  linear_ramp_span_nm: 1.125
+  non_overlap_margin_nm: 0.675
+- case_id: case_04
+  name: wide_grading
+  purpose: Wider grading at the same asymmetry and barrier, so a change in requested
+    width must show up as a change in realized x_Al(z). Still clearly non-overlapping
+    (0.30 nm of margin).
+  asymmetry_s: 0.41999999999999993
+  nominal_central_barrier_thickness_nm: 1.8
+  gaas_to_algaas_grading_width_10_90_nm: 1.2
+  algaas_to_gaas_grading_width_10_90_nm: 1.2
+  grading_profile: linear
+  physics: true
+  physics_label: B
+  derived_thick_well_nm: 7.1
+  derived_thin_well_nm: 2.9000000000000004
+  total_well_thickness_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  minimum_layer_nm: 1.8
+  linear_ramp_span_nm: 1.5
+  non_overlap_margin_nm: 0.30000000000000004
+- case_id: case_05
+  name: minimum_barrier
+  purpose: Thinnest barrier the Demo 14 space allows, with the most conservative grading,
+    so the geometry stays simple and valid. The strongest inter-well coupling of the
+    eight.
+  asymmetry_s: 0.41999999999999993
+  nominal_central_barrier_thickness_nm: 0.85
+  gaas_to_algaas_grading_width_10_90_nm: 0.4
+  algaas_to_gaas_grading_width_10_90_nm: 0.4
+  grading_profile: linear
+  physics: true
+  physics_label: C
+  derived_thick_well_nm: 7.1
+  derived_thin_well_nm: 2.9000000000000004
+  total_well_thickness_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  minimum_layer_nm: 0.85
+  linear_ramp_span_nm: 0.5
+  non_overlap_margin_nm: 0.35
+- case_id: case_06
+  name: maximum_barrier
+  purpose: Thickest barrier the Demo 14 space allows; the opposite boundary from case
+    05, with a wide nominal plateau.
+  asymmetry_s: 0.41999999999999993
+  nominal_central_barrier_thickness_nm: 2.5
+  gaas_to_algaas_grading_width_10_90_nm: 0.9
+  algaas_to_gaas_grading_width_10_90_nm: 0.9
+  grading_profile: linear
+  physics: false
+  physics_label: ''
+  derived_thick_well_nm: 7.1
+  derived_thin_well_nm: 2.9000000000000004
+  total_well_thickness_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  minimum_layer_nm: 2.5
+  linear_ramp_span_nm: 1.125
+  non_overlap_margin_nm: 1.375
+- case_id: case_07
+  name: low_asymmetry
+  purpose: 'Lower asymmetry bound: 6.5 / 3.5 nm wells.'
+  asymmetry_s: 0.3
+  nominal_central_barrier_thickness_nm: 1.8
+  gaas_to_algaas_grading_width_10_90_nm: 0.9
+  algaas_to_gaas_grading_width_10_90_nm: 0.9
+  grading_profile: linear
+  physics: false
+  physics_label: ''
+  derived_thick_well_nm: 6.5
+  derived_thin_well_nm: 3.5
+  total_well_thickness_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  minimum_layer_nm: 1.8
+  linear_ramp_span_nm: 1.125
+  non_overlap_margin_nm: 0.675
+- case_id: case_08
+  name: high_asymmetry
+  purpose: 'Upper asymmetry bound: 7.75 / 2.25 nm wells.'
+  asymmetry_s: 0.55
+  nominal_central_barrier_thickness_nm: 1.8
+  gaas_to_algaas_grading_width_10_90_nm: 0.9
+  algaas_to_gaas_grading_width_10_90_nm: 0.9
+  grading_profile: linear
+  physics: false
+  physics_label: ''
+  derived_thick_well_nm: 7.75
+  derived_thin_well_nm: 2.25
+  total_well_thickness_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  minimum_layer_nm: 1.8
+  linear_ramp_span_nm: 1.125
+  non_overlap_margin_nm: 0.675
