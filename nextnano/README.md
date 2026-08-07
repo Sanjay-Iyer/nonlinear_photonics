@@ -16,6 +16,9 @@ per-machine data is one gitignored YAML file.
 > [`WORK_LAPTOP_PATHS.txt`](docs/WORK_LAPTOP_PATHS.txt) and
 > [`WORK_LAPTOP_PATHS.json`](docs/WORK_LAPTOP_PATHS.json) are the authoritative
 > deployment-path references for licensed work-laptop execution.
+> Select the tracked [`nextnano_machine.work.yaml`](config/machines/nextnano_machine.work.yaml)
+> for licensed runs; its short `results_root` keeps raw solver output under
+> `C:/nn_results`.
 
 **→ The full cycle, commands, and error-correction loop are in
 [docs/WORKFLOW.md](docs/WORKFLOW.md). Start there.**

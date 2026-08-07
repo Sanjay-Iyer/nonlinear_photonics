@@ -70,13 +70,19 @@ The relative portable root is resolved from the Git repository root, so no
 drive letter is assumed. Inspect each demo's validation report, tables, plots,
 and failed/suspicious-run lists before advancing.
 
-Every new nextnano demo must look for the gitignored
-`nextnano/config/machines/nextnano_machine.local.yaml`. If it is missing, the
-demo setup must create it without prompting, set a short machine-local results
-root such as `results_root: C:/nn_results`, and create that directory when
-needed. Existing local settings must be preserved. Machine-specific paths must
-never be written to `nextnano_machine.example.yaml`; that tracked file remains
-the shared example only.
+For licensed work-laptop execution, first read
+[`WORK_LAPTOP_PATHS.txt`](../docs/WORK_LAPTOP_PATHS.txt) and
+[`WORK_LAPTOP_PATHS.json`](../docs/WORK_LAPTOP_PATHS.json), then select the
+tracked [`nextnano_machine.work.yaml`](../config/machines/nextnano_machine.work.yaml)
+with
+`$env:NEXTNANO_MACHINE_CONFIG = "nextnano/config/machines/nextnano_machine.work.yaml"`.
+Those manifests are authoritative: never substitute home-laptop, Codex-sandbox,
+temporary-checkout, or guessed paths.
+Every demo must keep deep raw nextnano++ output beneath the selected config's
+short `results_root` (`C:/nn_results` on the work laptop); repository run trees
+may continue to hold summaries, CSV/JSON files, and plots. The generic
+`nextnano_machine.example.yaml` remains documentation, while the optional
+gitignored `nextnano_machine.local.yaml` is only for genuine local overrides.
 
 Normal scientific and numerical changes belong in each `demo.yaml`; the Python
 commands need no flags. All generated inputs and outputs remain in

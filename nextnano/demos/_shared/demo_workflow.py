@@ -42,6 +42,7 @@ MACHINE_CONFIG = NEXTNANO_ROOT / "config" / "machines" / "nextnano_machine.local
 MACHINE_EXAMPLE = (
     NEXTNANO_ROOT / "config" / "machines" / "nextnano_machine.example.yaml"
 )
+MACHINE_CONFIG_ENV = "NEXTNANO_MACHINE_CONFIG"
 LEGACY_MACHINE_CONFIG = NEXTNANO_ROOT / "config" / "paths.local.yaml"
 DEFAULT_RESULTS_ROOT = NEXTNANO_ROOT / "results" / "demo_runs"
 
@@ -253,15 +254,26 @@ def _discover_unique(root: Path, kind: str) -> Path:
 def load_machine_config(config_path: Path | None = None) -> MachineConfig:
     """Resolve execution settings with zero-config work/home laptop behavior.
 
-    An explicit/new local demo config wins.  When it is absent, the runner
+    An explicit config path or ``NEXTNANO_MACHINE_CONFIG`` selection wins,
+    followed by the optional local config.  When those are absent, the runner
     reuses the repository's established ``paths.local.yaml`` or the active
     environment's nextnanopy configuration before trying sibling-portable
     discovery.  ``run_solver: auto`` executes only when a complete licensed
     setup is available; otherwise it performs the successful home dry-run.
     """
 
-    requested = config_path or MACHINE_CONFIG
-    source = requested if requested.is_file() else MACHINE_EXAMPLE
+    environment_selection = os.environ.get(MACHINE_CONFIG_ENV)
+    requested = config_path or (
+        _resolve_local_path(environment_selection)
+        if environment_selection
+        else MACHINE_CONFIG
+    )
+    explicitly_selected = config_path is not None or bool(environment_selection)
+    source = (
+        requested
+        if explicitly_selected or requested.is_file()
+        else MACHINE_EXAMPLE
+    )
     data = _strict_keys(_read_yaml(source), MACHINE_KEYS, str(source))
     run_setting = data.get("run_solver", "auto")
     if isinstance(run_setting, str):
@@ -272,6 +284,8 @@ def load_machine_config(config_path: Path | None = None) -> MachineConfig:
     run_solver = bool(run_setting) if not auto_mode else False
 
     notes: list[str] = []
+    if config_path is None and environment_selection:
+        notes.append(f"machine configuration selected by {MACHINE_CONFIG_ENV}: {source}")
     if source != requested:
         notes.append(
             f"local machine override not found; using tracked automatic defaults: {source}"

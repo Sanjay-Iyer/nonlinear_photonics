@@ -1,0 +1,13 @@
+# Authoritative nextnano++ configuration for the licensed work laptop.
+# This file is intentionally tracked in Git.
+# Paths come from nextnano/docs/WORK_LAPTOP_PATHS.json.
+# Machine: work_laptop
+# Repository root: C:/Code/optics/nextnano/nonlinear_photonics
+
+portable_root: C:/Code/optics/nextnano/2026_07_03
+executable: C:/Code/optics/nextnano/2026_07_03/nextnano++/bin/nextnano++_Intel_64bit.exe
+database: C:/Code/optics/nextnano/2026_07_03/nextnano++/database/database.nnp
+license: C:/Code/optics/nextnano/2026_07_03/License/License_nnp.lic
+threads: 1
+run_solver: auto
+results_root: C:/nn_results
