@@ -70,8 +70,13 @@ The relative portable root is resolved from the Git repository root, so no
 drive letter is assumed. Inspect each demo's validation report, tables, plots,
 and failed/suspicious-run lists before advancing.
 
-Only if automatic discovery reports an ambiguity, copy the example to the
-gitignored `nextnano_machine.local.yaml` and enter the exact reported path.
+Every new nextnano demo must look for the gitignored
+`nextnano/config/machines/nextnano_machine.local.yaml`. If it is missing, the
+demo setup must create it without prompting, set a short machine-local results
+root such as `results_root: C:/nn_results`, and create that directory when
+needed. Existing local settings must be preserved. Machine-specific paths must
+never be written to `nextnano_machine.example.yaml`; that tracked file remains
+the shared example only.
 
 Normal scientific and numerical changes belong in each `demo.yaml`; the Python
 commands need no flags. All generated inputs and outputs remain in
