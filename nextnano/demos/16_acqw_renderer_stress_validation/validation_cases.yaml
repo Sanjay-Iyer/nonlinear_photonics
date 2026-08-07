@@ -1,0 +1,338 @@
+seed: 1616
+total_cases: 20
+deliberate_cases: 12
+seeded_random_cases: 8
+bounds:
+  asymmetry_s:
+  - 0.3
+  - 0.55
+  nominal_central_barrier_thickness_nm:
+  - 0.85
+  - 2.5
+  gaas_to_algaas_grading_width_10_90_nm:
+  - 0.4
+  - 1.4
+  algaas_to_gaas_grading_width_10_90_nm:
+  - 0.4
+  - 1.4
+fixed:
+  total_well_thickness_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  target_wavelength_nm: 1550.0
+  broadening_meV: 5.0
+paper_asymmetry_s: 0.41999999999999993
+cases:
+- case_id: case_01
+  name: paper_reference
+  origin: deliberate
+  purpose: 7.1 / 1.8 / 2.9 nm converted through the authoritative asymmetry formula.
+    The primary structural regression case.
+  asymmetry_s: 0.41999999999999993
+  nominal_central_barrier_thickness_nm: 1.8
+  gaas_to_algaas_grading_width_10_90_nm: 1.0
+  algaas_to_gaas_grading_width_10_90_nm: 1.0
+  grading_profile: linear
+  level3: true
+  derived_thick_well_nm: 7.1
+  derived_thin_well_nm: 2.9000000000000004
+  total_well_thickness_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+- case_id: case_02
+  name: minimum_barrier
+  origin: deliberate
+  purpose: Thinnest allowed central barrier.
+  asymmetry_s: 0.41999999999999993
+  nominal_central_barrier_thickness_nm: 0.85
+  gaas_to_algaas_grading_width_10_90_nm: 0.9
+  algaas_to_gaas_grading_width_10_90_nm: 0.9
+  grading_profile: linear
+  level3: true
+  derived_thick_well_nm: 7.1
+  derived_thin_well_nm: 2.9000000000000004
+  total_well_thickness_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+- case_id: case_03
+  name: maximum_barrier
+  origin: deliberate
+  purpose: Thickest central barrier; a clearly separated plateau must exist.
+  asymmetry_s: 0.41999999999999993
+  nominal_central_barrier_thickness_nm: 2.5
+  gaas_to_algaas_grading_width_10_90_nm: 0.9
+  algaas_to_gaas_grading_width_10_90_nm: 0.9
+  grading_profile: linear
+  level3: true
+  derived_thick_well_nm: 7.1
+  derived_thin_well_nm: 2.9000000000000004
+  total_well_thickness_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+- case_id: case_04
+  name: minimum_left_grade
+  origin: deliberate
+  purpose: Sharpest GaAs->AlGaAs interface.
+  asymmetry_s: 0.41999999999999993
+  nominal_central_barrier_thickness_nm: 1.8
+  gaas_to_algaas_grading_width_10_90_nm: 0.4
+  algaas_to_gaas_grading_width_10_90_nm: 0.9
+  grading_profile: linear
+  level3: false
+  derived_thick_well_nm: 7.1
+  derived_thin_well_nm: 2.9000000000000004
+  total_well_thickness_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+- case_id: case_05
+  name: maximum_left_grade
+  origin: deliberate
+  purpose: Widest GaAs->AlGaAs interface.
+  asymmetry_s: 0.41999999999999993
+  nominal_central_barrier_thickness_nm: 1.8
+  gaas_to_algaas_grading_width_10_90_nm: 1.4
+  algaas_to_gaas_grading_width_10_90_nm: 0.9
+  grading_profile: linear
+  level3: false
+  derived_thick_well_nm: 7.1
+  derived_thin_well_nm: 2.9000000000000004
+  total_well_thickness_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+- case_id: case_06
+  name: minimum_right_grade
+  origin: deliberate
+  purpose: Sharpest AlGaAs->GaAs interface.
+  asymmetry_s: 0.41999999999999993
+  nominal_central_barrier_thickness_nm: 1.8
+  gaas_to_algaas_grading_width_10_90_nm: 0.9
+  algaas_to_gaas_grading_width_10_90_nm: 0.4
+  grading_profile: linear
+  level3: false
+  derived_thick_well_nm: 7.1
+  derived_thin_well_nm: 2.9000000000000004
+  total_well_thickness_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+- case_id: case_07
+  name: maximum_right_grade
+  origin: deliberate
+  purpose: Widest AlGaAs->GaAs interface.
+  asymmetry_s: 0.41999999999999993
+  nominal_central_barrier_thickness_nm: 1.8
+  gaas_to_algaas_grading_width_10_90_nm: 0.9
+  algaas_to_gaas_grading_width_10_90_nm: 1.4
+  grading_profile: linear
+  level3: false
+  derived_thick_well_nm: 7.1
+  derived_thin_well_nm: 2.9000000000000004
+  total_well_thickness_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+- case_id: case_08
+  name: both_grades_minimum
+  origin: deliberate
+  purpose: Near-abrupt structure at both central interfaces.
+  asymmetry_s: 0.41999999999999993
+  nominal_central_barrier_thickness_nm: 1.8
+  gaas_to_algaas_grading_width_10_90_nm: 0.4
+  algaas_to_gaas_grading_width_10_90_nm: 0.4
+  grading_profile: linear
+  level3: false
+  derived_thick_well_nm: 7.1
+  derived_thin_well_nm: 2.9000000000000004
+  total_well_thickness_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+- case_id: case_09
+  name: maximum_overlap_linear
+  origin: deliberate
+  purpose: Widest grades across the thinnest barrier. The renderer must NOT fabricate
+    a flat Al=0.55 plateau; the two ramps genuinely overlap and the peak composition
+    falls short of nominal.
+  asymmetry_s: 0.41999999999999993
+  nominal_central_barrier_thickness_nm: 0.85
+  gaas_to_algaas_grading_width_10_90_nm: 1.4
+  algaas_to_gaas_grading_width_10_90_nm: 1.4
+  grading_profile: linear
+  level3: true
+  derived_thick_well_nm: 7.1
+  derived_thin_well_nm: 2.9000000000000004
+  total_well_thickness_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+- case_id: case_10
+  name: low_asymmetry_boundary
+  origin: deliberate
+  purpose: Lower asymmetry bound.
+  asymmetry_s: 0.3
+  nominal_central_barrier_thickness_nm: 1.8
+  gaas_to_algaas_grading_width_10_90_nm: 0.9
+  algaas_to_gaas_grading_width_10_90_nm: 0.9
+  grading_profile: linear
+  level3: true
+  derived_thick_well_nm: 6.5
+  derived_thin_well_nm: 3.5
+  total_well_thickness_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+- case_id: case_11
+  name: high_asymmetry_boundary
+  origin: deliberate
+  purpose: Upper asymmetry bound.
+  asymmetry_s: 0.55
+  nominal_central_barrier_thickness_nm: 1.8
+  gaas_to_algaas_grading_width_10_90_nm: 0.9
+  algaas_to_gaas_grading_width_10_90_nm: 0.9
+  grading_profile: linear
+  level3: false
+  derived_thick_well_nm: 7.75
+  derived_thin_well_nm: 2.25
+  total_well_thickness_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+- case_id: case_12
+  name: asymmetric_grading_widths
+  origin: deliberate
+  purpose: Narrow left, wide right. Proves the two interfaces are handled independently
+    and localised correctly -- the check that would have caught well widths being
+    reported as grading widths.
+  asymmetry_s: 0.41999999999999993
+  nominal_central_barrier_thickness_nm: 1.8
+  gaas_to_algaas_grading_width_10_90_nm: 0.4
+  algaas_to_gaas_grading_width_10_90_nm: 1.4
+  grading_profile: linear
+  level3: false
+  derived_thick_well_nm: 7.1
+  derived_thin_well_nm: 2.9000000000000004
+  total_well_thickness_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+- case_id: case_13
+  name: seeded_interior_01_fermi
+  origin: seeded_random
+  purpose: Deterministic interior design from seed 1616, rejected if within 0.25 normalised
+    units of an existing case.
+  asymmetry_s: 0.475963
+  nominal_central_barrier_thickness_nm: 1.542225
+  gaas_to_algaas_grading_width_10_90_nm: 0.923945
+  algaas_to_gaas_grading_width_10_90_nm: 0.831675
+  grading_profile: fermi
+  level3: true
+  derived_thick_well_nm: 7.379815000000001
+  derived_thin_well_nm: 2.6201849999999998
+  total_well_thickness_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+- case_id: case_14
+  name: seeded_interior_02_erf
+  origin: seeded_random
+  purpose: Deterministic interior design from seed 1616, rejected if within 0.25 normalised
+    units of an existing case.
+  asymmetry_s: 0.339558
+  nominal_central_barrier_thickness_nm: 0.850634
+  gaas_to_algaas_grading_width_10_90_nm: 0.7518
+  algaas_to_gaas_grading_width_10_90_nm: 0.570454
+  grading_profile: erf
+  level3: true
+  derived_thick_well_nm: 6.69779
+  derived_thin_well_nm: 3.3022099999999996
+  total_well_thickness_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+- case_id: case_15
+  name: seeded_interior_03_cosine
+  origin: seeded_random
+  purpose: Deterministic interior design from seed 1616, rejected if within 0.25 normalised
+    units of an existing case.
+  asymmetry_s: 0.421862
+  nominal_central_barrier_thickness_nm: 2.389537
+  gaas_to_algaas_grading_width_10_90_nm: 0.7134
+  algaas_to_gaas_grading_width_10_90_nm: 0.667392
+  grading_profile: cosine
+  level3: false
+  derived_thick_well_nm: 7.10931
+  derived_thin_well_nm: 2.89069
+  total_well_thickness_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+- case_id: case_16
+  name: seeded_interior_04_linear
+  origin: seeded_random
+  purpose: Deterministic interior design from seed 1616, rejected if within 0.25 normalised
+    units of an existing case.
+  asymmetry_s: 0.323334
+  nominal_central_barrier_thickness_nm: 0.942774
+  gaas_to_algaas_grading_width_10_90_nm: 1.274146
+  algaas_to_gaas_grading_width_10_90_nm: 1.328096
+  grading_profile: linear
+  level3: false
+  derived_thick_well_nm: 6.61667
+  derived_thin_well_nm: 3.38333
+  total_well_thickness_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+- case_id: case_17
+  name: seeded_interior_05_fermi
+  origin: seeded_random
+  purpose: Deterministic interior design from seed 1616, rejected if within 0.25 normalised
+    units of an existing case.
+  asymmetry_s: 0.409049
+  nominal_central_barrier_thickness_nm: 1.289169
+  gaas_to_algaas_grading_width_10_90_nm: 0.826394
+  algaas_to_gaas_grading_width_10_90_nm: 0.816511
+  grading_profile: fermi
+  level3: false
+  derived_thick_well_nm: 7.0452449999999995
+  derived_thin_well_nm: 2.954755
+  total_well_thickness_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+- case_id: case_18
+  name: seeded_interior_06_erf
+  origin: seeded_random
+  purpose: Deterministic interior design from seed 1616, rejected if within 0.25 normalised
+    units of an existing case.
+  asymmetry_s: 0.305349
+  nominal_central_barrier_thickness_nm: 2.048058
+  gaas_to_algaas_grading_width_10_90_nm: 0.436532
+  algaas_to_gaas_grading_width_10_90_nm: 0.544468
+  grading_profile: erf
+  level3: false
+  derived_thick_well_nm: 6.526745
+  derived_thin_well_nm: 3.473255
+  total_well_thickness_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+- case_id: case_19
+  name: seeded_interior_07_cosine
+  origin: seeded_random
+  purpose: Deterministic interior design from seed 1616, rejected if within 0.25 normalised
+    units of an existing case.
+  asymmetry_s: 0.410023
+  nominal_central_barrier_thickness_nm: 2.010163
+  gaas_to_algaas_grading_width_10_90_nm: 0.680923
+  algaas_to_gaas_grading_width_10_90_nm: 1.134629
+  grading_profile: cosine
+  level3: false
+  derived_thick_well_nm: 7.050115
+  derived_thin_well_nm: 2.949885
+  total_well_thickness_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+- case_id: case_20
+  name: seeded_interior_08_linear
+  origin: seeded_random
+  purpose: Deterministic interior design from seed 1616, rejected if within 0.25 normalised
+    units of an existing case.
+  asymmetry_s: 0.43286
+  nominal_central_barrier_thickness_nm: 2.06834
+  gaas_to_algaas_grading_width_10_90_nm: 1.339951
+  algaas_to_gaas_grading_width_10_90_nm: 1.205458
+  grading_profile: linear
+  level3: true
+  derived_thick_well_nm: 7.1643
+  derived_thin_well_nm: 2.8357
+  total_well_thickness_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05

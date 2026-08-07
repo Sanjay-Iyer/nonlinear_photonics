@@ -506,3 +506,39 @@ demos:
     unvalidated_syntax:
       - ternary_import and import{ file{} } parse against nextnano++ 3.0.0 but have never been executed by any nextnano++ build in this project
       - the analytic_function alloy route is unverified; --parse does not validate function-string contents
+
+  16_acqw_renderer_stress_validation:
+    title: ACQW renderer / structure stress validation
+    # Demo 16 is not an optimization. It answers one question: when Python
+    # specifies an ACQW geometry and grading profile, does nextnano++ construct
+    # the structure we intended? It exists because three failure classes reached
+    # a licensed Demo 14 gate run -- invalid region syntax, a structure with no
+    # outer barriers, and well widths reported as grading widths.
+    status: implemented_dry_run
+    depends_on:
+      - 14_absolute_chi2_graded_acqw_bo
+    introduces:
+      - a frozen 20-case regression fixture (12 deliberate boundary/corner cases + 8 seeded interior, seed 1616)
+      - Level 1 syntax validation running every rendered deck through nextnano++ --parse, which needs no licence
+      - structural invariants that reject a composition with no outer barriers, where --parse alone cannot
+      - per-interface metrics measured in windows clamped to the midpoint between neighbouring interfaces
+      - an explicit overlap oracle reporting realized peak composition, plateau existence and local Al dose
+      - deliberately-bad-structure tests proving the validators reject what they are supposed to reject
+      - reuse of Demo 14's production renderer, with a preflight check that forbids a duplicate implementation
+    home_syntax_check: all_20_decks_parse_against_free_nextnano_pp_3_0_0
+    home_solver_check: not_attempted_free_build_cannot_execute_production_decks
+    licensed_validation:
+      date: null
+      solver: null
+      evidence: >-
+        Level 1 complete on the home laptop: all 20 production decks parse
+        against the free nextnano++ 3.0.0 build, and all 20 satisfy every
+        structural invariant. Level 2 (realized alloy composition compared
+        against the authoritative Python profile) and Level 3 (selected physics)
+        require the licensed build and have not run.
+    pending_licensed_checks:
+      - Run Level 2 and compare nextnano++'s realized alloy composition against the authoritative Python x_Al(x) for all 20 cases; a deck that parses can still build the wrong material topology.
+      - Characterize the numerical agreement floor on a non-overlapping linear case before fixing Level 2 tolerances, so the tolerance is justified rather than chosen to pass.
+      - Run Level 3 on the eight selected cases and confirm bound states are confined by AlGaAs rather than by the quantum region's Dirichlet walls.
+    unvalidated_syntax:
+      - ternary_import decks parse but have never been executed by any nextnano++ build in this project

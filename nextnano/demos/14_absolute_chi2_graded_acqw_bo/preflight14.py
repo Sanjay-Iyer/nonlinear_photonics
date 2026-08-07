@@ -25,6 +25,39 @@ PASS = "PASS"
 FAIL = "FAIL"
 WARN = "WARN"
 
+#: Free nextnano++ builds that can validate deck SYNTAX without a licence. Used
+#: only when no licensed executable is resolved, so the deck-parse check still
+#: runs on a development machine.
+FREE_PARSER_CANDIDATES = (
+    Path(r"C:\Program Files\nextnano\2026_07_03\nextnano++\bin 32bit"
+         r"\nextnano++_Microsoft_32bit_free.exe"),
+)
+
+
+def _database_for(exe: Path) -> Path | None:
+    """The database beside a given nextnano++ executable, if there is one."""
+
+    exe = Path(exe)
+    for candidate in (
+        exe.parent.parent / "database" / "database.nnp",
+        exe.parent.parent / "database" / "database_free.nnp",
+    ):
+        if candidate.is_file():
+            return candidate
+    return None
+
+
+def _parser_executable(machine: Any | None) -> Path | None:
+    """Prefer the licensed solver; fall back to a free build for syntax only."""
+
+    configured = getattr(machine, "executable", None) if machine else None
+    if configured and Path(configured).is_file():
+        return Path(configured)
+    for candidate in FREE_PARSER_CANDIDATES:
+        if candidate.is_file():
+            return candidate
+    return None
+
 
 def miniature_config(cfg: Mapping[str, Any]) -> dict[str, Any]:
     """A 5-trial version of the campaign for harness testing.
@@ -310,6 +343,76 @@ def run_preflight(
             f"window {window[0]:.2f}-{window[1]:.2f} nm"
         )
 
+    def decks_parse_against_nextnano(exe: Path) -> str:
+        """Run every grading family's rendered deck through nextnano++ --parse.
+
+        This is the check whose absence cost a licensed run: the deck put three
+        materials in one ``region{}``, nextnano++ answered "Too many instances of
+        'ternary_linear'" and terminated before solving, and the harness then
+        crashed in post-processing so the real cause was masked.
+
+        ``--parse`` reads the input and exits. It runs no physics and consumes no
+        licensed computation, so it is safe to run before every campaign, and it
+        works on the free build too.
+        """
+
+        import subprocess
+        import tempfile
+
+        import grading14
+
+        database = _database_for(exe)
+        corners = [
+            ("linear", 0.30, 0.85, 0.40, 0.40),
+            ("linear", 0.50, 0.85, 1.40, 1.40),   # ramps overrun: no plateau
+            ("fermi", 0.55, 2.50, 1.40, 1.40),
+            ("erf", 0.42, 1.80, 1.00, 1.00),
+            ("cosine", 0.35, 0.90, 1.40, 0.40),
+        ]
+        failures: list[str] = []
+        with tempfile.TemporaryDirectory(prefix="demo14_parse_") as tmp:
+            for index, (fam, s, barrier, wl, wr) in enumerate(corners):
+                params = {
+                    "asymmetry_s": s,
+                    "nominal_central_barrier_thickness_nm": barrier,
+                    "gaas_to_algaas_grading_width_10_90_nm": wl,
+                    "algaas_to_gaas_grading_width_10_90_nm": wr,
+                    "grading_profile": fam,
+                }
+                geometry = demo14.geometry_for(cfg, params)
+                profile = demo14.build_grading(cfg, params, geometry)
+                blocks = grading14.render_structure_blocks(profile)
+                case = Path(tmp) / f"{index:02d}_{fam}"
+                case.mkdir(parents=True, exist_ok=True)
+                deck = case / "case.in"
+                deck.write_text(
+                    demo14.render_deck(cfg, geometry, profile, blocks),
+                    encoding="utf-8", newline="\n",
+                )
+                if blocks["datafile"]:
+                    (case / "al_profile.dat").write_text(
+                        blocks["datafile"], encoding="utf-8", newline="\n"
+                    )
+                argv = [str(exe), "--parse"]
+                if database:
+                    argv += ["-d", str(database)]
+                argv += ["-o", str(case / "out"), "case.in"]
+                completed = subprocess.run(
+                    argv, cwd=str(case), capture_output=True, text=True,
+                    timeout=120, check=False,
+                )
+                output = (completed.stdout or "") + (completed.stderr or "")
+                if "PARSING COMPLETED" not in output:
+                    reason = next(
+                        (ln.strip() for ln in output.splitlines()
+                         if "error" in ln.lower() or "Too many" in ln
+                         or "Unexpected" in ln),
+                        f"exit {completed.returncode}",
+                    )
+                    failures.append(f"{fam} (barrier {barrier} nm, widths {wl}/{wr}): {reason}")
+        assert not failures, "; ".join(failures)
+        return f"{len(corners)} decks parsed by {Path(exe).name} (all 4 families)"
+
     def solver_timeout_is_finite() -> str:
         timeout = float(cfg["nextnano"]["solver_timeout_seconds"])
         assert 0 < timeout < 86400, timeout
@@ -336,6 +439,24 @@ def run_preflight(
     ]
     for name, fn in checks:
         results.append(_check(name, fn))
+
+    # Deck syntax. Uses the licensed solver when there is one, otherwise a free
+    # build, because --parse is pure input validation and needs no licence.
+    parser_exe = _parser_executable(machine)
+    if parser_exe is not None:
+        results.append(_check(
+            "nextnano++ accepts every rendered deck",
+            lambda: decks_parse_against_nextnano(parser_exe),
+        ))
+    else:
+        results.append({
+            "check": "nextnano++ accepts every rendered deck", "status": FAIL,
+            "detail": (
+                "no nextnano++ binary found to validate deck syntax. This check "
+                "is what catches a malformed deck before it terminates a "
+                "licensed run; do not launch --gate without it."
+            ),
+        })
 
     if machine_error is not None:
         # The machine config exists but is wrong -- a missing path, a bad key.

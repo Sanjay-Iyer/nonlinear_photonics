@@ -806,6 +806,10 @@ DEMO_SCHEMAS: Mapping[str, DemoSchema] = {
     "12": DEMO12_SCHEMA,
     "13": DEMO13_SCHEMA,
     "14": DEMO14_SCHEMA,
+    # Demo 16 reads Demo 14's configuration; it has no demo.yaml of its own,
+    # which is deliberate -- a second scientific config could drift from the
+    # one the production renderer actually uses.
+    "16": DEMO14_SCHEMA,
 }
 
 

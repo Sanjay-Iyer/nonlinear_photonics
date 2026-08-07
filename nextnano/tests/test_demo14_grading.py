@@ -319,3 +319,157 @@ def test_invalid_widths_and_thicknesses_are_refused(bad):
         build("erf", 1.8, bad, 1.0)
     with pytest.raises(grading14.Grading14Error):
         build("erf", bad, 1.0, 1.0)
+
+
+# --- one material per region (the licensed-run failure) --------------------
+
+
+def _regions_in(deck: str) -> list[str]:
+    """Split a rendered deck's structure{} into individual region{} bodies."""
+
+    import re
+
+    start = deck.index("structure{")
+    depth, i = 0, start
+    for i in range(start, len(deck)):
+        if deck[i] == "{":
+            depth += 1
+        elif deck[i] == "}":
+            depth -= 1
+            if depth == 0:
+                break
+    body = deck[start:i]
+    return re.findall(r"region\{(.*?)\n    \}", body, flags=re.S)
+
+
+@pytest.mark.parametrize("profile", grading14.PROFILE_FAMILIES)
+def test_each_region_declares_exactly_one_material(profile):
+    """nextnano++ rejects a region carrying several material specifications.
+
+    The first licensed gate died on exactly this: the linear renderer emitted
+    ternary_linear + ternary_constant + ternary_linear into one region and the
+    solver answered "Too many instances of 'ternary_linear'" and terminated
+    before solving anything.
+    """
+
+    import sys
+    from pathlib import Path as _P
+
+    sys.path.insert(0, str(_P(__file__).resolve().parents[1] / "demos" / "_shared"))
+    import demo14
+
+    cfg = demo14.load_config()
+    params = {
+        "asymmetry_s": 0.42, "nominal_central_barrier_thickness_nm": 1.8,
+        "gaas_to_algaas_grading_width_10_90_nm": 1.0,
+        "algaas_to_gaas_grading_width_10_90_nm": 1.0,
+        "grading_profile": profile,
+    }
+    geometry = demo14.geometry_for(cfg, params)
+    built = demo14.build_grading(cfg, params, geometry)
+    blocks = grading14.render_structure_blocks(built)
+    deck = demo14.render_deck(cfg, geometry, built, blocks)
+
+    materials = ("binary{", "ternary_constant{", "ternary_linear{",
+                 "ternary_import{")
+    bodies = _regions_in(deck)
+    assert bodies, "the deck declares no regions at all"
+    for body in bodies:
+        count = sum(body.count(m) for m in materials)
+        # At most one: nextnano++ rejects a region carrying several. Zero is
+        # legal -- a region may exist solely to attach a contact.
+        assert count <= 1, (
+            f"{profile}: a region declares {count} materials, nextnano++ allows "
+            f"at most one:\n{body}"
+        )
+    assert sum(
+        sum(b.count(m) for m in materials) for b in bodies
+    ) >= 2, f"{profile}: deck declares too few materials to be a real structure"
+
+
+def test_render_blocks_expose_one_material_per_region_entry():
+    for profile in grading14.PROFILE_FAMILIES:
+        blocks = grading14.render_structure_blocks(build(profile, 1.8, 1.0, 1.0))
+        assert blocks["regions"], f"{profile} produced no regions"
+        for entry in blocks["regions"]:
+            assert entry["material"].count("{") >= 1
+            declared = sum(
+                entry["material"].count(m)
+                for m in ("ternary_constant{", "ternary_linear{", "ternary_import{")
+            )
+            assert declared == 1, entry
+
+
+def test_degenerate_barrier_drops_the_empty_plateau_region():
+    """Ramps wider than the barrier leave no plateau; a zero-width region is
+    invalid, so it must not be emitted at all."""
+
+    blocks = grading14.render_structure_blocks(build("linear", 0.85, 1.4, 1.4))
+    for entry in blocks["regions"]:
+        lo, hi = entry["x"]
+        assert hi - lo > 0.0, f"zero or negative width region {entry}"
+
+
+def test_structure_profile_has_outer_barriers():
+    """A well needs something to confine it.
+
+    The first Demo 14 renderer put the central barrier in a GaAs background, so
+    outside it there was no barrier material at all: the wells were unbounded
+    and any computed state would have belonged to the quantum region's Dirichlet
+    walls rather than to a quantum well. --parse cannot catch that; only looking
+    at the composition can.
+    """
+
+    import sys
+    from pathlib import Path as _P
+
+    sys.path.insert(0, str(_P(__file__).resolve().parents[1] / "demos" / "_shared"))
+    import demo14
+
+    cfg = demo14.load_config()
+    for profile in grading14.PROFILE_FAMILIES:
+        params = {
+            "asymmetry_s": 0.42, "nominal_central_barrier_thickness_nm": 1.8,
+            "gaas_to_algaas_grading_width_10_90_nm": 1.0,
+            "algaas_to_gaas_grading_width_10_90_nm": 1.0,
+            "grading_profile": profile,
+        }
+        geometry = demo14.geometry_for(cfg, params)
+        built = demo14.build_grading(cfg, params, geometry)
+        y = built.al_fraction
+        assert y[0] == pytest.approx(XMAX, abs=1e-3), f"{profile}: no left outer barrier"
+        assert y[-1] == pytest.approx(XMAX, abs=1e-3), f"{profile}: no right outer barrier"
+        assert built.diagnostics["outer_barrier_present"] is True, profile
+        # And the wells must actually be GaAs.
+        z1 = built.request["interfaces_nm"]["outer_left_algaas_to_gaas"]
+        z2 = built.request["interfaces_nm"]["central_gaas_to_algaas"]
+        centre = 0.5 * (z1 + z2)
+        well = float(np.interp(centre, built.x_nm, y))
+        assert well < 0.02, f"{profile}: thick well is not GaAs (x_Al={well})"
+
+
+def test_structure_profile_realizes_the_requested_interface_widths():
+    """Measured on the central barrier only, between the two well floors."""
+
+    import sys
+    from pathlib import Path as _P
+
+    sys.path.insert(0, str(_P(__file__).resolve().parents[1] / "demos" / "_shared"))
+    import demo14
+
+    cfg = demo14.load_config()
+    for profile in ("linear", "cosine"):   # compact support -> exact
+        params = {
+            "asymmetry_s": 0.42, "nominal_central_barrier_thickness_nm": 1.8,
+            "gaas_to_algaas_grading_width_10_90_nm": 0.4,
+            "algaas_to_gaas_grading_width_10_90_nm": 1.4,
+            "grading_profile": profile,
+        }
+        geometry = demo14.geometry_for(cfg, params)
+        d = demo14.build_grading(cfg, params, geometry).diagnostics
+        left = d["realized_gaas_to_algaas_grading_width_10_90_peakref_nm"]
+        right = d["realized_algaas_to_gaas_grading_width_10_90_peakref_nm"]
+        assert left == pytest.approx(0.4, abs=2 * MESH), f"{profile} left {left}"
+        assert right == pytest.approx(1.4, abs=2 * MESH), f"{profile} right {right}"
+        # A well width must never be mistaken for an interface width.
+        assert left < 2.0 and right < 3.0, (profile, left, right)

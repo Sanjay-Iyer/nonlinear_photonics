@@ -31,6 +31,15 @@ import numpy as np
 
 MOCK_MARKER = "DEMO14_MOCK_RESULT_NOT_SCIENTIFIC"
 
+#: nextnano++ prints one of these and stops. Matched case-insensitively against
+#: stdout, mirroring Demo 11's own ``validation.fatal_markers``.
+FATAL_STDOUT_MARKERS = (
+    "terminating program",
+    "fatal error",
+    "validation error",
+    "license expired",
+)
+
 
 class SolverTimeout(RuntimeError):
     """The solver exceeded its configured wall-clock budget."""
@@ -198,6 +207,25 @@ def execute_real(
             f"nextnano++ exited with code {invocation.return_code}. "
             f"stdout: {invocation.stdout_path}  stderr: {invocation.stderr_path}. "
             f"Raw output preserved under {output_dir}."
+        )
+
+    # The exit code is not the only verdict. nextnano++ prints an explicit fatal
+    # marker before it stops, and a validation error can leave a zero-length
+    # output tree behind -- which is exactly what the first licensed gate
+    # produced. Both are checked so a refused deck can never be mistaken for a
+    # completed calculation.
+    lowered = (out or "").lower()
+    for marker in FATAL_STDOUT_MARKERS:
+        if marker in lowered:
+            raise SolverTechnicalFailure(
+                f"nextnano++ reported '{marker}' and did not complete. See "
+                f"{invocation.stdout_path}. Raw output under {output_dir}."
+            )
+    produced = [p for p in Path(output_dir).rglob("*") if p.is_file()]
+    if not produced:
+        raise SolverTechnicalFailure(
+            f"nextnano++ exited 0 but wrote no output files under {output_dir}. "
+            f"See {invocation.stdout_path}."
         )
     return invocation
 

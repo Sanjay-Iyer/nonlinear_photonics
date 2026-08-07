@@ -149,16 +149,27 @@ def test_the_exact_deck_and_imported_profile_are_preserved(mini, tmp_path):
         directives = "\n".join(
             l for l in deck.splitlines() if not l.lstrip().startswith("#")
         )
-        if family == "linear":
-            assert "ternary_linear{" in directives
-            assert not (trial / "nextnano_input" / "al_profile.dat").is_file()
-        else:
-            assert "ternary_import{" in directives
-            data = trial / "nextnano_input" / "al_profile.dat"
-            assert data.is_file(), f"{family} trial has no imported profile"
+        # The render method is decided by the deck, not by the family: a linear
+        # design whose central ramps overlap falls back to an imported profile,
+        # because a linear -> constant -> linear region template would let one
+        # ramp override the other and build a composition nobody requested.
+        data = trial / "nextnano_input" / "al_profile.dat"
+        if "ternary_import{" in directives:
+            assert data.is_file(), f"{family} trial imports but has no profile file"
             rows = [l.split() for l in data.read_text(encoding="utf-8").splitlines() if l.strip()]
             xs = [float(r[0]) for r in rows]
             assert all(b > a for a, b in zip(xs, xs[1:]))
+            assert all(0.0 <= float(r[1]) <= 0.55 + 1e-9 for r in rows)
+        else:
+            assert family == "linear", (
+                f"{family} must render through ternary_import, not natively"
+            )
+            assert "ternary_linear{" in directives
+            assert not data.is_file(), "native render must not emit a profile file"
+        # Either way the structure must have outer barriers: a GaAs background
+        # would leave the wells unconfined.
+        assert 'ternary_constant{ name = "Al(x)Ga(1-x)As"' in directives
+        assert 'everywhere{}' in directives
 
 
 def test_constraints_are_recorded_per_metric_not_as_one_boolean(mini, tmp_path):

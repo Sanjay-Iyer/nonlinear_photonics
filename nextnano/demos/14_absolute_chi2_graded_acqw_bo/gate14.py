@@ -96,6 +96,17 @@ def build_equivalence_decks(cfg: Mapping[str, Any], destination: Path) -> dict[s
             "    output_imports{}\n"
             "}\n"
         ),
+        "regions": [
+            {
+                # None -> the whole active region; the imported table already
+                # carries the composition across it.
+                "x": None,
+                "material": (
+                    'ternary_import{ name = "Al(x)Ga(1-x)As"  '
+                    'import_from = "al_profile" }'
+                ),
+            }
+        ],
         "structure_block": (
             '        ternary_import{ name = "Al(x)Ga(1-x)As"  '
             'import_from = "al_profile" }\n'

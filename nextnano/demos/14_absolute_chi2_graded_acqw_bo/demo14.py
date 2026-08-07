@@ -213,8 +213,16 @@ def geometry_for(cfg: Mapping[str, Any], parameters: Mapping[str, Any]) -> Geome
 def build_grading(
     cfg: Mapping[str, Any], parameters: Mapping[str, Any], geometry: Geometry
 ) -> grading14.CompositionProfile:
-    return grading14.build_profile(
+    """The WHOLE structure's composition, outer barriers included.
+
+    Modelling only the central barrier leaves the wells sitting in bulk GaAs with
+    nothing to confine them; see ``grading14.build_structure_profile``.
+    """
+
+    return grading14.build_structure_profile(
         profile=str(parameters["grading_profile"]),
+        thick_well_nm=geometry.thick_well_nm,
+        thin_well_nm=geometry.thin_well_nm,
         barrier_thickness_nm=geometry.barrier_nm,
         gaas_to_algaas_width_10_90_nm=float(
             parameters["gaas_to_algaas_grading_width_10_90_nm"]
@@ -222,7 +230,7 @@ def build_grading(
         algaas_to_gaas_width_10_90_nm=float(
             parameters["algaas_to_gaas_grading_width_10_90_nm"]
         ),
-        barrier_centre_nm=geometry.barrier_centre_nm,
+        active_start_nm=geometry.active_start_nm,
         domain_nm=geometry.domain_nm,
         mesh_nm=float(cfg["mesh"]["active_region_grid_spacing_nm"]),
         max_al_fraction=float(cfg["materials"]["barrier_al_fraction"]),
@@ -811,17 +819,33 @@ def _structure_regions(
 
     lo, hi = geometry.domain_nm
     contact = "qw_contact"
+    x_max = float(cfg["materials"]["barrier_al_fraction"])
+    # The matrix is the BARRIER alloy and the wells are carved out of it, matching
+    # the validated reference decks. A GaAs background would leave the wells
+    # unbounded: outside the central barrier there would be no confining
+    # material at all, and the computed states would belong to the quantum
+    # region's Dirichlet walls rather than to any quantum well.
     parts = [
         "    region{",
-        f"        everywhere{{}}",
-        '        binary{ name = "GaAs" }',
-        f"        contact{{ name = {contact} }}",
+        "        everywhere{}",
+        f'        ternary_constant{{ name = "Al(x)Ga(1-x)As"  alloy_x = {x_max:.6f} }}',
         "    }",
         "    region{",
-        f"        line{{ x = [{geometry.active_start_nm:.6f}, {geometry.active_end_nm:.6f}] }}",
-        blocks["structure_block"].rstrip("\n"),
+        f"        line{{ x = [{lo:.6f}, {hi:.6f}] }}",
+        f"        contact{{ name = {contact} }}",
         "    }",
     ]
+    # One material per region. nextnano++ answers "Too many instances of
+    # 'ternary_linear'" otherwise and terminates before solving -- the failure
+    # that ended the first licensed gate.
+    for entry in blocks["regions"]:
+        span = entry["x"] or (geometry.active_start_nm, geometry.active_end_nm)
+        parts += [
+            "    region{",
+            f"        line{{ x = [{span[0]:.6f}, {span[1]:.6f}] }}",
+            f"        {entry['material']}",
+            "    }",
+        ]
     return "\n".join(parts)
 
 
