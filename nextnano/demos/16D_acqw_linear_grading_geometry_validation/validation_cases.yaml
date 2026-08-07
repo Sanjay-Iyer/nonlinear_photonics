@@ -1,0 +1,140 @@
+demo: 16D_acqw_linear_grading_geometry_validation
+purpose: Fixed-case validation of central-barrier thickness, well asymmetry, and one
+  overlapping linear grade using the Demo 16C pipeline.
+total_cases: 7
+deterministic: true
+random_seed: null
+grading_profile: linear
+grading_families_supported:
+- linear
+fixed_materials:
+  well: GaAs
+  barrier: AlGaAs
+  aluminium_fraction: 0.55
+  total_gaas_well_nm: 10.0
+  mesh_nm: 0.05
+physics_cases:
+- case_01
+- case_02
+- case_05
+- case_07
+cases:
+- case_id: case_01
+  name: reference
+  description: Paper-like 7.1 / 1.8 / 2.9 nm baseline.
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 1.8
+  left_grading_width_nm: 0.7
+  right_grading_width_nm: 0.7
+  physics: true
+  overlap: false
+  grading_profile: linear
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 0.875
+  overlap_width_nm: 0.0
+- case_id: case_02
+  name: thin_barrier
+  description: Thin 0.85 nm barrier with conservative non-overlapping grades.
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 0.85
+  left_grading_width_nm: 0.4
+  right_grading_width_nm: 0.4
+  physics: true
+  overlap: false
+  grading_profile: linear
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 0.5
+  overlap_width_nm: 0.0
+- case_id: case_03
+  name: thick_barrier
+  description: Thick 2.50 nm barrier; otherwise reference-like.
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 2.5
+  left_grading_width_nm: 0.7
+  right_grading_width_nm: 0.7
+  physics: false
+  overlap: false
+  grading_profile: linear
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 0.875
+  overlap_width_nm: 0.0
+- case_id: case_04
+  name: low_asymmetry
+  description: Redistribute the fixed 10 nm GaAs total with s=0.30.
+  asymmetry_s: 0.3
+  central_barrier_nm: 1.8
+  left_grading_width_nm: 0.7
+  right_grading_width_nm: 0.7
+  physics: false
+  overlap: false
+  grading_profile: linear
+  well_1_nm: 6.5
+  well_2_nm: 3.5
+  total_gaas_well_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 0.875
+  overlap_width_nm: 0.0
+- case_id: case_05
+  name: high_asymmetry
+  description: Redistribute the fixed 10 nm GaAs total with s=0.55.
+  asymmetry_s: 0.55
+  central_barrier_nm: 1.8
+  left_grading_width_nm: 0.7
+  right_grading_width_nm: 0.7
+  physics: true
+  overlap: false
+  grading_profile: linear
+  well_1_nm: 7.75
+  well_2_nm: 2.25
+  total_gaas_well_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 0.875
+  overlap_width_nm: 0.0
+- case_id: case_06
+  name: asymmetric_grading
+  description: Independent 0.40/1.40 nm grades on a non-overlapping barrier.
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 2.5
+  left_grading_width_nm: 0.4
+  right_grading_width_nm: 1.4
+  physics: false
+  overlap: false
+  grading_profile: linear
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 1.125
+  overlap_width_nm: 0.0
+- case_id: case_07
+  name: linear_overlap
+  description: Exactly one deliberate 1.40/1.40 nm overlap across 0.85 nm.
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 0.85
+  left_grading_width_nm: 1.4
+  right_grading_width_nm: 1.4
+  physics: true
+  overlap: true
+  grading_profile: linear
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 1.75
+  overlap_width_nm: 0.9
