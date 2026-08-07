@@ -62,7 +62,7 @@ def _check(name: str, fn: Callable[[], Any]) -> dict[str, Any]:
 
 def run_preflight(
     cfg: Mapping[str, Any], *, config_path: Path | None = None,
-    machine: Any | None = None,
+    machine: Any | None = None, machine_error: str | None = None,
 ) -> int:
     """Run every solver-free check and print a verdict. 0 on success."""
 
@@ -287,12 +287,70 @@ def run_preflight(
     for name, fn in checks:
         results.append(_check(name, fn))
 
+    if machine_error is not None:
+        # The machine config exists but is wrong -- a missing path, a bad key.
+        # Reported as one failed check rather than a traceback, because the
+        # remaining checks above are still meaningful and still ran.
+        results.append({
+            "check": "machine configuration resolves", "status": FAIL,
+            "detail": machine_error,
+        })
+
     if machine is not None:
-        def solver_executable_exists() -> str:
+        # All four are resolved and verified independently. A licensed run needs
+        # every one of them, and a missing licence or database fails deep inside
+        # the solver with a message that looks like a physics problem.
+        def machine_source() -> str:
+            source = getattr(machine, "source_path", None)
+            notes = list(getattr(machine, "discovery_notes", ()) or ())
+            detail = str(source)
+            if notes:
+                detail += f"  [{'; '.join(notes)}]"
+            return detail
+
+        def solver_executable() -> str:
             exe = getattr(machine, "executable", None)
-            assert exe and Path(exe).is_file(), f"nextnano++ not found at {exe}"
+            assert exe, (
+                "no nextnano++ executable resolved. On the licensed machine create "
+                "nextnano/config/machines/nextnano_machine.local.yaml (it is "
+                "gitignored, so git pull never supplies it)."
+            )
+            assert Path(exe).is_file(), f"nextnano++ executable not found: {exe}"
             return str(exe)
-        results.append(_check("nextnano++ executable exists", solver_executable_exists))
+
+        def solver_license() -> str:
+            path = getattr(machine, "license", None)
+            assert path, "no nextnano++ license path resolved"
+            assert Path(path).is_file(), f"nextnano++ license not found: {path}"
+            return str(path)
+
+        def solver_database() -> str:
+            path = getattr(machine, "database", None)
+            assert path, "no nextnano++ database resolved"
+            assert Path(path).is_file(), f"nextnano++ database not found: {path}"
+            return str(path)
+
+        def solver_threads() -> str:
+            threads = getattr(machine, "threads", None)
+            assert threads is not None, "no thread count resolved"
+            threads = int(threads)
+            assert threads >= 1, f"thread count must be >= 1, got {threads}"
+            return str(threads)
+
+        def solver_enabled() -> str:
+            enabled = bool(getattr(machine, "run_solver", False))
+            assert enabled, (
+                "run_solver resolved false: this machine will DRY-RUN, not "
+                "execute. --gate and --run would report success without solving."
+            )
+            return "true (this machine will execute nextnano++)"
+
+        results.append(_check("machine configuration source", machine_source))
+        results.append(_check("nextnano++ executable", solver_executable))
+        results.append(_check("nextnano++ license", solver_license))
+        results.append(_check("nextnano++ database", solver_database))
+        results.append(_check("nextnano++ threads", solver_threads))
+        results.append(_check("nextnano++ solver enabled", solver_enabled))
 
     width = max(len(r["check"]) for r in results) + 2
     print("=" * (width + 30))

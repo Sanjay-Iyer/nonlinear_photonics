@@ -31,11 +31,49 @@ conda activate NMIP
 python -c "import ax, botorch, numpy, scipy, yaml; print('ax', ax.__version__); import nextnanopy; print('nextnanopy', nextnanopy.__version__)"
 ```
 
-## 4. Confirm nextnano++ is discoverable — SAFE
+## 4. Create the machine config — SAFE, **do this once**
+
+`nextnano/config/machines/nextnano_machine.local.yaml` is **gitignored on
+purpose** — it holds machine-specific paths, and the repository's own comment
+says it is "created by hand on each machine, never tracked. A `git pull` will
+never overwrite it." So `git pull` does **not** deliver it. Create it here, once,
+with the values proven by the successful licensed run on this laptop:
 
 ```bash
-python -c "import sys; sys.path.insert(0,'nextnano/demos/_shared'); import demo_workflow as w; m=w.load_machine_config(__import__('pathlib').Path('nextnano/demos/14_absolute_chi2_graded_acqw_bo')); print('exe:', m.executable); print('db :', m.database); print('run_solver:', m.run_solver)"
+cat > nextnano/config/machines/nextnano_machine.local.yaml <<'YAML'
+# Work laptop. Values taken from a successful licensed nextnano++ run's
+# machine_summary.json / run_manifest.json and the raw solver log, so they are
+# known-good rather than discovered. Explicit paths are used instead of
+# auto-discovery precisely because these are already proven.
+#
+# This file is gitignored and must never be committed.
+portable_root: ../2026_07_03
+executable: C:\Code\optics\nextnano\2026_07_03\nextnano++\bin\nextnano++_Intel_64bit.exe
+license: C:\Code\optics\nextnano\2026_07_03\License\License_nnp.lic
+database: C:\Code\optics\nextnano\2026_07_03\nextnano++\database\database.nnp
+threads: 4
+run_solver: true
+results_root: null
+YAML
+echo "written"
 ```
+
+The keys are exactly the seven the loader accepts (`portable_root`,
+`executable`, `license`, `database`, `threads`, `run_solver`, `results_root`) —
+it validates strictly and rejects anything else.
+
+`run_solver: true` is deliberate rather than `auto`: these paths are known-good,
+so there is no reason to let discovery decide, and an explicit `true` means a
+missing file fails loudly instead of quietly downgrading to a dry run.
+
+Verify it resolves:
+
+```bash
+python -c "import sys; sys.path.insert(0,'nextnano/demos/_shared'); import demo_workflow as w; m=w.load_machine_config(); print('source    :', m.source_path); print('executable:', m.executable); print('license   :', m.license); print('database  :', m.database); print('threads   :', m.threads); print('run_solver:', m.run_solver)"
+```
+
+All four paths must print, `run_solver` must be `True`, and `source` must end in
+`nextnano_machine.local.yaml`.
 
 ## 5. Run the Demo 14 test suite — SAFE
 

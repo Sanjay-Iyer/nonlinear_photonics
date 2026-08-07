@@ -262,6 +262,10 @@ def run_campaign(
         f"  CONFIG                  : {config_path or demo14.DEMO_DIR / 'demo.yaml'}",
         f"  SOLVER                  : "
         f"{'<MOCK - NOT SCIENTIFIC>' if mock else getattr(machine, 'executable', None)}",
+        f"  MACHINE CONFIG          : {getattr(machine, 'source_path', None)}",
+        f"  LICENSE                 : {getattr(machine, 'license', None)}",
+        f"  DATABASE                : {getattr(machine, 'database', None)}",
+        f"  THREADS                 : {getattr(machine, 'threads', None)}",
         f"  TARGET COMPLETED TRIALS : {target} ({initial} init + {opt['bo_trials']} BO)",
         f"  OBJECTIVE               : maximize {demo14.objective_name(cfg)}",
         f"  TARGET WAVELENGTH       : {cfg['chi2']['target_wavelength_nm']} nm",

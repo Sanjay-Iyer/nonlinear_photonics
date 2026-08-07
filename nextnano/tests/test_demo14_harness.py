@@ -452,6 +452,64 @@ def test_solver_invocation_record_is_complete(mini, tmp_path):
     assert len(solver["input_sha256"]) == 64
 
 
+# --- machine resolution ----------------------------------------------------
+
+
+def test_preflight_gate_and_run_resolve_the_same_machine():
+    """One resolver, three entry points.
+
+    The earlier defect this guards: ``_results_root`` passed the demo directory
+    to ``load_machine_config``. A non-file argument silently falls back to the
+    tracked example AND disables the paths.local.yaml / nextnanopy reuse, both of
+    which sit behind a ``config_path is None`` guard. On a licensed machine that
+    resolves ``executable: null`` and dry-runs while reporting success.
+    """
+
+    import run_demo14
+
+    first = run_demo14.resolve_machine()
+    second = run_demo14.resolve_machine()
+    for field in ("executable", "license", "database", "threads", "run_solver",
+                  "results_root", "source_path"):
+        assert getattr(first, field) == getattr(second, field), field
+
+    # _results_root must go through the same resolver, not its own.
+    _, from_results_root = run_demo14._results_root()
+    for field in ("executable", "license", "database", "threads", "run_solver"):
+        assert getattr(from_results_root, field) == getattr(first, field), field
+
+
+def test_machine_config_is_resolved_with_no_argument():
+    """Passing any path re-enables the fallback that caused the defect."""
+
+    import inspect
+
+    import run_demo14
+
+    source = inspect.getsource(run_demo14.resolve_machine)
+    assert "load_machine_config()" in source, (
+        "resolve_machine must call load_machine_config with NO argument; passing "
+        "a path disables local-config discovery on the licensed machine"
+    )
+
+
+def test_preflight_reports_all_four_machine_fields():
+    """Executable, license, database and threads are each checked separately."""
+
+    import demo_workflow as workflow
+    import run_demo14
+
+    machine = run_demo14.resolve_machine()
+    src = inspect_source = __import__("inspect").getsource(preflight14.run_preflight)
+    for required in ("nextnano++ executable", "nextnano++ license",
+                     "nextnano++ database", "nextnano++ threads",
+                     "nextnano++ solver enabled", "machine configuration source"):
+        assert required in src, f"preflight does not report {required!r}"
+    # The fields exist on the resolved object regardless of this machine's setup.
+    for field in ("executable", "license", "database", "threads", "run_solver"):
+        assert hasattr(machine, field), field
+
+
 def test_unknown_mock_behaviour_is_refused():
     with pytest.raises(ValueError, match="unknown mock behaviour"):
         solver14.execute_mock(

@@ -192,7 +192,14 @@ def run_startup_gate(
     logger.info("  DEMO 14 LICENSED STARTUP GATE")
     logger.info("=" * 74)
     logger.info("  Destination : %s", destination)
-    logger.info("  Solver      : %s", getattr(machine, "executable", None))
+    # Echoed in full so the gate log records exactly which licensed installation
+    # produced the result, and so it can be compared against --preflight.
+    logger.info("  Machine cfg : %s", getattr(machine, "source_path", None))
+    logger.info("  Executable  : %s", getattr(machine, "executable", None))
+    logger.info("  License     : %s", getattr(machine, "license", None))
+    logger.info("  Database    : %s", getattr(machine, "database", None))
+    logger.info("  Threads     : %s", getattr(machine, "threads", None))
+    logger.info("  run_solver  : %s", getattr(machine, "run_solver", None))
     logger.info("  Paid solver calls : 2 (native linear, imported linear)")
     logger.info("=" * 74)
 

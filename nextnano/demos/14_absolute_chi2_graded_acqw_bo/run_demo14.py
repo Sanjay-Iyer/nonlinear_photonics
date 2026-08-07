@@ -34,10 +34,26 @@ import gate14  # noqa: E402
 import preflight14  # noqa: E402
 
 
-def _results_root() -> Path:
+def resolve_machine():
+    """The single machine resolution used by preflight, gate and run alike.
+
+    ``load_machine_config`` must be called with **no argument**. Passing a path
+    makes the loader treat it as an explicit config file, and a non-file (such as
+    a demo directory) silently falls back to the tracked example *and* disables
+    the `paths.local.yaml` and nextnanopy reuse that both live behind a
+    ``config_path is None`` guard. The symptom on a licensed machine is a
+    resolved ``executable: null`` and a campaign that dry-runs while reporting
+    success -- so this is deliberately one function, called by every entry point,
+    rather than three call sites that could drift apart.
+    """
+
     import demo_workflow as workflow
 
-    machine = workflow.load_machine_config(DEMO_DIR)
+    return workflow.load_machine_config()
+
+
+def _results_root():
+    machine = resolve_machine()
     return Path(machine.results_root) / "demo_runs", machine
 
 
@@ -69,7 +85,24 @@ def main(argv: list[str] | None = None) -> int:
     cfg = demo14.load_config(config_path)
 
     if args.preflight:
-        return preflight14.run_preflight(cfg, config_path=config_path)
+        # Resolved through the same function the licensed paths use, so a green
+        # preflight is evidence about the machine --gate and --run will actually
+        # get, not about a separately-derived one.
+        #
+        # The loader raises when a configured path is missing. For --gate and
+        # --run that is exactly right -- fail loudly before spending licensed
+        # time. For --preflight it would be a traceback in place of the report
+        # the command exists to produce, so it is caught and shown as a failed
+        # check alongside the others.
+        try:
+            machine = resolve_machine()
+            machine_error = None
+        except Exception as exc:  # noqa: BLE001 - reported, not swallowed
+            machine, machine_error = None, f"{type(exc).__name__}: {exc}"
+        return preflight14.run_preflight(
+            cfg, config_path=config_path, machine=machine,
+            machine_error=machine_error,
+        )
 
     if args.mock_campaign:
         import tempfile
