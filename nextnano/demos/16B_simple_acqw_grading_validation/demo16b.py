@@ -798,6 +798,7 @@ def solve_case(
     case_dir: Path,
     *,
     machine: Any,
+    raw_output_dir: Path | None = None,
 ) -> dict[str, Any]:
     """Level 3: one real licensed solve and the core physics checks.
 
@@ -819,14 +820,36 @@ def solve_case(
         runlog14.write_text_atomic(data_path, blocks["datafile"])
         imported[name] = data_path
 
-    raw = physics_dir / "raw"
+    raw = Path(raw_output_dir) if raw_output_dir is not None else physics_dir / "raw"
+    required_deck_markers = (
+        "output_bandedges", "quantum{", "Gamma{", "HH{", "output_states{",
+        "envelopes = yes", "probabilities = yes", "run{ quantum{} }",
+    )
+    compact_deck = " ".join(deck_text.split())
+    missing_markers = [marker for marker in required_deck_markers
+                       if marker not in compact_deck]
     record: dict[str, Any] = {
         "case_id": case.case_id,
         "physics_label": case.physics_label,
         "deck_path": str(deck),
         "raw_output_dir": str(raw),
+        "requested_quantum_outputs": {
+            "band_edges": True,
+            "electron_states": True,
+            "heavy_hole_states": True,
+            "electron_envelopes": True,
+            "heavy_hole_envelopes": True,
+            "probabilities": True,
+        },
         "passed": False,
     }
+    if missing_markers:
+        record["failure_reason"] = (
+            f"full-physics deck is missing required markers: {missing_markers}"
+        )
+        record["failure_stage"] = "deck_output_request"
+        runlog14.write_json_atomic(physics_dir / "physics_result.json", record)
+        return record
     try:
         invocation = solver14.execute_real(
             executable=Path(machine.executable),
@@ -838,13 +861,35 @@ def solve_case(
             imported_files=imported, logs_dir=physics_dir / "logs",
         )
     except Exception as exc:  # noqa: BLE001 - solver verdict, recorded verbatim
-        record["solver"] = {"solver_return_code": None, "failed": True}
+        failed_invocation = getattr(exc, "invocation", None)
+        record["solver"] = (
+            failed_invocation.as_record() if failed_invocation is not None else {
+                "solver_argv": solver14.real_argv(
+                    executable=Path(machine.executable),
+                    database=(Path(machine.database)
+                              if getattr(machine, "database", None) else None),
+                    license_path=(Path(machine.license)
+                                  if getattr(machine, "license", None) else None),
+                    deck=deck, output_dir=raw,
+                    threads=int(cfg["nextnano"].get("threads", 1)),
+                ),
+                "solver_return_code": None,
+            }
+        )
+        record["solver"]["failed"] = True
         record["failure_reason"] = f"{type(exc).__name__}: {exc}"
         record["failure_stage"] = "solver"
         runlog14.write_json_atomic(physics_dir / "physics_result.json", record)
         return record
 
     record["solver"] = invocation.as_record()
+    try:
+        record["preanalysis_gate"] = verify_quantum_outputs(cfg, raw)
+    except Exception as exc:  # noqa: BLE001
+        record["failure_reason"] = f"{type(exc).__name__}: {exc}"
+        record["failure_stage"] = "quantum_output_gate"
+        runlog14.write_json_atomic(physics_dir / "physics_result.json", record)
+        return record
     try:
         record["analysis"] = analyse_physics(cfg, raw, profile)
     except Exception as exc:  # noqa: BLE001
@@ -861,3 +906,47 @@ def solve_case(
         record["failure_stage"] = "physics_checks"
     runlog14.write_json_atomic(physics_dir / "physics_result.json", record)
     return record
+
+
+def verify_quantum_outputs(cfg: Mapping[str, Any], raw: Path) -> dict[str, Any]:
+    """Require solver completion and every state artifact before analysis."""
+
+    import outputs
+
+    raw = Path(raw)
+    completion = outputs.completion_evidence(raw)
+    if not completion["job_done_file_present"]:
+        raise Demo16BError(f"no job_done.txt beneath full-solver output {raw}")
+    if not completion["no_stale_job_running_file"]:
+        raise Demo16BError(f"stale job_running.txt beneath full-solver output {raw}")
+
+    profile = outputs.load_profile(str(cfg["nextnano"]["parser_profile"]))
+    region = str(cfg["nextnano"]["quantum_region_name"])
+    keys = (
+        "bandedges",
+        "energy_spectrum_gamma", "probabilities_gamma", "envelopes_gamma",
+        "energy_spectrum_hh", "probabilities_hh", "envelopes_hh",
+    )
+    resolved = outputs.resolve_outputs(
+        profile, raw, keys, substitutions={"region": region}
+    )
+    outputs.require_or_diagnose(
+        resolved, raw, keys,
+        why=("the Demo 16C full-physics deck requests Gamma and HH states, "
+             "envelopes, probabilities, and band edges"),
+    )
+    log_markers = outputs.scan_log_markers(
+        outputs.solver_log_text(raw), fatal_markers=solver14.FATAL_STDOUT_MARKERS
+    )
+    if not log_markers["no_fatal_marker"]:
+        raise Demo16BError(
+            f"fatal marker(s) in completed solver logs: "
+            f"{log_markers['fatal_markers_found']}"
+        )
+    return {
+        "passed": True,
+        "solver_return_code_is_zero": True,
+        "completion_evidence": completion,
+        "log_markers": log_markers,
+        "quantum_outputs": resolved.provenance(raw),
+    }

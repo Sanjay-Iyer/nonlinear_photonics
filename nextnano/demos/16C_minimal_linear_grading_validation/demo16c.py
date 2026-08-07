@@ -20,6 +20,8 @@ import demo16
 import demo16b
 import grading14
 import runlog14
+import solver14
+import sweeps
 
 DEMO_ID = "16C_minimal_linear_grading_validation"
 DEMO_VERSION = "demo16c-1.0.0"
@@ -349,6 +351,78 @@ def run_case(
 
 def solve_case(cfg: Mapping[str, Any], case: cases16c.GradingCase,
                case_dir: Path, *, machine: Any) -> dict[str, Any]:
-    """Use Demo 16B's thin production-solver/output-analysis wrapper."""
+    """Use Demo 16B's production wrapper and retain actionable diagnostics.
 
-    return demo16b.solve_case(cfg, case, case_dir, machine=machine)
+    Demo 16B already preserves the solver transcripts, but its compact result
+    only points at them.  Demo 16C is intended to be operated by hand, so keep
+    short stdout/stderr tails in the result when either solving or analysis
+    fails.  This never changes the verdict and never attempts analysis after a
+    failed solver.
+    """
+
+    raw_output = physics_raw_output_dir(case_dir, case)
+    record = demo16b.solve_case(
+        cfg, case, case_dir, machine=machine, raw_output_dir=raw_output
+    )
+    if record.get("passed"):
+        return record
+
+    logs = Path(case_dir) / "physics" / "logs"
+
+    def tail(path: Path, limit: int = 20) -> list[str]:
+        if not path.is_file():
+            return []
+        lines = [line.rstrip() for line in path.read_text(
+            encoding="utf-8", errors="replace").splitlines() if line.strip()]
+        return lines[-limit:]
+
+    raw = Path(record.get("raw_output_dir") or raw_output)
+    record["diagnostics"] = {
+        "stdout_tail": tail(logs / "stdout.txt"),
+        "stderr_tail": tail(logs / "stderr.txt"),
+        "raw_files_present": sorted(
+            str(path.relative_to(raw)).replace("\\", "/")
+            for path in raw.rglob("*") if path.is_file()
+        )[:80] if raw.is_dir() else [],
+    }
+    runlog14.write_json_atomic(
+        Path(case_dir) / "physics" / "physics_result.json", record
+    )
+    return record
+
+
+def physics_raw_output_dir(case_dir: Path, case: cases16c.GradingCase) -> Path:
+    """A Windows-safe raw-output root for nextnano++'s 104-char tail.
+
+    The human-facing case artifacts remain beneath ``cases/case_XX``.  Only the
+    solver's deeply nested raw tree moves to ``<run>/p01`` or ``<run>/p03``.
+    """
+
+    case_dir = Path(case_dir)
+    if case_dir.parent.name == "cases":
+        run_root = case_dir.parent.parent
+    else:  # unit tests and direct library use
+        run_root = case_dir.parent
+    suffix = case.case_id.rsplit("_", 1)[-1]
+    raw = run_root / f"p{suffix}"
+    warning = sweeps.check_path_budget(raw)
+    if warning:
+        raise RuntimeError(warning)
+    return raw
+
+
+def full_physics_command(cfg: Mapping[str, Any], case: cases16c.GradingCase,
+                         case_dir: Path, *, machine: Any) -> list[str]:
+    """Exact argv used by the shared production full-solver wrapper."""
+
+    deck = Path(case_dir) / "physics" / "nextnano_input" / "case.in"
+    return solver14.real_argv(
+        executable=Path(machine.executable),
+        database=(Path(machine.database)
+                  if getattr(machine, "database", None) else None),
+        license_path=(Path(machine.license)
+                      if getattr(machine, "license", None) else None),
+        deck=deck,
+        output_dir=physics_raw_output_dir(case_dir, case),
+        threads=int(cfg["nextnano"].get("threads", 1)),
+    )

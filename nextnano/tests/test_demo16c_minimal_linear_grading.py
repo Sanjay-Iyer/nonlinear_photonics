@@ -28,6 +28,8 @@ import demo16  # noqa: E402
 import demo16b  # noqa: E402
 import demo16c  # noqa: E402
 import run_demo16c  # noqa: E402
+import solver14  # noqa: E402
+import sweeps  # noqa: E402
 
 CASES_PATH = DEMOS / "16C_minimal_linear_grading_validation" / "validation_cases.yaml"
 
@@ -190,6 +192,8 @@ def test_solver_failure_stops_analysis(tmp_path, monkeypatch, cfg, cases):
     record = demo16c.solve_case(cfg, cases[0], tmp_path / "case_01", machine=machine)
     assert not record["passed"]
     assert record["failure_stage"] == "solver"
+    assert "solver refused" in record["failure_reason"]
+    assert "diagnostics" in record
     assert not analysed
 
 
@@ -211,3 +215,88 @@ def test_duplicate_demo_runs_path_cannot_occur(monkeypatch, tmp_path):
     root = run_demo16c.results_root() / demo16c.DEMO_ID
     assert list(root.parts).count("demo_runs") == 1
     assert not [a for a, b in zip(root.parts, root.parts[1:]) if a == b]
+
+
+def test_physics_uses_full_solver_command_and_short_raw_root(cfg, cases):
+    run_root = Path(
+        r"C:\Code\optics\nextnano\nonlinear_photonics\nextnano\results\demo_runs"
+        r"\16C_minimal_linear_grading_validation"
+        r"\demo16c_20260807T201711Z_3f837abc_c90082"
+    )
+    case_dir = run_root / "cases" / "case_01"
+    machine = SimpleNamespace(
+        executable=Path(r"C:\nextnano\nextnano++_Intel_64bit.exe"),
+        database=Path(r"C:\nextnano\database.nnp"),
+        license=Path(r"C:\nextnano\license.lic"),
+    )
+    raw = demo16c.physics_raw_output_dir(case_dir, cases[0])
+    assert raw == run_root / "p01"
+    assert len(str(raw)) < sweeps.MAX_RUN_DIR_LENGTH
+    command = demo16c.full_physics_command(
+        cfg, cases[0], case_dir, machine=machine
+    )
+    assert command == solver14.real_argv(
+        executable=machine.executable, database=machine.database,
+        license_path=machine.license,
+        deck=case_dir / "physics" / "nextnano_input" / "case.in",
+        output_dir=raw, threads=1,
+    )
+    assert "--structure" not in command and "--parse" not in command
+
+
+def test_full_physics_deck_requests_states_wavefunctions_and_bandedges(cfg, cases):
+    _g, _profile, _blocks, deck = demo16c.build_case(cfg, cases[0])
+    compact = " ".join(deck.split())
+    for marker in (
+        "output_bandedges", "Gamma{ num_ev", "HH{ num_ev", "output_states{",
+        "envelopes = yes", "probabilities = yes", "run{ quantum{} }",
+    ):
+        assert marker in compact
+
+
+def test_quantum_output_gate_accepts_known_working_demo11_fixture(cfg):
+    fixture = (
+        Path(__file__).resolve().parent / "fixtures" / "nextnano_pp_3_0_0"
+        / "demo11_acqw_paper"
+    )
+    gate = demo16b.verify_quantum_outputs(cfg, fixture)
+    assert gate["passed"]
+    assert gate["completion_evidence"]["job_done_file_present"]
+    resolved = gate["quantum_outputs"]["resolved_artifacts"]
+    assert resolved["energy_spectrum_gamma"]
+    assert resolved["energy_spectrum_hh"]
+    assert resolved["envelopes_gamma"]
+    assert resolved["envelopes_hh"]
+
+
+def test_missing_quantum_outputs_stop_analysis(tmp_path, monkeypatch, cfg, cases):
+    analysed = []
+
+    def successful_solver(**kwargs):
+        return solver14.SolverInvocation(
+            executable=str(kwargs["executable"]),
+            argv=solver14.real_argv(
+                executable=kwargs["executable"], database=kwargs["database"],
+                license_path=kwargs["license_path"], deck=kwargs["deck"],
+                output_dir=kwargs["output_dir"], threads=kwargs["threads"],
+            ),
+            working_directory=str(kwargs["deck"].parent),
+            input_path=str(kwargs["deck"]), input_sha256="test",
+            return_code=0,
+        )
+
+    def missing_gate(*args, **kwargs):
+        raise demo16b.Demo16BError("missing HH envelopes")
+
+    def analysis_must_not_run(*args, **kwargs):
+        analysed.append(True)
+
+    monkeypatch.setattr(demo16b.solver14, "execute_real", successful_solver)
+    monkeypatch.setattr(demo16b, "verify_quantum_outputs", missing_gate)
+    monkeypatch.setattr(demo16b, "analyse_physics", analysis_must_not_run)
+    machine = SimpleNamespace(executable="nextnano++.exe", database=None, license=None)
+    record = demo16c.solve_case(cfg, cases[0], tmp_path / "case_01", machine=machine)
+    assert record["solver"]["solver_return_code"] == 0
+    assert record["failure_stage"] == "quantum_output_gate"
+    assert "missing HH envelopes" in record["failure_reason"]
+    assert not analysed

@@ -44,9 +44,17 @@ FATAL_STDOUT_MARKERS = (
 class SolverTimeout(RuntimeError):
     """The solver exceeded its configured wall-clock budget."""
 
+    def __init__(self, message: str, invocation: "SolverInvocation | None" = None):
+        super().__init__(message)
+        self.invocation = invocation
+
 
 class SolverTechnicalFailure(RuntimeError):
     """Infrastructure failed, as distinct from the physics being unfavourable."""
+
+    def __init__(self, message: str, invocation: "SolverInvocation | None" = None):
+        super().__init__(message)
+        self.invocation = invocation
 
 
 @dataclass
@@ -94,6 +102,21 @@ def _sha256(path: Path) -> str | None:
         return hashlib.sha256(Path(path).read_bytes()).hexdigest()
     except Exception:
         return None
+
+
+def real_argv(
+    *, executable: Path, database: Path | None, license_path: Path | None,
+    deck: Path, output_dir: Path, threads: int = 1,
+) -> list[str]:
+    """The authoritative full-solver command, shared by execution/reporting."""
+
+    argv = [str(executable)]
+    if database is not None:
+        argv += ["-d", str(database)]
+    if license_path is not None:
+        argv += ["-l", str(license_path)]
+    argv += ["--threads", str(int(threads)), "-o", str(output_dir), str(deck)]
+    return argv
 
 
 def _terminate_tree(process: subprocess.Popen) -> None:
@@ -150,12 +173,10 @@ def execute_real(
     logs = Path(logs_dir) if logs_dir else deck.parent
     logs.mkdir(parents=True, exist_ok=True)
 
-    argv = [str(executable)]
-    if database is not None:
-        argv += ["-d", str(database)]
-    if license_path is not None:
-        argv += ["-l", str(license_path)]
-    argv += ["--threads", str(int(threads)), "-o", str(output_dir), str(deck)]
+    argv = real_argv(
+        executable=executable, database=database, license_path=license_path,
+        deck=deck, output_dir=output_dir, threads=threads,
+    )
 
     invocation = SolverInvocation(
         executable=str(executable),
@@ -197,7 +218,7 @@ def execute_real(
     if invocation.timed_out:
         raise SolverTimeout(
             f"nextnano++ exceeded {timeout_seconds} s and was terminated. Partial "
-            f"output preserved under {output_dir}."
+            f"output preserved under {output_dir}.", invocation,
         )
     if invocation.return_code != 0:
         # Previously this returned normally and analysis ran on the wreckage of a
@@ -206,7 +227,7 @@ def execute_real(
         raise SolverTechnicalFailure(
             f"nextnano++ exited with code {invocation.return_code}. "
             f"stdout: {invocation.stdout_path}  stderr: {invocation.stderr_path}. "
-            f"Raw output preserved under {output_dir}."
+            f"Raw output preserved under {output_dir}.", invocation,
         )
 
     # The exit code is not the only verdict. nextnano++ prints an explicit fatal
@@ -219,13 +240,13 @@ def execute_real(
         if marker in lowered:
             raise SolverTechnicalFailure(
                 f"nextnano++ reported '{marker}' and did not complete. See "
-                f"{invocation.stdout_path}. Raw output under {output_dir}."
+                f"{invocation.stdout_path}. Raw output under {output_dir}.", invocation,
             )
     produced = [p for p in Path(output_dir).rglob("*") if p.is_file()]
     if not produced:
         raise SolverTechnicalFailure(
             f"nextnano++ exited 0 but wrote no output files under {output_dir}. "
-            f"See {invocation.stdout_path}."
+            f"See {invocation.stdout_path}.", invocation,
         )
     return invocation
 

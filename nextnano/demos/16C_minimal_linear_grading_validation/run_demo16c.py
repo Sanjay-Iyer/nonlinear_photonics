@@ -10,6 +10,7 @@ import argparse
 import datetime as dt
 import json
 from pathlib import Path
+import subprocess
 import sys
 import uuid
 
@@ -109,7 +110,10 @@ def run_levels(*, do_parse: bool, do_structure: bool, mode: str,
     print(f"  RUN DIR    : {root}")
     print(f"  EXECUTABLE : {exe or '<none found>'}")
     print(f"  CASES      : {len(cases)} (fixed geometry, linear grading only)")
-    if do_structure:
+    if mode == "physics":
+        print("  NOTE       : parser + structure are the pre-physics safety gate.")
+        print("               Licensed full quantum solves follow for passing cases.")
+    elif do_structure:
         print("  NOTE       : --structure builds composition but does not solve physics.")
     else:
         print("  NOTE       : --parse checks syntax and does not solve physics.")
@@ -156,7 +160,8 @@ def run_levels(*, do_parse: bool, do_structure: bool, mode: str,
     })
     _write_readme(root, environment, cases, outcomes)
     print(RULE)
-    print(f"  RESULT: {passed}/{len(outcomes)} passed")
+    label = "PRE-PHYSICS GATE" if mode == "physics" else "RESULT"
+    print(f"  {label}: {passed}/{len(outcomes)} passed")
     print(f"  FILES : {root}")
     print(RULE)
     return (0 if passed == len(outcomes) else 1), root, outcomes
@@ -283,19 +288,56 @@ def run_physics(verbose: bool = False) -> int:
             record = {"case_id": case.case_id, "passed": False, "skipped": True,
                       "failure_reason": outcome.failure_reason}
         else:
+            command = demo16c.full_physics_command(
+                cfg, case, case_dir, machine=machine
+            )
+            print(f"  [FULL-SOLVE] {case.case_id}")
+            print(f"               command={subprocess.list2cmdline(command)}")
             record = demo16c.solve_case(cfg, case, case_dir, machine=machine)
+            record["reported_full_physics_command"] = command
             outcome.physics = record
             runlog14.write_json_atomic(case_dir / "case_result.json", outcome.as_record())
         records.append(record)
         analysis = record.get("analysis") or {}
+        return_code = (record.get("solver") or {}).get("solver_return_code")
         print(f"  [{'PHYS-OK' if record.get('passed') else 'PHYS-FAIL':<9}] "
-              f"{case.case_id} E1={analysis.get('E_e1_eV')} "
+              f"{case.case_id} rc={return_code} E1={analysis.get('E_e1_eV')} "
               f"E2={analysis.get('E_e2_eV')} HH1={analysis.get('E_hh1_eV')} "
               f"HH2={analysis.get('E_hh2_eV')}")
+        if record.get("passed"):
+            provenance = ((record.get("preanalysis_gate") or {})
+                          .get("quantum_outputs") or {})
+            resolved = provenance.get("resolved_artifacts") or {}
+            for key in ("energy_spectrum_gamma", "energy_spectrum_hh",
+                        "envelopes_gamma", "envelopes_hh", "bandedges"):
+                print(f"               {key}={resolved.get(key)}")
+        if not record.get("passed"):
+            print(f"               stage={record.get('failure_stage', 'unknown')}")
+            print(f"               reason={record.get('failure_reason', 'not recorded')}")
+            diagnostics = record.get("diagnostics") or {}
+            stderr_tail = diagnostics.get("stderr_tail") or []
+            stdout_tail = diagnostics.get("stdout_tail") or []
+            useful_tail = stderr_tail[-3:] or stdout_tail[-3:]
+            for line in useful_tail:
+                print(f"               log: {line}")
+    solved = sum(bool(r.get("passed")) for r in records)
     runlog14.write_json_atomic(root / "physics_summary.json", {
         "selected_cases": [c.case_id for c in selected], "cases": records,
-        "passed": sum(bool(r.get("passed")) for r in records),
+        "passed": solved,
     })
+    runlog14.write_json_atomic(root / "RUN_STATUS.json", {
+        "run_id": root.name,
+        "demo_id": demo16c.DEMO_ID,
+        "mode": "physics",
+        "status": "completed",
+        "cases_total": len(records),
+        "cases_passed": solved,
+        "cases_failed": len(records) - solved,
+    })
+    print(RULE)
+    print(f"  PHYSICS RESULT: {solved}/{len(records)} solved and verified")
+    print(f"  DIAGNOSTICS   : {root / 'physics_summary.json'}")
+    print(RULE)
     return 0 if status == 0 and all(r.get("passed") for r in records) else 1
 
 

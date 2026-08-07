@@ -35,6 +35,14 @@ Running with no flag is the same safe, solver-free action as `--preflight`.
 Only `--physics` launches full solves, and only for cases 01 and 03. It first
 requires both syntax and realized-composition validation to pass.
 
+For the full solves, the deeply nested nextnano++ raw trees use short run-root
+directories (`p01` and `p03`). This keeps the longest Gamma/HH state paths below
+Windows' 259-character limit. Human-facing decks, logs, results, and summaries
+remain under `cases/case_01/physics/` and `cases/case_03/physics/`. The command
+prints the exact full-solver argv and verifies return code 0, `job_done.txt`,
+band edges, Gamma/HH energy spectra, probabilities, and envelopes before the
+state analyzer runs.
+
 The free nextnano++ build accepts all four production decks with `--parse`, but
 its 100-grid-point limit refuses the 441-point production stack in
 `--structure`. Run `--structure`, `--validate`, and `--physics` on the licensed
