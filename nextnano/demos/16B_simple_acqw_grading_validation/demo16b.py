@@ -41,7 +41,7 @@ from dataclasses import dataclass, field
 import math
 from pathlib import Path
 import re
-from typing import Any, Mapping, Sequence
+from typing import Any, Callable, Mapping, Sequence
 
 import numpy as np
 
@@ -799,15 +799,22 @@ def solve_case(
     *,
     machine: Any,
     raw_output_dir: Path | None = None,
+    build: Callable[..., tuple] | None = None,
 ) -> dict[str, Any]:
     """Level 3: one real licensed solve and the core physics checks.
 
     ``solver14.execute_real`` raises on a nonzero exit, a timeout, a fatal stdout
     marker or an empty output tree, so nothing below this line can run on a
     failed solve.
+
+    ``build`` defaults to :func:`build_case`, which renders every case through
+    Demo 14's native path. A caller that deliberately renders some of its cases
+    differently -- Demo 16E's abrupt and imported representations -- passes its
+    own builder so the deck that is solved is the deck it validated, while the
+    solver invocation, the output gate and the analysis stay this one.
     """
 
-    geometry, profile, blocks, deck_text = build_case(cfg, case)
+    geometry, profile, blocks, deck_text = (build or build_case)(cfg, case)
     physics_dir = Path(case_dir) / "physics"
     input_dir = physics_dir / "nextnano_input"
     input_dir.mkdir(parents=True, exist_ok=True)
