@@ -150,6 +150,38 @@ def json_safe(value: Any) -> Any:
     return value
 
 
+#: Delays before each retry of the temp-then-rename step, in seconds. On Windows
+#: a virus scanner or the search indexer can hold a just-written file open for a
+#: few hundred milliseconds; ``os.replace`` then fails with PermissionError
+#: (WinError 5) even though the write itself succeeded and nothing is wrong.
+#: Six attempts spanning ~1.5 s covers that window without hiding a real
+#: permission problem, which fails every attempt just as fast.
+REPLACE_RETRY_DELAYS_S: tuple[float, ...] = (0.05, 0.1, 0.2, 0.4, 0.8)
+
+
+def _replace_with_retry(temporary: Path, path: Path) -> None:
+    """``os.replace`` with a short Windows-safe retry.
+
+    Only the rename is retried. The temporary file is already written and
+    flushed, so a retry re-attempts exactly the atomic step and never rewrites
+    or re-serialises anything.
+    """
+
+    for attempt in range(len(REPLACE_RETRY_DELAYS_S) + 1):
+        try:
+            os.replace(temporary, path)
+            return
+        except PermissionError as exc:
+            if attempt == len(REPLACE_RETRY_DELAYS_S):
+                raise Runlog14Error(
+                    f"could not atomically replace {path} with {temporary} after "
+                    f"{attempt + 1} attempts over "
+                    f"{sum(REPLACE_RETRY_DELAYS_S):.2f} s: {exc}. The temporary "
+                    "file has been left in place for inspection."
+                ) from exc
+            time.sleep(REPLACE_RETRY_DELAYS_S[attempt])
+
+
 def write_json_atomic(path: Path, payload: Any) -> Path:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -158,7 +190,7 @@ def write_json_atomic(path: Path, payload: Any) -> Path:
         json.dumps(json_safe(payload), indent=2, sort_keys=True, allow_nan=False),
         encoding="utf-8", newline="\n",
     )
-    os.replace(temporary, path)
+    _replace_with_retry(temporary, path)
     return path
 
 
@@ -167,7 +199,7 @@ def write_text_atomic(path: Path, text: str) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(f"~{path.name}.{uuid.uuid4().hex[:8]}.tmp")
     temporary.write_text(text, encoding="utf-8", newline="\n")
-    os.replace(temporary, path)
+    _replace_with_retry(temporary, path)
     return path
 
 

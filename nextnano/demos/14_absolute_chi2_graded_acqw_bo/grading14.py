@@ -317,6 +317,24 @@ def build_structure_profile(
         "active_start_nm": z1,
         "active_end_nm": z4,
     }
+    # Where the profile bends. A compact-support family reaches its plateaus at
+    # finite positions, so x_Al(z) has a slope discontinuity there -- for the
+    # linear family it is piecewise linear with exactly these knots. The mesh
+    # does not generally contain them, so anything that RESAMPLES the profile
+    # (an imported table, above all) has to be told where they are or it will
+    # cut every corner. Recorded here, with the values from the same evaluator
+    # that built the profile, so a resampler never has to re-derive either.
+    if fam.compact_support:
+        knots = np.array(
+            [z1 - 0.5 * scale_fall, z1 + 0.5 * scale_fall,
+             z2 - 0.5 * scale_rise, z2 + 0.5 * scale_rise,
+             z3 - 0.5 * scale_fall, z3 + 0.5 * scale_fall,
+             z4 - 0.5 * scale_rise, z4 + 0.5 * scale_rise],
+            dtype=float,
+        )
+        knots = np.unique(knots[(knots > lo) & (knots < hi)])
+        request["breakpoints_nm"] = knots.tolist()
+        request["breakpoint_al_fractions"] = evaluate(knots).tolist()
     built = CompositionProfile(
         x_nm=x_mesh, al_fraction=evaluate(x_mesh),
         x_nm_continuous=x_fine, al_fraction_continuous=evaluate(x_fine),
@@ -662,7 +680,48 @@ def measure(
 # ---------------------------------------------------------------------------
 
 
-def import_datafile(profile: CompositionProfile) -> str:
+#: Two table positions closer than this are the same position once written at
+#: the six-decimal precision of the datafile.
+_IMPORT_POSITION_RESOLUTION_NM = 1.0e-6
+
+
+def import_samples(
+    profile: CompositionProfile, *, include_breakpoints: bool = False
+) -> tuple[np.ndarray, np.ndarray]:
+    """Table coordinates and values, optionally including the profile's knots.
+
+    nextnano++ interpolates an imported table linearly between its rows. A
+    piecewise-linear profile whose knots are not rows is therefore reproduced
+    with the corners cut: the error at a knot is ``d (h - d) / h`` times the
+    slope change, which peaks when the knot sits half a mesh cell from the
+    nearest sample -- 5.5e-3 in Al fraction for a 1.0 nm 10-90 grade on a
+    0.05 nm mesh, an order above the composition tolerance.
+
+    Adding the knots removes that error exactly rather than reducing it, and
+    costs one row per knot. It is opt-in because the tables Demos 13, 14 and 17
+    have already run are part of their recorded provenance.
+    """
+
+    x = np.asarray(profile.x_nm, dtype=float)
+    y = np.asarray(profile.al_fraction, dtype=float)
+    knots = profile.request.get("breakpoints_nm") if include_breakpoints else None
+    if not knots:
+        return x, y
+    values = profile.request["breakpoint_al_fractions"]
+    merged_x = np.concatenate([x, np.asarray(knots, dtype=float)])
+    merged_y = np.concatenate([y, np.asarray(values, dtype=float)])
+    order = np.argsort(merged_x, kind="stable")
+    merged_x, merged_y = merged_x[order], merged_y[order]
+    # A knot that already coincides with a mesh point would otherwise become a
+    # duplicate row, which the ascending-coordinate check below rejects.
+    keep = np.ones(merged_x.size, dtype=bool)
+    keep[1:] = np.diff(merged_x) > _IMPORT_POSITION_RESOLUTION_NM
+    return merged_x[keep], merged_y[keep]
+
+
+def import_datafile(
+    profile: CompositionProfile, *, include_breakpoints: bool = False
+) -> str:
     """The ``format = DAT`` payload for ``import{ file{} }``.
 
     Two columns, position in nm and Al fraction, strictly ascending in position.
@@ -670,8 +729,7 @@ def import_datafile(profile: CompositionProfile) -> str:
     rather than being re-quantized by the formatter.
     """
 
-    x = np.asarray(profile.x_nm, dtype=float)
-    y = np.asarray(profile.al_fraction, dtype=float)
+    x, y = import_samples(profile, include_breakpoints=include_breakpoints)
     if x.size != y.size:
         raise Grading14Error("profile coordinate and value arrays differ in length.")
     if x.size == 0:
@@ -688,7 +746,7 @@ def import_datafile(profile: CompositionProfile) -> str:
 
 def _imported_regions(
     profile: CompositionProfile, *, import_name: str, material_name: str,
-    reason: str = "",
+    reason: str = "", include_breakpoints: bool = False,
 ) -> dict[str, Any]:
     """One imported-table region covering the whole domain."""
 
@@ -714,7 +772,9 @@ def _imported_regions(
             f'        ternary_import{{ name = "{material_name}"  '
             f'import_from = "{import_name}" }}\n'
         ),
-        "datafile": import_datafile(profile),
+        "datafile": import_datafile(
+            profile, include_breakpoints=include_breakpoints
+        ),
         "render_fallback_reason": reason,
     }
 
@@ -725,6 +785,7 @@ def render_imported_blocks(
     import_name: str = "al_profile",
     material_name: str = "Al(x)Ga(1-x)As",
     reason: str = "",
+    include_breakpoints: bool = False,
 ) -> dict[str, Any]:
     """The imported-table rendering of ``profile``, whatever family it came from.
 
@@ -737,10 +798,16 @@ def render_imported_blocks(
     called deliberately. Demo 17's native-vs-imported equivalence experiment needs
     both renderings of one profile, and generating the second one anywhere else
     would compare Demo 17's importer against nextnano++ rather than Demo 14's.
+
+    ``include_breakpoints`` adds the profile's own knots to the table; see
+    :func:`import_samples`. An equivalence experiment wants it, because without
+    it the imported deck encodes a measurably different function from the native
+    one and the experiment measures the sampling, not the solver.
     """
 
     return _imported_regions(
-        profile, import_name=import_name, material_name=material_name, reason=reason
+        profile, import_name=import_name, material_name=material_name, reason=reason,
+        include_breakpoints=include_breakpoints,
     )
 
 

@@ -153,10 +153,21 @@ def run_preflight(verbose: bool = False) -> int:
              for line in profiles[imported_id][1]["datafile"].strip().splitlines()],
             dtype=float,
         )
-        error = float(np.max(np.abs(table[:, 1] - profiles[imported_id][0].al_fraction)))
-        assert error <= 1e-8, error
-        return (f"{native_id}/{imported_id} share x_Al(z) exactly; "
-                f"imported table reproduces it to {error:.1e}")
+        # The table carries the profile's knots as well as its mesh samples, so
+        # it has more rows than the profile has points. What has to agree is the
+        # FUNCTION nextnano++ will interpolate out of it -- checked where the
+        # solver actually samples it, at cell centres.
+        native = profiles[native_id][0]
+        mesh = float(native.request["mesh_nm"])
+        centres = np.arange(0.0, float(native.request["domain_nm"][1]), mesh) + 0.5 * mesh
+        centres = centres[(centres >= table[0, 0]) & (centres <= table[-1, 0])]
+        error = float(np.max(np.abs(
+            np.interp(centres, table[:, 0], table[:, 1])
+            - demo16b.intended_on(native, centres)
+        )))
+        assert error <= 1e-9, error
+        return (f"{native_id}/{imported_id} share x_Al(z) exactly; imported table "
+                f"reproduces it at solver cell centres to {error:.1e}")
 
     def local_metrology() -> str:
         for case in loaded:

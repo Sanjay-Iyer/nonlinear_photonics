@@ -126,14 +126,29 @@ def abrupt_blocks(profile: grading14.CompositionProfile) -> dict[str, Any]:
 def render_blocks(
     case: cases16e.GeometryCase, profile: grading14.CompositionProfile
 ) -> dict[str, Any]:
-    """Deck blocks for this case's requested representation."""
+    """Deck blocks for this case's requested representation.
+
+    The deliberately imported case asks for the profile's knots to be included in
+    the table. nextnano++ interpolates an imported table linearly, so a table
+    sampled only on the 0.05 nm mesh cuts the corner at every ramp end: for a
+    1.00 nm 10-90 grade the knots land half a mesh cell from the nearest sample
+    and the realized composition is wrong by 5.5e-3, an order above the
+    tolerance. That is a property of the sampling, not of the structure, and it
+    would make the equivalence pair measure the table instead of the solver.
+
+    The overlapping case is left alone on purpose: there the imported rendering
+    is production's own automatic fallback, and Demo 16E is validating that
+    behaviour rather than substituting for it.
+    """
 
     if case.is_abrupt:
         return abrupt_blocks(profile)
     if case.render_request == "imported":
         return grading14.render_imported_blocks(
-            profile, reason="Demo 16E case_10 asks for the imported rendering so it "
-                            "can be compared against its native twin",
+            profile,
+            reason="Demo 16E case_10 asks for the imported rendering so it "
+                   "can be compared against its native twin",
+            include_breakpoints=True,
         )
     return grading14.render_structure_blocks(profile)
 

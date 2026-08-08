@@ -59,6 +59,34 @@ through `ternary_import` rather than emitting overriding linear regions that
 would invent a flat Al<sub>0.55</sub> plateau. Its realized barrier peak is
 ≈ 0.267, and that is recorded as the expected value, not a defect.
 
+### Why the imported table carries the profile's knots
+
+nextnano++ interpolates an imported table linearly between its rows. A table
+sampled only on the 0.05 nm mesh therefore cuts the corner at every ramp end,
+because the profile's knots are not mesh points: for `case_10`'s 1.00 nm grades
+all eight knots land exactly half a mesh cell from the nearest sample, the worst
+possible offset, and the realized composition came out wrong by
+
+    d (h - d) / h × |Δslope| = 0.0125 × 0.44 = 5.5e-3
+
+against a 5e-3 tolerance — while native `case_09`, which hands nextnano++ the
+exact ramp endpoints, was exact. That is a property of the sampling, not of the
+structure, and it would have made the equivalence pair measure the table rather
+than the solver.
+
+`case_10` therefore asks the production importer to include the profile's own
+knots (`grading14.import_samples(..., include_breakpoints=True)`), which
+`build_structure_profile` now records along with their exact values. Eight extra
+rows make the table reproduce the analytic profile exactly (residual ~3e-15 at
+solver cell centres) rather than approximately.
+
+This is opt-in, and only `case_10` opts in. `case_08`'s table is production's own
+automatic fallback — the behaviour Demo 16E exists to validate — so it is left
+byte-identical, as are the tables Demos 13, 14 and 17 have already recorded.
+`case_08` carries the same sampling artifact at 3.9e-3, below the tolerance;
+enabling knots there too is a one-flag change, but it would move a case this
+study is meant to observe rather than improve.
+
 ### How the abrupt case is built
 
 Demo 14's profile builder has no abrupt branch (a 10-90 width must be positive),
@@ -210,10 +238,30 @@ probability and `L` for each of E1, E2, HH1, HH2); and optics (`chi2_at_1550`,
 ## Relationship to Demo 16D
 
 Demo 16D is unchanged and still runs. Demo 16E reuses its case, render,
-validation and path-safety patterns rather than replacing them. The one shared
-change is additive: `demo16b.solve_case` gained an optional `build=` hook so a
-caller can solve the deck it validated. Demo 16B, 16C and 16D pass nothing and
-behave exactly as before.
+validation and path-safety patterns rather than replacing them. Three shared
+changes, all additive and all defaulting to the previous behaviour:
+
+* `demo16b.solve_case` gained an optional `build=` hook so a caller can solve the
+  deck it validated. Demo 16B, 16C and 16D pass nothing and behave as before.
+* `grading14.build_structure_profile` records the profile's knots
+  (`breakpoints_nm`, `breakpoint_al_fractions`) for compact-support families.
+  Extra keys in `request`; nothing else reads them unless it asks.
+* `grading14.import_datafile` / `render_imported_blocks` gained
+  `include_breakpoints=False`. With the default, every existing imported table is
+  byte-identical.
+* `runlog14.write_json_atomic` and `write_text_atomic` retry the `os.replace`
+  step; see below.
+
+### Atomic writes on Windows
+
+A licensed run lost a case at `os.replace` with `PermissionError: [WinError 5]`
+— `case_06` in one run, `case_04` in another, so not case-specific: a virus
+scanner or the search indexer holds a just-written file open for a few hundred
+milliseconds. `runlog14` now retries only the rename, six attempts over about
+1.5 s with increasing delays. The temporary file is already written and flushed,
+so a retry re-attempts exactly the atomic step and never re-serialises anything.
+If every attempt fails the error names both the temporary and the destination
+path, and the temporary is left in place for inspection.
 
 ## Tests
 

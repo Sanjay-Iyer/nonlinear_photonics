@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 import sys
 from types import SimpleNamespace
@@ -29,6 +30,7 @@ import demo16b  # noqa: E402
 import demo16e  # noqa: E402
 import grading14  # noqa: E402
 import run_demo16e  # noqa: E402
+import runlog14  # noqa: E402
 import solver14  # noqa: E402
 import sweeps  # noqa: E402
 
@@ -200,7 +202,7 @@ def test_equivalence_pair_is_one_profile_two_encodings(cfg, cases):
     assert built[native_id][2] != built[imported_id][2]
 
 
-def test_imported_table_reproduces_the_authoritative_profile(cfg, cases):
+def test_imported_table_contains_every_mesh_sample_and_every_breakpoint(cfg, cases):
     case = next(case for case in cases if case.render_request == "imported")
     _geometry, profile, blocks, _deck = demo16e.build_case(cfg, case)
     table = np.array(
@@ -208,15 +210,101 @@ def test_imported_table_reproduces_the_authoritative_profile(cfg, cases):
          for line in blocks["datafile"].strip().splitlines()],
         dtype=float,
     )
+    positions = table[:, 0]
+    assert np.all(np.diff(positions) > 0)
+    for sample in profile.x_nm:
+        assert np.min(np.abs(positions - sample)) <= 1e-6
+    knots = profile.request["breakpoints_nm"]
+    assert len(knots) == 8
+    for knot in knots:
+        assert np.min(np.abs(positions - knot)) <= 1e-6
+    assert table.shape[0] == profile.x_nm.size + len(knots)
+
+
+def test_imported_table_reproduces_the_analytic_profile_where_the_solver_reads_it(
+    cfg, cases
+):
+    """The defect this guards: a table sampled only on the mesh cuts every corner.
+
+    nextnano++ interpolates the table linearly, so a knot sitting half a mesh
+    cell from the nearest row was reproduced with an error of d(h-d)/h times the
+    slope change -- 5.5e-3 in Al fraction for the 1.00 nm grades of case_10, an
+    order above the composition tolerance, while native case_09 was exact.
+    """
+
+    native_id, imported_id = cases16e.equivalence_pair()
+    by_id = {case.case_id: case for case in cases}
+    _geometry, native_profile, _blocks, _deck = demo16e.build_case(
+        cfg, by_id[native_id]
+    )
+    _geometry, _profile, blocks, _deck = demo16e.build_case(cfg, by_id[imported_id])
+    table = np.array(
+        [[float(v) for v in line.split()]
+         for line in blocks["datafile"].strip().splitlines()],
+        dtype=float,
+    )
+    domain_end = float(native_profile.request["domain_nm"][1])
+    centres = np.arange(0.0, domain_end, cases16e.MESH_NM) + 0.5 * cases16e.MESH_NM
+    centres = centres[(centres >= table[0, 0]) & (centres <= table[-1, 0])]
+    residual = np.interp(centres, table[:, 0], table[:, 1]) - demo16b.intended_on(
+        native_profile, centres
+    )
+    assert np.max(np.abs(residual)) <= 1e-9
+    assert np.sqrt(np.mean(residual**2)) <= 1e-9
+
+
+def test_overlap_case_keeps_the_untouched_production_import(cfg, cases):
+    """case_08 exercises production's automatic fallback and must not be altered."""
+
+    case = next(case for case in cases if case.overlap)
+    _geometry, profile, blocks, _deck = demo16e.build_case(cfg, case)
+    assert blocks["datafile"] == grading14.import_datafile(profile)
+    table = np.array(
+        [[float(v) for v in line.split()]
+         for line in blocks["datafile"].strip().splitlines()],
+        dtype=float,
+    )
+    assert table.shape[0] == profile.x_nm.size
     assert np.max(np.abs(table[:, 0] - profile.x_nm)) <= 1e-6
-    assert np.max(np.abs(table[:, 1] - profile.al_fraction)) <= 1e-8
+
+
+def test_default_importer_output_is_unchanged(cfg, cases):
+    """Demos 13, 14 and 17 must keep emitting exactly the tables they recorded."""
+
+    for case in cases:
+        _geometry, profile, _blocks, _deck = demo16e.build_case(cfg, case)
+        legacy = "".join(
+            f"{x:.6f} {y:.8f}\n"
+            for x, y in zip(np.asarray(profile.x_nm, dtype=float),
+                            np.asarray(profile.al_fraction, dtype=float))
+        )
+        assert grading14.import_datafile(profile) == legacy, case.case_id
+
+
+def test_breakpoints_are_recorded_only_for_compact_support_families(cfg):
+    recorded = {}
+    for family in ("linear", "fermi", "erf", "cosine"):
+        parameters = {
+            "asymmetry_s": 0.42,
+            "nominal_central_barrier_thickness_nm": 1.80,
+            "gaas_to_algaas_grading_width_10_90_nm": 1.00,
+            "algaas_to_gaas_grading_width_10_90_nm": 1.00,
+            "grading_profile": family,
+        }
+        geometry = demo14.geometry_for(cfg, parameters)
+        profile = demo14.build_grading(cfg, parameters, geometry)
+        recorded[family] = profile.request.get("breakpoints_nm")
+    assert len(recorded["linear"]) == 8
+    assert len(recorded["cosine"]) == 8
+    assert recorded["fermi"] is None
+    assert recorded["erf"] is None
 
 
 def test_imported_rendering_comes_from_production_grading14(cfg, cases):
     case = next(case for case in cases if case.render_request == "imported")
     _geometry, profile, blocks, _deck = demo16e.build_case(cfg, case)
     assert blocks == grading14.render_imported_blocks(
-        profile, reason=blocks["render_fallback_reason"]
+        profile, reason=blocks["render_fallback_reason"], include_breakpoints=True,
     )
 
 
@@ -787,6 +875,82 @@ def test_master_summary_writes_csv_and_json(tmp_path, cfg, cases):
     assert payload["reference_case"] == "case_01"
     assert payload["detuning_sign_convention"] == "peak_wavelength_nm - 1550_nm"
     assert (tmp_path / "summaries" / "abrupt_vs_graded.json").is_file()
+
+
+# ---------------------------------------------------------------------------
+# Atomic writes on Windows
+#
+# Shared Demo 14 infrastructure, tested here because this is where the failure
+# was seen: a licensed Demo 16E run lost a case at os.replace with
+# PermissionError (WinError 5), on case_06 in one run and case_04 in another.
+# ---------------------------------------------------------------------------
+
+
+def test_atomic_write_retries_a_transient_windows_lock(tmp_path, monkeypatch):
+    real_replace = os.replace
+    attempts, slept = [], []
+
+    def flaky(src, dst):
+        attempts.append((src, dst))
+        if len(attempts) <= 3:
+            raise PermissionError(5, "Access is denied")
+        return real_replace(src, dst)
+
+    monkeypatch.setattr(runlog14.os, "replace", flaky)
+    monkeypatch.setattr(runlog14.time, "sleep", slept.append)
+
+    target = tmp_path / "physics_result.json"
+    assert runlog14.write_json_atomic(target, {"case_id": "case_06"}) == target
+    assert json.loads(target.read_text(encoding="utf-8")) == {"case_id": "case_06"}
+    assert len(attempts) == 4
+    assert slept == list(runlog14.REPLACE_RETRY_DELAYS_S[:3])
+    assert slept == sorted(slept), "delays must back off, not shrink"
+    # Only the rename is retried; the payload is serialised once.
+    assert not list(tmp_path.glob("~*.tmp"))
+
+
+def test_atomic_write_reports_both_paths_when_every_retry_fails(tmp_path, monkeypatch):
+    def always_denied(src, dst):
+        raise PermissionError(5, "Access is denied")
+
+    monkeypatch.setattr(runlog14.os, "replace", always_denied)
+    monkeypatch.setattr(runlog14.time, "sleep", lambda _delay: None)
+
+    target = tmp_path / "case_result.json"
+    with pytest.raises(runlog14.Runlog14Error) as raised:
+        runlog14.write_json_atomic(target, {"case_id": "case_04"})
+    message = str(raised.value)
+    assert str(target) in message
+    leftover = list(tmp_path.glob("~case_result.json.*.tmp"))
+    assert len(leftover) == 1
+    assert str(leftover[0]) in message
+    assert f"{len(runlog14.REPLACE_RETRY_DELAYS_S) + 1} attempts" in message
+
+
+def test_atomic_text_write_shares_the_retry(tmp_path, monkeypatch):
+    real_replace = os.replace
+    attempts = []
+
+    def flaky(src, dst):
+        attempts.append(dst)
+        if len(attempts) == 1:
+            raise PermissionError(5, "Access is denied")
+        return real_replace(src, dst)
+
+    monkeypatch.setattr(runlog14.os, "replace", flaky)
+    monkeypatch.setattr(runlog14.time, "sleep", lambda _delay: None)
+
+    target = tmp_path / "realized_profile.csv"
+    runlog14.write_text_atomic(target, "position_nm,realized_al_fraction\n")
+    assert target.read_text(encoding="utf-8") == "position_nm,realized_al_fraction\n"
+    assert len(attempts) == 2
+
+
+def test_atomic_write_does_not_retry_when_the_rename_succeeds(tmp_path, monkeypatch):
+    slept = []
+    monkeypatch.setattr(runlog14.time, "sleep", slept.append)
+    runlog14.write_json_atomic(tmp_path / "summary.json", {"ok": True})
+    assert not slept
 
 
 def test_no_optimization_vocabulary_in_the_demo_sources():
