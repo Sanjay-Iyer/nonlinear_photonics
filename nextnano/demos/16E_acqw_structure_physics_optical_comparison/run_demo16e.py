@@ -291,15 +291,9 @@ def _write_structure_plots(root: Path, cfg, cases, outcomes) -> None:
     entries = _profile_entries(cfg, cases, outcomes)
     for entry in entries:
         case = entry["case"]
-        grading = (
-            "abrupt interfaces"
-            if case.is_abrupt
-            else (f"linear grades {case.left_grading_width_nm:.2f}/"
-                  f"{case.right_grading_width_nm:.2f} nm")
-        )
         plots16e.composition_figure(
             root / "cases" / case.case_id / "plots" / "composition.png",
-            title=f"{case.case_id}: {case.name}, {grading}",
+            title=plots16e.case_title(case, "Composition"),
             interfaces=entry["interfaces"],
             intended_x_nm=entry["x_nm"], intended_al=entry["al_fraction"],
             realized_x_nm=entry["realized_x_nm"], realized_al=entry["realized_al"],
@@ -458,12 +452,9 @@ def _write_wavefunction_plots(root: Path, cfg, case, record) -> None:
         return
     _geometry, profile, _blocks, _deck = demo16e.build_case(cfg, case)
     localization = (record.get("localization") or {}).get("by_state") or {}
-    grading = ("abrupt interfaces" if case.is_abrupt else
-               f"grades {case.left_grading_width_nm:.2f}/"
-               f"{case.right_grading_width_nm:.2f} nm")
     plots16e.wavefunction_figure(
         root / "cases" / case.case_id / "plots" / "wavefunctions.png",
-        title=f"{case.case_id}: {case.name} -- {grading}",
+        title=plots16e.case_title(case, "Band Edges and Wavefunctions"),
         interfaces=profile.request["interfaces_nm"],
         intended_x_nm=profile.x_nm, intended_al=profile.al_fraction,
         band_position_nm=waves.band_position_nm, band_edges=waves.band_edges,

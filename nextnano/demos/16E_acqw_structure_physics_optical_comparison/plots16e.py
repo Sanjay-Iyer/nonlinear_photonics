@@ -47,6 +47,18 @@ def _label(row: Mapping[str, Any]) -> str:
     return f"{row['case']} {row.get('name', '')}".strip()
 
 
+def case_title(case: Any, subject: str) -> str:
+    """``Case 07 - Asymmetric Grading: Composition``.
+
+    One place so the per-case composition and wavefunction figures are titled the
+    same way, and so ``case_07``/``asymmetric_grading`` read as prose.
+    """
+
+    number = case.case_id.rsplit("_", 1)[-1]
+    name = case.name.replace("_", " ").title()
+    return f"Case {number} - {name}: {subject}"
+
+
 def _finite(rows: Sequence[Mapping[str, Any]], key: str) -> list[Mapping[str, Any]]:
     return [row for row in rows if row.get(key) is not None]
 
@@ -214,7 +226,7 @@ def composition_all_cases(
     top.set_xlim(z1 - 2.0, z4 + 2.0)
     top.set_ylim(-0.01, 0.59)
     top.set_ylabel("aluminium fraction $x_{Al}$")
-    top.set_title("Demo 16E: intended composition of all ten fixed structures")
+    top.set_title("Aluminium Composition of All Ten Structures")
 
     centre = float(reference["central_gaas_to_algaas"])
     other = float(reference["central_algaas_to_gaas"])
@@ -222,7 +234,7 @@ def composition_all_cases(
     bottom.set_ylim(-0.01, 0.59)
     bottom.set_xlabel("position $z$ (nm)")
     bottom.set_ylabel("aluminium fraction $x_{Al}$")
-    bottom.set_title("central barrier, magnified", fontsize=10)
+    bottom.set_title("Central Barrier, Magnified", fontsize=10)
     # A legend inside either panel lands on top of a curve: ten profiles leave no
     # empty corner. It goes under the figure instead.
     fig.legend(handles, [line.get_label() for line in handles], fontsize=8,
@@ -259,7 +271,7 @@ def energy_levels_all_cases(
         holes.bar(x + offset * width, [row.get(key) for row in rows], width,
                   label=label, color=STATE_COLOURS[label])
     for ax, title in (
-        (electrons, "electron states"), (holes, "heavy-hole states"),
+        (electrons, "Electron States"), (holes, "Heavy-Hole States"),
     ):
         ax.set_ylabel("energy (eV)")
         ax.set_title(title, fontsize=10)
@@ -273,10 +285,9 @@ def energy_levels_all_cases(
     if hole_values:
         holes.set_ylim(min(hole_values) - 0.05, max(hole_values) + 0.05)
     holes.set_xticks(x, labels, rotation=30, ha="right")
-    electrons.set_title(
-        "Demo 16E: nextnano++ state energies (bars start below the lowest level; "
-        "read differences, not bar height)", fontsize=10,
-    )
+    # A figure-level title, so both panels keep their own: the electron panel's
+    # title used to be overwritten by the figure's and was never visible.
+    fig.suptitle("Quantum State Energies by Case", fontsize=11)
     return plots.save_figure(fig, Path(path))
 
 
@@ -304,10 +315,7 @@ def energy_shifts_vs_reference(
     ax.axhline(0.0, color="#222222", lw=1.0)
     ax.set_xticks(x, labels, rotation=30, ha="right")
     ax.set_ylabel(f"energy shift vs {reference_case} (meV)")
-    ax.set_title(
-        f"Demo 16E: state-energy shifts relative to {reference_case} "
-        "(positive = higher on nextnano++'s electron scale)"
-    )
+    ax.set_title(f"State-Energy Shifts Relative to {reference_case}")
     ax.legend(ncol=4, fontsize=8)
     ax.grid(axis="y", alpha=0.25)
     return plots.save_figure(fig, Path(path))
@@ -363,10 +371,7 @@ def localization_all_cases(
     handles, labels_text = axes[0, 0].get_legend_handles_labels()
     fig.legend(handles[:4], labels_text[:4], fontsize=8, ncol=4,
                loc="lower center", framealpha=0.92)
-    fig.suptitle(
-        "Demo 16E: wavefunction localization by layer  "
-        "(L = P_left - P_right; > 0 left well, < 0 right well)", fontsize=11,
-    )
+    fig.suptitle("Wavefunction Localization by Layer", fontsize=11)
     fig.subplots_adjust(left=0.08, right=0.92, top=0.90, bottom=0.13, wspace=0.34,
                         hspace=0.30)
     return plots.save_figure(fig, Path(path), tight=False)
@@ -428,10 +433,7 @@ def chi2_wavelength_all_cases(
                 color="#222222")
     ax.set_xlabel("wavelength (nm)")
     ax.set_ylabel(f"absolute $|\\chi^{{(2)}}|$ ({_units(rows)})")
-    ax.set_title(
-        "Demo 16E: calculated optical response of ten fixed structures "
-        "(circle = value at 1550 nm, triangle = spectral peak)"
-    )
+    ax.set_title("Nonlinear Optical Response Near 1550 nm")
     ax.legend(fontsize=7.5, ncol=2, framealpha=0.92)
     ax.grid(alpha=0.2)
     return plots.save_figure(fig, Path(path))
@@ -440,9 +442,9 @@ def chi2_wavelength_all_cases(
 #: Three readable groups for the crowded ten-curve comparison. Each group holds
 #: the reference plus the cases that vary one thing away from it.
 SPECTRUM_GROUPS = (
-    ("central barrier and interfaces", ("case_01", "case_02", "case_03", "case_04")),
-    ("well asymmetry", ("case_01", "case_05", "case_06")),
-    ("grading width and representation",
+    ("Central Barrier and Interfaces", ("case_01", "case_02", "case_03", "case_04")),
+    ("Well Asymmetry", ("case_01", "case_05", "case_06")),
+    ("Grading Width and Representation",
      ("case_01", "case_07", "case_08", "case_09", "case_10")),
 )
 
@@ -480,7 +482,9 @@ def chi2_wavelength_grouped(
         ax.legend(fontsize=7.5, framealpha=0.92)
         ax.grid(alpha=0.2)
     np.atleast_1d(axes)[-1].set_xlabel("wavelength (nm)")
-    fig.suptitle("Demo 16E: optical response grouped by what was changed", fontsize=11)
+    fig.suptitle(
+        "Nonlinear Optical Response by Structural Variation", fontsize=11
+    )
     return plots.save_figure(fig, Path(path))
 
 
@@ -508,10 +512,7 @@ def chi2_at_1550_all_cases(
                     ha="center", fontsize=7.5, color="#333333")
     ax.set_xticks(range(len(labels)), labels, rotation=30, ha="right")
     ax.set_ylabel(f"absolute $|\\chi^{{(2)}}|$ at 1550 nm ({_units(rows)})")
-    ax.set_title(
-        "Demo 16E: calculated response at exactly 1550 nm "
-        "(interpolated on the production spectrum; descriptive, not ranked)"
-    )
+    ax.set_title("Nonlinear Optical Response at 1550 nm")
     ax.grid(axis="y", alpha=0.25)
     return plots.save_figure(fig, Path(path))
 
@@ -544,9 +545,7 @@ def peak_wavelength_and_detuning(
     bottom.set_xticks(range(len(labels)), labels, rotation=30, ha="right")
     bottom.grid(axis="y", alpha=0.25)
     fig.suptitle(
-        "Demo 16E: spectral peak position and detuning\n"
-        "detuning_nm = peak_wavelength_nm - 1550; positive = peak red of 1550 nm",
-        fontsize=11,
+        "Spectral Peak Position and Detuning from 1550 nm", fontsize=11
     )
     return plots.save_figure(fig, Path(path))
 
@@ -589,7 +588,7 @@ def abrupt_vs_graded(
     composition.set_ylim(-0.01, 0.59)
     composition.set_xlabel("position $z$ (nm)")
     composition.set_ylabel("$x_{Al}$")
-    composition.set_title("composition", fontsize=10)
+    composition.set_title("Composition", fontsize=10)
     composition.legend(fontsize=8)
 
     states = ("E1", "E2", "HH1", "HH2")
@@ -604,7 +603,7 @@ def abrupt_vs_graded(
     energies.axhline(0.0, color="#222222", lw=1.0)
     energies.set_xticks(x, states)
     energies.set_ylabel("graded - abrupt (meV)")
-    energies.set_title("state-energy shift from grading", fontsize=10)
+    energies.set_title("State-Energy Shift from Grading", fontsize=10)
     energies.grid(axis="y", alpha=0.25)
 
     width = 0.36
@@ -619,7 +618,7 @@ def abrupt_vs_graded(
     localization.axhline(0.0, color="#222222", lw=1.0)
     localization.set_xticks(x, states)
     localization.set_ylabel("L = $P_{left} - P_{right}$")
-    localization.set_title("localization", fontsize=10)
+    localization.set_title("Localization", fontsize=10)
     localization.legend(fontsize=8)
     localization.grid(axis="y", alpha=0.25)
 
@@ -637,13 +636,13 @@ def abrupt_vs_graded(
     spectra.axvline(TARGET_NM, color="#222222", ls="--", lw=1.3)
     spectra.set_xlabel("wavelength (nm)")
     spectra.set_ylabel(f"$|\\chi^{{(2)}}|$ ({_units([graded, abrupt])})")
-    spectra.set_title("optical response", fontsize=10)
+    spectra.set_title("Optical Response", fontsize=10)
     spectra.legend(fontsize=8)
     spectra.grid(alpha=0.2)
 
     fig.suptitle(
-        f"Demo 16E: {graded['case']} graded vs {abrupt['case']} abrupt "
-        "-- one layer geometry, two interface treatments", fontsize=11,
+        f"Abrupt vs Graded Interfaces: {abrupt['case']} vs {graded['case']}",
+        fontsize=11,
     )
     return plots.save_figure(fig, Path(path))
 
@@ -688,7 +687,7 @@ def native_vs_imported(
         [report["energy_differences_meV"].get(f"delta_{s}_meV") or 0.0 for s in states],
         report["tolerances"]["energy_eV"] * 1000.0,
         "imported - native (meV)",
-        f"state energies (budget {report['tolerances']['energy_eV'] * 1000.0:g} meV)",
+        f"State Energies (Budget {report['tolerances']['energy_eV'] * 1000.0:g} meV)",
     )
     budget_panel(
         local_ax,
@@ -696,7 +695,7 @@ def native_vs_imported(
          for s in states],
         report["tolerances"]["localization_probability"],
         "imported - native",
-        f"localization (budget {report['tolerances']['localization_probability']:g})",
+        f"Localization (Budget {report['tolerances']['localization_probability']:g})",
     )
 
     for row, colour, label in (
@@ -714,17 +713,14 @@ def native_vs_imported(
     optical_ax.set_ylabel(f"$|\\chi^{{(2)}}|$ ({_units([native, imported])})")
     relative = report.get("chi2_at_1550_relative_difference")
     optical_ax.set_title(
-        "chi2 spectra"
-        + ("" if relative is None else f" (1550 nm differs by {relative:.2%})"),
+        "$\\chi^{(2)}$ Spectra"
+        + ("" if relative is None else f" (1550 nm Differs by {relative:.2%})"),
         fontsize=10,
     )
     optical_ax.legend(fontsize=8)
 
     verdict = "PASS" if report["checks"]["passed"] else "FAIL"
     fig.suptitle(
-        f"Demo 16E: native vs imported rendering of one $x_{{Al}}(z)$ -- "
-        f"implementation equivalence {verdict} "
-        f"(max |dx_Al| = {report['composition']['max_abs_xAl_difference']:.2e})",
-        fontsize=11,
+        f"Native vs Imported Rendering: Equivalence {verdict}", fontsize=11
     )
     return plots.save_figure(fig, Path(path))
