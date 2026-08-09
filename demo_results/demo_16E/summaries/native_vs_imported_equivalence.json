@@ -1,0 +1,60 @@
+{
+  "checks": {
+    "chi2_at_1550_agrees": true,
+    "composition_agrees": true,
+    "composition_rms_agrees": true,
+    "localization_agrees": true,
+    "passed": true,
+    "peak_wavelength_agrees": true,
+    "region_probabilities_agree": true,
+    "state_energies_agree": true
+  },
+  "chi2_at_1550_imported": 16.088670276024043,
+  "chi2_at_1550_native": 16.088670276021286,
+  "chi2_at_1550_relative_difference": 1.7135697154895617e-13,
+  "composition": {
+    "max_abs_xAl_difference": 0.0,
+    "points": 1037,
+    "rms_xAl_difference": 0.0
+  },
+  "energy_differences_meV": {
+    "delta_E1_meV": 0.0,
+    "delta_E2_meV": 0.0,
+    "delta_HH1_meV": 0.0,
+    "delta_HH2_meV": 0.0
+  },
+  "imported_case": "case_10",
+  "localization_differences": {
+    "delta_E1_localization": -2.1094237467877974e-15,
+    "delta_E2_localization": 5.440092820663267e-14,
+    "delta_HH1_localization": -2.220446049250313e-16,
+    "delta_HH2_localization": 1.4432899320127035e-15
+  },
+  "max_abs_energy_difference_meV": 0.0,
+  "native_case": "case_09",
+  "peak_wavelength_difference_nm": 0.0,
+  "purpose": "implementation equivalence of the native ternary_linear and imported table renderings of one x_Al(z); not a physics comparison",
+  "region_probability_differences": {
+    "delta_E1_barrier_probability": 2.310651670001107e-15,
+    "delta_E1_left_probability": -1.9984014443252818e-15,
+    "delta_E1_right_probability": 1.5439038936193583e-16,
+    "delta_E2_barrier_probability": 5.467848396278896e-15,
+    "delta_E2_left_probability": 2.475797344914099e-14,
+    "delta_E2_right_probability": -2.964295475749168e-14,
+    "delta_HH1_barrier_probability": 4.566659550508945e-16,
+    "delta_HH1_left_probability": -1.1102230246251565e-16,
+    "delta_HH1_right_probability": 3.80351674635071e-17,
+    "delta_HH2_barrier_probability": -1.2351231148954867e-15,
+    "delta_HH2_left_probability": 1.1102230246251565e-15,
+    "delta_HH2_right_probability": -2.896988204881268e-16
+  },
+  "tolerances": {
+    "chi2_relative": 0.02,
+    "composition_max": 0.005,
+    "composition_rms": 0.001,
+    "energy_eV": 0.001,
+    "localization_probability": 0.005,
+    "peak_wavelength_nm": 1.0,
+    "transition_eV": 0.001
+  }
+}

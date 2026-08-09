@@ -1,0 +1,51 @@
+{
+  "abrupt_case": "case_02",
+  "chi2_at_1550": {
+    "abrupt": 30.99419558736484,
+    "graded": 19.40022731300329,
+    "graded_minus_abrupt": -11.59396827436155,
+    "graded_over_abrupt": 0.6259309830551636
+  },
+  "detuning_from_1550_nm": {
+    "abrupt": -33.0,
+    "graded": -45.0
+  },
+  "energy_shifts_graded_minus_abrupt_meV": {
+    "delta_E1_meV": 2.6353797309996985,
+    "delta_E2_meV": 10.891287904999825,
+    "delta_HH1_meV": -0.5588767430000363,
+    "delta_HH2_meV": -2.0984258649998644
+  },
+  "graded_case": "case_01",
+  "grading_widths_nm": {
+    "abrupt": [
+      0.0,
+      0.0
+    ],
+    "graded": [
+      0.7,
+      0.7
+    ]
+  },
+  "interpretation_note": "descriptive only: a larger chi2 or a smaller detuning is reported, never selected",
+  "localization_graded_minus_abrupt": {
+    "delta_E1_localization": 0.0036726425646393945,
+    "delta_E2_localization": 0.02180830757591934,
+    "delta_HH1_localization": 0.0005571045147622078,
+    "delta_HH2_localization": 0.06242105350541349
+  },
+  "peak_wavelength_nm": {
+    "abrupt": 1517.0,
+    "graded": 1505.0,
+    "graded_minus_abrupt_nm": -12.0
+  },
+  "realized_peak_xAl": {
+    "abrupt": 0.55,
+    "graded": 0.55
+  },
+  "shared_geometry_nm": {
+    "central_barrier_nm": 1.8,
+    "well_1_nm": 7.1,
+    "well_2_nm": 2.9000000000000004
+  }
+}

@@ -1,0 +1,3716 @@
+{
+  "cases": [
+    {
+      "case_id": "case_01",
+      "demo16e_version": "demo16e-1.0.0",
+      "failure_reason": null,
+      "geometry": {
+        "active_end_nm": 31.800000000000004,
+        "active_start_nm": 20.0,
+        "asymmetry_s": 0.41999999999999993,
+        "barrier_centre_nm": 28.0,
+        "domain_end_nm": 51.800000000000004,
+        "domain_start_nm": 0.0,
+        "nominal_central_barrier_thickness_nm": 1.8,
+        "thick_well_nm": 7.1,
+        "thin_well_nm": 2.9000000000000004,
+        "total_well_thickness_nm": 10.0
+      },
+      "grading": {
+        "grading_interfaces_overlap": false,
+        "grading_profile_realization_max_error": 0.005892857142858057,
+        "grading_profile_realization_rms_error": 0.0002999595998650125,
+        "grading_slope_max_left_per_nm": 0.628571428571429,
+        "grading_slope_max_right_per_nm": 0.6285714285714294,
+        "integrated_al_dose_nm_equivalent": 1.8000000000000007,
+        "nominal_90pct_threshold_al_fraction": 0.49500000000000005,
+        "nominal_90pct_threshold_reached": true,
+        "outer_barrier_present": true,
+        "profile_monotone_coordinates": true,
+        "profile_points": 1037,
+        "profile_within_bounds": true,
+        "realized_algaas_to_gaas_grading_width_10_90_nominalref_nm": 0.7000000000000028,
+        "realized_algaas_to_gaas_grading_width_10_90_peakref_nm": 0.7000000000000028,
+        "realized_barrier_fwhm_nm": 1.8000000000000007,
+        "realized_gaas_to_algaas_grading_width_10_90_nominalref_nm": 0.7000000000000028,
+        "realized_gaas_to_algaas_grading_width_10_90_peakref_nm": 0.7000000000000028,
+        "realized_min_al_fraction": 0.0,
+        "realized_peak_al_fraction": 0.55
+      },
+      "intended_structural_invariants": {
+        "all_passed": true,
+        "central_barrier_present": true,
+        "composition_finite": true,
+        "composition_within_bounds": true,
+        "confinement_is_material_not_boundary": true,
+        "coordinates_ascending": true,
+        "four_interfaces_ordered": true,
+        "left_outer_barrier_present": true,
+        "right_outer_barrier_present": true,
+        "thick_well_is_gaas": true,
+        "thin_well_is_gaas": true
+      },
+      "name": "reference_graded",
+      "overlap": {
+        "case_declares_overlap": false,
+        "central_interface_left_nm": 27.1,
+        "central_interface_right_nm": 28.900000000000002,
+        "expected_peak_al_fraction": 0.55,
+        "grades_overlap": false,
+        "local_integrated_al_dose_nm_equivalent": 1.5807142857142862,
+        "nominal_barrier_al_fraction": 0.55,
+        "nominal_plateau_exists": true,
+        "overlap": false,
+        "overlap_end_nm": null,
+        "overlap_start_nm": null,
+        "overlap_width_nm": 0.0,
+        "peak_position_nm": 27.55,
+        "reaches_90_percent_of_nominal": true,
+        "realized_peak_al_fraction": 0.55,
+        "true_flat_central_plateau_exists": true
+      },
+      "parser": {
+        "deck_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_01\\nextnano_input\\case.in",
+        "deck_sha256": "1cc02dd5408e441ad6b5c4ed588cc812f045bd8e03bd7c278c375d699e57f023",
+        "failure_reason": null,
+        "fatal_markers": [],
+        "output_dir": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_01\\parser\\out",
+        "parser_command": [
+          "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\bin\\nextnano++_Intel_64bit.exe",
+          "--parse",
+          "-d",
+          "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\database\\database.nnp",
+          "-l",
+          "C:\\Code\\optics\\nextnano\\2026_07_03\\License\\License_nnp.lic",
+          "-o",
+          "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_01\\parser\\out",
+          "case.in"
+        ],
+        "passed": true,
+        "profile_path": null,
+        "profile_sha256": null,
+        "return_code": 0,
+        "runmode": "--parse",
+        "stderr_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_01\\parser\\stderr.txt",
+        "stdout_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_01\\parser\\stdout.txt"
+      },
+      "physics": {},
+      "render_method": "ternary_linear",
+      "representation": "native_linear",
+      "status": "structure_passed",
+      "structure": {
+        "comparison": {
+          "case_id": "case_01",
+          "central_interface_positions_gated": true,
+          "checks": {
+            "every_interface_was_located": true,
+            "interface_positions_within_tolerance": true,
+            "max_absolute_error_within_tolerance": true,
+            "measurement_windows_are_local": true,
+            "outer_barriers_and_two_wells_present": true,
+            "overlap_classification_matches_request": true,
+            "overlap_does_not_fabricate_nominal_plateau": true,
+            "overlap_peak_matches_authoritative_profile": true,
+            "passed": true,
+            "rms_error_within_tolerance": true,
+            "well_widths_not_reported_as_grading_widths": true
+          },
+          "comparison_points": 440,
+          "expected_peak_al_fraction": 0.55,
+          "forbidden_width_hits": [],
+          "gated_interface_positions": [
+            "outer_left_algaas_to_gaas",
+            "central_gaas_to_algaas",
+            "central_algaas_to_gaas",
+            "outer_right_gaas_to_algaas"
+          ],
+          "gated_max_absolute_al_fraction_difference": 3.0558888752807434e-13,
+          "gated_rms_al_fraction_difference": 3.8978035358686605e-14,
+          "geometry": {
+            "realized_central_barrier_nm": 1.7999999999999687,
+            "realized_interface_positions_nm": {
+              "central_algaas_to_gaas": 28.899999999999896,
+              "central_gaas_to_algaas": 27.099999999999927,
+              "outer_left_algaas_to_gaas": 20.0,
+              "outer_right_gaas_to_algaas": 31.799999999999958
+            },
+            "realized_total_gaas_well_nm": 9.99999999999999,
+            "realized_well_1_nm": 7.099999999999927,
+            "realized_well_2_nm": 2.9000000000000625,
+            "requested_central_barrier_nm": 1.8,
+            "requested_interface_positions_nm": {
+              "central_algaas_to_gaas": 28.900000000000002,
+              "central_gaas_to_algaas": 27.1,
+              "outer_left_algaas_to_gaas": 20.0,
+              "outer_right_gaas_to_algaas": 31.800000000000004
+            },
+            "requested_total_gaas_well_nm": 10.0,
+            "requested_well_1_nm": 7.1,
+            "requested_well_2_nm": 2.9000000000000004
+          },
+          "intended_interface_metrics": [
+            {
+              "centre_error_nm": 0.0,
+              "interface": "outer_left_algaas_to_gaas",
+              "measurement_window_nm": [
+                18.88,
+                21.12
+              ],
+              "realized_centre_nm": 20.0,
+              "realized_width_10_90_nm": 0.7000000000000028,
+              "requested_centre_nm": 20.0,
+              "requested_width_10_90_nm": 0.7,
+              "width_error_nm": 2.886579864025407e-15,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 0.0,
+              "interface": "central_gaas_to_algaas",
+              "measurement_window_nm": [
+                25.98,
+                28.0
+              ],
+              "realized_centre_nm": 27.1,
+              "realized_width_10_90_nm": 0.7000000000000028,
+              "requested_centre_nm": 27.1,
+              "requested_width_10_90_nm": 0.7,
+              "width_error_nm": 2.886579864025407e-15,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 0.0,
+              "interface": "central_algaas_to_gaas",
+              "measurement_window_nm": [
+                28.0,
+                30.020000000000003
+              ],
+              "realized_centre_nm": 28.900000000000002,
+              "realized_width_10_90_nm": 0.7000000000000028,
+              "requested_centre_nm": 28.900000000000002,
+              "requested_width_10_90_nm": 0.7,
+              "width_error_nm": 2.886579864025407e-15,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 0.0,
+              "interface": "outer_right_gaas_to_algaas",
+              "measurement_window_nm": [
+                30.680000000000003,
+                32.92
+              ],
+              "realized_centre_nm": 31.800000000000004,
+              "realized_width_10_90_nm": 0.7000000000000028,
+              "requested_centre_nm": 31.800000000000004,
+              "requested_width_10_90_nm": 0.7,
+              "width_error_nm": 2.886579864025407e-15,
+              "window_isolated_from_other_interfaces": true
+            }
+          ],
+          "intended_overlap": {
+            "case_declares_overlap": false,
+            "central_interface_left_nm": 27.1,
+            "central_interface_right_nm": 28.900000000000002,
+            "expected_peak_al_fraction": 0.55,
+            "grades_overlap": false,
+            "local_integrated_al_dose_nm_equivalent": 1.5807142857142862,
+            "nominal_barrier_al_fraction": 0.55,
+            "nominal_plateau_exists": true,
+            "overlap": false,
+            "overlap_end_nm": null,
+            "overlap_start_nm": null,
+            "overlap_width_nm": 0.0,
+            "peak_position_nm": 27.55,
+            "reaches_90_percent_of_nominal": true,
+            "realized_peak_al_fraction": 0.55,
+            "true_flat_central_plateau_exists": true
+          },
+          "interface_exclusion_applied": false,
+          "interface_exclusion_half_width_nm": 0.05,
+          "max_absolute_al_fraction_difference": 3.0558888752807434e-13,
+          "max_absolute_al_fraction_difference_off_interface": 3.0558888752807434e-13,
+          "metrology_window_is_the_requested_width": true,
+          "metrology_window_widths_nm": {
+            "central_algaas_to_gaas": 0.7,
+            "central_gaas_to_algaas": 0.7,
+            "outer_left_algaas_to_gaas": 0.7,
+            "outer_right_gaas_to_algaas": 0.7
+          },
+          "points_excluded_near_interfaces": 8,
+          "realized_interface_metrics": [
+            {
+              "centre_error_nm": 0.0,
+              "interface": "outer_left_algaas_to_gaas",
+              "measurement_window_nm": [
+                18.88,
+                21.12
+              ],
+              "realized_centre_nm": 20.0,
+              "realized_width_10_90_nm": 0.6999999999998465,
+              "requested_centre_nm": 20.0,
+              "requested_width_10_90_nm": 0.7,
+              "width_error_nm": 1.5343282200319663e-13,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 7.460698725481052e-14,
+              "interface": "central_gaas_to_algaas",
+              "measurement_window_nm": [
+                25.98,
+                28.0
+              ],
+              "realized_centre_nm": 27.099999999999927,
+              "realized_width_10_90_nm": 0.6999999999999886,
+              "requested_centre_nm": 27.1,
+              "requested_width_10_90_nm": 0.7,
+              "width_error_nm": 1.1324274851176597e-14,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 1.0658141036401503e-13,
+              "interface": "central_algaas_to_gaas",
+              "measurement_window_nm": [
+                28.0,
+                30.020000000000003
+              ],
+              "realized_centre_nm": 28.899999999999896,
+              "realized_width_10_90_nm": 0.6999999999999993,
+              "requested_centre_nm": 28.900000000000002,
+              "requested_width_10_90_nm": 0.7,
+              "width_error_nm": 6.661338147750939e-16,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 4.618527782440651e-14,
+              "interface": "outer_right_gaas_to_algaas",
+              "measurement_window_nm": [
+                30.680000000000003,
+                32.92
+              ],
+              "realized_centre_nm": 31.799999999999958,
+              "realized_width_10_90_nm": 0.699999999999978,
+              "requested_centre_nm": 31.800000000000004,
+              "requested_width_10_90_nm": 0.7,
+              "width_error_nm": 2.19824158875781e-14,
+              "window_isolated_from_other_interfaces": true
+            }
+          ],
+          "realized_overlap": {
+            "central_interface_left_nm": 27.1,
+            "central_interface_right_nm": 28.900000000000002,
+            "expected_peak_al_fraction": 0.55,
+            "grades_overlap": false,
+            "local_integrated_al_dose_nm_equivalent": 1.5549999999999922,
+            "nominal_barrier_al_fraction": 0.55,
+            "nominal_plateau_exists": true,
+            "overlap": false,
+            "peak_position_nm": 27.575,
+            "reaches_90_percent_of_nominal": true,
+            "realized_peak_al_fraction": 0.55,
+            "true_flat_central_plateau_exists": true
+          },
+          "realized_peak_al_fraction": 0.55,
+          "representation": "native_linear",
+          "requested_asymmetry_s": 0.41999999999999993,
+          "requested_grading_widths_nm": {
+            "central_algaas_to_gaas": 0.7,
+            "central_gaas_to_algaas": 0.7,
+            "outer_left_algaas_to_gaas": 0.7,
+            "outer_right_gaas_to_algaas": 0.7
+          },
+          "rms_al_fraction_difference": 3.8978035358686605e-14,
+          "rms_al_fraction_difference_off_interface": 3.887717881676735e-14,
+          "structural_invariants": {
+            "all_passed": true,
+            "central_barrier_present": true,
+            "composition_finite": true,
+            "composition_within_bounds": true,
+            "confinement_is_material_not_boundary": true,
+            "coordinates_ascending": true,
+            "four_interfaces_ordered": true,
+            "left_outer_barrier_present": true,
+            "right_outer_barrier_present": true,
+            "thick_well_is_gaas": true,
+            "thin_well_is_gaas": true
+          },
+          "tolerances": {
+            "interface_position_nm": 0.1,
+            "max_absolute_al_fraction_difference": 0.005,
+            "rms_al_fraction_difference": 0.001
+          }
+        },
+        "comparison_metrics_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_01\\comparison_metrics.json",
+        "failure_reason": null,
+        "invocation": {
+          "deck_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_01\\nextnano_input\\case.in",
+          "deck_sha256": "1cc02dd5408e441ad6b5c4ed588cc812f045bd8e03bd7c278c375d699e57f023",
+          "failure_reason": null,
+          "fatal_markers": [],
+          "output_dir": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_01\\structure\\out",
+          "parser_command": [
+            "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\bin\\nextnano++_Intel_64bit.exe",
+            "--structure",
+            "-d",
+            "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\database\\database.nnp",
+            "-l",
+            "C:\\Code\\optics\\nextnano\\2026_07_03\\License\\License_nnp.lic",
+            "-o",
+            "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_01\\structure\\out",
+            "case.in"
+          ],
+          "passed": true,
+          "profile_path": null,
+          "profile_sha256": null,
+          "return_code": 0,
+          "runmode": "--structure",
+          "stderr_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_01\\structure\\stderr.txt",
+          "stdout_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_01\\structure\\stdout.txt"
+        },
+        "passed": true,
+        "realized_profile_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_01\\realized_profile.csv",
+        "source_alloy_composition_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_01\\structure\\out\\case\\Structure\\alloy_composition.dat"
+      }
+    },
+    {
+      "case_id": "case_02",
+      "demo16e_version": "demo16e-1.0.0",
+      "failure_reason": null,
+      "geometry": {
+        "active_end_nm": 31.800000000000004,
+        "active_start_nm": 20.0,
+        "asymmetry_s": 0.41999999999999993,
+        "barrier_centre_nm": 28.0,
+        "domain_end_nm": 51.800000000000004,
+        "domain_start_nm": 0.0,
+        "nominal_central_barrier_thickness_nm": 1.8,
+        "thick_well_nm": 7.1,
+        "thin_well_nm": 2.9000000000000004,
+        "total_well_thickness_nm": 10.0
+      },
+      "grading": {
+        "grading_interfaces_overlap": false,
+        "grading_profile_realization_max_error": 0.26125000000147824,
+        "grading_profile_realization_rms_error": 0.013427365565717794,
+        "grading_slope_max_left_per_nm": 5.499999999999922,
+        "grading_slope_max_right_per_nm": 5.499999999999923,
+        "integrated_al_dose_nm_equivalent": 1.8000000000000007,
+        "nominal_90pct_threshold_al_fraction": 0.49500000000000005,
+        "nominal_90pct_threshold_reached": true,
+        "outer_barrier_present": true,
+        "profile_monotone_coordinates": true,
+        "profile_points": 1037,
+        "profile_within_bounds": true,
+        "realized_algaas_to_gaas_grading_width_10_90_nominalref_nm": 0.0799999999999983,
+        "realized_algaas_to_gaas_grading_width_10_90_peakref_nm": 0.0799999999999983,
+        "realized_barrier_fwhm_nm": 1.8000000000000007,
+        "realized_gaas_to_algaas_grading_width_10_90_nominalref_nm": 0.0799999999999983,
+        "realized_gaas_to_algaas_grading_width_10_90_peakref_nm": 0.0799999999999983,
+        "realized_min_al_fraction": 0.0,
+        "realized_peak_al_fraction": 0.55
+      },
+      "intended_structural_invariants": {
+        "all_passed": true,
+        "central_barrier_present": true,
+        "composition_finite": true,
+        "composition_within_bounds": true,
+        "confinement_is_material_not_boundary": true,
+        "coordinates_ascending": true,
+        "four_interfaces_ordered": true,
+        "left_outer_barrier_present": true,
+        "right_outer_barrier_present": true,
+        "thick_well_is_gaas": true,
+        "thin_well_is_gaas": true
+      },
+      "name": "abrupt_reference",
+      "overlap": {
+        "case_declares_overlap": false,
+        "central_interface_left_nm": 27.1,
+        "central_interface_right_nm": 28.900000000000002,
+        "expected_peak_al_fraction": 0.55,
+        "grades_overlap": false,
+        "local_integrated_al_dose_nm_equivalent": 1.7750000000000004,
+        "nominal_barrier_al_fraction": 0.55,
+        "nominal_plateau_exists": true,
+        "overlap": false,
+        "overlap_end_nm": null,
+        "overlap_start_nm": null,
+        "overlap_width_nm": 0.0,
+        "peak_position_nm": 27.150000000000002,
+        "reaches_90_percent_of_nominal": true,
+        "realized_peak_al_fraction": 0.55,
+        "true_flat_central_plateau_exists": true
+      },
+      "parser": {
+        "deck_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_02\\nextnano_input\\case.in",
+        "deck_sha256": "6e7377e55494d81cbb33fc3d84ea4da97d47b0d9afc557557859aaede8ad2441",
+        "failure_reason": null,
+        "fatal_markers": [],
+        "output_dir": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_02\\parser\\out",
+        "parser_command": [
+          "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\bin\\nextnano++_Intel_64bit.exe",
+          "--parse",
+          "-d",
+          "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\database\\database.nnp",
+          "-l",
+          "C:\\Code\\optics\\nextnano\\2026_07_03\\License\\License_nnp.lic",
+          "-o",
+          "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_02\\parser\\out",
+          "case.in"
+        ],
+        "passed": true,
+        "profile_path": null,
+        "profile_sha256": null,
+        "return_code": 0,
+        "runmode": "--parse",
+        "stderr_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_02\\parser\\stderr.txt",
+        "stdout_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_02\\parser\\stdout.txt"
+      },
+      "physics": {},
+      "render_method": "ternary_linear",
+      "representation": "abrupt",
+      "status": "structure_passed",
+      "structure": {
+        "comparison": {
+          "case_id": "case_02",
+          "central_interface_positions_gated": true,
+          "checks": {
+            "every_interface_was_located": true,
+            "interface_positions_within_tolerance": true,
+            "max_absolute_error_within_tolerance": true,
+            "measurement_windows_are_local": true,
+            "outer_barriers_and_two_wells_present": true,
+            "overlap_classification_matches_request": true,
+            "overlap_does_not_fabricate_nominal_plateau": true,
+            "overlap_peak_matches_authoritative_profile": true,
+            "passed": true,
+            "rms_error_within_tolerance": true,
+            "well_widths_not_reported_as_grading_widths": true
+          },
+          "comparison_points": 440,
+          "expected_peak_al_fraction": 0.55,
+          "forbidden_width_hits": [],
+          "gated_interface_positions": [
+            "outer_left_algaas_to_gaas",
+            "central_gaas_to_algaas",
+            "central_algaas_to_gaas",
+            "outer_right_gaas_to_algaas"
+          ],
+          "gated_max_absolute_al_fraction_difference": 0.0,
+          "gated_rms_al_fraction_difference": 0.0,
+          "geometry": {
+            "realized_central_barrier_nm": 1.7999999999999972,
+            "realized_interface_positions_nm": {
+              "central_algaas_to_gaas": 28.9,
+              "central_gaas_to_algaas": 27.1,
+              "outer_left_algaas_to_gaas": 20.0,
+              "outer_right_gaas_to_algaas": 31.799999999999997
+            },
+            "realized_total_gaas_well_nm": 10.0,
+            "realized_well_1_nm": 7.100000000000001,
+            "realized_well_2_nm": 2.8999999999999986,
+            "requested_central_barrier_nm": 1.8,
+            "requested_interface_positions_nm": {
+              "central_algaas_to_gaas": 28.900000000000002,
+              "central_gaas_to_algaas": 27.1,
+              "outer_left_algaas_to_gaas": 20.0,
+              "outer_right_gaas_to_algaas": 31.800000000000004
+            },
+            "requested_total_gaas_well_nm": 10.0,
+            "requested_well_1_nm": 7.1,
+            "requested_well_2_nm": 2.9000000000000004
+          },
+          "intended_interface_metrics": [
+            {
+              "centre_error_nm": 0.0,
+              "interface": "outer_left_algaas_to_gaas",
+              "measurement_window_nm": [
+                19.36,
+                20.64
+              ],
+              "realized_centre_nm": 20.0,
+              "realized_width_10_90_nm": 0.0799999999999983,
+              "requested_centre_nm": 20.0,
+              "requested_width_10_90_nm": 0.4,
+              "width_error_nm": 0.3200000000000017,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 0.0,
+              "interface": "central_gaas_to_algaas",
+              "measurement_window_nm": [
+                26.46,
+                27.740000000000002
+              ],
+              "realized_centre_nm": 27.1,
+              "realized_width_10_90_nm": 0.0799999999999983,
+              "requested_centre_nm": 27.1,
+              "requested_width_10_90_nm": 0.4,
+              "width_error_nm": 0.3200000000000017,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 0.0,
+              "interface": "central_algaas_to_gaas",
+              "measurement_window_nm": [
+                28.26,
+                29.540000000000003
+              ],
+              "realized_centre_nm": 28.900000000000002,
+              "realized_width_10_90_nm": 0.0799999999999983,
+              "requested_centre_nm": 28.900000000000002,
+              "requested_width_10_90_nm": 0.4,
+              "width_error_nm": 0.3200000000000017,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 2.8066438062523957e-13,
+              "interface": "outer_right_gaas_to_algaas",
+              "measurement_window_nm": [
+                31.160000000000004,
+                32.440000000000005
+              ],
+              "realized_centre_nm": 31.800000000000285,
+              "realized_width_10_90_nm": 0.0799999999999983,
+              "requested_centre_nm": 31.800000000000004,
+              "requested_width_10_90_nm": 0.4,
+              "width_error_nm": 0.3200000000000017,
+              "window_isolated_from_other_interfaces": true
+            }
+          ],
+          "intended_overlap": {
+            "case_declares_overlap": false,
+            "central_interface_left_nm": 27.1,
+            "central_interface_right_nm": 28.900000000000002,
+            "expected_peak_al_fraction": 0.55,
+            "grades_overlap": false,
+            "local_integrated_al_dose_nm_equivalent": 1.7750000000000004,
+            "nominal_barrier_al_fraction": 0.55,
+            "nominal_plateau_exists": true,
+            "overlap": false,
+            "overlap_end_nm": null,
+            "overlap_start_nm": null,
+            "overlap_width_nm": 0.0,
+            "peak_position_nm": 27.150000000000002,
+            "reaches_90_percent_of_nominal": true,
+            "realized_peak_al_fraction": 0.55,
+            "true_flat_central_plateau_exists": true
+          },
+          "interface_exclusion_applied": true,
+          "interface_exclusion_half_width_nm": 0.05,
+          "max_absolute_al_fraction_difference": 0.0,
+          "max_absolute_al_fraction_difference_off_interface": 0.0,
+          "metrology_window_is_the_requested_width": false,
+          "metrology_window_widths_nm": {
+            "central_algaas_to_gaas": 0.4,
+            "central_gaas_to_algaas": 0.4,
+            "outer_left_algaas_to_gaas": 0.4,
+            "outer_right_gaas_to_algaas": 0.4
+          },
+          "points_excluded_near_interfaces": 8,
+          "realized_interface_metrics": [
+            {
+              "centre_error_nm": 0.0,
+              "interface": "outer_left_algaas_to_gaas",
+              "measurement_window_nm": [
+                19.36,
+                20.64
+              ],
+              "realized_centre_nm": 20.0,
+              "realized_width_10_90_nm": 0.03999999999999915,
+              "requested_centre_nm": 20.0,
+              "requested_width_10_90_nm": 0.4,
+              "width_error_nm": 0.3600000000000009,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 0.0,
+              "interface": "central_gaas_to_algaas",
+              "measurement_window_nm": [
+                26.46,
+                27.740000000000002
+              ],
+              "realized_centre_nm": 27.1,
+              "realized_width_10_90_nm": 0.0400000000000027,
+              "requested_centre_nm": 27.1,
+              "requested_width_10_90_nm": 0.4,
+              "width_error_nm": 0.3599999999999973,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 3.552713678800501e-15,
+              "interface": "central_algaas_to_gaas",
+              "measurement_window_nm": [
+                28.26,
+                29.540000000000003
+              ],
+              "realized_centre_nm": 28.9,
+              "realized_width_10_90_nm": 0.0400000000000027,
+              "requested_centre_nm": 28.900000000000002,
+              "requested_width_10_90_nm": 0.4,
+              "width_error_nm": 0.3599999999999973,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 7.105427357601002e-15,
+              "interface": "outer_right_gaas_to_algaas",
+              "measurement_window_nm": [
+                31.160000000000004,
+                32.440000000000005
+              ],
+              "realized_centre_nm": 31.799999999999997,
+              "realized_width_10_90_nm": 0.0400000000000027,
+              "requested_centre_nm": 31.800000000000004,
+              "requested_width_10_90_nm": 0.4,
+              "width_error_nm": 0.3599999999999973,
+              "window_isolated_from_other_interfaces": true
+            }
+          ],
+          "realized_overlap": {
+            "central_interface_left_nm": 27.1,
+            "central_interface_right_nm": 28.900000000000002,
+            "expected_peak_al_fraction": 0.55,
+            "grades_overlap": false,
+            "local_integrated_al_dose_nm_equivalent": 1.75,
+            "nominal_barrier_al_fraction": 0.55,
+            "nominal_plateau_exists": true,
+            "overlap": false,
+            "peak_position_nm": 27.125,
+            "reaches_90_percent_of_nominal": true,
+            "realized_peak_al_fraction": 0.55,
+            "true_flat_central_plateau_exists": true
+          },
+          "realized_peak_al_fraction": 0.55,
+          "representation": "abrupt",
+          "requested_asymmetry_s": 0.41999999999999993,
+          "requested_grading_widths_nm": {
+            "central_algaas_to_gaas": 0.0,
+            "central_gaas_to_algaas": 0.0,
+            "outer_left_algaas_to_gaas": 0.0,
+            "outer_right_gaas_to_algaas": 0.0
+          },
+          "rms_al_fraction_difference": 0.0,
+          "rms_al_fraction_difference_off_interface": 0.0,
+          "structural_invariants": {
+            "all_passed": true,
+            "central_barrier_present": true,
+            "composition_finite": true,
+            "composition_within_bounds": true,
+            "confinement_is_material_not_boundary": true,
+            "coordinates_ascending": true,
+            "four_interfaces_ordered": true,
+            "left_outer_barrier_present": true,
+            "right_outer_barrier_present": true,
+            "thick_well_is_gaas": true,
+            "thin_well_is_gaas": true
+          },
+          "tolerances": {
+            "interface_position_nm": 0.1,
+            "max_absolute_al_fraction_difference": 0.005,
+            "rms_al_fraction_difference": 0.001
+          }
+        },
+        "comparison_metrics_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_02\\comparison_metrics.json",
+        "failure_reason": null,
+        "invocation": {
+          "deck_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_02\\nextnano_input\\case.in",
+          "deck_sha256": "6e7377e55494d81cbb33fc3d84ea4da97d47b0d9afc557557859aaede8ad2441",
+          "failure_reason": null,
+          "fatal_markers": [],
+          "output_dir": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_02\\structure\\out",
+          "parser_command": [
+            "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\bin\\nextnano++_Intel_64bit.exe",
+            "--structure",
+            "-d",
+            "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\database\\database.nnp",
+            "-l",
+            "C:\\Code\\optics\\nextnano\\2026_07_03\\License\\License_nnp.lic",
+            "-o",
+            "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_02\\structure\\out",
+            "case.in"
+          ],
+          "passed": true,
+          "profile_path": null,
+          "profile_sha256": null,
+          "return_code": 0,
+          "runmode": "--structure",
+          "stderr_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_02\\structure\\stderr.txt",
+          "stdout_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_02\\structure\\stdout.txt"
+        },
+        "passed": true,
+        "realized_profile_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_02\\realized_profile.csv",
+        "source_alloy_composition_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_02\\structure\\out\\case\\Structure\\alloy_composition.dat"
+      }
+    },
+    {
+      "case_id": "case_03",
+      "demo16e_version": "demo16e-1.0.0",
+      "failure_reason": null,
+      "geometry": {
+        "active_end_nm": 30.85,
+        "active_start_nm": 20.0,
+        "asymmetry_s": 0.41999999999999993,
+        "barrier_centre_nm": 27.525000000000002,
+        "domain_end_nm": 50.85,
+        "domain_start_nm": 0.0,
+        "nominal_central_barrier_thickness_nm": 0.85,
+        "thick_well_nm": 7.1,
+        "thin_well_nm": 2.9000000000000004,
+        "total_well_thickness_nm": 10.0
+      },
+      "grading": {
+        "grading_interfaces_overlap": false,
+        "grading_profile_realization_max_error": 5.551115123125783e-17,
+        "grading_profile_realization_rms_error": 2.490325500000074e-18,
+        "grading_slope_max_left_per_nm": 1.1000000000000005,
+        "grading_slope_max_right_per_nm": 1.1000000000000005,
+        "integrated_al_dose_nm_equivalent": 0.8500000000000013,
+        "nominal_90pct_threshold_al_fraction": 0.49500000000000005,
+        "nominal_90pct_threshold_reached": true,
+        "outer_barrier_present": true,
+        "profile_monotone_coordinates": true,
+        "profile_points": 1018,
+        "profile_within_bounds": true,
+        "realized_algaas_to_gaas_grading_width_10_90_nominalref_nm": 0.3999999999999986,
+        "realized_algaas_to_gaas_grading_width_10_90_peakref_nm": 0.3999999999999986,
+        "realized_barrier_fwhm_nm": 0.8500000000000014,
+        "realized_gaas_to_algaas_grading_width_10_90_nominalref_nm": 0.3999999999999986,
+        "realized_gaas_to_algaas_grading_width_10_90_peakref_nm": 0.3999999999999986,
+        "realized_min_al_fraction": 0.0,
+        "realized_peak_al_fraction": 0.55
+      },
+      "intended_structural_invariants": {
+        "all_passed": true,
+        "central_barrier_present": true,
+        "composition_finite": true,
+        "composition_within_bounds": true,
+        "confinement_is_material_not_boundary": true,
+        "coordinates_ascending": true,
+        "four_interfaces_ordered": true,
+        "left_outer_barrier_present": true,
+        "right_outer_barrier_present": true,
+        "thick_well_is_gaas": true,
+        "thin_well_is_gaas": true
+      },
+      "name": "thin_barrier",
+      "overlap": {
+        "case_declares_overlap": false,
+        "central_interface_left_nm": 27.1,
+        "central_interface_right_nm": 27.950000000000003,
+        "expected_peak_al_fraction": 0.55,
+        "grades_overlap": false,
+        "local_integrated_al_dose_nm_equivalent": 0.7250000000000013,
+        "nominal_barrier_al_fraction": 0.55,
+        "nominal_plateau_exists": true,
+        "overlap": false,
+        "overlap_end_nm": null,
+        "overlap_start_nm": null,
+        "overlap_width_nm": 0.0,
+        "peak_position_nm": 27.35,
+        "reaches_90_percent_of_nominal": true,
+        "realized_peak_al_fraction": 0.55,
+        "true_flat_central_plateau_exists": true
+      },
+      "parser": {
+        "deck_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_03\\nextnano_input\\case.in",
+        "deck_sha256": "0b72fb8f8e228e6a94e982a0b0b9c558609b169c22b0172c07b4cf6f036afbf8",
+        "failure_reason": null,
+        "fatal_markers": [],
+        "output_dir": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_03\\parser\\out",
+        "parser_command": [
+          "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\bin\\nextnano++_Intel_64bit.exe",
+          "--parse",
+          "-d",
+          "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\database\\database.nnp",
+          "-l",
+          "C:\\Code\\optics\\nextnano\\2026_07_03\\License\\License_nnp.lic",
+          "-o",
+          "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_03\\parser\\out",
+          "case.in"
+        ],
+        "passed": true,
+        "profile_path": null,
+        "profile_sha256": null,
+        "return_code": 0,
+        "runmode": "--parse",
+        "stderr_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_03\\parser\\stderr.txt",
+        "stdout_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_03\\parser\\stdout.txt"
+      },
+      "physics": {},
+      "render_method": "ternary_linear",
+      "representation": "native_linear",
+      "status": "structure_passed",
+      "structure": {
+        "comparison": {
+          "case_id": "case_03",
+          "central_interface_positions_gated": true,
+          "checks": {
+            "every_interface_was_located": true,
+            "interface_positions_within_tolerance": true,
+            "max_absolute_error_within_tolerance": true,
+            "measurement_windows_are_local": true,
+            "outer_barriers_and_two_wells_present": true,
+            "overlap_classification_matches_request": true,
+            "overlap_does_not_fabricate_nominal_plateau": true,
+            "overlap_peak_matches_authoritative_profile": true,
+            "passed": true,
+            "rms_error_within_tolerance": true,
+            "well_widths_not_reported_as_grading_widths": true
+          },
+          "comparison_points": 421,
+          "expected_peak_al_fraction": 0.55,
+          "forbidden_width_hits": [],
+          "gated_interface_positions": [
+            "outer_left_algaas_to_gaas",
+            "central_gaas_to_algaas",
+            "central_algaas_to_gaas",
+            "outer_right_gaas_to_algaas"
+          ],
+          "gated_max_absolute_al_fraction_difference": 4.782285678572862e-13,
+          "gated_rms_al_fraction_difference": 5.11804985561164e-14,
+          "geometry": {
+            "realized_central_barrier_nm": 0.8499999999999908,
+            "realized_interface_positions_nm": {
+              "central_algaas_to_gaas": 27.9499999999999,
+              "central_gaas_to_algaas": 27.09999999999991,
+              "outer_left_algaas_to_gaas": 20.0,
+              "outer_right_gaas_to_algaas": 30.84999999999997
+            },
+            "realized_total_gaas_well_nm": 9.999999999999979,
+            "realized_well_1_nm": 7.099999999999909,
+            "realized_well_2_nm": 2.9000000000000696,
+            "requested_central_barrier_nm": 0.85,
+            "requested_interface_positions_nm": {
+              "central_algaas_to_gaas": 27.950000000000003,
+              "central_gaas_to_algaas": 27.1,
+              "outer_left_algaas_to_gaas": 20.0,
+              "outer_right_gaas_to_algaas": 30.85
+            },
+            "requested_total_gaas_well_nm": 10.0,
+            "requested_well_1_nm": 7.1,
+            "requested_well_2_nm": 2.9000000000000004
+          },
+          "intended_interface_metrics": [
+            {
+              "centre_error_nm": 0.0,
+              "interface": "outer_left_algaas_to_gaas",
+              "measurement_window_nm": [
+                19.36,
+                20.64
+              ],
+              "realized_centre_nm": 20.0,
+              "realized_width_10_90_nm": 0.3999999999999986,
+              "requested_centre_nm": 20.0,
+              "requested_width_10_90_nm": 0.4,
+              "width_error_nm": 1.4432899320127035e-15,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 0.0,
+              "interface": "central_gaas_to_algaas",
+              "measurement_window_nm": [
+                26.46,
+                27.525000000000002
+              ],
+              "realized_centre_nm": 27.1,
+              "realized_width_10_90_nm": 0.3999999999999986,
+              "requested_centre_nm": 27.1,
+              "requested_width_10_90_nm": 0.4,
+              "width_error_nm": 1.4432899320127035e-15,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 0.0,
+              "interface": "central_algaas_to_gaas",
+              "measurement_window_nm": [
+                27.525000000000002,
+                28.590000000000003
+              ],
+              "realized_centre_nm": 27.950000000000003,
+              "realized_width_10_90_nm": 0.3999999999999986,
+              "requested_centre_nm": 27.950000000000003,
+              "requested_width_10_90_nm": 0.4,
+              "width_error_nm": 1.4432899320127035e-15,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 0.0,
+              "interface": "outer_right_gaas_to_algaas",
+              "measurement_window_nm": [
+                30.21,
+                31.490000000000002
+              ],
+              "realized_centre_nm": 30.85,
+              "realized_width_10_90_nm": 0.3999999999999986,
+              "requested_centre_nm": 30.85,
+              "requested_width_10_90_nm": 0.4,
+              "width_error_nm": 1.4432899320127035e-15,
+              "window_isolated_from_other_interfaces": true
+            }
+          ],
+          "intended_overlap": {
+            "case_declares_overlap": false,
+            "central_interface_left_nm": 27.1,
+            "central_interface_right_nm": 27.950000000000003,
+            "expected_peak_al_fraction": 0.55,
+            "grades_overlap": false,
+            "local_integrated_al_dose_nm_equivalent": 0.7250000000000013,
+            "nominal_barrier_al_fraction": 0.55,
+            "nominal_plateau_exists": true,
+            "overlap": false,
+            "overlap_end_nm": null,
+            "overlap_start_nm": null,
+            "overlap_width_nm": 0.0,
+            "peak_position_nm": 27.35,
+            "reaches_90_percent_of_nominal": true,
+            "realized_peak_al_fraction": 0.55,
+            "true_flat_central_plateau_exists": true
+          },
+          "interface_exclusion_applied": false,
+          "interface_exclusion_half_width_nm": 0.05,
+          "max_absolute_al_fraction_difference": 4.782285678572862e-13,
+          "max_absolute_al_fraction_difference_off_interface": 4.782285678572862e-13,
+          "metrology_window_is_the_requested_width": true,
+          "metrology_window_widths_nm": {
+            "central_algaas_to_gaas": 0.4,
+            "central_gaas_to_algaas": 0.4,
+            "outer_left_algaas_to_gaas": 0.4,
+            "outer_right_gaas_to_algaas": 0.4
+          },
+          "points_excluded_near_interfaces": 8,
+          "realized_interface_metrics": [
+            {
+              "centre_error_nm": 0.0,
+              "interface": "outer_left_algaas_to_gaas",
+              "measurement_window_nm": [
+                19.36,
+                20.64
+              ],
+              "realized_centre_nm": 20.0,
+              "realized_width_10_90_nm": 0.40000000000016556,
+              "requested_centre_nm": 20.0,
+              "requested_width_10_90_nm": 0.4,
+              "width_error_nm": 1.6553425297161084e-13,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 9.237055564881302e-14,
+              "interface": "central_gaas_to_algaas",
+              "measurement_window_nm": [
+                26.46,
+                27.525000000000002
+              ],
+              "realized_centre_nm": 27.09999999999991,
+              "realized_width_10_90_nm": 0.399999999999995,
+              "requested_centre_nm": 27.1,
+              "requested_width_10_90_nm": 0.4,
+              "width_error_nm": 4.9960036108132044e-15,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 1.0302869668521453e-13,
+              "interface": "central_algaas_to_gaas",
+              "measurement_window_nm": [
+                27.525000000000002,
+                28.590000000000003
+              ],
+              "realized_centre_nm": 27.9499999999999,
+              "realized_width_10_90_nm": 0.399999999999995,
+              "requested_centre_nm": 27.950000000000003,
+              "requested_width_10_90_nm": 0.4,
+              "width_error_nm": 4.9960036108132044e-15,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 3.197442310920451e-14,
+              "interface": "outer_right_gaas_to_algaas",
+              "measurement_window_nm": [
+                30.21,
+                31.490000000000002
+              ],
+              "realized_centre_nm": 30.84999999999997,
+              "realized_width_10_90_nm": 0.40000000000029345,
+              "requested_centre_nm": 30.85,
+              "requested_width_10_90_nm": 0.4,
+              "width_error_nm": 2.9343194540842887e-13,
+              "window_isolated_from_other_interfaces": true
+            }
+          ],
+          "realized_overlap": {
+            "central_interface_left_nm": 27.1,
+            "central_interface_right_nm": 27.950000000000003,
+            "expected_peak_al_fraction": 0.55,
+            "grades_overlap": false,
+            "local_integrated_al_dose_nm_equivalent": 0.6974999999999971,
+            "nominal_barrier_al_fraction": 0.55,
+            "nominal_plateau_exists": true,
+            "overlap": false,
+            "peak_position_nm": 27.375,
+            "reaches_90_percent_of_nominal": true,
+            "realized_peak_al_fraction": 0.55,
+            "true_flat_central_plateau_exists": true
+          },
+          "realized_peak_al_fraction": 0.55,
+          "representation": "native_linear",
+          "requested_asymmetry_s": 0.41999999999999993,
+          "requested_grading_widths_nm": {
+            "central_algaas_to_gaas": 0.4,
+            "central_gaas_to_algaas": 0.4,
+            "outer_left_algaas_to_gaas": 0.4,
+            "outer_right_gaas_to_algaas": 0.4
+          },
+          "rms_al_fraction_difference": 5.11804985561164e-14,
+          "rms_al_fraction_difference_off_interface": 5.0462305737994664e-14,
+          "structural_invariants": {
+            "all_passed": true,
+            "central_barrier_present": true,
+            "composition_finite": true,
+            "composition_within_bounds": true,
+            "confinement_is_material_not_boundary": true,
+            "coordinates_ascending": true,
+            "four_interfaces_ordered": true,
+            "left_outer_barrier_present": true,
+            "right_outer_barrier_present": true,
+            "thick_well_is_gaas": true,
+            "thin_well_is_gaas": true
+          },
+          "tolerances": {
+            "interface_position_nm": 0.1,
+            "max_absolute_al_fraction_difference": 0.005,
+            "rms_al_fraction_difference": 0.001
+          }
+        },
+        "comparison_metrics_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_03\\comparison_metrics.json",
+        "failure_reason": null,
+        "invocation": {
+          "deck_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_03\\nextnano_input\\case.in",
+          "deck_sha256": "0b72fb8f8e228e6a94e982a0b0b9c558609b169c22b0172c07b4cf6f036afbf8",
+          "failure_reason": null,
+          "fatal_markers": [],
+          "output_dir": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_03\\structure\\out",
+          "parser_command": [
+            "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\bin\\nextnano++_Intel_64bit.exe",
+            "--structure",
+            "-d",
+            "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\database\\database.nnp",
+            "-l",
+            "C:\\Code\\optics\\nextnano\\2026_07_03\\License\\License_nnp.lic",
+            "-o",
+            "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_03\\structure\\out",
+            "case.in"
+          ],
+          "passed": true,
+          "profile_path": null,
+          "profile_sha256": null,
+          "return_code": 0,
+          "runmode": "--structure",
+          "stderr_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_03\\structure\\stderr.txt",
+          "stdout_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_03\\structure\\stdout.txt"
+        },
+        "passed": true,
+        "realized_profile_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_03\\realized_profile.csv",
+        "source_alloy_composition_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_03\\structure\\out\\case\\Structure\\alloy_composition.dat"
+      }
+    },
+    {
+      "case_id": "case_04",
+      "demo16e_version": "demo16e-1.0.0",
+      "failure_reason": null,
+      "geometry": {
+        "active_end_nm": 32.5,
+        "active_start_nm": 20.0,
+        "asymmetry_s": 0.41999999999999993,
+        "barrier_centre_nm": 28.35,
+        "domain_end_nm": 52.5,
+        "domain_start_nm": 0.0,
+        "nominal_central_barrier_thickness_nm": 2.5,
+        "thick_well_nm": 7.1,
+        "thin_well_nm": 2.9000000000000004,
+        "total_well_thickness_nm": 10.0
+      },
+      "grading": {
+        "grading_interfaces_overlap": false,
+        "grading_profile_realization_max_error": 0.005892857142858254,
+        "grading_profile_realization_rms_error": 0.0002979532544800394,
+        "grading_slope_max_left_per_nm": 0.628571428571429,
+        "grading_slope_max_right_per_nm": 0.628571428571429,
+        "integrated_al_dose_nm_equivalent": 2.5,
+        "nominal_90pct_threshold_al_fraction": 0.49500000000000005,
+        "nominal_90pct_threshold_reached": true,
+        "outer_barrier_present": true,
+        "profile_monotone_coordinates": true,
+        "profile_points": 1051,
+        "profile_within_bounds": true,
+        "realized_algaas_to_gaas_grading_width_10_90_nominalref_nm": 0.7000000000000028,
+        "realized_algaas_to_gaas_grading_width_10_90_peakref_nm": 0.7000000000000028,
+        "realized_barrier_fwhm_nm": 2.5,
+        "realized_gaas_to_algaas_grading_width_10_90_nominalref_nm": 0.7000000000000028,
+        "realized_gaas_to_algaas_grading_width_10_90_peakref_nm": 0.7000000000000028,
+        "realized_min_al_fraction": 0.0,
+        "realized_peak_al_fraction": 0.55
+      },
+      "intended_structural_invariants": {
+        "all_passed": true,
+        "central_barrier_present": true,
+        "composition_finite": true,
+        "composition_within_bounds": true,
+        "confinement_is_material_not_boundary": true,
+        "coordinates_ascending": true,
+        "four_interfaces_ordered": true,
+        "left_outer_barrier_present": true,
+        "right_outer_barrier_present": true,
+        "thick_well_is_gaas": true,
+        "thin_well_is_gaas": true
+      },
+      "name": "thick_barrier",
+      "overlap": {
+        "case_declares_overlap": false,
+        "central_interface_left_nm": 27.1,
+        "central_interface_right_nm": 29.6,
+        "expected_peak_al_fraction": 0.55,
+        "grades_overlap": false,
+        "local_integrated_al_dose_nm_equivalent": 2.2807142857142852,
+        "nominal_barrier_al_fraction": 0.55,
+        "nominal_plateau_exists": true,
+        "overlap": false,
+        "overlap_end_nm": null,
+        "overlap_start_nm": null,
+        "overlap_width_nm": 0.0,
+        "peak_position_nm": 27.55,
+        "reaches_90_percent_of_nominal": true,
+        "realized_peak_al_fraction": 0.55,
+        "true_flat_central_plateau_exists": true
+      },
+      "parser": {
+        "deck_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_04\\nextnano_input\\case.in",
+        "deck_sha256": "8749903224979008bffebbbacfa86fa2fdf4e8c51d2137a0d395de43ee536c27",
+        "failure_reason": null,
+        "fatal_markers": [],
+        "output_dir": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_04\\parser\\out",
+        "parser_command": [
+          "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\bin\\nextnano++_Intel_64bit.exe",
+          "--parse",
+          "-d",
+          "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\database\\database.nnp",
+          "-l",
+          "C:\\Code\\optics\\nextnano\\2026_07_03\\License\\License_nnp.lic",
+          "-o",
+          "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_04\\parser\\out",
+          "case.in"
+        ],
+        "passed": true,
+        "profile_path": null,
+        "profile_sha256": null,
+        "return_code": 0,
+        "runmode": "--parse",
+        "stderr_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_04\\parser\\stderr.txt",
+        "stdout_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_04\\parser\\stdout.txt"
+      },
+      "physics": {},
+      "render_method": "ternary_linear",
+      "representation": "native_linear",
+      "status": "structure_passed",
+      "structure": {
+        "comparison": {
+          "case_id": "case_04",
+          "central_interface_positions_gated": true,
+          "checks": {
+            "every_interface_was_located": true,
+            "interface_positions_within_tolerance": true,
+            "max_absolute_error_within_tolerance": true,
+            "measurement_windows_are_local": true,
+            "outer_barriers_and_two_wells_present": true,
+            "overlap_classification_matches_request": true,
+            "overlap_does_not_fabricate_nominal_plateau": true,
+            "overlap_peak_matches_authoritative_profile": true,
+            "passed": true,
+            "rms_error_within_tolerance": true,
+            "well_widths_not_reported_as_grading_widths": true
+          },
+          "comparison_points": 454,
+          "expected_peak_al_fraction": 0.55,
+          "forbidden_width_hits": [],
+          "gated_interface_positions": [
+            "outer_left_algaas_to_gaas",
+            "central_gaas_to_algaas",
+            "central_algaas_to_gaas",
+            "outer_right_gaas_to_algaas"
+          ],
+          "gated_max_absolute_al_fraction_difference": 2.932654119547351e-13,
+          "gated_rms_al_fraction_difference": 3.7347731301906464e-14,
+          "geometry": {
+            "realized_central_barrier_nm": 2.499999999999968,
+            "realized_interface_positions_nm": {
+              "central_algaas_to_gaas": 29.599999999999895,
+              "central_gaas_to_algaas": 27.099999999999927,
+              "outer_left_algaas_to_gaas": 20.0,
+              "outer_right_gaas_to_algaas": 32.49999999999998
+            },
+            "realized_total_gaas_well_nm": 10.00000000000001,
+            "realized_well_1_nm": 7.099999999999927,
+            "realized_well_2_nm": 2.900000000000084,
+            "requested_central_barrier_nm": 2.5,
+            "requested_interface_positions_nm": {
+              "central_algaas_to_gaas": 29.6,
+              "central_gaas_to_algaas": 27.1,
+              "outer_left_algaas_to_gaas": 20.0,
+              "outer_right_gaas_to_algaas": 32.5
+            },
+            "requested_total_gaas_well_nm": 10.0,
+            "requested_well_1_nm": 7.1,
+            "requested_well_2_nm": 2.9000000000000004
+          },
+          "intended_interface_metrics": [
+            {
+              "centre_error_nm": 0.0,
+              "interface": "outer_left_algaas_to_gaas",
+              "measurement_window_nm": [
+                18.88,
+                21.12
+              ],
+              "realized_centre_nm": 20.0,
+              "realized_width_10_90_nm": 0.7000000000000028,
+              "requested_centre_nm": 20.0,
+              "requested_width_10_90_nm": 0.7,
+              "width_error_nm": 2.886579864025407e-15,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 0.0,
+              "interface": "central_gaas_to_algaas",
+              "measurement_window_nm": [
+                25.98,
+                28.220000000000002
+              ],
+              "realized_centre_nm": 27.1,
+              "realized_width_10_90_nm": 0.7000000000000028,
+              "requested_centre_nm": 27.1,
+              "requested_width_10_90_nm": 0.7,
+              "width_error_nm": 2.886579864025407e-15,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 0.0,
+              "interface": "central_algaas_to_gaas",
+              "measurement_window_nm": [
+                28.48,
+                30.720000000000002
+              ],
+              "realized_centre_nm": 29.6,
+              "realized_width_10_90_nm": 0.7000000000000028,
+              "requested_centre_nm": 29.6,
+              "requested_width_10_90_nm": 0.7,
+              "width_error_nm": 2.886579864025407e-15,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 0.0,
+              "interface": "outer_right_gaas_to_algaas",
+              "measurement_window_nm": [
+                31.38,
+                33.62
+              ],
+              "realized_centre_nm": 32.5,
+              "realized_width_10_90_nm": 0.7000000000000028,
+              "requested_centre_nm": 32.5,
+              "requested_width_10_90_nm": 0.7,
+              "width_error_nm": 2.886579864025407e-15,
+              "window_isolated_from_other_interfaces": true
+            }
+          ],
+          "intended_overlap": {
+            "case_declares_overlap": false,
+            "central_interface_left_nm": 27.1,
+            "central_interface_right_nm": 29.6,
+            "expected_peak_al_fraction": 0.55,
+            "grades_overlap": false,
+            "local_integrated_al_dose_nm_equivalent": 2.2807142857142852,
+            "nominal_barrier_al_fraction": 0.55,
+            "nominal_plateau_exists": true,
+            "overlap": false,
+            "overlap_end_nm": null,
+            "overlap_start_nm": null,
+            "overlap_width_nm": 0.0,
+            "peak_position_nm": 27.55,
+            "reaches_90_percent_of_nominal": true,
+            "realized_peak_al_fraction": 0.55,
+            "true_flat_central_plateau_exists": true
+          },
+          "interface_exclusion_applied": false,
+          "interface_exclusion_half_width_nm": 0.05,
+          "max_absolute_al_fraction_difference": 2.932654119547351e-13,
+          "max_absolute_al_fraction_difference_off_interface": 2.932654119547351e-13,
+          "metrology_window_is_the_requested_width": true,
+          "metrology_window_widths_nm": {
+            "central_algaas_to_gaas": 0.7,
+            "central_gaas_to_algaas": 0.7,
+            "outer_left_algaas_to_gaas": 0.7,
+            "outer_right_gaas_to_algaas": 0.7
+          },
+          "points_excluded_near_interfaces": 8,
+          "realized_interface_metrics": [
+            {
+              "centre_error_nm": 0.0,
+              "interface": "outer_left_algaas_to_gaas",
+              "measurement_window_nm": [
+                18.88,
+                21.12
+              ],
+              "realized_centre_nm": 20.0,
+              "realized_width_10_90_nm": 0.6999999999998465,
+              "requested_centre_nm": 20.0,
+              "requested_width_10_90_nm": 0.7,
+              "width_error_nm": 1.5343282200319663e-13,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 7.460698725481052e-14,
+              "interface": "central_gaas_to_algaas",
+              "measurement_window_nm": [
+                25.98,
+                28.220000000000002
+              ],
+              "realized_centre_nm": 27.099999999999927,
+              "realized_width_10_90_nm": 0.6999999999999922,
+              "requested_centre_nm": 27.1,
+              "requested_width_10_90_nm": 0.7,
+              "width_error_nm": 7.771561172376096e-15,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 1.0658141036401503e-13,
+              "interface": "central_algaas_to_gaas",
+              "measurement_window_nm": [
+                28.48,
+                30.720000000000002
+              ],
+              "realized_centre_nm": 29.599999999999895,
+              "realized_width_10_90_nm": 0.6999999999999993,
+              "requested_centre_nm": 29.6,
+              "requested_width_10_90_nm": 0.7,
+              "width_error_nm": 6.661338147750939e-16,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 2.1316282072803006e-14,
+              "interface": "outer_right_gaas_to_algaas",
+              "measurement_window_nm": [
+                31.38,
+                33.62
+              ],
+              "realized_centre_nm": 32.49999999999998,
+              "realized_width_10_90_nm": 0.6999999999999744,
+              "requested_centre_nm": 32.5,
+              "requested_width_10_90_nm": 0.7,
+              "width_error_nm": 2.55351295663786e-14,
+              "window_isolated_from_other_interfaces": true
+            }
+          ],
+          "realized_overlap": {
+            "central_interface_left_nm": 27.1,
+            "central_interface_right_nm": 29.6,
+            "expected_peak_al_fraction": 0.55,
+            "grades_overlap": false,
+            "local_integrated_al_dose_nm_equivalent": 2.2549999999999892,
+            "nominal_barrier_al_fraction": 0.55,
+            "nominal_plateau_exists": true,
+            "overlap": false,
+            "peak_position_nm": 27.575,
+            "reaches_90_percent_of_nominal": true,
+            "realized_peak_al_fraction": 0.55,
+            "true_flat_central_plateau_exists": true
+          },
+          "realized_peak_al_fraction": 0.55,
+          "representation": "native_linear",
+          "requested_asymmetry_s": 0.41999999999999993,
+          "requested_grading_widths_nm": {
+            "central_algaas_to_gaas": 0.7,
+            "central_gaas_to_algaas": 0.7,
+            "outer_left_algaas_to_gaas": 0.7,
+            "outer_right_gaas_to_algaas": 0.7
+          },
+          "rms_al_fraction_difference": 3.7347731301906464e-14,
+          "rms_al_fraction_difference_off_interface": 3.725351042042797e-14,
+          "structural_invariants": {
+            "all_passed": true,
+            "central_barrier_present": true,
+            "composition_finite": true,
+            "composition_within_bounds": true,
+            "confinement_is_material_not_boundary": true,
+            "coordinates_ascending": true,
+            "four_interfaces_ordered": true,
+            "left_outer_barrier_present": true,
+            "right_outer_barrier_present": true,
+            "thick_well_is_gaas": true,
+            "thin_well_is_gaas": true
+          },
+          "tolerances": {
+            "interface_position_nm": 0.1,
+            "max_absolute_al_fraction_difference": 0.005,
+            "rms_al_fraction_difference": 0.001
+          }
+        },
+        "comparison_metrics_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_04\\comparison_metrics.json",
+        "failure_reason": null,
+        "invocation": {
+          "deck_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_04\\nextnano_input\\case.in",
+          "deck_sha256": "8749903224979008bffebbbacfa86fa2fdf4e8c51d2137a0d395de43ee536c27",
+          "failure_reason": null,
+          "fatal_markers": [],
+          "output_dir": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_04\\structure\\out",
+          "parser_command": [
+            "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\bin\\nextnano++_Intel_64bit.exe",
+            "--structure",
+            "-d",
+            "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\database\\database.nnp",
+            "-l",
+            "C:\\Code\\optics\\nextnano\\2026_07_03\\License\\License_nnp.lic",
+            "-o",
+            "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_04\\structure\\out",
+            "case.in"
+          ],
+          "passed": true,
+          "profile_path": null,
+          "profile_sha256": null,
+          "return_code": 0,
+          "runmode": "--structure",
+          "stderr_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_04\\structure\\stderr.txt",
+          "stdout_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_04\\structure\\stdout.txt"
+        },
+        "passed": true,
+        "realized_profile_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_04\\realized_profile.csv",
+        "source_alloy_composition_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_04\\structure\\out\\case\\Structure\\alloy_composition.dat"
+      }
+    },
+    {
+      "case_id": "case_05",
+      "demo16e_version": "demo16e-1.0.0",
+      "failure_reason": null,
+      "geometry": {
+        "active_end_nm": 31.8,
+        "active_start_nm": 20.0,
+        "asymmetry_s": 0.3,
+        "barrier_centre_nm": 27.4,
+        "domain_end_nm": 51.8,
+        "domain_start_nm": 0.0,
+        "nominal_central_barrier_thickness_nm": 1.8,
+        "thick_well_nm": 6.5,
+        "thin_well_nm": 3.5,
+        "total_well_thickness_nm": 10.0
+      },
+      "grading": {
+        "grading_interfaces_overlap": false,
+        "grading_profile_realization_max_error": 0.005892857142858057,
+        "grading_profile_realization_rms_error": 0.00029995959986502135,
+        "grading_slope_max_left_per_nm": 0.6285714285714294,
+        "grading_slope_max_right_per_nm": 0.628571428571429,
+        "integrated_al_dose_nm_equivalent": 1.8000000000000005,
+        "nominal_90pct_threshold_al_fraction": 0.49500000000000005,
+        "nominal_90pct_threshold_reached": true,
+        "outer_barrier_present": true,
+        "profile_monotone_coordinates": true,
+        "profile_points": 1037,
+        "profile_within_bounds": true,
+        "realized_algaas_to_gaas_grading_width_10_90_nominalref_nm": 0.7000000000000028,
+        "realized_algaas_to_gaas_grading_width_10_90_peakref_nm": 0.7000000000000028,
+        "realized_barrier_fwhm_nm": 1.8000000000000007,
+        "realized_gaas_to_algaas_grading_width_10_90_nominalref_nm": 0.7000000000000028,
+        "realized_gaas_to_algaas_grading_width_10_90_peakref_nm": 0.7000000000000028,
+        "realized_min_al_fraction": 0.0,
+        "realized_peak_al_fraction": 0.55
+      },
+      "intended_structural_invariants": {
+        "all_passed": true,
+        "central_barrier_present": true,
+        "composition_finite": true,
+        "composition_within_bounds": true,
+        "confinement_is_material_not_boundary": true,
+        "coordinates_ascending": true,
+        "four_interfaces_ordered": true,
+        "left_outer_barrier_present": true,
+        "right_outer_barrier_present": true,
+        "thick_well_is_gaas": true,
+        "thin_well_is_gaas": true
+      },
+      "name": "low_asymmetry",
+      "overlap": {
+        "case_declares_overlap": false,
+        "central_interface_left_nm": 26.5,
+        "central_interface_right_nm": 28.3,
+        "expected_peak_al_fraction": 0.55,
+        "grades_overlap": false,
+        "local_integrated_al_dose_nm_equivalent": 1.5807142857142864,
+        "nominal_barrier_al_fraction": 0.55,
+        "nominal_plateau_exists": true,
+        "overlap": false,
+        "overlap_end_nm": null,
+        "overlap_start_nm": null,
+        "overlap_width_nm": 0.0,
+        "peak_position_nm": 26.950000000000003,
+        "reaches_90_percent_of_nominal": true,
+        "realized_peak_al_fraction": 0.55,
+        "true_flat_central_plateau_exists": true
+      },
+      "parser": {
+        "deck_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_05\\nextnano_input\\case.in",
+        "deck_sha256": "e30141b58aee6c2284e420ddad5b0b59c7fa1910a8b92938073ebe1a3bb16d8d",
+        "failure_reason": null,
+        "fatal_markers": [],
+        "output_dir": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_05\\parser\\out",
+        "parser_command": [
+          "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\bin\\nextnano++_Intel_64bit.exe",
+          "--parse",
+          "-d",
+          "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\database\\database.nnp",
+          "-l",
+          "C:\\Code\\optics\\nextnano\\2026_07_03\\License\\License_nnp.lic",
+          "-o",
+          "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_05\\parser\\out",
+          "case.in"
+        ],
+        "passed": true,
+        "profile_path": null,
+        "profile_sha256": null,
+        "return_code": 0,
+        "runmode": "--parse",
+        "stderr_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_05\\parser\\stderr.txt",
+        "stdout_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_05\\parser\\stdout.txt"
+      },
+      "physics": {},
+      "render_method": "ternary_linear",
+      "representation": "native_linear",
+      "status": "structure_passed",
+      "structure": {
+        "comparison": {
+          "case_id": "case_05",
+          "central_interface_positions_gated": true,
+          "checks": {
+            "every_interface_was_located": true,
+            "interface_positions_within_tolerance": true,
+            "max_absolute_error_within_tolerance": true,
+            "measurement_windows_are_local": true,
+            "outer_barriers_and_two_wells_present": true,
+            "overlap_classification_matches_request": true,
+            "overlap_does_not_fabricate_nominal_plateau": true,
+            "overlap_peak_matches_authoritative_profile": true,
+            "passed": true,
+            "rms_error_within_tolerance": true,
+            "well_widths_not_reported_as_grading_widths": true
+          },
+          "comparison_points": 440,
+          "expected_peak_al_fraction": 0.55,
+          "forbidden_width_hits": [],
+          "gated_interface_positions": [
+            "outer_left_algaas_to_gaas",
+            "central_gaas_to_algaas",
+            "central_algaas_to_gaas",
+            "outer_right_gaas_to_algaas"
+          ],
+          "gated_max_absolute_al_fraction_difference": 3.03368441478824e-13,
+          "gated_rms_al_fraction_difference": 3.820250464065329e-14,
+          "geometry": {
+            "realized_central_barrier_nm": 1.7999999999999652,
+            "realized_interface_positions_nm": {
+              "central_algaas_to_gaas": 28.299999999999894,
+              "central_gaas_to_algaas": 26.49999999999993,
+              "outer_left_algaas_to_gaas": 20.0,
+              "outer_right_gaas_to_algaas": 31.799999999999958
+            },
+            "realized_total_gaas_well_nm": 9.999999999999993,
+            "realized_well_1_nm": 6.499999999999929,
+            "realized_well_2_nm": 3.500000000000064,
+            "requested_central_barrier_nm": 1.8,
+            "requested_interface_positions_nm": {
+              "central_algaas_to_gaas": 28.3,
+              "central_gaas_to_algaas": 26.5,
+              "outer_left_algaas_to_gaas": 20.0,
+              "outer_right_gaas_to_algaas": 31.8
+            },
+            "requested_total_gaas_well_nm": 10.0,
+            "requested_well_1_nm": 6.5,
+            "requested_well_2_nm": 3.5
+          },
+          "intended_interface_metrics": [
+            {
+              "centre_error_nm": 0.0,
+              "interface": "outer_left_algaas_to_gaas",
+              "measurement_window_nm": [
+                18.88,
+                21.12
+              ],
+              "realized_centre_nm": 20.0,
+              "realized_width_10_90_nm": 0.7000000000000028,
+              "requested_centre_nm": 20.0,
+              "requested_width_10_90_nm": 0.7,
+              "width_error_nm": 2.886579864025407e-15,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 0.0,
+              "interface": "central_gaas_to_algaas",
+              "measurement_window_nm": [
+                25.38,
+                27.4
+              ],
+              "realized_centre_nm": 26.5,
+              "realized_width_10_90_nm": 0.7000000000000028,
+              "requested_centre_nm": 26.5,
+              "requested_width_10_90_nm": 0.7,
+              "width_error_nm": 2.886579864025407e-15,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 0.0,
+              "interface": "central_algaas_to_gaas",
+              "measurement_window_nm": [
+                27.4,
+                29.42
+              ],
+              "realized_centre_nm": 28.3,
+              "realized_width_10_90_nm": 0.7000000000000028,
+              "requested_centre_nm": 28.3,
+              "requested_width_10_90_nm": 0.7,
+              "width_error_nm": 2.886579864025407e-15,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 0.0,
+              "interface": "outer_right_gaas_to_algaas",
+              "measurement_window_nm": [
+                30.68,
+                32.92
+              ],
+              "realized_centre_nm": 31.8,
+              "realized_width_10_90_nm": 0.6999999999999993,
+              "requested_centre_nm": 31.8,
+              "requested_width_10_90_nm": 0.7,
+              "width_error_nm": 6.661338147750939e-16,
+              "window_isolated_from_other_interfaces": true
+            }
+          ],
+          "intended_overlap": {
+            "case_declares_overlap": false,
+            "central_interface_left_nm": 26.5,
+            "central_interface_right_nm": 28.3,
+            "expected_peak_al_fraction": 0.55,
+            "grades_overlap": false,
+            "local_integrated_al_dose_nm_equivalent": 1.5807142857142864,
+            "nominal_barrier_al_fraction": 0.55,
+            "nominal_plateau_exists": true,
+            "overlap": false,
+            "overlap_end_nm": null,
+            "overlap_start_nm": null,
+            "overlap_width_nm": 0.0,
+            "peak_position_nm": 26.950000000000003,
+            "reaches_90_percent_of_nominal": true,
+            "realized_peak_al_fraction": 0.55,
+            "true_flat_central_plateau_exists": true
+          },
+          "interface_exclusion_applied": false,
+          "interface_exclusion_half_width_nm": 0.05,
+          "max_absolute_al_fraction_difference": 3.03368441478824e-13,
+          "max_absolute_al_fraction_difference_off_interface": 3.03368441478824e-13,
+          "metrology_window_is_the_requested_width": true,
+          "metrology_window_widths_nm": {
+            "central_algaas_to_gaas": 0.7,
+            "central_gaas_to_algaas": 0.7,
+            "outer_left_algaas_to_gaas": 0.7,
+            "outer_right_gaas_to_algaas": 0.7
+          },
+          "points_excluded_near_interfaces": 8,
+          "realized_interface_metrics": [
+            {
+              "centre_error_nm": 0.0,
+              "interface": "outer_left_algaas_to_gaas",
+              "measurement_window_nm": [
+                18.88,
+                21.12
+              ],
+              "realized_centre_nm": 20.0,
+              "realized_width_10_90_nm": 0.6999999999998465,
+              "requested_centre_nm": 20.0,
+              "requested_width_10_90_nm": 0.7,
+              "width_error_nm": 1.5343282200319663e-13,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 7.105427357601002e-14,
+              "interface": "central_gaas_to_algaas",
+              "measurement_window_nm": [
+                25.38,
+                27.4
+              ],
+              "realized_centre_nm": 26.49999999999993,
+              "realized_width_10_90_nm": 0.6999999999999886,
+              "requested_centre_nm": 26.5,
+              "requested_width_10_90_nm": 0.7,
+              "width_error_nm": 1.1324274851176597e-14,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 1.0658141036401503e-13,
+              "interface": "central_algaas_to_gaas",
+              "measurement_window_nm": [
+                27.4,
+                29.42
+              ],
+              "realized_centre_nm": 28.299999999999894,
+              "realized_width_10_90_nm": 0.6999999999999886,
+              "requested_centre_nm": 28.3,
+              "requested_width_10_90_nm": 0.7,
+              "width_error_nm": 1.1324274851176597e-14,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 4.263256414560601e-14,
+              "interface": "outer_right_gaas_to_algaas",
+              "measurement_window_nm": [
+                30.68,
+                32.92
+              ],
+              "realized_centre_nm": 31.799999999999958,
+              "realized_width_10_90_nm": 0.699999999999978,
+              "requested_centre_nm": 31.8,
+              "requested_width_10_90_nm": 0.7,
+              "width_error_nm": 2.19824158875781e-14,
+              "window_isolated_from_other_interfaces": true
+            }
+          ],
+          "realized_overlap": {
+            "central_interface_left_nm": 26.5,
+            "central_interface_right_nm": 28.3,
+            "expected_peak_al_fraction": 0.55,
+            "grades_overlap": false,
+            "local_integrated_al_dose_nm_equivalent": 1.5549999999999933,
+            "nominal_barrier_al_fraction": 0.55,
+            "nominal_plateau_exists": true,
+            "overlap": false,
+            "peak_position_nm": 26.975,
+            "reaches_90_percent_of_nominal": true,
+            "realized_peak_al_fraction": 0.55,
+            "true_flat_central_plateau_exists": true
+          },
+          "realized_peak_al_fraction": 0.55,
+          "representation": "native_linear",
+          "requested_asymmetry_s": 0.3,
+          "requested_grading_widths_nm": {
+            "central_algaas_to_gaas": 0.7,
+            "central_gaas_to_algaas": 0.7,
+            "outer_left_algaas_to_gaas": 0.7,
+            "outer_right_gaas_to_algaas": 0.7
+          },
+          "rms_al_fraction_difference": 3.820250464065329e-14,
+          "rms_al_fraction_difference_off_interface": 3.8099259516990253e-14,
+          "structural_invariants": {
+            "all_passed": true,
+            "central_barrier_present": true,
+            "composition_finite": true,
+            "composition_within_bounds": true,
+            "confinement_is_material_not_boundary": true,
+            "coordinates_ascending": true,
+            "four_interfaces_ordered": true,
+            "left_outer_barrier_present": true,
+            "right_outer_barrier_present": true,
+            "thick_well_is_gaas": true,
+            "thin_well_is_gaas": true
+          },
+          "tolerances": {
+            "interface_position_nm": 0.1,
+            "max_absolute_al_fraction_difference": 0.005,
+            "rms_al_fraction_difference": 0.001
+          }
+        },
+        "comparison_metrics_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_05\\comparison_metrics.json",
+        "failure_reason": null,
+        "invocation": {
+          "deck_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_05\\nextnano_input\\case.in",
+          "deck_sha256": "e30141b58aee6c2284e420ddad5b0b59c7fa1910a8b92938073ebe1a3bb16d8d",
+          "failure_reason": null,
+          "fatal_markers": [],
+          "output_dir": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_05\\structure\\out",
+          "parser_command": [
+            "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\bin\\nextnano++_Intel_64bit.exe",
+            "--structure",
+            "-d",
+            "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\database\\database.nnp",
+            "-l",
+            "C:\\Code\\optics\\nextnano\\2026_07_03\\License\\License_nnp.lic",
+            "-o",
+            "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_05\\structure\\out",
+            "case.in"
+          ],
+          "passed": true,
+          "profile_path": null,
+          "profile_sha256": null,
+          "return_code": 0,
+          "runmode": "--structure",
+          "stderr_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_05\\structure\\stderr.txt",
+          "stdout_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_05\\structure\\stdout.txt"
+        },
+        "passed": true,
+        "realized_profile_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_05\\realized_profile.csv",
+        "source_alloy_composition_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_05\\structure\\out\\case\\Structure\\alloy_composition.dat"
+      }
+    },
+    {
+      "case_id": "case_06",
+      "demo16e_version": "demo16e-1.0.0",
+      "failure_reason": null,
+      "geometry": {
+        "active_end_nm": 31.8,
+        "active_start_nm": 20.0,
+        "asymmetry_s": 0.55,
+        "barrier_centre_nm": 28.65,
+        "domain_end_nm": 51.8,
+        "domain_start_nm": 0.0,
+        "nominal_central_barrier_thickness_nm": 1.8,
+        "thick_well_nm": 7.75,
+        "thin_well_nm": 2.25,
+        "total_well_thickness_nm": 10.0
+      },
+      "grading": {
+        "grading_interfaces_overlap": false,
+        "grading_profile_realization_max_error": 0.005892857142858057,
+        "grading_profile_realization_rms_error": 0.00029995959986502135,
+        "grading_slope_max_left_per_nm": 0.6285714285714294,
+        "grading_slope_max_right_per_nm": 0.628571428571429,
+        "integrated_al_dose_nm_equivalent": 1.8000000000000005,
+        "nominal_90pct_threshold_al_fraction": 0.49500000000000005,
+        "nominal_90pct_threshold_reached": true,
+        "outer_barrier_present": true,
+        "profile_monotone_coordinates": true,
+        "profile_points": 1037,
+        "profile_within_bounds": true,
+        "realized_algaas_to_gaas_grading_width_10_90_nominalref_nm": 0.7000000000000028,
+        "realized_algaas_to_gaas_grading_width_10_90_peakref_nm": 0.7000000000000028,
+        "realized_barrier_fwhm_nm": 1.8000000000000007,
+        "realized_gaas_to_algaas_grading_width_10_90_nominalref_nm": 0.7000000000000028,
+        "realized_gaas_to_algaas_grading_width_10_90_peakref_nm": 0.7000000000000028,
+        "realized_min_al_fraction": 0.0,
+        "realized_peak_al_fraction": 0.55
+      },
+      "intended_structural_invariants": {
+        "all_passed": true,
+        "central_barrier_present": true,
+        "composition_finite": true,
+        "composition_within_bounds": true,
+        "confinement_is_material_not_boundary": true,
+        "coordinates_ascending": true,
+        "four_interfaces_ordered": true,
+        "left_outer_barrier_present": true,
+        "right_outer_barrier_present": true,
+        "thick_well_is_gaas": true,
+        "thin_well_is_gaas": true
+      },
+      "name": "high_asymmetry",
+      "overlap": {
+        "case_declares_overlap": false,
+        "central_interface_left_nm": 27.75,
+        "central_interface_right_nm": 29.55,
+        "expected_peak_al_fraction": 0.55,
+        "grades_overlap": false,
+        "local_integrated_al_dose_nm_equivalent": 1.5807142857142864,
+        "nominal_barrier_al_fraction": 0.55,
+        "nominal_plateau_exists": true,
+        "overlap": false,
+        "overlap_end_nm": null,
+        "overlap_start_nm": null,
+        "overlap_width_nm": 0.0,
+        "peak_position_nm": 28.200000000000003,
+        "reaches_90_percent_of_nominal": true,
+        "realized_peak_al_fraction": 0.55,
+        "true_flat_central_plateau_exists": true
+      },
+      "parser": {
+        "deck_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_06\\nextnano_input\\case.in",
+        "deck_sha256": "54f7830eebfdd07b1f36d226184036c0ad4b3a06d8b2c17996e0a75af7c621d8",
+        "failure_reason": null,
+        "fatal_markers": [],
+        "output_dir": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_06\\parser\\out",
+        "parser_command": [
+          "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\bin\\nextnano++_Intel_64bit.exe",
+          "--parse",
+          "-d",
+          "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\database\\database.nnp",
+          "-l",
+          "C:\\Code\\optics\\nextnano\\2026_07_03\\License\\License_nnp.lic",
+          "-o",
+          "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_06\\parser\\out",
+          "case.in"
+        ],
+        "passed": true,
+        "profile_path": null,
+        "profile_sha256": null,
+        "return_code": 0,
+        "runmode": "--parse",
+        "stderr_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_06\\parser\\stderr.txt",
+        "stdout_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_06\\parser\\stdout.txt"
+      },
+      "physics": {},
+      "render_method": "ternary_linear",
+      "representation": "native_linear",
+      "status": "structure_passed",
+      "structure": {
+        "comparison": {
+          "case_id": "case_06",
+          "central_interface_positions_gated": true,
+          "checks": {
+            "every_interface_was_located": true,
+            "interface_positions_within_tolerance": true,
+            "max_absolute_error_within_tolerance": true,
+            "measurement_windows_are_local": true,
+            "outer_barriers_and_two_wells_present": true,
+            "overlap_classification_matches_request": true,
+            "overlap_does_not_fabricate_nominal_plateau": true,
+            "overlap_peak_matches_authoritative_profile": true,
+            "passed": true,
+            "rms_error_within_tolerance": true,
+            "well_widths_not_reported_as_grading_widths": true
+          },
+          "comparison_points": 440,
+          "expected_peak_al_fraction": 0.55,
+          "forbidden_width_hits": [],
+          "gated_interface_positions": [
+            "outer_left_algaas_to_gaas",
+            "central_gaas_to_algaas",
+            "central_algaas_to_gaas",
+            "outer_right_gaas_to_algaas"
+          ],
+          "gated_max_absolute_al_fraction_difference": 3.03368441478824e-13,
+          "gated_rms_al_fraction_difference": 3.929371659570784e-14,
+          "geometry": {
+            "realized_central_barrier_nm": 1.799999999999983,
+            "realized_interface_positions_nm": {
+              "central_algaas_to_gaas": 29.549999999999894,
+              "central_gaas_to_algaas": 27.74999999999991,
+              "outer_left_algaas_to_gaas": 20.0,
+              "outer_right_gaas_to_algaas": 31.799999999999958
+            },
+            "realized_total_gaas_well_nm": 9.999999999999975,
+            "realized_well_1_nm": 7.749999999999911,
+            "realized_well_2_nm": 2.250000000000064,
+            "requested_central_barrier_nm": 1.8,
+            "requested_interface_positions_nm": {
+              "central_algaas_to_gaas": 29.55,
+              "central_gaas_to_algaas": 27.75,
+              "outer_left_algaas_to_gaas": 20.0,
+              "outer_right_gaas_to_algaas": 31.8
+            },
+            "requested_total_gaas_well_nm": 10.0,
+            "requested_well_1_nm": 7.75,
+            "requested_well_2_nm": 2.25
+          },
+          "intended_interface_metrics": [
+            {
+              "centre_error_nm": 0.0,
+              "interface": "outer_left_algaas_to_gaas",
+              "measurement_window_nm": [
+                18.88,
+                21.12
+              ],
+              "realized_centre_nm": 20.0,
+              "realized_width_10_90_nm": 0.7000000000000028,
+              "requested_centre_nm": 20.0,
+              "requested_width_10_90_nm": 0.7,
+              "width_error_nm": 2.886579864025407e-15,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 0.0,
+              "interface": "central_gaas_to_algaas",
+              "measurement_window_nm": [
+                26.63,
+                28.65
+              ],
+              "realized_centre_nm": 27.75,
+              "realized_width_10_90_nm": 0.7000000000000028,
+              "requested_centre_nm": 27.75,
+              "requested_width_10_90_nm": 0.7,
+              "width_error_nm": 2.886579864025407e-15,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 0.0,
+              "interface": "central_algaas_to_gaas",
+              "measurement_window_nm": [
+                28.65,
+                30.67
+              ],
+              "realized_centre_nm": 29.55,
+              "realized_width_10_90_nm": 0.7000000000000028,
+              "requested_centre_nm": 29.55,
+              "requested_width_10_90_nm": 0.7,
+              "width_error_nm": 2.886579864025407e-15,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 0.0,
+              "interface": "outer_right_gaas_to_algaas",
+              "measurement_window_nm": [
+                30.68,
+                32.92
+              ],
+              "realized_centre_nm": 31.8,
+              "realized_width_10_90_nm": 0.6999999999999993,
+              "requested_centre_nm": 31.8,
+              "requested_width_10_90_nm": 0.7,
+              "width_error_nm": 6.661338147750939e-16,
+              "window_isolated_from_other_interfaces": true
+            }
+          ],
+          "intended_overlap": {
+            "case_declares_overlap": false,
+            "central_interface_left_nm": 27.75,
+            "central_interface_right_nm": 29.55,
+            "expected_peak_al_fraction": 0.55,
+            "grades_overlap": false,
+            "local_integrated_al_dose_nm_equivalent": 1.5807142857142864,
+            "nominal_barrier_al_fraction": 0.55,
+            "nominal_plateau_exists": true,
+            "overlap": false,
+            "overlap_end_nm": null,
+            "overlap_start_nm": null,
+            "overlap_width_nm": 0.0,
+            "peak_position_nm": 28.200000000000003,
+            "reaches_90_percent_of_nominal": true,
+            "realized_peak_al_fraction": 0.55,
+            "true_flat_central_plateau_exists": true
+          },
+          "interface_exclusion_applied": false,
+          "interface_exclusion_half_width_nm": 0.05,
+          "max_absolute_al_fraction_difference": 3.03368441478824e-13,
+          "max_absolute_al_fraction_difference_off_interface": 3.03368441478824e-13,
+          "metrology_window_is_the_requested_width": true,
+          "metrology_window_widths_nm": {
+            "central_algaas_to_gaas": 0.7,
+            "central_gaas_to_algaas": 0.7,
+            "outer_left_algaas_to_gaas": 0.7,
+            "outer_right_gaas_to_algaas": 0.7
+          },
+          "points_excluded_near_interfaces": 8,
+          "realized_interface_metrics": [
+            {
+              "centre_error_nm": 0.0,
+              "interface": "outer_left_algaas_to_gaas",
+              "measurement_window_nm": [
+                18.88,
+                21.12
+              ],
+              "realized_centre_nm": 20.0,
+              "realized_width_10_90_nm": 0.6999999999998465,
+              "requested_centre_nm": 20.0,
+              "requested_width_10_90_nm": 0.7,
+              "width_error_nm": 1.5343282200319663e-13,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 8.881784197001252e-14,
+              "interface": "central_gaas_to_algaas",
+              "measurement_window_nm": [
+                26.63,
+                28.65
+              ],
+              "realized_centre_nm": 27.74999999999991,
+              "realized_width_10_90_nm": 0.6999999999999957,
+              "requested_centre_nm": 27.75,
+              "requested_width_10_90_nm": 0.7,
+              "width_error_nm": 4.218847493575595e-15,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 1.0658141036401503e-13,
+              "interface": "central_algaas_to_gaas",
+              "measurement_window_nm": [
+                28.65,
+                30.67
+              ],
+              "realized_centre_nm": 29.549999999999894,
+              "realized_width_10_90_nm": 0.6999999999999922,
+              "requested_centre_nm": 29.55,
+              "requested_width_10_90_nm": 0.7,
+              "width_error_nm": 7.771561172376096e-15,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 4.263256414560601e-14,
+              "interface": "outer_right_gaas_to_algaas",
+              "measurement_window_nm": [
+                30.68,
+                32.92
+              ],
+              "realized_centre_nm": 31.799999999999958,
+              "realized_width_10_90_nm": 0.699999999999978,
+              "requested_centre_nm": 31.8,
+              "requested_width_10_90_nm": 0.7,
+              "width_error_nm": 2.19824158875781e-14,
+              "window_isolated_from_other_interfaces": true
+            }
+          ],
+          "realized_overlap": {
+            "central_interface_left_nm": 27.75,
+            "central_interface_right_nm": 29.55,
+            "expected_peak_al_fraction": 0.55,
+            "grades_overlap": false,
+            "local_integrated_al_dose_nm_equivalent": 1.5549999999999926,
+            "nominal_barrier_al_fraction": 0.55,
+            "nominal_plateau_exists": true,
+            "overlap": false,
+            "peak_position_nm": 28.225,
+            "reaches_90_percent_of_nominal": true,
+            "realized_peak_al_fraction": 0.55,
+            "true_flat_central_plateau_exists": true
+          },
+          "realized_peak_al_fraction": 0.55,
+          "representation": "native_linear",
+          "requested_asymmetry_s": 0.55,
+          "requested_grading_widths_nm": {
+            "central_algaas_to_gaas": 0.7,
+            "central_gaas_to_algaas": 0.7,
+            "outer_left_algaas_to_gaas": 0.7,
+            "outer_right_gaas_to_algaas": 0.7
+          },
+          "rms_al_fraction_difference": 3.929371659570784e-14,
+          "rms_al_fraction_difference_off_interface": 3.91543377141416e-14,
+          "structural_invariants": {
+            "all_passed": true,
+            "central_barrier_present": true,
+            "composition_finite": true,
+            "composition_within_bounds": true,
+            "confinement_is_material_not_boundary": true,
+            "coordinates_ascending": true,
+            "four_interfaces_ordered": true,
+            "left_outer_barrier_present": true,
+            "right_outer_barrier_present": true,
+            "thick_well_is_gaas": true,
+            "thin_well_is_gaas": true
+          },
+          "tolerances": {
+            "interface_position_nm": 0.1,
+            "max_absolute_al_fraction_difference": 0.005,
+            "rms_al_fraction_difference": 0.001
+          }
+        },
+        "comparison_metrics_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_06\\comparison_metrics.json",
+        "failure_reason": null,
+        "invocation": {
+          "deck_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_06\\nextnano_input\\case.in",
+          "deck_sha256": "54f7830eebfdd07b1f36d226184036c0ad4b3a06d8b2c17996e0a75af7c621d8",
+          "failure_reason": null,
+          "fatal_markers": [],
+          "output_dir": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_06\\structure\\out",
+          "parser_command": [
+            "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\bin\\nextnano++_Intel_64bit.exe",
+            "--structure",
+            "-d",
+            "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\database\\database.nnp",
+            "-l",
+            "C:\\Code\\optics\\nextnano\\2026_07_03\\License\\License_nnp.lic",
+            "-o",
+            "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_06\\structure\\out",
+            "case.in"
+          ],
+          "passed": true,
+          "profile_path": null,
+          "profile_sha256": null,
+          "return_code": 0,
+          "runmode": "--structure",
+          "stderr_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_06\\structure\\stderr.txt",
+          "stdout_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_06\\structure\\stdout.txt"
+        },
+        "passed": true,
+        "realized_profile_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_06\\realized_profile.csv",
+        "source_alloy_composition_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_06\\structure\\out\\case\\Structure\\alloy_composition.dat"
+      }
+    },
+    {
+      "case_id": "case_07",
+      "demo16e_version": "demo16e-1.0.0",
+      "failure_reason": null,
+      "geometry": {
+        "active_end_nm": 32.5,
+        "active_start_nm": 20.0,
+        "asymmetry_s": 0.41999999999999993,
+        "barrier_centre_nm": 28.35,
+        "domain_end_nm": 52.5,
+        "domain_start_nm": 0.0,
+        "nominal_central_barrier_thickness_nm": 2.5,
+        "thick_well_nm": 7.1,
+        "thin_well_nm": 2.9000000000000004,
+        "total_well_thickness_nm": 10.0
+      },
+      "grading": {
+        "grading_interfaces_overlap": false,
+        "grading_profile_realization_max_error": 0.003928571428571449,
+        "grading_profile_realization_rms_error": 0.00014034019103428589,
+        "grading_slope_max_left_per_nm": 1.1000000000000005,
+        "grading_slope_max_right_per_nm": 0.5499999999999998,
+        "integrated_al_dose_nm_equivalent": 2.5,
+        "nominal_90pct_threshold_al_fraction": 0.49500000000000005,
+        "nominal_90pct_threshold_reached": true,
+        "outer_barrier_present": true,
+        "profile_monotone_coordinates": true,
+        "profile_points": 1051,
+        "profile_within_bounds": true,
+        "realized_algaas_to_gaas_grading_width_10_90_nominalref_nm": 1.3999999999999986,
+        "realized_algaas_to_gaas_grading_width_10_90_peakref_nm": 1.3999999999999986,
+        "realized_barrier_fwhm_nm": 2.5,
+        "realized_gaas_to_algaas_grading_width_10_90_nominalref_nm": 0.3999999999999986,
+        "realized_gaas_to_algaas_grading_width_10_90_peakref_nm": 0.3999999999999986,
+        "realized_min_al_fraction": 0.0,
+        "realized_peak_al_fraction": 0.55
+      },
+      "intended_structural_invariants": {
+        "all_passed": true,
+        "central_barrier_present": true,
+        "composition_finite": true,
+        "composition_within_bounds": true,
+        "confinement_is_material_not_boundary": true,
+        "coordinates_ascending": true,
+        "four_interfaces_ordered": true,
+        "left_outer_barrier_present": true,
+        "right_outer_barrier_present": true,
+        "thick_well_is_gaas": true,
+        "thin_well_is_gaas": true
+      },
+      "name": "asymmetric_grading",
+      "overlap": {
+        "case_declares_overlap": false,
+        "central_interface_left_nm": 27.1,
+        "central_interface_right_nm": 29.6,
+        "expected_peak_al_fraction": 0.55,
+        "grades_overlap": false,
+        "local_integrated_al_dose_nm_equivalent": 2.218571428571429,
+        "nominal_barrier_al_fraction": 0.55,
+        "nominal_plateau_exists": true,
+        "overlap": false,
+        "overlap_end_nm": null,
+        "overlap_start_nm": null,
+        "overlap_width_nm": 0.0,
+        "peak_position_nm": 27.35,
+        "reaches_90_percent_of_nominal": true,
+        "realized_peak_al_fraction": 0.55,
+        "true_flat_central_plateau_exists": true
+      },
+      "parser": {
+        "deck_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_07\\nextnano_input\\case.in",
+        "deck_sha256": "23b32d27fe4c92642cfb2e42c5b1ff59a83b76d5f00718118573adf30ea2de50",
+        "failure_reason": null,
+        "fatal_markers": [],
+        "output_dir": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_07\\parser\\out",
+        "parser_command": [
+          "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\bin\\nextnano++_Intel_64bit.exe",
+          "--parse",
+          "-d",
+          "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\database\\database.nnp",
+          "-l",
+          "C:\\Code\\optics\\nextnano\\2026_07_03\\License\\License_nnp.lic",
+          "-o",
+          "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_07\\parser\\out",
+          "case.in"
+        ],
+        "passed": true,
+        "profile_path": null,
+        "profile_sha256": null,
+        "return_code": 0,
+        "runmode": "--parse",
+        "stderr_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_07\\parser\\stderr.txt",
+        "stdout_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_07\\parser\\stdout.txt"
+      },
+      "physics": {},
+      "render_method": "ternary_linear",
+      "representation": "native_linear",
+      "status": "structure_passed",
+      "structure": {
+        "comparison": {
+          "case_id": "case_07",
+          "central_interface_positions_gated": true,
+          "checks": {
+            "every_interface_was_located": true,
+            "interface_positions_within_tolerance": true,
+            "max_absolute_error_within_tolerance": true,
+            "measurement_windows_are_local": true,
+            "outer_barriers_and_two_wells_present": true,
+            "overlap_classification_matches_request": true,
+            "overlap_does_not_fabricate_nominal_plateau": true,
+            "overlap_peak_matches_authoritative_profile": true,
+            "passed": true,
+            "rms_error_within_tolerance": true,
+            "well_widths_not_reported_as_grading_widths": true
+          },
+          "comparison_points": 454,
+          "expected_peak_al_fraction": 0.55,
+          "forbidden_width_hits": [],
+          "gated_interface_positions": [
+            "outer_left_algaas_to_gaas",
+            "central_gaas_to_algaas",
+            "central_algaas_to_gaas",
+            "outer_right_gaas_to_algaas"
+          ],
+          "gated_max_absolute_al_fraction_difference": 4.782285678572862e-13,
+          "gated_rms_al_fraction_difference": 3.847146503626643e-14,
+          "geometry": {
+            "realized_central_barrier_nm": 2.499999999999961,
+            "realized_interface_positions_nm": {
+              "central_algaas_to_gaas": 29.599999999999888,
+              "central_gaas_to_algaas": 27.099999999999927,
+              "outer_left_algaas_to_gaas": 20.0,
+              "outer_right_gaas_to_algaas": 32.49999999999997
+            },
+            "realized_total_gaas_well_nm": 10.00000000000001,
+            "realized_well_1_nm": 7.099999999999927,
+            "realized_well_2_nm": 2.900000000000084,
+            "requested_central_barrier_nm": 2.5,
+            "requested_interface_positions_nm": {
+              "central_algaas_to_gaas": 29.6,
+              "central_gaas_to_algaas": 27.1,
+              "outer_left_algaas_to_gaas": 20.0,
+              "outer_right_gaas_to_algaas": 32.5
+            },
+            "requested_total_gaas_well_nm": 10.0,
+            "requested_well_1_nm": 7.1,
+            "requested_well_2_nm": 2.9000000000000004
+          },
+          "intended_interface_metrics": [
+            {
+              "centre_error_nm": 0.0,
+              "interface": "outer_left_algaas_to_gaas",
+              "measurement_window_nm": [
+                17.76,
+                22.24
+              ],
+              "realized_centre_nm": 20.0,
+              "realized_width_10_90_nm": 1.3999999999999986,
+              "requested_centre_nm": 20.0,
+              "requested_width_10_90_nm": 1.4,
+              "width_error_nm": 1.3322676295501878e-15,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 0.0,
+              "interface": "central_gaas_to_algaas",
+              "measurement_window_nm": [
+                26.46,
+                27.740000000000002
+              ],
+              "realized_centre_nm": 27.1,
+              "realized_width_10_90_nm": 0.3999999999999986,
+              "requested_centre_nm": 27.1,
+              "requested_width_10_90_nm": 0.4,
+              "width_error_nm": 1.4432899320127035e-15,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 0.0,
+              "interface": "central_algaas_to_gaas",
+              "measurement_window_nm": [
+                28.35,
+                31.05
+              ],
+              "realized_centre_nm": 29.6,
+              "realized_width_10_90_nm": 1.3999999999999986,
+              "requested_centre_nm": 29.6,
+              "requested_width_10_90_nm": 1.4,
+              "width_error_nm": 1.3322676295501878e-15,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 0.0,
+              "interface": "outer_right_gaas_to_algaas",
+              "measurement_window_nm": [
+                31.86,
+                33.14
+              ],
+              "realized_centre_nm": 32.5,
+              "realized_width_10_90_nm": 0.4000000000000057,
+              "requested_centre_nm": 32.5,
+              "requested_width_10_90_nm": 0.4,
+              "width_error_nm": 5.662137425588298e-15,
+              "window_isolated_from_other_interfaces": true
+            }
+          ],
+          "intended_overlap": {
+            "case_declares_overlap": false,
+            "central_interface_left_nm": 27.1,
+            "central_interface_right_nm": 29.6,
+            "expected_peak_al_fraction": 0.55,
+            "grades_overlap": false,
+            "local_integrated_al_dose_nm_equivalent": 2.218571428571429,
+            "nominal_barrier_al_fraction": 0.55,
+            "nominal_plateau_exists": true,
+            "overlap": false,
+            "overlap_end_nm": null,
+            "overlap_start_nm": null,
+            "overlap_width_nm": 0.0,
+            "peak_position_nm": 27.35,
+            "reaches_90_percent_of_nominal": true,
+            "realized_peak_al_fraction": 0.55,
+            "true_flat_central_plateau_exists": true
+          },
+          "interface_exclusion_applied": false,
+          "interface_exclusion_half_width_nm": 0.05,
+          "max_absolute_al_fraction_difference": 4.782285678572862e-13,
+          "max_absolute_al_fraction_difference_off_interface": 4.782285678572862e-13,
+          "metrology_window_is_the_requested_width": true,
+          "metrology_window_widths_nm": {
+            "central_algaas_to_gaas": 1.4,
+            "central_gaas_to_algaas": 0.4,
+            "outer_left_algaas_to_gaas": 1.4,
+            "outer_right_gaas_to_algaas": 0.4
+          },
+          "points_excluded_near_interfaces": 8,
+          "realized_interface_metrics": [
+            {
+              "centre_error_nm": 0.0,
+              "interface": "outer_left_algaas_to_gaas",
+              "measurement_window_nm": [
+                17.76,
+                22.24
+              ],
+              "realized_centre_nm": 20.0,
+              "realized_width_10_90_nm": 1.399999999999725,
+              "requested_centre_nm": 20.0,
+              "requested_width_10_90_nm": 1.4,
+              "width_error_nm": 2.7489122089718876e-13,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 7.460698725481052e-14,
+              "interface": "central_gaas_to_algaas",
+              "measurement_window_nm": [
+                26.46,
+                27.740000000000002
+              ],
+              "realized_centre_nm": 27.099999999999927,
+              "realized_width_10_90_nm": 0.399999999999995,
+              "requested_centre_nm": 27.1,
+              "requested_width_10_90_nm": 0.4,
+              "width_error_nm": 4.9960036108132044e-15,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 1.1368683772161603e-13,
+              "interface": "central_algaas_to_gaas",
+              "measurement_window_nm": [
+                28.35,
+                31.05
+              ],
+              "realized_centre_nm": 29.599999999999888,
+              "realized_width_10_90_nm": 1.3999999999999844,
+              "requested_centre_nm": 29.6,
+              "requested_width_10_90_nm": 1.4,
+              "width_error_nm": 1.554312234475219e-14,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 2.842170943040401e-14,
+              "interface": "outer_right_gaas_to_algaas",
+              "measurement_window_nm": [
+                31.86,
+                33.14
+              ],
+              "realized_centre_nm": 32.49999999999997,
+              "realized_width_10_90_nm": 0.4000000000002757,
+              "requested_centre_nm": 32.5,
+              "requested_width_10_90_nm": 0.4,
+              "width_error_nm": 2.7566837701442637e-13,
+              "window_isolated_from_other_interfaces": true
+            }
+          ],
+          "realized_overlap": {
+            "central_interface_left_nm": 27.1,
+            "central_interface_right_nm": 29.6,
+            "expected_peak_al_fraction": 0.55,
+            "grades_overlap": false,
+            "local_integrated_al_dose_nm_equivalent": 2.1923214285714145,
+            "nominal_barrier_al_fraction": 0.55,
+            "nominal_plateau_exists": true,
+            "overlap": false,
+            "peak_position_nm": 27.375,
+            "reaches_90_percent_of_nominal": true,
+            "realized_peak_al_fraction": 0.55,
+            "true_flat_central_plateau_exists": true
+          },
+          "realized_peak_al_fraction": 0.55,
+          "representation": "native_linear",
+          "requested_asymmetry_s": 0.41999999999999993,
+          "requested_grading_widths_nm": {
+            "central_algaas_to_gaas": 1.4,
+            "central_gaas_to_algaas": 0.4,
+            "outer_left_algaas_to_gaas": 1.4,
+            "outer_right_gaas_to_algaas": 0.4
+          },
+          "rms_al_fraction_difference": 3.847146503626643e-14,
+          "rms_al_fraction_difference_off_interface": 3.825057524969239e-14,
+          "structural_invariants": {
+            "all_passed": true,
+            "central_barrier_present": true,
+            "composition_finite": true,
+            "composition_within_bounds": true,
+            "confinement_is_material_not_boundary": true,
+            "coordinates_ascending": true,
+            "four_interfaces_ordered": true,
+            "left_outer_barrier_present": true,
+            "right_outer_barrier_present": true,
+            "thick_well_is_gaas": true,
+            "thin_well_is_gaas": true
+          },
+          "tolerances": {
+            "interface_position_nm": 0.1,
+            "max_absolute_al_fraction_difference": 0.005,
+            "rms_al_fraction_difference": 0.001
+          }
+        },
+        "comparison_metrics_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_07\\comparison_metrics.json",
+        "failure_reason": null,
+        "invocation": {
+          "deck_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_07\\nextnano_input\\case.in",
+          "deck_sha256": "23b32d27fe4c92642cfb2e42c5b1ff59a83b76d5f00718118573adf30ea2de50",
+          "failure_reason": null,
+          "fatal_markers": [],
+          "output_dir": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_07\\structure\\out",
+          "parser_command": [
+            "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\bin\\nextnano++_Intel_64bit.exe",
+            "--structure",
+            "-d",
+            "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\database\\database.nnp",
+            "-l",
+            "C:\\Code\\optics\\nextnano\\2026_07_03\\License\\License_nnp.lic",
+            "-o",
+            "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_07\\structure\\out",
+            "case.in"
+          ],
+          "passed": true,
+          "profile_path": null,
+          "profile_sha256": null,
+          "return_code": 0,
+          "runmode": "--structure",
+          "stderr_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_07\\structure\\stderr.txt",
+          "stdout_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_07\\structure\\stdout.txt"
+        },
+        "passed": true,
+        "realized_profile_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_07\\realized_profile.csv",
+        "source_alloy_composition_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_07\\structure\\out\\case\\Structure\\alloy_composition.dat"
+      }
+    },
+    {
+      "case_id": "case_08",
+      "demo16e_version": "demo16e-1.0.0",
+      "failure_reason": null,
+      "geometry": {
+        "active_end_nm": 30.85,
+        "active_start_nm": 20.0,
+        "asymmetry_s": 0.41999999999999993,
+        "barrier_centre_nm": 27.525000000000002,
+        "domain_end_nm": 50.85,
+        "domain_start_nm": 0.0,
+        "nominal_central_barrier_thickness_nm": 0.85,
+        "thick_well_nm": 7.1,
+        "thin_well_nm": 2.9000000000000004,
+        "total_well_thickness_nm": 10.0
+      },
+      "grading": {
+        "grading_interfaces_overlap": true,
+        "grading_profile_realization_max_error": 0.003928571428571449,
+        "grading_profile_realization_rms_error": 0.000201665170905245,
+        "grading_slope_max_left_per_nm": 0.31428571428571506,
+        "grading_slope_max_right_per_nm": 0.31428571428571495,
+        "integrated_al_dose_nm_equivalent": 0.8500000000000015,
+        "nominal_90pct_threshold_al_fraction": 0.49500000000000005,
+        "nominal_90pct_threshold_reached": false,
+        "outer_barrier_present": true,
+        "profile_monotone_coordinates": true,
+        "profile_points": 1018,
+        "profile_within_bounds": true,
+        "realized_algaas_to_gaas_grading_width_10_90_nominalref_nm": null,
+        "realized_algaas_to_gaas_grading_width_10_90_peakref_nm": 0.6799999999999997,
+        "realized_barrier_fwhm_nm": 1.75,
+        "realized_gaas_to_algaas_grading_width_10_90_nominalref_nm": null,
+        "realized_gaas_to_algaas_grading_width_10_90_peakref_nm": 0.6799999999999997,
+        "realized_min_al_fraction": 0.0,
+        "realized_peak_al_fraction": 0.2671428571428577
+      },
+      "intended_structural_invariants": {
+        "all_passed": true,
+        "central_barrier_present": true,
+        "composition_finite": true,
+        "composition_within_bounds": true,
+        "confinement_is_material_not_boundary": true,
+        "coordinates_ascending": true,
+        "four_interfaces_ordered": true,
+        "left_outer_barrier_present": true,
+        "right_outer_barrier_present": true,
+        "thick_well_is_gaas": true,
+        "thin_well_is_gaas": true
+      },
+      "name": "controlled_overlap",
+      "overlap": {
+        "case_declares_overlap": true,
+        "central_interface_left_nm": 27.1,
+        "central_interface_right_nm": 27.950000000000003,
+        "expected_peak_al_fraction": 0.2671428571428577,
+        "grades_overlap": true,
+        "local_integrated_al_dose_nm_equivalent": 0.41285714285714425,
+        "nominal_barrier_al_fraction": 0.55,
+        "nominal_plateau_exists": false,
+        "overlap": true,
+        "overlap_end_nm": 27.975,
+        "overlap_start_nm": 27.075000000000003,
+        "overlap_width_nm": 0.8999999999999986,
+        "peak_position_nm": 27.150000000000002,
+        "reaches_90_percent_of_nominal": false,
+        "realized_peak_al_fraction": 0.2671428571428577,
+        "true_flat_central_plateau_exists": false
+      },
+      "parser": {
+        "deck_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_08\\nextnano_input\\case.in",
+        "deck_sha256": "8cd8bda5bd93cabe1a216957e8f674f57e77423fad5b8507f7b7b5a4dec37b07",
+        "failure_reason": null,
+        "fatal_markers": [],
+        "output_dir": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_08\\parser\\out",
+        "parser_command": [
+          "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\bin\\nextnano++_Intel_64bit.exe",
+          "--parse",
+          "-d",
+          "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\database\\database.nnp",
+          "-l",
+          "C:\\Code\\optics\\nextnano\\2026_07_03\\License\\License_nnp.lic",
+          "-o",
+          "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_08\\parser\\out",
+          "case.in"
+        ],
+        "passed": true,
+        "profile_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_08\\nextnano_input\\al_profile.dat",
+        "profile_sha256": "f7785215c4ec1f60c1cb4de7ca9753c5cef62d8002ec2649b98023a6f9a08e2b",
+        "return_code": 0,
+        "runmode": "--parse",
+        "stderr_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_08\\parser\\stderr.txt",
+        "stdout_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_08\\parser\\stdout.txt"
+      },
+      "physics": {},
+      "render_method": "ternary_import",
+      "representation": "imported_profile",
+      "status": "structure_passed",
+      "structure": {
+        "comparison": {
+          "case_id": "case_08",
+          "central_interface_positions_gated": false,
+          "checks": {
+            "every_interface_was_located": true,
+            "interface_positions_within_tolerance": true,
+            "max_absolute_error_within_tolerance": true,
+            "measurement_windows_are_local": true,
+            "outer_barriers_and_two_wells_present": true,
+            "overlap_classification_matches_request": true,
+            "overlap_does_not_fabricate_nominal_plateau": true,
+            "overlap_peak_matches_authoritative_profile": true,
+            "passed": true,
+            "rms_error_within_tolerance": true,
+            "well_widths_not_reported_as_grading_widths": true
+          },
+          "comparison_points": 421,
+          "expected_peak_al_fraction": 0.2671428571428577,
+          "forbidden_width_hits": [],
+          "gated_interface_positions": [
+            "outer_left_algaas_to_gaas",
+            "outer_right_gaas_to_algaas"
+          ],
+          "gated_max_absolute_al_fraction_difference": 0.003928572142877618,
+          "gated_rms_al_fraction_difference": 0.00046899601450688593,
+          "geometry": {
+            "realized_central_barrier_nm": 1.749999984090909,
+            "realized_interface_positions_nm": {
+              "central_algaas_to_gaas": 28.39999999204536,
+              "central_gaas_to_algaas": 26.65000000795445,
+              "outer_left_algaas_to_gaas": 20.0,
+              "outer_right_gaas_to_algaas": 30.84999999999997
+            },
+            "realized_total_gaas_well_nm": 9.10000001590906,
+            "realized_well_1_nm": 6.65000000795445,
+            "realized_well_2_nm": 2.4500000079546105,
+            "requested_central_barrier_nm": 0.85,
+            "requested_interface_positions_nm": {
+              "central_algaas_to_gaas": 27.950000000000003,
+              "central_gaas_to_algaas": 27.1,
+              "outer_left_algaas_to_gaas": 20.0,
+              "outer_right_gaas_to_algaas": 30.85
+            },
+            "requested_total_gaas_well_nm": 10.0,
+            "requested_well_1_nm": 7.1,
+            "requested_well_2_nm": 2.9000000000000004
+          },
+          "intended_interface_metrics": [
+            {
+              "centre_error_nm": 0.0,
+              "interface": "outer_left_algaas_to_gaas",
+              "measurement_window_nm": [
+                17.76,
+                22.24
+              ],
+              "realized_centre_nm": 20.0,
+              "realized_width_10_90_nm": 1.3999999999999986,
+              "requested_centre_nm": 20.0,
+              "requested_width_10_90_nm": 1.4,
+              "width_error_nm": 1.3322676295501878e-15,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 0.4499999999999993,
+              "interface": "central_gaas_to_algaas",
+              "measurement_window_nm": [
+                24.860000000000003,
+                27.525000000000002
+              ],
+              "realized_centre_nm": 26.650000000000002,
+              "realized_width_10_90_nm": 0.6799999999999997,
+              "requested_centre_nm": 27.1,
+              "requested_width_10_90_nm": 1.4,
+              "width_error_nm": 0.7200000000000002,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 0.4499999999999993,
+              "interface": "central_algaas_to_gaas",
+              "measurement_window_nm": [
+                27.525000000000002,
+                29.400000000000002
+              ],
+              "realized_centre_nm": 28.400000000000002,
+              "realized_width_10_90_nm": 0.6799999999999997,
+              "requested_centre_nm": 27.950000000000003,
+              "requested_width_10_90_nm": 1.4,
+              "width_error_nm": 0.7200000000000002,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 0.0,
+              "interface": "outer_right_gaas_to_algaas",
+              "measurement_window_nm": [
+                29.400000000000002,
+                33.09
+              ],
+              "realized_centre_nm": 30.85,
+              "realized_width_10_90_nm": 1.3999999999999986,
+              "requested_centre_nm": 30.85,
+              "requested_width_10_90_nm": 1.4,
+              "width_error_nm": 1.3322676295501878e-15,
+              "window_isolated_from_other_interfaces": true
+            }
+          ],
+          "intended_overlap": {
+            "case_declares_overlap": true,
+            "central_interface_left_nm": 27.1,
+            "central_interface_right_nm": 27.950000000000003,
+            "expected_peak_al_fraction": 0.2671428571428577,
+            "grades_overlap": true,
+            "local_integrated_al_dose_nm_equivalent": 0.41285714285714425,
+            "nominal_barrier_al_fraction": 0.55,
+            "nominal_plateau_exists": false,
+            "overlap": true,
+            "overlap_end_nm": 27.975,
+            "overlap_start_nm": 27.075000000000003,
+            "overlap_width_nm": 0.8999999999999986,
+            "peak_position_nm": 27.150000000000002,
+            "reaches_90_percent_of_nominal": false,
+            "realized_peak_al_fraction": 0.2671428571428577,
+            "true_flat_central_plateau_exists": false
+          },
+          "interface_exclusion_applied": false,
+          "interface_exclusion_half_width_nm": 0.05,
+          "max_absolute_al_fraction_difference": 0.003928572142877618,
+          "max_absolute_al_fraction_difference_off_interface": 0.0039285700000193,
+          "metrology_window_is_the_requested_width": true,
+          "metrology_window_widths_nm": {
+            "central_algaas_to_gaas": 1.4,
+            "central_gaas_to_algaas": 1.4,
+            "outer_left_algaas_to_gaas": 1.4,
+            "outer_right_gaas_to_algaas": 1.4
+          },
+          "points_excluded_near_interfaces": 8,
+          "realized_interface_metrics": [
+            {
+              "centre_error_nm": 0.0,
+              "interface": "outer_left_algaas_to_gaas",
+              "measurement_window_nm": [
+                17.76,
+                22.24
+              ],
+              "realized_centre_nm": 20.0,
+              "realized_width_10_90_nm": 1.3999999999997144,
+              "requested_centre_nm": 20.0,
+              "requested_width_10_90_nm": 1.4,
+              "width_error_nm": 2.8554936193359026e-13,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 0.4499999920455515,
+              "interface": "central_gaas_to_algaas",
+              "measurement_window_nm": [
+                24.860000000000003,
+                27.525000000000002
+              ],
+              "realized_centre_nm": 26.65000000795445,
+              "realized_width_10_90_nm": 0.680000006363624,
+              "requested_centre_nm": 27.1,
+              "requested_width_10_90_nm": 1.4,
+              "width_error_nm": 0.7199999936363759,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 0.4499999920453561,
+              "interface": "central_algaas_to_gaas",
+              "measurement_window_nm": [
+                27.525000000000002,
+                29.400000000000002
+              ],
+              "realized_centre_nm": 28.39999999204536,
+              "realized_width_10_90_nm": 0.6800000063636276,
+              "requested_centre_nm": 27.950000000000003,
+              "requested_width_10_90_nm": 1.4,
+              "width_error_nm": 0.7199999936363723,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 3.197442310920451e-14,
+              "interface": "outer_right_gaas_to_algaas",
+              "measurement_window_nm": [
+                29.400000000000002,
+                33.09
+              ],
+              "realized_centre_nm": 30.84999999999997,
+              "realized_width_10_90_nm": 1.3999999999998494,
+              "requested_centre_nm": 30.85,
+              "requested_width_10_90_nm": 1.4,
+              "width_error_nm": 1.5054624213917123e-13,
+              "window_isolated_from_other_interfaces": true
+            }
+          ],
+          "realized_overlap": {
+            "central_interface_left_nm": 27.1,
+            "central_interface_right_nm": 27.950000000000003,
+            "expected_peak_al_fraction": 0.26714286,
+            "grades_overlap": true,
+            "local_integrated_al_dose_nm_equivalent": 0.38857143272727307,
+            "nominal_barrier_al_fraction": 0.55,
+            "nominal_plateau_exists": false,
+            "overlap": true,
+            "peak_position_nm": 27.125,
+            "reaches_90_percent_of_nominal": false,
+            "realized_peak_al_fraction": 0.26714286,
+            "true_flat_central_plateau_exists": false
+          },
+          "realized_peak_al_fraction": 0.26714286,
+          "representation": "imported_profile",
+          "requested_asymmetry_s": 0.41999999999999993,
+          "requested_grading_widths_nm": {
+            "central_algaas_to_gaas": 1.4,
+            "central_gaas_to_algaas": 1.4,
+            "outer_left_algaas_to_gaas": 1.4,
+            "outer_right_gaas_to_algaas": 1.4
+          },
+          "rms_al_fraction_difference": 0.00046899601450688593,
+          "rms_al_fraction_difference_off_interface": 0.0003866245840074806,
+          "structural_invariants": {
+            "all_passed": true,
+            "central_barrier_present": true,
+            "composition_finite": true,
+            "composition_within_bounds": true,
+            "confinement_is_material_not_boundary": true,
+            "coordinates_ascending": true,
+            "four_interfaces_ordered": true,
+            "left_outer_barrier_present": true,
+            "right_outer_barrier_present": true,
+            "thick_well_is_gaas": true,
+            "thin_well_is_gaas": true
+          },
+          "tolerances": {
+            "interface_position_nm": 0.1,
+            "max_absolute_al_fraction_difference": 0.005,
+            "rms_al_fraction_difference": 0.001
+          }
+        },
+        "comparison_metrics_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_08\\comparison_metrics.json",
+        "failure_reason": null,
+        "invocation": {
+          "deck_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_08\\nextnano_input\\case.in",
+          "deck_sha256": "8cd8bda5bd93cabe1a216957e8f674f57e77423fad5b8507f7b7b5a4dec37b07",
+          "failure_reason": null,
+          "fatal_markers": [],
+          "output_dir": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_08\\structure\\out",
+          "parser_command": [
+            "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\bin\\nextnano++_Intel_64bit.exe",
+            "--structure",
+            "-d",
+            "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\database\\database.nnp",
+            "-l",
+            "C:\\Code\\optics\\nextnano\\2026_07_03\\License\\License_nnp.lic",
+            "-o",
+            "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_08\\structure\\out",
+            "case.in"
+          ],
+          "passed": true,
+          "profile_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_08\\nextnano_input\\al_profile.dat",
+          "profile_sha256": "f7785215c4ec1f60c1cb4de7ca9753c5cef62d8002ec2649b98023a6f9a08e2b",
+          "return_code": 0,
+          "runmode": "--structure",
+          "stderr_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_08\\structure\\stderr.txt",
+          "stdout_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_08\\structure\\stdout.txt"
+        },
+        "passed": true,
+        "realized_profile_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_08\\realized_profile.csv",
+        "source_alloy_composition_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_08\\structure\\out\\case\\Structure\\alloy_composition.dat"
+      }
+    },
+    {
+      "case_id": "case_09",
+      "demo16e_version": "demo16e-1.0.0",
+      "failure_reason": null,
+      "geometry": {
+        "active_end_nm": 31.800000000000004,
+        "active_start_nm": 20.0,
+        "asymmetry_s": 0.41999999999999993,
+        "barrier_centre_nm": 28.0,
+        "domain_end_nm": 51.800000000000004,
+        "domain_start_nm": 0.0,
+        "nominal_central_barrier_thickness_nm": 1.8,
+        "thick_well_nm": 7.1,
+        "thin_well_nm": 2.9000000000000004,
+        "total_well_thickness_nm": 10.0
+      },
+      "grading": {
+        "grading_interfaces_overlap": false,
+        "grading_profile_realization_max_error": 0.005500000000000171,
+        "grading_profile_realization_rms_error": 0.000279730440336769,
+        "grading_slope_max_left_per_nm": 0.4400000000000013,
+        "grading_slope_max_right_per_nm": 0.44000000000000083,
+        "integrated_al_dose_nm_equivalent": 1.800000000000001,
+        "nominal_90pct_threshold_al_fraction": 0.49500000000000005,
+        "nominal_90pct_threshold_reached": true,
+        "outer_barrier_present": true,
+        "profile_monotone_coordinates": true,
+        "profile_points": 1037,
+        "profile_within_bounds": true,
+        "realized_algaas_to_gaas_grading_width_10_90_nominalref_nm": 1.0,
+        "realized_algaas_to_gaas_grading_width_10_90_peakref_nm": 1.0,
+        "realized_barrier_fwhm_nm": 1.8000000000000007,
+        "realized_gaas_to_algaas_grading_width_10_90_nominalref_nm": 1.0,
+        "realized_gaas_to_algaas_grading_width_10_90_peakref_nm": 1.0,
+        "realized_min_al_fraction": 0.0,
+        "realized_peak_al_fraction": 0.55
+      },
+      "intended_structural_invariants": {
+        "all_passed": true,
+        "central_barrier_present": true,
+        "composition_finite": true,
+        "composition_within_bounds": true,
+        "confinement_is_material_not_boundary": true,
+        "coordinates_ascending": true,
+        "four_interfaces_ordered": true,
+        "left_outer_barrier_present": true,
+        "right_outer_barrier_present": true,
+        "thick_well_is_gaas": true,
+        "thin_well_is_gaas": true
+      },
+      "name": "native_linear_wide_grade",
+      "overlap": {
+        "case_declares_overlap": false,
+        "central_interface_left_nm": 27.1,
+        "central_interface_right_nm": 28.900000000000002,
+        "expected_peak_al_fraction": 0.55,
+        "grades_overlap": false,
+        "local_integrated_al_dose_nm_equivalent": 1.4870000000000005,
+        "nominal_barrier_al_fraction": 0.55,
+        "nominal_plateau_exists": true,
+        "overlap": false,
+        "overlap_end_nm": null,
+        "overlap_start_nm": null,
+        "overlap_width_nm": 0.0,
+        "peak_position_nm": 27.75,
+        "reaches_90_percent_of_nominal": true,
+        "realized_peak_al_fraction": 0.55,
+        "true_flat_central_plateau_exists": true
+      },
+      "parser": {
+        "deck_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_09\\nextnano_input\\case.in",
+        "deck_sha256": "715afade1d47d07b0132066bcd4f4e9ac1576b97a86fefeca5b83930b070cf32",
+        "failure_reason": null,
+        "fatal_markers": [],
+        "output_dir": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_09\\parser\\out",
+        "parser_command": [
+          "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\bin\\nextnano++_Intel_64bit.exe",
+          "--parse",
+          "-d",
+          "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\database\\database.nnp",
+          "-l",
+          "C:\\Code\\optics\\nextnano\\2026_07_03\\License\\License_nnp.lic",
+          "-o",
+          "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_09\\parser\\out",
+          "case.in"
+        ],
+        "passed": true,
+        "profile_path": null,
+        "profile_sha256": null,
+        "return_code": 0,
+        "runmode": "--parse",
+        "stderr_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_09\\parser\\stderr.txt",
+        "stdout_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_09\\parser\\stdout.txt"
+      },
+      "physics": {},
+      "render_method": "ternary_linear",
+      "representation": "native_linear",
+      "status": "structure_passed",
+      "structure": {
+        "comparison": {
+          "case_id": "case_09",
+          "central_interface_positions_gated": true,
+          "checks": {
+            "every_interface_was_located": true,
+            "interface_positions_within_tolerance": true,
+            "max_absolute_error_within_tolerance": true,
+            "measurement_windows_are_local": true,
+            "outer_barriers_and_two_wells_present": true,
+            "overlap_classification_matches_request": true,
+            "overlap_does_not_fabricate_nominal_plateau": true,
+            "overlap_peak_matches_authoritative_profile": true,
+            "passed": true,
+            "rms_error_within_tolerance": true,
+            "well_widths_not_reported_as_grading_widths": true
+          },
+          "comparison_points": 440,
+          "expected_peak_al_fraction": 0.55,
+          "forbidden_width_hits": [],
+          "gated_interface_positions": [
+            "outer_left_algaas_to_gaas",
+            "central_gaas_to_algaas",
+            "central_algaas_to_gaas",
+            "outer_right_gaas_to_algaas"
+          ],
+          "gated_max_absolute_al_fraction_difference": 2.1183055309847987e-13,
+          "gated_rms_al_fraction_difference": 3.125843292379782e-14,
+          "geometry": {
+            "realized_central_barrier_nm": 1.7999999999999794,
+            "realized_interface_positions_nm": {
+              "central_algaas_to_gaas": 28.8999999999999,
+              "central_gaas_to_algaas": 27.09999999999992,
+              "outer_left_algaas_to_gaas": 20.0,
+              "outer_right_gaas_to_algaas": 31.799999999999965
+            },
+            "realized_total_gaas_well_nm": 9.999999999999986,
+            "realized_well_1_nm": 7.09999999999992,
+            "realized_well_2_nm": 2.900000000000066,
+            "requested_central_barrier_nm": 1.8,
+            "requested_interface_positions_nm": {
+              "central_algaas_to_gaas": 28.900000000000002,
+              "central_gaas_to_algaas": 27.1,
+              "outer_left_algaas_to_gaas": 20.0,
+              "outer_right_gaas_to_algaas": 31.800000000000004
+            },
+            "requested_total_gaas_well_nm": 10.0,
+            "requested_well_1_nm": 7.1,
+            "requested_well_2_nm": 2.9000000000000004
+          },
+          "intended_interface_metrics": [
+            {
+              "centre_error_nm": 0.0,
+              "interface": "outer_left_algaas_to_gaas",
+              "measurement_window_nm": [
+                18.4,
+                21.6
+              ],
+              "realized_centre_nm": 20.0,
+              "realized_width_10_90_nm": 1.0,
+              "requested_centre_nm": 20.0,
+              "requested_width_10_90_nm": 1.0,
+              "width_error_nm": 0.0,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 0.0,
+              "interface": "central_gaas_to_algaas",
+              "measurement_window_nm": [
+                25.5,
+                28.0
+              ],
+              "realized_centre_nm": 27.1,
+              "realized_width_10_90_nm": 1.0,
+              "requested_centre_nm": 27.1,
+              "requested_width_10_90_nm": 1.0,
+              "width_error_nm": 0.0,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 0.0,
+              "interface": "central_algaas_to_gaas",
+              "measurement_window_nm": [
+                28.0,
+                30.35
+              ],
+              "realized_centre_nm": 28.900000000000002,
+              "realized_width_10_90_nm": 1.0,
+              "requested_centre_nm": 28.900000000000002,
+              "requested_width_10_90_nm": 1.0,
+              "width_error_nm": 0.0,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 0.0,
+              "interface": "outer_right_gaas_to_algaas",
+              "measurement_window_nm": [
+                30.35,
+                33.400000000000006
+              ],
+              "realized_centre_nm": 31.800000000000004,
+              "realized_width_10_90_nm": 1.0,
+              "requested_centre_nm": 31.800000000000004,
+              "requested_width_10_90_nm": 1.0,
+              "width_error_nm": 0.0,
+              "window_isolated_from_other_interfaces": true
+            }
+          ],
+          "intended_overlap": {
+            "case_declares_overlap": false,
+            "central_interface_left_nm": 27.1,
+            "central_interface_right_nm": 28.900000000000002,
+            "expected_peak_al_fraction": 0.55,
+            "grades_overlap": false,
+            "local_integrated_al_dose_nm_equivalent": 1.4870000000000005,
+            "nominal_barrier_al_fraction": 0.55,
+            "nominal_plateau_exists": true,
+            "overlap": false,
+            "overlap_end_nm": null,
+            "overlap_start_nm": null,
+            "overlap_width_nm": 0.0,
+            "peak_position_nm": 27.75,
+            "reaches_90_percent_of_nominal": true,
+            "realized_peak_al_fraction": 0.55,
+            "true_flat_central_plateau_exists": true
+          },
+          "interface_exclusion_applied": false,
+          "interface_exclusion_half_width_nm": 0.05,
+          "max_absolute_al_fraction_difference": 2.1183055309847987e-13,
+          "max_absolute_al_fraction_difference_off_interface": 2.1183055309847987e-13,
+          "metrology_window_is_the_requested_width": true,
+          "metrology_window_widths_nm": {
+            "central_algaas_to_gaas": 1.0,
+            "central_gaas_to_algaas": 1.0,
+            "outer_left_algaas_to_gaas": 1.0,
+            "outer_right_gaas_to_algaas": 1.0
+          },
+          "points_excluded_near_interfaces": 8,
+          "realized_interface_metrics": [
+            {
+              "centre_error_nm": 0.0,
+              "interface": "outer_left_algaas_to_gaas",
+              "measurement_window_nm": [
+                18.4,
+                21.6
+              ],
+              "realized_centre_nm": 20.0,
+              "realized_width_10_90_nm": 0.999999999999897,
+              "requested_centre_nm": 20.0,
+              "requested_width_10_90_nm": 1.0,
+              "width_error_nm": 1.0302869668521453e-13,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 8.171241461241152e-14,
+              "interface": "central_gaas_to_algaas",
+              "measurement_window_nm": [
+                25.5,
+                28.0
+              ],
+              "realized_centre_nm": 27.09999999999992,
+              "realized_width_10_90_nm": 0.9999999999999858,
+              "requested_centre_nm": 27.1,
+              "requested_width_10_90_nm": 1.0,
+              "width_error_nm": 1.4210854715202004e-14,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 1.0302869668521453e-13,
+              "interface": "central_algaas_to_gaas",
+              "measurement_window_nm": [
+                28.0,
+                30.35
+              ],
+              "realized_centre_nm": 28.8999999999999,
+              "realized_width_10_90_nm": 0.9999999999999787,
+              "requested_centre_nm": 28.900000000000002,
+              "requested_width_10_90_nm": 1.0,
+              "width_error_nm": 2.1316282072803006e-14,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 3.907985046680551e-14,
+              "interface": "outer_right_gaas_to_algaas",
+              "measurement_window_nm": [
+                30.35,
+                33.400000000000006
+              ],
+              "realized_centre_nm": 31.799999999999965,
+              "realized_width_10_90_nm": 1.000000000000032,
+              "requested_centre_nm": 31.800000000000004,
+              "requested_width_10_90_nm": 1.0,
+              "width_error_nm": 3.197442310920451e-14,
+              "window_isolated_from_other_interfaces": true
+            }
+          ],
+          "realized_overlap": {
+            "central_interface_left_nm": 27.1,
+            "central_interface_right_nm": 28.900000000000002,
+            "expected_peak_al_fraction": 0.55,
+            "grades_overlap": false,
+            "local_integrated_al_dose_nm_equivalent": 1.4619999999999937,
+            "nominal_barrier_al_fraction": 0.55,
+            "nominal_plateau_exists": true,
+            "overlap": false,
+            "peak_position_nm": 27.725,
+            "reaches_90_percent_of_nominal": true,
+            "realized_peak_al_fraction": 0.55,
+            "true_flat_central_plateau_exists": true
+          },
+          "realized_peak_al_fraction": 0.55,
+          "representation": "native_linear",
+          "requested_asymmetry_s": 0.41999999999999993,
+          "requested_grading_widths_nm": {
+            "central_algaas_to_gaas": 1.0,
+            "central_gaas_to_algaas": 1.0,
+            "outer_left_algaas_to_gaas": 1.0,
+            "outer_right_gaas_to_algaas": 1.0
+          },
+          "rms_al_fraction_difference": 3.125843292379782e-14,
+          "rms_al_fraction_difference_off_interface": 3.125495783046362e-14,
+          "structural_invariants": {
+            "all_passed": true,
+            "central_barrier_present": true,
+            "composition_finite": true,
+            "composition_within_bounds": true,
+            "confinement_is_material_not_boundary": true,
+            "coordinates_ascending": true,
+            "four_interfaces_ordered": true,
+            "left_outer_barrier_present": true,
+            "right_outer_barrier_present": true,
+            "thick_well_is_gaas": true,
+            "thin_well_is_gaas": true
+          },
+          "tolerances": {
+            "interface_position_nm": 0.1,
+            "max_absolute_al_fraction_difference": 0.005,
+            "rms_al_fraction_difference": 0.001
+          }
+        },
+        "comparison_metrics_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_09\\comparison_metrics.json",
+        "failure_reason": null,
+        "invocation": {
+          "deck_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_09\\nextnano_input\\case.in",
+          "deck_sha256": "715afade1d47d07b0132066bcd4f4e9ac1576b97a86fefeca5b83930b070cf32",
+          "failure_reason": null,
+          "fatal_markers": [],
+          "output_dir": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_09\\structure\\out",
+          "parser_command": [
+            "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\bin\\nextnano++_Intel_64bit.exe",
+            "--structure",
+            "-d",
+            "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\database\\database.nnp",
+            "-l",
+            "C:\\Code\\optics\\nextnano\\2026_07_03\\License\\License_nnp.lic",
+            "-o",
+            "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_09\\structure\\out",
+            "case.in"
+          ],
+          "passed": true,
+          "profile_path": null,
+          "profile_sha256": null,
+          "return_code": 0,
+          "runmode": "--structure",
+          "stderr_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_09\\structure\\stderr.txt",
+          "stdout_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_09\\structure\\stdout.txt"
+        },
+        "passed": true,
+        "realized_profile_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_09\\realized_profile.csv",
+        "source_alloy_composition_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_09\\structure\\out\\case\\Structure\\alloy_composition.dat"
+      }
+    },
+    {
+      "case_id": "case_10",
+      "demo16e_version": "demo16e-1.0.0",
+      "failure_reason": null,
+      "geometry": {
+        "active_end_nm": 31.800000000000004,
+        "active_start_nm": 20.0,
+        "asymmetry_s": 0.41999999999999993,
+        "barrier_centre_nm": 28.0,
+        "domain_end_nm": 51.800000000000004,
+        "domain_start_nm": 0.0,
+        "nominal_central_barrier_thickness_nm": 1.8,
+        "thick_well_nm": 7.1,
+        "thin_well_nm": 2.9000000000000004,
+        "total_well_thickness_nm": 10.0
+      },
+      "grading": {
+        "grading_interfaces_overlap": false,
+        "grading_profile_realization_max_error": 0.005500000000000171,
+        "grading_profile_realization_rms_error": 0.000279730440336769,
+        "grading_slope_max_left_per_nm": 0.4400000000000013,
+        "grading_slope_max_right_per_nm": 0.44000000000000083,
+        "integrated_al_dose_nm_equivalent": 1.800000000000001,
+        "nominal_90pct_threshold_al_fraction": 0.49500000000000005,
+        "nominal_90pct_threshold_reached": true,
+        "outer_barrier_present": true,
+        "profile_monotone_coordinates": true,
+        "profile_points": 1037,
+        "profile_within_bounds": true,
+        "realized_algaas_to_gaas_grading_width_10_90_nominalref_nm": 1.0,
+        "realized_algaas_to_gaas_grading_width_10_90_peakref_nm": 1.0,
+        "realized_barrier_fwhm_nm": 1.8000000000000007,
+        "realized_gaas_to_algaas_grading_width_10_90_nominalref_nm": 1.0,
+        "realized_gaas_to_algaas_grading_width_10_90_peakref_nm": 1.0,
+        "realized_min_al_fraction": 0.0,
+        "realized_peak_al_fraction": 0.55
+      },
+      "intended_structural_invariants": {
+        "all_passed": true,
+        "central_barrier_present": true,
+        "composition_finite": true,
+        "composition_within_bounds": true,
+        "confinement_is_material_not_boundary": true,
+        "coordinates_ascending": true,
+        "four_interfaces_ordered": true,
+        "left_outer_barrier_present": true,
+        "right_outer_barrier_present": true,
+        "thick_well_is_gaas": true,
+        "thin_well_is_gaas": true
+      },
+      "name": "imported_linear_equivalent",
+      "overlap": {
+        "case_declares_overlap": false,
+        "central_interface_left_nm": 27.1,
+        "central_interface_right_nm": 28.900000000000002,
+        "expected_peak_al_fraction": 0.55,
+        "grades_overlap": false,
+        "local_integrated_al_dose_nm_equivalent": 1.4870000000000005,
+        "nominal_barrier_al_fraction": 0.55,
+        "nominal_plateau_exists": true,
+        "overlap": false,
+        "overlap_end_nm": null,
+        "overlap_start_nm": null,
+        "overlap_width_nm": 0.0,
+        "peak_position_nm": 27.75,
+        "reaches_90_percent_of_nominal": true,
+        "realized_peak_al_fraction": 0.55,
+        "true_flat_central_plateau_exists": true
+      },
+      "parser": {
+        "deck_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_10\\nextnano_input\\case.in",
+        "deck_sha256": "da010afcf41129050f980063460b33b4ec8bb64084b26263be6f055debac44e8",
+        "failure_reason": null,
+        "fatal_markers": [],
+        "output_dir": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_10\\parser\\out",
+        "parser_command": [
+          "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\bin\\nextnano++_Intel_64bit.exe",
+          "--parse",
+          "-d",
+          "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\database\\database.nnp",
+          "-l",
+          "C:\\Code\\optics\\nextnano\\2026_07_03\\License\\License_nnp.lic",
+          "-o",
+          "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_10\\parser\\out",
+          "case.in"
+        ],
+        "passed": true,
+        "profile_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_10\\nextnano_input\\al_profile.dat",
+        "profile_sha256": "921c378657b49ee020050004d311a0ec847568a0101d3d90010a1ed031726017",
+        "return_code": 0,
+        "runmode": "--parse",
+        "stderr_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_10\\parser\\stderr.txt",
+        "stdout_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_10\\parser\\stdout.txt"
+      },
+      "physics": {},
+      "render_method": "ternary_import",
+      "representation": "imported_profile",
+      "status": "structure_passed",
+      "structure": {
+        "comparison": {
+          "case_id": "case_10",
+          "central_interface_positions_gated": true,
+          "checks": {
+            "every_interface_was_located": true,
+            "interface_positions_within_tolerance": true,
+            "max_absolute_error_within_tolerance": true,
+            "measurement_windows_are_local": true,
+            "outer_barriers_and_two_wells_present": true,
+            "overlap_classification_matches_request": true,
+            "overlap_does_not_fabricate_nominal_plateau": true,
+            "overlap_peak_matches_authoritative_profile": true,
+            "passed": true,
+            "rms_error_within_tolerance": true,
+            "well_widths_not_reported_as_grading_widths": true
+          },
+          "comparison_points": 440,
+          "expected_peak_al_fraction": 0.55,
+          "forbidden_width_hits": [],
+          "gated_interface_positions": [
+            "outer_left_algaas_to_gaas",
+            "central_gaas_to_algaas",
+            "central_algaas_to_gaas",
+            "outer_right_gaas_to_algaas"
+          ],
+          "gated_max_absolute_al_fraction_difference": 2.1183055309847987e-13,
+          "gated_rms_al_fraction_difference": 3.128457778257521e-14,
+          "geometry": {
+            "realized_central_barrier_nm": 1.7999999999999794,
+            "realized_interface_positions_nm": {
+              "central_algaas_to_gaas": 28.8999999999999,
+              "central_gaas_to_algaas": 27.09999999999992,
+              "outer_left_algaas_to_gaas": 20.0,
+              "outer_right_gaas_to_algaas": 31.799999999999965
+            },
+            "realized_total_gaas_well_nm": 9.999999999999986,
+            "realized_well_1_nm": 7.09999999999992,
+            "realized_well_2_nm": 2.900000000000066,
+            "requested_central_barrier_nm": 1.8,
+            "requested_interface_positions_nm": {
+              "central_algaas_to_gaas": 28.900000000000002,
+              "central_gaas_to_algaas": 27.1,
+              "outer_left_algaas_to_gaas": 20.0,
+              "outer_right_gaas_to_algaas": 31.800000000000004
+            },
+            "requested_total_gaas_well_nm": 10.0,
+            "requested_well_1_nm": 7.1,
+            "requested_well_2_nm": 2.9000000000000004
+          },
+          "intended_interface_metrics": [
+            {
+              "centre_error_nm": 0.0,
+              "interface": "outer_left_algaas_to_gaas",
+              "measurement_window_nm": [
+                18.4,
+                21.6
+              ],
+              "realized_centre_nm": 20.0,
+              "realized_width_10_90_nm": 1.0,
+              "requested_centre_nm": 20.0,
+              "requested_width_10_90_nm": 1.0,
+              "width_error_nm": 0.0,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 0.0,
+              "interface": "central_gaas_to_algaas",
+              "measurement_window_nm": [
+                25.5,
+                28.0
+              ],
+              "realized_centre_nm": 27.1,
+              "realized_width_10_90_nm": 1.0,
+              "requested_centre_nm": 27.1,
+              "requested_width_10_90_nm": 1.0,
+              "width_error_nm": 0.0,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 0.0,
+              "interface": "central_algaas_to_gaas",
+              "measurement_window_nm": [
+                28.0,
+                30.35
+              ],
+              "realized_centre_nm": 28.900000000000002,
+              "realized_width_10_90_nm": 1.0,
+              "requested_centre_nm": 28.900000000000002,
+              "requested_width_10_90_nm": 1.0,
+              "width_error_nm": 0.0,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 0.0,
+              "interface": "outer_right_gaas_to_algaas",
+              "measurement_window_nm": [
+                30.35,
+                33.400000000000006
+              ],
+              "realized_centre_nm": 31.800000000000004,
+              "realized_width_10_90_nm": 1.0,
+              "requested_centre_nm": 31.800000000000004,
+              "requested_width_10_90_nm": 1.0,
+              "width_error_nm": 0.0,
+              "window_isolated_from_other_interfaces": true
+            }
+          ],
+          "intended_overlap": {
+            "case_declares_overlap": false,
+            "central_interface_left_nm": 27.1,
+            "central_interface_right_nm": 28.900000000000002,
+            "expected_peak_al_fraction": 0.55,
+            "grades_overlap": false,
+            "local_integrated_al_dose_nm_equivalent": 1.4870000000000005,
+            "nominal_barrier_al_fraction": 0.55,
+            "nominal_plateau_exists": true,
+            "overlap": false,
+            "overlap_end_nm": null,
+            "overlap_start_nm": null,
+            "overlap_width_nm": 0.0,
+            "peak_position_nm": 27.75,
+            "reaches_90_percent_of_nominal": true,
+            "realized_peak_al_fraction": 0.55,
+            "true_flat_central_plateau_exists": true
+          },
+          "interface_exclusion_applied": false,
+          "interface_exclusion_half_width_nm": 0.05,
+          "max_absolute_al_fraction_difference": 2.1183055309847987e-13,
+          "max_absolute_al_fraction_difference_off_interface": 2.1183055309847987e-13,
+          "metrology_window_is_the_requested_width": true,
+          "metrology_window_widths_nm": {
+            "central_algaas_to_gaas": 1.0,
+            "central_gaas_to_algaas": 1.0,
+            "outer_left_algaas_to_gaas": 1.0,
+            "outer_right_gaas_to_algaas": 1.0
+          },
+          "points_excluded_near_interfaces": 8,
+          "realized_interface_metrics": [
+            {
+              "centre_error_nm": 0.0,
+              "interface": "outer_left_algaas_to_gaas",
+              "measurement_window_nm": [
+                18.4,
+                21.6
+              ],
+              "realized_centre_nm": 20.0,
+              "realized_width_10_90_nm": 0.999999999999897,
+              "requested_centre_nm": 20.0,
+              "requested_width_10_90_nm": 1.0,
+              "width_error_nm": 1.0302869668521453e-13,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 8.171241461241152e-14,
+              "interface": "central_gaas_to_algaas",
+              "measurement_window_nm": [
+                25.5,
+                28.0
+              ],
+              "realized_centre_nm": 27.09999999999992,
+              "realized_width_10_90_nm": 0.9999999999999858,
+              "requested_centre_nm": 27.1,
+              "requested_width_10_90_nm": 1.0,
+              "width_error_nm": 1.4210854715202004e-14,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 1.0302869668521453e-13,
+              "interface": "central_algaas_to_gaas",
+              "measurement_window_nm": [
+                28.0,
+                30.35
+              ],
+              "realized_centre_nm": 28.8999999999999,
+              "realized_width_10_90_nm": 0.9999999999999822,
+              "requested_centre_nm": 28.900000000000002,
+              "requested_width_10_90_nm": 1.0,
+              "width_error_nm": 1.7763568394002505e-14,
+              "window_isolated_from_other_interfaces": true
+            },
+            {
+              "centre_error_nm": 3.907985046680551e-14,
+              "interface": "outer_right_gaas_to_algaas",
+              "measurement_window_nm": [
+                30.35,
+                33.400000000000006
+              ],
+              "realized_centre_nm": 31.799999999999965,
+              "realized_width_10_90_nm": 1.000000000000032,
+              "requested_centre_nm": 31.800000000000004,
+              "requested_width_10_90_nm": 1.0,
+              "width_error_nm": 3.197442310920451e-14,
+              "window_isolated_from_other_interfaces": true
+            }
+          ],
+          "realized_overlap": {
+            "central_interface_left_nm": 27.1,
+            "central_interface_right_nm": 28.900000000000002,
+            "expected_peak_al_fraction": 0.55,
+            "grades_overlap": false,
+            "local_integrated_al_dose_nm_equivalent": 1.4619999999999957,
+            "nominal_barrier_al_fraction": 0.55,
+            "nominal_plateau_exists": true,
+            "overlap": false,
+            "peak_position_nm": 27.725,
+            "reaches_90_percent_of_nominal": true,
+            "realized_peak_al_fraction": 0.55,
+            "true_flat_central_plateau_exists": true
+          },
+          "realized_peak_al_fraction": 0.55,
+          "representation": "imported_profile",
+          "requested_asymmetry_s": 0.41999999999999993,
+          "requested_grading_widths_nm": {
+            "central_algaas_to_gaas": 1.0,
+            "central_gaas_to_algaas": 1.0,
+            "outer_left_algaas_to_gaas": 1.0,
+            "outer_right_gaas_to_algaas": 1.0
+          },
+          "rms_al_fraction_difference": 3.128457778257521e-14,
+          "rms_al_fraction_difference_off_interface": 3.1281589605452314e-14,
+          "structural_invariants": {
+            "all_passed": true,
+            "central_barrier_present": true,
+            "composition_finite": true,
+            "composition_within_bounds": true,
+            "confinement_is_material_not_boundary": true,
+            "coordinates_ascending": true,
+            "four_interfaces_ordered": true,
+            "left_outer_barrier_present": true,
+            "right_outer_barrier_present": true,
+            "thick_well_is_gaas": true,
+            "thin_well_is_gaas": true
+          },
+          "tolerances": {
+            "interface_position_nm": 0.1,
+            "max_absolute_al_fraction_difference": 0.005,
+            "rms_al_fraction_difference": 0.001
+          }
+        },
+        "comparison_metrics_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_10\\comparison_metrics.json",
+        "failure_reason": null,
+        "invocation": {
+          "deck_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_10\\nextnano_input\\case.in",
+          "deck_sha256": "da010afcf41129050f980063460b33b4ec8bb64084b26263be6f055debac44e8",
+          "failure_reason": null,
+          "fatal_markers": [],
+          "output_dir": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_10\\structure\\out",
+          "parser_command": [
+            "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\bin\\nextnano++_Intel_64bit.exe",
+            "--structure",
+            "-d",
+            "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\database\\database.nnp",
+            "-l",
+            "C:\\Code\\optics\\nextnano\\2026_07_03\\License\\License_nnp.lic",
+            "-o",
+            "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_10\\structure\\out",
+            "case.in"
+          ],
+          "passed": true,
+          "profile_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_10\\nextnano_input\\al_profile.dat",
+          "profile_sha256": "921c378657b49ee020050004d311a0ec847568a0101d3d90010a1ed031726017",
+          "return_code": 0,
+          "runmode": "--structure",
+          "stderr_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_10\\structure\\stderr.txt",
+          "stdout_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_10\\structure\\stdout.txt"
+        },
+        "passed": true,
+        "realized_profile_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_10\\realized_profile.csv",
+        "source_alloy_composition_path": "C:\\nn_results\\16E_acqw_structure_physics_optical_comparison\\demo16e_20260809T170442Z_95aacf20_f36004\\cases\\case_10\\structure\\out\\case\\Structure\\alloy_composition.dat"
+      }
+    }
+  ],
+  "cases_failed": 0,
+  "cases_passed": 10,
+  "cases_total": 10,
+  "demo16e_version": "demo16e-1.0.0",
+  "demo_id": "16E_acqw_structure_physics_optical_comparison",
+  "machine_config_source": "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\nextnano\\config\\machines\\nextnano_machine.work.yaml",
+  "mode": "physics",
+  "nextnano_database": "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\database\\database.nnp",
+  "nextnano_executable": "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\bin\\nextnano++_Intel_64bit.exe",
+  "nextnano_license": "C:\\Code\\optics\\nextnano\\2026_07_03\\License\\License_nnp.lic",
+  "optimization_performed": false,
+  "run_id": "demo16e_20260809T170442Z_95aacf20_f36004",
+  "run_solver_enabled": true,
+  "timestamp_utc": "2026-08-09T17:04:42.664045+00:00"
+}
