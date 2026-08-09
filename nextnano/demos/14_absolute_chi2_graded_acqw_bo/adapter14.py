@@ -204,7 +204,13 @@ def build_demo11_analysis_config_from_demo14(
             "maximum_boundary_probability": float(
                 limits["maximum_boundary_probability"]
             ),
-            "quasi_bound_state_policy": "warn",      # analysis-only
+            # Analysis-only, and "warn" unless a caller asks for something
+            # stricter. Read from the Demo 14 config rather than hardcoded so a
+            # reproduction audit can demand `fail_case`; absent the key the
+            # value is "warn", so Demos 13, 14, 16B-16E are unchanged.
+            "quasi_bound_state_policy": str(
+                cfg.get("validation", {}).get("quasi_bound_state_policy", "warn")
+            ),
             "normalization_tolerance": float(limits["maximum_orthonormality_error"]),
             "transition_energy_tolerance_meV": 40.0,  # analysis-only
             "absolute_energy_tolerance_meV": 1.0,     # analysis-only

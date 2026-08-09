@@ -1,0 +1,136 @@
+# Demo 16G configuration. Everything tunable lives here.
+#
+# Edit the ranges, the seed or the sweep size and rerun; nothing in the Python
+# hardcodes a limit. There is deliberately NO scale factor, calibration constant
+# or empirical multiplier anywhere in this file or in the code that reads it.
+
+demo_id: 16G_paper_nnp_and_structure_sweep_comparison
+version: demo16g-1.0.0
+
+# ---------------------------------------------------------------------------
+# Group 1 -- the two supplied .nnp files
+# ---------------------------------------------------------------------------
+# Repository-relative. Override either with --nnp-file on the CLI. The originals
+# are never edited; verbatim copies are made in the run directory and both the
+# source and the copy are SHA256-hashed.
+supplied_nnp:
+  - id: nnp_grades
+    label: NNP grades
+    path: nextnano/docs/DoubleQuantumWell_ramesh_arxiv_grades.nnp
+  - id: nnp_grades_bandstructure
+    label: NNP grades + bandstructure
+    path: nextnano/docs/DoubleQuantumWell_ramesh_arxiv_grades_w_bandstructure.nnp
+
+# ---------------------------------------------------------------------------
+# Group 2 -- the 20-structure sweep
+# ---------------------------------------------------------------------------
+sweep:
+  count: 20
+  seed: 16072026
+  # Latin-hypercube with a maximin selection over this many seeded candidate
+  # designs. Deterministic: the same seed always yields the same 20 structures.
+  maximin_candidates: 64
+  # Snap sampled widths to this grid so a structure is reproducible from the
+  # table alone and not only from the RNG.
+  quantize_nm: 0.01
+  ranges_nm:
+    thick_well: [6.0, 8.0]
+    thin_well: [2.0, 4.0]
+    tunnel_barrier: [0.5, 2.5]
+    left_grade: [0.0, 1.4]
+    right_grade: [0.0, 1.4]
+  # A sampled grade at or below this is rendered as a genuinely abrupt
+  # interface: no ramp region is emitted at all.
+  abrupt_threshold_nm: 0.005
+
+# ---------------------------------------------------------------------------
+# Grading definition -- read grading16g.py before changing this
+# ---------------------------------------------------------------------------
+# The supplied .nnp files define a grade as the FULL 0 -> 0.55 linear ramp width
+# and place it OUTSIDE the well, so the GaAs well keeps its stated width.
+# Demo 16E defined a grade as the 10-90% width and CENTRED it on the interface,
+# making the full ramp 1.25x wider and eating half of it into the well.
+# Those are two different structures for the same number. 16G adopts the .nnp
+# convention so the sweep is directly comparable with Group 1, and reports all
+# three numbers on every case so the two can never be confused.
+grading:
+  definition: full_linear_ramp_outside_well
+  ten_ninety_over_full_ramp: 0.8   # a linear ramp's 10-90 span is 0.8 x its full width
+  # For reference only; never used to build anything in this demo.
+  demo16e_full_ramp_over_ten_ninety: 1.25
+
+# ---------------------------------------------------------------------------
+# Group 3 -- the paper benchmark
+# ---------------------------------------------------------------------------
+paper_benchmark:
+  reference: "Ramesh et al., arXiv:2602.23246v1 (26 Feb 2026)"
+  pdf: 2602.23246v1.pdf
+  thick_well_nm: 7.1
+  tunnel_barrier_nm: 1.8
+  thin_well_nm: 2.9
+  total_well_nm: 10.0
+  asymmetry_s: 0.42
+  period_barrier_nm: 18.2
+  total_period_nm: 30.0
+  interfaces: abrupt
+  # Numbers the paper states in words. The primary regression target is the
+  # first. Fig. 2d's ~3000-4000 pm/V peak is read off a figure and is a visual
+  # reference only -- never a target.
+  targets_pm_per_V:
+    ideal_abrupt_at_1550: 2340.0
+    eds_al_profile_at_1550: 1200.0
+    eds_ga_profile_at_1550: 1363.0
+    measured_effective_typical: 1400.0
+  figure2d_peak_visual_reference_pm_per_V: [3000.0, 4000.0]
+
+# ---------------------------------------------------------------------------
+# Fixed material and optical context -- shared by all three groups
+# ---------------------------------------------------------------------------
+materials:
+  well: GaAs
+  barrier: AlGaAs
+  al_fraction: 0.55
+  temperature_K: 300.0
+
+optics:
+  target_wavelength_nm: 1550.0
+  scan_wavelength_nm: [1400.0, 1800.0]
+  scan_points: 401
+  broadening_meV: 5.0
+  max_states_per_band: 2
+  tensor: chi2_xzx
+  # Demo 16F's promotable conventions: every choice required by a cited source.
+  nz_definition: well_density
+  zone_edge: gamma_to_x_2pi_over_a
+  k_domain: disc
+  k_methods: [radial, cartesian]
+  r_e_hh_nm: 0.751
+  # Explicitly absent and must stay absent.
+  absolute_scale_factor: null
+
+numerics:
+  mesh_nm: 0.05
+  outer_grid_spacing_nm: 1.0
+  domain_padding_nm: 18.2
+  quantum_region_padding_nm: 2.0
+  number_of_electron_states: 6
+  number_of_hole_states: 6
+
+# ---------------------------------------------------------------------------
+# Execution
+# ---------------------------------------------------------------------------
+execution:
+  # Resolved from NEXTNANO_MACHINE_CONFIG; never hardcode a machine path here.
+  machine_config_env: NEXTNANO_MACHINE_CONFIG
+  threads: 1
+  solver_timeout_seconds: 3600
+  # A failing case is recorded and the run continues, unless the failure makes
+  # the whole comparison meaningless (no group produced a single result).
+  continue_on_case_failure: true
+
+plots:
+  target_line_nm: 1550.0
+  sweep_alpha: 0.45
+  sweep_linewidth: 1.0
+  highlight_linewidth: 2.4
+  figure_dpi: 160

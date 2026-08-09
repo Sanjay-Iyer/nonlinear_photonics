@@ -319,14 +319,80 @@ def cross_check_recorded(
 # ---------------------------------------------------------------------------
 
 
-def bound_state_gate(parsed_dir: Path) -> dict[str, Any]:
-    """Which states entering Eq. 2 fail the bound criterion, and why.
+#: The four states Eq. 2 sums over. All four must be found and all four must
+#: pass before the gate certifies anything.
+REQUIRED_STATES: tuple[str, ...] = ("E1", "E2", "HH1", "HH2")
 
-    Reads the per-state table Demo 11 already writes. 16E aggregated this to a
-    count; the audit needs the identity of the failing state, because "the
-    domain is too short", "the outer barrier is too thin" and "this state is
-    genuinely quasi-bound" are different defects with different fixes and the
-    count cannot distinguish them.
+#: Demo 11 records a band name and a 1-based index within that band; Eq. 2 and
+#: this audit speak in E1/E2/HH1/HH2. One mapping, in one place.
+_BAND_PREFIX: Mapping[str, str] = {"electron": "E", "heavy_hole": "HH"}
+
+
+def _state_label(record: Mapping[str, Any]) -> str | None:
+    prefix = _BAND_PREFIX.get(str(record.get("band")))
+    index = record.get("state")
+    if prefix is None or index is None:
+        return None
+    try:
+        return f"{prefix}{int(index)}"
+    except (TypeError, ValueError):
+        return None
+
+
+def _state_verdict(record: Mapping[str, Any]) -> dict[str, Any]:
+    """One state's bound-state verdict, keeping "not tested" distinct from "passed".
+
+    The distinction is not pedantry. Demo 11 applies the full test to electrons
+    -- energy below the enclosing barrier maximum *and* enough probability in
+    the wells -- but heavy holes are solved without a matching valence
+    barrier-edge profile, so only the probability half runs. A hole that
+    "passes" has passed a weaker test, and the record says which.
+    """
+
+    passes = record.get("passes_bound_criterion")
+    boundary_ok = record.get("boundary_probability_within_threshold")
+    if passes is None or boundary_ok is None:
+        verdict = "NOT TESTED"
+        passed: bool | None = None
+    elif bool(passes) and bool(boundary_ok):
+        verdict = "BOUND"
+        passed = True
+    else:
+        verdict = "NOT BOUND"
+        passed = False
+    return {
+        "verdict": verdict,
+        "passed": passed,
+        "energy_eV": record.get("energy_eV"),
+        "passes_bound_criterion": passes,
+        "bound_criterion_detail": record.get("bound_criterion_detail"),
+        "boundary_probability": record.get("boundary_probability"),
+        "left_boundary_probability": record.get("left_boundary_probability"),
+        "right_boundary_probability": record.get("right_boundary_probability"),
+        "boundary_probability_within_threshold": boundary_ok,
+        "within_chi2_state_window": record.get("within_chi2_state_window"),
+        "included_in_chi2": record.get("included_in_chi2"),
+        "exclusion_reason": record.get("exclusion_reason") or "",
+        "energy_half_of_test_applied": str(record.get("band")) == "electron",
+    }
+
+
+def bound_state_gate(parsed_dir: Path) -> dict[str, Any]:
+    """The strict bound-state verdict for E1, E2, HH1 and HH2 individually.
+
+    Reads the per-state table Demo 11 writes. Demo 16E aggregated it to a count;
+    the audit needs the *identity* of the failing state, because "the domain is
+    too short", "the outer barrier is too thin" and "this state is genuinely
+    quasi-bound" are different defects with different fixes and a count cannot
+    tell them apart.
+
+    **This gate fails closed.** An earlier version of it filtered on a key name
+    (``in_chi2_sum``) that this schema does not use, so it matched nothing, found
+    no failures, and reported ``passed = True`` while printing an empty state
+    list -- the worst possible outcome, a silent pass. Certification now requires
+    all four of :data:`REQUIRED_STATES` to be present *and* to pass; anything
+    else returns ``passed`` as ``None`` with a reason, and ``None`` is never
+    treated as success by any caller.
     """
 
     path = Path(parsed_dir) / "quasi_bound_states.json"
@@ -340,34 +406,93 @@ def bound_state_gate(parsed_dir: Path) -> dict[str, Any]:
                 "producing demo so the state-resolved diagnosis exists"
             ),
         }
+
     payload = json.loads(path.read_text(encoding="utf-8"))
     records = payload.get("records") or []
-    in_sum = [row for row in records if row.get("in_chi2_sum")]
-    failing = [row for row in in_sum if not row.get("bound", True)]
+    by_state: dict[str, dict[str, Any]] = {}
+    unrecognised = 0
+    for record in records:
+        label = _state_label(record)
+        if label is None:
+            unrecognised += 1
+            continue
+        if label in REQUIRED_STATES:
+            by_state[label] = _state_verdict(record)
+
+    missing = [label for label in REQUIRED_STATES if label not in by_state]
+    failing = [
+        label for label, row in by_state.items() if row["passed"] is False
+    ]
+    untested = [
+        label for label, row in by_state.items() if row["passed"] is None
+    ]
+    outside_window = [
+        label for label, row in by_state.items()
+        if row["within_chi2_state_window"] is False
+    ]
+
+    if unrecognised and not by_state:
+        passed: bool | None = None
+        reason = (
+            f"{unrecognised} record(s) present but none carried a recognised "
+            "band/state pair. The table schema is not the one this gate parses, "
+            "so no verdict can be given -- which is NOT a pass."
+        )
+    elif missing:
+        passed = None
+        reason = (
+            f"no record for {missing}; Eq. 2 sums over all four of "
+            f"{list(REQUIRED_STATES)}, so a missing state means the gate cannot "
+            "certify the sum. An incomplete table is not a pass."
+        )
+    elif untested:
+        passed = None
+        reason = (
+            f"{untested} were not tested (Demo 11 could not apply the criterion). "
+            "An untested state is not a passed state."
+        )
+    elif failing:
+        passed = False
+        reason = (
+            f"{failing} entering Eq. 2 fail the bound-state criterion; the paper "
+            "uses bound states only"
+        )
+    else:
+        passed = True
+        reason = "all four states entering Eq. 2 are bound"
+
     return {
         "available": True,
         "path": str(path),
         "policy_required": "fail_case",
         "policy_in_source_run": payload.get("policy"),
-        "maximum_boundary_probability": MAX_BOUNDARY_PROBABILITY,
-        "states_in_chi2_sum": [row.get("state") or row.get("label") for row in in_sum],
-        "failing_states": [
-            {
-                "state": row.get("state") or row.get("label"),
-                "boundary_probability": row.get("boundary_probability"),
-                "left_boundary_probability": row.get("left_boundary_probability"),
-                "right_boundary_probability": row.get("right_boundary_probability"),
-                "reason": row.get("reason"),
-            }
-            for row in failing
-        ],
+        "strict_verdict_applied_by": DEMO_ID,
+        "maximum_boundary_probability": payload.get(
+            "maximum_boundary_probability", MAX_BOUNDARY_PROBABILITY
+        ),
+        "boundary_edge_fraction": payload.get(
+            "boundary_edge_fraction", BOUNDARY_EDGE_FRACTION
+        ),
+        "required_states": list(REQUIRED_STATES),
+        "records_seen": len(records),
+        "records_unrecognised": unrecognised,
+        "by_state": by_state,
+        "states_found": sorted(by_state),
+        "missing_states": missing,
+        "failing_states": failing,
+        "untested_states": untested,
+        "states_outside_chi2_window": outside_window,
         "failing_count": len(failing),
-        "passed": bool(records) and not failing,
+        "source_run_failing_in_sum_count": payload.get("failing_in_sum_count"),
+        "source_run_failing_reasons": payload.get("failing_in_sum_reasons") or [],
+        "passed": passed,
+        "reason": reason,
         "interpretation": (
             "Methods Sec. 5.1 states the first two bound states of each band are "
-            "used and that two bound states were guaranteed. A failing state "
-            "means this calculation and the paper are not applying the same "
-            "selection, independent of how close the energies look."
+            "used and that two bound states were guaranteed across the simulated "
+            "structures. A failing state means this calculation and the paper are "
+            "not applying the same selection, independent of how close the "
+            "energies look."
         ),
     }
 

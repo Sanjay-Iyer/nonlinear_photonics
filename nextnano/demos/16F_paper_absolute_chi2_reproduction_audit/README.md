@@ -99,16 +99,40 @@ agreement would not make such a set correct.
 
 ## The two gates 16E ran in warning mode
 
-**Bound states — now `fail_case`.** Every one of 16E's ten cases recorded
-`physical_qc_valid = False` with one state entering the χ⁽²⁾ sum failing the
-bound criterion, under `quasi_bound_policy: warn`. The paper says it uses "the
-first two bound states in the heavy hole and conduction bands" and that two
+**Bound states — now strict, and it fails closed.** Every one of 16E's ten cases
+recorded `physical_qc_valid = False` with one state entering the χ⁽²⁾ sum failing
+the bound criterion, under `quasi_bound_policy: warn`. The paper says it uses
+"the first two bound states in the heavy hole and conduction bands" and that two
 bound states were guaranteed. **16E and the paper were therefore not applying the
-same state selection**, however close the energies looked. `bound_state_gate()`
-reads the per-state table Demo 11 already writes and names *which* state fails
-and why — because "domain too short", "outer barrier too thin" and "genuinely
-quasi-bound" are different defects with different fixes, and a count cannot tell
-them apart.
+same state selection**, however close the energies looked.
+
+`bound_state_gate()` reports **E1, E2, HH1 and HH2 individually** — verdict,
+energy, boundary probability, whether the state is inside Eq. 2's window, and the
+criterion text — because "domain too short", "outer barrier too thin" and
+"genuinely quasi-bound" are different defects with different fixes and a count
+cannot tell them apart. It also records that heavy holes get the **weaker** test:
+Demo 11 has no valence barrier-edge profile, so only the probability half runs,
+and a hole that "passes" has passed less than an electron that passes.
+
+> **Fixed defect.** The first version of this gate filtered on `in_chi2_sum`, a
+> key `demo11._quasi_bound_records` does not use — it writes
+> `within_chi2_state_window`. The filter matched nothing, so the failing list was
+> empty, so the gate returned **`passed = True`** while printing
+> `states in the chi2 sum: []`. That is why `--from-run` showed an empty list.
+> The gate now certifies **only** when all four required states are present *and*
+> all four pass; a missing state, an untested state or an unrecognised schema
+> returns `passed = None` (**NOT CERTIFIED**), and no caller treats `None` as
+> success. Four tests pin this, including one that replays the exact old schema.
+
+**On `fail_case` vs `warn`.** The requested policy is `fail_case`, and the
+verdict 16F enforces *is* `fail_case`. The mechanism differs for one concrete
+reason: Demo 11 raises on `fail_case` at the point the diagnosis is written,
+**before `envelopes.csv` exists**, which would deny the audit the wavefunctions it
+needs to explain the failure. So the analysis runs under `warn` and 16F applies
+the strict verdict to the per-state table — identical verdict, all artifacts
+preserved. `--strict-abort` restores the hard abort; `adapter14` now reads the
+policy from the config instead of hardcoding `"warn"`, defaulting to `"warn"` so
+Demos 13, 14 and 16B–16E are unchanged.
 
 **Outer domain — dipoles, not just energies.** Absolute χ⁽²⁾ rides directly on
 `<ψ|z|ψ>`, which converges more slowly with domain size than eigenvalues do.
@@ -131,6 +155,45 @@ If it does not, one of them is wrong and the audit has found it. Reusing
 from the envelopes, and `cross_check_recorded` compares all eight against the
 values the producing run stored.
 
+## Regression anchors
+
+The ladder was validated on Demo 16E's licensed `case_02` envelopes. These values
+are pinned in `conventions16f.LADDER_REGRESSION_PM_PER_V` and checked on every
+run:
+
+| rung | χ⁽²⁾(1550) pm/V | |
+|---|---:|---|
+| `legacy` | **30.99** | reproduces 16E's recorded 30.994 — **two independently written evaluators, one number** |
+| `paper_Nz` | 61.99 | exactly ×2, as N_z enters linearly |
+| `paper_Nz_and_zone` | 84.04 | ×1.356 from the zincblende zone edge |
+| `independent_cartesian` | 84.14 | the control: 0.12 % from the row above |
+
+A drift is not automatically an error — newly solved wavefunctions may genuinely
+differ — but it is never allowed to pass silently, because the *other* thing that
+moves these numbers is somebody editing a convention.
+
+## The licensed experiment
+
+`--solve` performs all remaining licensed work itself. It uses the authoritative
+machine configuration and Demo 16E's solver infrastructure unchanged: 16E's
+renderer, parser gate, realized-composition gate, required-quantum-output gate,
+solve, and Demo 11's optical analysis through Demo 14's adapter. 16F adds only
+the domain sweep, the strict bound verdict and the ladder.
+
+One structure, three domains:
+
+| | |
+|---|---|
+| structure | 7.1 nm GaAs / 1.8 nm Al₀.₅₅Ga₀.₄₅As / 2.9 nm GaAs, s = 0.42, **abrupt** |
+| outer AlGaAs | **18.2 nm** (the paper's own period barrier), 25.0 nm, 35.0 nm |
+| per solve | E1, E2, HH1, HH2; E2−E1, HH1−HH2; E1−HH1, E2−HH2; all four ⟨ψ_e\|ψ_hh⟩; all six ⟨ψ\|z\|ψ⟩ and both diagonal differences; boundary probability and bound criterion per state; χ⁽²⁾(1550) |
+| convergence | eigenenergies (1 meV) and position matrix elements (1 % relative) reported **separately** |
+| then | the ladder on the newly solved wavefunctions, `well_density` + `gamma_to_x_2pi_over_a`, radial **and** independent Cartesian |
+
+The final report states whether the domains are converged, which state (if any)
+is not bound, the best physically justified absolute χ⁽²⁾, and the remaining
+factor versus 2340 pm/V.
+
 ## Commands
 
 Runs anywhere, no licence:
@@ -139,20 +202,25 @@ Runs anywhere, no licence:
 python nextnano/demos/16F_paper_absolute_chi2_reproduction_audit/run_demo16f.py --audit
 ```
 
-**The variant ladder needs no new solve** — a completed Demo 16E run already
-contains `case_02`'s envelopes:
+The licensed experiment — three solves, gates, ladder, final report:
 
 ```bash
-python nextnano/demos/16F_paper_absolute_chi2_reproduction_audit/run_demo16f.py --from-run <16E_run_dir> --case case_02
+python nextnano/demos/16F_paper_absolute_chi2_reproduction_audit/run_demo16f.py --solve
 ```
 
-What licensed work remains, and the exact settings each piece needs:
+See what it will do before it does it:
 
 ```bash
 python nextnano/demos/16F_paper_absolute_chi2_reproduction_audit/run_demo16f.py --plan
 ```
 
-Outer-domain convergence, once the three solves exist:
+The ladder alone, from an existing Demo 16E run, with no new solve:
+
+```bash
+python nextnano/demos/16F_paper_absolute_chi2_reproduction_audit/run_demo16f.py --from-run <16E_run_dir> --case case_02
+```
+
+Convergence across runs this demo did not produce:
 
 ```bash
 python nextnano/demos/16F_paper_absolute_chi2_reproduction_audit/run_demo16f.py --converge 18.2=<run1> 25=<run2> 35=<run3>
@@ -160,16 +228,25 @@ python nextnano/demos/16F_paper_absolute_chi2_reproduction_audit/run_demo16f.py 
 
 ## Expected outcome, stated in advance
 
-N_z (×2) and the zincblende zone edge together are worth roughly ×8 on the
-off-resonant baseline and less at the peak, because the peak contribution goes
-as `dk/k` and grows only logarithmically with k_max. **That will not turn 31 pm/V
-into 2340 pm/V, and it is not supposed to.** What it does is remove two known
-ambiguities honestly, so that the remaining discrepancy is narrowed from "maybe
-any of our quantum-well physics is wrong" to a specific short list:
+Measured, not predicted: N_z (×2) and the zincblende zone edge (×1.356 at
+1550 nm) took `case_02` from **30.99 → 84.04 pm/V**. Against 2340 pm/V that
+leaves **27.8×**.
 
-* the factor of 3 between Eq. 1 and Eq. 2 as printed (measured, above);
-* the heavy-hole m_j multiplicity the paper does not state (×2 if it applies);
-* whatever the bound-state gate turns up once it is strict.
+**That is the honest result and it was not supposed to close.** What it does is
+remove two known ambiguities, narrowing the remaining discrepancy from "maybe any
+of our quantum-well physics is wrong" to a specific short list:
+
+* the factor of **3** between Eq. 1 and Eq. 2 as printed (measured, above) —
+  reported, never applied;
+* the heavy-hole m_j multiplicity the paper does not state (**×2** if it
+  applies) — the open ladder rung, never promoted;
+* whatever the strict bound-state gate turns up on the newly solved states;
+* whether the position matrix elements are converged at the paper's own 18.2 nm
+  period barrier — energies converging while `<z>` has not is exactly the pattern
+  that gives a right resonance position with a wrong amplitude.
+
+Even granting both unresolved factors (3 × 2 = 6) the gap would still be ~4.6×,
+so neither is a hidden answer. They are bounded, cited and reported separately.
 
 16E's `case_09`/`case_10` equivalence — 0.0 composition difference, 0.0 meV
 energy difference, 1.7 × 10⁻¹³ relative χ⁽²⁾ — already proves the grading

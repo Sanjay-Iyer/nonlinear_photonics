@@ -18,7 +18,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import math
-from typing import Any, Callable, Mapping
+from typing import Any, Mapping, Sequence
 
 DEMO_ID = "16F_paper_absolute_chi2_reproduction_audit"
 DEMO_VERSION = "demo16f-1.0.0"
@@ -397,6 +397,80 @@ class Convention:
             "fully_faithful": self.fully_faithful,
             "justification": self.justification(),
         }
+
+
+#: Ladder values measured on Demo 16E's licensed ``case_02`` envelopes. These are
+#: regression anchors, not targets: the licensed solves added later must not move
+#: them unless the newly solved wavefunctions genuinely differ, and if they do,
+#: the difference must be attributable to the wavefunctions rather than to a
+#: convention having been edited.
+#:
+#: ``legacy`` reproducing Demo 16E's recorded 31.0 pm/V is the load-bearing one.
+#: Two independently written evaluators -- production ``chi2.py`` and this demo's
+#: :func:`variants16f.chi2_at` -- landing on the same number is what licenses
+#: every other row in the table.
+LADDER_REGRESSION_PM_PER_V: Mapping[str, float] = {
+    "legacy": 30.99,
+    "paper_Nz": 61.99,
+    "paper_Nz_and_zone": 84.04,
+    "independent_cartesian": 84.14,
+}
+
+#: Fractional budget for the regression check. Loose enough to absorb quadrature
+#: and the two-decimal transcription above, tight enough that any convention
+#: change would blow straight through it.
+LADDER_REGRESSION_TOLERANCE = 0.02
+
+#: Demo 16E's own recorded chi2(1550) for case_02, from
+#: ``demo16e_master_summary.csv``. The ``legacy`` rung must reproduce it.
+DEMO16E_CASE02_CHI2_AT_1550 = 30.99419558736484
+
+
+def check_ladder_regression(
+    rows: Sequence[Mapping[str, Any]], *,
+    tolerance: float = LADDER_REGRESSION_TOLERANCE,
+) -> dict[str, Any]:
+    """Do the ladder's rungs still land where the validated run put them?
+
+    A drift here is not automatically an error -- newly solved wavefunctions may
+    genuinely differ from Demo 16E's -- but it is never allowed to pass silently,
+    because the other thing that moves these numbers is somebody editing a
+    convention, and the whole demo rests on that not having happened.
+    """
+
+    by_name = {row["variant"]: row for row in rows}
+    comparisons = []
+    for name, expected in LADDER_REGRESSION_PM_PER_V.items():
+        row = by_name.get(name)
+        if row is None:
+            comparisons.append({"variant": name, "expected": expected,
+                                "observed": None, "agrees": None})
+            continue
+        observed = float(row["chi2_at_1550_pm_per_V"])
+        relative = abs(observed - expected) / expected
+        comparisons.append({
+            "variant": name, "expected": expected, "observed": observed,
+            "relative_difference": relative,
+            "agrees": bool(relative <= tolerance),
+        })
+    checked = [row for row in comparisons if row["agrees"] is not None]
+    return {
+        "tolerance": tolerance,
+        "reference": (
+            "Demo 16E licensed case_02 envelopes; legacy anchors to "
+            f"{DEMO16E_CASE02_CHI2_AT_1550:.5f} pm/V from 16E's master summary"
+        ),
+        "comparisons": comparisons,
+        "variants_checked": len(checked),
+        "all_agree": (
+            all(row["agrees"] for row in checked) if checked else None
+        ),
+        "interpretation": (
+            "a drift means either the newly solved wavefunctions differ from "
+            "Demo 16E's -- legitimate, and attributable to the solve -- or a "
+            "convention was edited, which is not"
+        ),
+    }
 
 
 #: What Demo 14/16E production actually did. Reproduced here so the audit's

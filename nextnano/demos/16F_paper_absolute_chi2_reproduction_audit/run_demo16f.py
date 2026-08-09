@@ -15,14 +15,19 @@ Four entry points, in the order they are meant to be used:
     already contains everything Eq. 2 needs for ``case_02``, so the variant table
     can be produced from work already done.
 
+``--solve`` (alias ``--licensed``)
+    **Run the licensed experiment.** Solves the paper's ideal-abrupt structure at
+    three outer AlGaAs widths on the authoritative machine configuration, applies
+    the strict per-state bound gate, compares dipole convergence separately from
+    energy convergence, walks the convention ladder on the newly solved
+    wavefunctions and prints one final report. Licensed machine only.
+
 ``--converge RUN_DIRS...``
-    The outer-domain convergence verdict across runs at different outer barrier
-    widths, checking the position matrix elements and not only the eigenvalues.
+    The outer-domain convergence verdict across runs that already exist, for
+    comparing solves this demo did not produce.
 
 ``--plan``
-    Print the licensed work this audit still needs and the exact settings each
-    piece requires. Emitted rather than executed so the overrides are reviewed
-    before a solver runs.
+    Print what the licensed run will do before doing it.
 """
 
 from __future__ import annotations
@@ -151,6 +156,58 @@ def run_audit(verbose: bool = False) -> tuple[int, dict]:
 # ---------------------------------------------------------------------------
 
 
+def _print_bound_gate(bound: dict, indent: str = "    ") -> None:
+    """Per-state bound verdict. An uncertified gate is never printed as a pass."""
+
+    print(f"{indent}bound-state gate (strict; the paper uses bound states only)")
+    if not bound.get("available"):
+        print(f"{indent}  UNAVAILABLE: {bound.get('reason')}")
+        print(f"{indent}  verdict: NOT CERTIFIED (absence of evidence is not a pass)")
+        return
+    print(f"{indent}  policy in producing run : {bound.get('policy_in_source_run')}"
+          f"   required: {bound.get('policy_required')}")
+    print(f"{indent}  {'state':<6}{'verdict':<12}{'E (eV)':>10}"
+          f"{'P_boundary':>13}{'in Eq.2':>9}  criterion")
+    for label in bound.get("required_states", []):
+        row = (bound.get("by_state") or {}).get(label)
+        if row is None:
+            print(f"{indent}  {label:<6}{'MISSING':<12}{'-':>10}{'-':>13}{'-':>9}  "
+                  "no record in the per-state table")
+            continue
+        energy = row.get("energy_eV")
+        boundary = row.get("boundary_probability")
+        detail = (row.get("bound_criterion_detail") or "")[:64]
+        if not row.get("energy_half_of_test_applied"):
+            detail = f"probability-only test; {detail}"
+        # Pre-formatted so a missing value prints a dash instead of crashing the
+        # report. A verdict printer that dies on incomplete data is the last
+        # thing anyone wants when the data is incomplete because something failed.
+        energy_text = "-" if energy is None else f"{float(energy):.4f}"
+        boundary_text = "-" if boundary is None else f"{float(boundary):.3e}"
+        window_text = str(row.get("within_chi2_state_window"))
+        print(f"{indent}  {label:<6}{row['verdict']:<12}{energy_text:>10}"
+              f"{boundary_text:>13}{window_text:>9}  {detail}")
+    verdict = bound.get("passed")
+    label = {True: "PASS", False: "FAIL"}.get(verdict, "NOT CERTIFIED")
+    print(f"{indent}  verdict: {label} -- {bound.get('reason')}")
+
+
+def _print_regression(check: dict, indent: str = "    ") -> None:
+    print(f"{indent}regression against the validated ladder")
+    for row in check["comparisons"]:
+        if row["agrees"] is None:
+            print(f"{indent}  {row['variant']:<24} expected {row['expected']:>8.2f}  "
+                  "not present in this ladder")
+            continue
+        print(f"{indent}  {'OK  ' if row['agrees'] else 'DRIFT'} "
+              f"{row['variant']:<24} expected {row['expected']:>8.2f}  "
+              f"observed {row['observed']:>8.2f}  "
+              f"rel {row['relative_difference']:.3e}")
+    print(f"{indent}  all agree: {check['all_agree']}")
+    if check["all_agree"] is False:
+        print(f"{indent}  NOTE: {check['interpretation']}")
+
+
 def _recorded_metrics(run_dir: Path, case_id: str) -> dict:
     """The producing run's own numbers for this case, for cross-checking."""
 
@@ -216,17 +273,7 @@ def run_from_run(run_dir: Path, case_id: str, output: Path | None) -> tuple[int,
               f"rel={row['relative_difference']:.2e}")
     print(f"    independent recomputation agrees: {cross_check['all_agree']}")
 
-    print("\n  bound-state gate (strict; the paper uses bound states only)")
-    if not bound["available"]:
-        print(f"    UNAVAILABLE: {bound['reason']}")
-    else:
-        print(f"    policy in producing run : {bound['policy_in_source_run']}")
-        print(f"    states in the chi2 sum  : {bound['states_in_chi2_sum']}")
-        for row in bound["failing_states"]:
-            print(f"    FAILING {row['state']}: boundary probability "
-                  f"{row['boundary_probability']} (left {row['left_boundary_probability']}, "
-                  f"right {row['right_boundary_probability']}) -- {row['reason']}")
-        print(f"    gate passed             : {bound['passed']}")
+    _print_bound_gate(bound)
 
     print("\n  variant ladder, chi2_xzx at 1550 nm")
     header = (f"    {'variant':<24}{'N_z':<12}{'zone':<24}{'domain':<8}"
@@ -251,6 +298,10 @@ def run_from_run(run_dir: Path, case_id: str, output: Path | None) -> tuple[int,
         print(f"    best promotable value             : {best:.2f} pm/V")
         print(f"    remaining shortfall vs {conv.PRIMARY_TARGET.value_pm_per_V:g} pm/V : "
               f"{conv.PRIMARY_TARGET.value_pm_per_V / best:.1f}x")
+
+    regression = conv.check_ladder_regression(ladder["rows"])
+    print()
+    _print_regression(regression)
     print(RULE)
 
     payload = {
@@ -263,6 +314,7 @@ def run_from_run(run_dir: Path, case_id: str, output: Path | None) -> tuple[int,
         "matrix_element_cross_check": cross_check,
         "bound_state_gate": bound,
         "variant_ladder": ladder,
+        "ladder_regression": regression,
         "optimization_performed": False,
     }
     if output:
@@ -314,6 +366,137 @@ def run_converge(run_dirs: list[str], case_id: str) -> tuple[int, dict]:
 
 
 # ---------------------------------------------------------------------------
+# Licensed solves
+# ---------------------------------------------------------------------------
+
+
+def _print_domain(record: dict) -> None:
+    marker = "  <- the paper's own period barrier" if record.get("is_paper_domain") else ""
+    print(f"\n  --- outer AlGaAs {record['outer_barrier_nm']:g} nm{marker}")
+    if not record.get("passed"):
+        print(f"      FAILED at {record.get('failure_stage')}: "
+              f"{record.get('failure_reason')}")
+        if record.get("bound_state_gate"):
+            _print_bound_gate(record["bound_state_gate"], indent="      ")
+        return
+
+    elements = record["matrix_elements"]
+    print("      energies (eV) and separations")
+    print(f"        E1  = {elements['E1_eV']:.6f}   E2  = {elements['E2_eV']:.6f}"
+          f"   E2-E1   = {elements['E2_minus_E1_meV']:8.3f} meV")
+    print(f"        HH1 = {elements['HH1_eV']:.6f}   HH2 = {elements['HH2_eV']:.6f}"
+          f"   HH1-HH2 = {elements['HH1_minus_HH2_meV']:8.3f} meV")
+    print(f"        E1-HH1 = {elements['transition_E1_HH1_eV']:.6f} eV     "
+          f"E2-HH2 = {elements['transition_E2_HH2_eV']:.6f} eV")
+    print("      overlaps <psi_e|psi_hh>")
+    print(f"        e1-hh1 = {elements['overlap_e1_hh1']:+.6f}   "
+          f"e1-hh2 = {elements['overlap_e1_hh2']:+.6f}")
+    print(f"        e2-hh1 = {elements['overlap_e2_hh1']:+.6f}   "
+          f"e2-hh2 = {elements['overlap_e2_hh2']:+.6f}")
+    print("      position matrix elements <psi|z|psi> (nm)")
+    print(f"        z_e1e1 = {elements['z_e1_e1_nm']:+.6f}  "
+          f"z_e1e2 = {elements['z_e1_e2_nm']:+.6f}  "
+          f"z_e2e2 = {elements['z_e2_e2_nm']:+.6f}")
+    print(f"        z_h1h1 = {elements['z_hh1_hh1_nm']:+.6f}  "
+          f"z_h1h2 = {elements['z_hh1_hh2_nm']:+.6f}  "
+          f"z_h2h2 = {elements['z_hh2_hh2_nm']:+.6f}")
+    print(f"        electron diagonal difference = "
+          f"{elements['electron_diagonal_difference_nm']:+.6f} nm   "
+          f"hole = {elements['hole_diagonal_difference_nm']:+.6f} nm")
+    _print_bound_gate(record["bound_state_gate"], indent="      ")
+
+    ladder = record["variant_ladder"]
+    print("      variant ladder, chi2_xzx at 1550 nm (pm/V)")
+    for row in ladder["rows"]:
+        print(f"        {row['variant']:<24}{row['chi2_at_1550_pm_per_V']:>10.2f}"
+              f"   promotable={'yes' if row['promotable'] else 'no'}")
+    print(f"        production chi2.py value : "
+          f"{record.get('production_chi2_at_1550_pm_per_V')}")
+    regression = conv.check_ladder_regression(ladder["rows"])
+    _print_regression(regression, indent="      ")
+
+
+def run_solve(
+    domains: list[float] | None, strict_abort: bool, verbose: bool
+) -> tuple[int, dict]:
+    """The licensed experiment: three domains, gates, ladder, final verdict."""
+
+    import solve16f  # imported here; it pulls in the whole demo tree
+
+    print(RULE)
+    print("  DEMO 16F -- LICENSED SOLVES (paper ideal-abrupt ACQW)")
+    print(RULE)
+    print(f"  STRUCTURE : {conv.PAPER_THICK_WELL_NM:g} nm GaAs / "
+          f"{conv.PAPER_TUNNEL_BARRIER_NM:g} nm Al{conv.PAPER_AL_FRACTION:g}GaAs / "
+          f"{conv.PAPER_THIN_WELL_NM:g} nm GaAs, s = 0.42, abrupt")
+    print(f"  DOMAINS   : "
+          f"{', '.join(f'{w:g} nm' for w in (domains or demo16f.DOMAIN_SWEEP_NM))}")
+    print(f"  TARGET    : {conv.PRIMARY_TARGET.value_pm_per_V:g} pm/V "
+          f"({conv.PRIMARY_TARGET.source})")
+    print("  SCALE     : none. Demo 16F fits nothing.")
+    print(RULE)
+
+    root, report = solve16f.run_solves(
+        domains=domains, strict_abort=strict_abort, verbose=verbose,
+    )
+    for record in report["domains"]:
+        _print_domain(record)
+
+    convergence = report["domain_convergence"]
+    print(f"\n{RULE}")
+    print("  DOMAIN CONVERGENCE")
+    print(RULE)
+    for row in convergence.get("rows", []):
+        print(f"    outer {row['outer_barrier_nm']:>6.2f} nm   "
+              f"max |dE| = {row['max_energy_shift_meV']:8.4f} meV   "
+              f"max relative d<z> = {row['max_dipole_relative_shift']:.3e}")
+    print(f"\n    energies converged at the paper domain : "
+          f"{convergence.get('paper_domain_energies_converged')}")
+    print(f"    dipoles  converged at the paper domain : "
+          f"{convergence.get('paper_domain_dipoles_converged')}")
+    print(f"    CONVERGED                              : {convergence.get('converged')}")
+    if convergence.get("diagnostic"):
+        print(f"    DIAGNOSTIC: {convergence['diagnostic']}")
+
+    print(f"\n{RULE}")
+    print("  FINAL REPORT")
+    print(RULE)
+    print(f"    domains converged        : {convergence.get('converged')}")
+    print(f"    bound-state verdicts     : {report['bound_state_verdicts']}")
+    if report["non_bound_states"]:
+        print(f"    NON-BOUND STATES         : {report['non_bound_states']}")
+    else:
+        print("    non-bound states         : none identified")
+    if report["domains_without_a_certified_bound_gate"]:
+        print(f"    NOT CERTIFIED            : "
+              f"{report['domains_without_a_certified_bound_gate']}")
+    best = report["best_physically_justified"]
+    print(f"\n    best physically justified chi2_xzx(1550):")
+    print(f"      value      : {best['chi2_at_1550_pm_per_V']} pm/V")
+    print(f"      variant    : {best['variant']}")
+    print(f"      conventions: {best['conventions']}")
+    print(f"      bound gate : {best['certified_by_bound_gate']}")
+    print(f"\n    paper target : {report['target']['value_pm_per_V']:g} pm/V "
+          f"({report['target']['source']})")
+    factor = report["remaining_factor_vs_target"]
+    print(f"    REMAINING FACTOR VS TARGET : "
+          f"{'n/a' if factor is None else format(factor, '.1f') + 'x'}")
+    print("\n    unresolved published ambiguities (reported, NOT applied):")
+    for item in report["unresolved_published_ambiguities"]:
+        print(f"      {item['name']:<28} x{item['size']:g}  applied={item['applied']}")
+    print(f"\n    {report['no_empirical_scaling_note']}")
+    print(f"\n  RUN DIR: {root}")
+    print(f"  REPORT : {root / 'summaries' / 'demo16f_report.json'}")
+    print(RULE)
+
+    solved = sum(bool(r.get("passed")) for r in report["domains"])
+    certified = not report["domains_without_a_certified_bound_gate"]
+    status = 0 if (solved == len(report["domains"]) and certified
+                   and convergence.get("converged")) else 1
+    return status, report
+
+
+# ---------------------------------------------------------------------------
 # Plan
 # ---------------------------------------------------------------------------
 
@@ -323,27 +506,33 @@ def run_plan() -> int:
     print(RULE)
     print("  DEMO 16F -- LICENSED WORK REQUIRED")
     print(RULE)
-    print("\n  A. Variant ladder -- NEEDS NO NEW SOLVE.")
-    print("     A completed Demo 16E run already contains case_02's envelopes.")
-    print("     python run_demo16f.py --from-run <16E_run_dir> --case case_02")
-    print("\n  B. Strict bound-state diagnosis. Demo 16E ran with")
-    print("     quasi_bound_state_policy: warn and every case reported")
-    print("     physical_qc_valid = False with one state in the chi2 sum failing.")
-    print("     Re-run the producing demo with, in its demo.yaml validation block:")
-    print("         quasi_bound_state_policy: fail_case")
-    print("     so the run stops on the failing state instead of recording it, and")
-    print("     the per-state quasi_bound_states.json names which state and why.")
-    print("\n  C. Outer-domain convergence. Solve the same structure at three")
-    print("     outer AlGaAs widths and compare position matrix elements, not")
-    print("     only eigenvalues:")
+    print("\n  Demo 16F performs all of the following itself:")
+    print("     python run_demo16f.py --solve")
+    print("\n  A. Three licensed solves of one structure, at outer AlGaAs widths:")
     for width in demo16f.DOMAIN_SWEEP_NM:
         marker = "  <- the paper's own period barrier" if abs(
             width - conv.PAPER_PERIOD_BARRIER_NM
         ) < 1e-9 else ""
         print(f"         outer barrier {width:>5.1f} nm{marker}")
-    print("     then:")
-    print("     python run_demo16f.py --converge 18.2=<run1> 25=<run2> 35=<run3>")
-    print("\n  D. The structure this audit is about:")
+    print("     Each uses Demo 16E's renderer, parser gate, realized-composition")
+    print("     gate, required-output gate and solver, unchanged.")
+    print("\n  B. Strict per-state bound gate for E1, E2, HH1 and HH2. The verdict")
+    print("     is fail_case: a non-bound state in the Eq. 2 sum is a failure, and")
+    print("     a missing or untested state is NOT CERTIFIED, never a pass.")
+    print("     Demo 11 itself runs under warn so envelopes.csv is written before")
+    print("     any abort; --strict-abort switches it to fail_case instead.")
+    print("\n  C. Convergence of the position matrix elements checked SEPARATELY")
+    print("     from the eigenenergies, because absolute chi2 rides on <psi|z|psi>.")
+    print("\n  D. The convention ladder on the newly solved wavefunctions, with")
+    print("     well_density, gamma_to_x_2pi_over_a, and both radial and")
+    print("     independent Cartesian k integration; then the regression check")
+    print("     against the validated values:")
+    for name, value in conv.LADDER_REGRESSION_PM_PER_V.items():
+        print(f"         {name:<24}{value:>8.2f} pm/V")
+    print("\n  E. Without a licensed machine, the ladder alone still runs from an")
+    print("     existing Demo 16E run, with no new solve:")
+    print("     python run_demo16f.py --from-run <16E_run_dir> --case case_02")
+    print("\n  F. The structure this audit is about:")
     for key in ("thick_well_nm", "tunnel_barrier_nm", "thin_well_nm",
                 "period_barrier_nm", "period_nm", "asymmetry_s", "interfaces"):
         print(f"         {key:<20} {structure[key]}")
@@ -365,6 +554,9 @@ def main(argv: list[str] | None = None) -> int:
     group = parser.add_mutually_exclusive_group()
     group.add_argument("--audit", action="store_true",
                        help="solver-free mathematics; runs anywhere")
+    group.add_argument("--solve", "--licensed", dest="solve", action="store_true",
+                       help="run the licensed nextnano++ domain sweep, gates, "
+                            "ladder and final report (licensed machine only)")
     group.add_argument("--from-run", metavar="RUN_DIR",
                        help="walk the variant ladder using an existing run")
     group.add_argument("--converge", nargs="+", metavar="OUTER_NM=RUN_DIR",
@@ -372,10 +564,26 @@ def main(argv: list[str] | None = None) -> int:
     group.add_argument("--plan", action="store_true",
                        help="print the licensed work still required")
     parser.add_argument("--case", default=DEFAULT_CASE)
+    parser.add_argument("--domains", nargs="+", type=float, metavar="NM",
+                        help="outer AlGaAs widths for --solve "
+                             "(default 18.2 25 35)")
+    parser.add_argument("--strict-abort", action="store_true",
+                        help="run Demo 11 under quasi_bound_state_policy=fail_case "
+                             "so a non-bound state aborts the case. Off by "
+                             "default because the abort precedes envelopes.csv, "
+                             "and 16F applies the same verdict either way")
     parser.add_argument("--output", metavar="JSON")
     parser.add_argument("--verbose", action="store_true")
     args = parser.parse_args(argv)
 
+    if args.solve:
+        status, payload = run_solve(args.domains, args.strict_abort, args.verbose)
+        if args.output:
+            Path(args.output).parent.mkdir(parents=True, exist_ok=True)
+            Path(args.output).write_text(json.dumps(payload, indent=1),
+                                         encoding="utf-8")
+            print(f"  WROTE: {args.output}")
+        return status
     if args.from_run:
         status, payload = run_from_run(Path(args.from_run), args.case,
                                        Path(args.output) if args.output else None)

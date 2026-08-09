@@ -335,6 +335,33 @@ def test_domain_sweep_includes_the_papers_own_period_barrier():
     assert demo16f.DOMAIN_SWEEP_NM == tuple(sorted(demo16f.DOMAIN_SWEEP_NM))
 
 
+def _quasi_bound_record(band, state, *, passes=True, boundary=1e-5, in_window=True):
+    """A record shaped exactly like demo11._quasi_bound_records writes them."""
+
+    return {
+        "band": band,
+        "state": state,
+        "energy_eV": 2.9 if band == "electron" else 1.44,
+        "left_boundary_probability": boundary / 2.0,
+        "right_boundary_probability": boundary / 2.0,
+        "boundary_probability": boundary,
+        "passes_bound_criterion": passes,
+        "bound_criterion_detail": "energy below barrier maximum",
+        "boundary_probability_within_threshold": boundary <= 1.0e-3,
+        "within_chi2_state_window": in_window,
+        "included_in_chi2": in_window,
+        "exclusion_reason": "",
+    }
+
+
+def _write_quasi_bound(tmp_path, records, policy="warn"):
+    import json
+
+    (tmp_path / "quasi_bound_states.json").write_text(
+        json.dumps({"policy": policy, "records": records}), encoding="utf-8"
+    )
+
+
 def test_bound_state_gate_reports_unavailable_rather_than_passing(tmp_path):
     """A missing table must never read as a pass."""
 
@@ -343,26 +370,211 @@ def test_bound_state_gate_reports_unavailable_rather_than_passing(tmp_path):
     assert report["passed"] is None
 
 
-def test_bound_state_gate_names_the_failing_state(tmp_path):
-    import json
+def test_bound_state_gate_certifies_only_when_all_four_states_are_bound(tmp_path):
+    _write_quasi_bound(tmp_path, [
+        _quasi_bound_record("electron", 1),
+        _quasi_bound_record("electron", 2),
+        _quasi_bound_record("heavy_hole", 1),
+        _quasi_bound_record("heavy_hole", 2),
+    ])
+    report = demo16f.bound_state_gate(tmp_path)
+    assert report["passed"] is True
+    assert sorted(report["by_state"]) == ["E1", "E2", "HH1", "HH2"]
+    assert all(row["verdict"] == "BOUND" for row in report["by_state"].values())
 
-    (tmp_path / "quasi_bound_states.json").write_text(json.dumps({
-        "policy": "warn",
-        "records": [
-            {"state": "E1", "in_chi2_sum": True, "bound": True,
-             "boundary_probability": 1e-5},
-            {"state": "E2", "in_chi2_sum": True, "bound": False,
-             "boundary_probability": 3.6e-2,
-             "left_boundary_probability": 3.6e-2,
-             "right_boundary_probability": 2.4e-2,
-             "reason": "boundary probability above 1e-3"},
-        ],
-    }), encoding="utf-8")
+
+def test_bound_state_gate_names_the_failing_state(tmp_path):
+    _write_quasi_bound(tmp_path, [
+        _quasi_bound_record("electron", 1),
+        _quasi_bound_record("electron", 2, passes=False, boundary=3.6e-2),
+        _quasi_bound_record("heavy_hole", 1),
+        _quasi_bound_record("heavy_hole", 2),
+    ])
     report = demo16f.bound_state_gate(tmp_path)
     assert report["passed"] is False
-    assert report["failing_count"] == 1
-    assert report["failing_states"][0]["state"] == "E2"
+    assert report["failing_states"] == ["E2"]
+    assert report["by_state"]["E2"]["verdict"] == "NOT BOUND"
     assert report["policy_required"] == "fail_case"
+
+
+def test_bound_state_gate_does_not_pass_on_an_unrecognised_schema(tmp_path):
+    """The regression for the silent pass: a key rename must never certify.
+
+    An earlier gate filtered on ``in_chi2_sum``, a key this schema does not use.
+    It matched nothing, found no failures and returned True while printing an
+    empty state list. Absence of evidence is not a pass.
+    """
+
+    _write_quasi_bound(tmp_path, [
+        {"label": "E1", "in_chi2_sum": True, "bound": True},
+        {"label": "E2", "in_chi2_sum": True, "bound": False},
+    ])
+    report = demo16f.bound_state_gate(tmp_path)
+    assert report["passed"] is not True
+    assert report["passed"] is None
+    assert report["records_unrecognised"] == 2
+    assert report["by_state"] == {}
+
+
+def test_bound_state_gate_does_not_pass_when_a_state_is_missing(tmp_path):
+    _write_quasi_bound(tmp_path, [
+        _quasi_bound_record("electron", 1),
+        _quasi_bound_record("electron", 2),
+        _quasi_bound_record("heavy_hole", 1),
+    ])
+    report = demo16f.bound_state_gate(tmp_path)
+    assert report["passed"] is None
+    assert report["missing_states"] == ["HH2"]
+
+
+def test_bound_state_gate_does_not_pass_an_untested_state(tmp_path):
+    _write_quasi_bound(tmp_path, [
+        _quasi_bound_record("electron", 1),
+        _quasi_bound_record("electron", 2, passes=None),
+        _quasi_bound_record("heavy_hole", 1),
+        _quasi_bound_record("heavy_hole", 2),
+    ])
+    report = demo16f.bound_state_gate(tmp_path)
+    assert report["passed"] is None
+    assert report["untested_states"] == ["E2"]
+    assert report["by_state"]["E2"]["verdict"] == "NOT TESTED"
+
+
+def test_bound_state_gate_records_that_holes_get_the_weaker_test(tmp_path):
+    _write_quasi_bound(tmp_path, [
+        _quasi_bound_record("electron", 1),
+        _quasi_bound_record("electron", 2),
+        _quasi_bound_record("heavy_hole", 1),
+        _quasi_bound_record("heavy_hole", 2),
+    ])
+    report = demo16f.bound_state_gate(tmp_path)
+    assert report["by_state"]["E1"]["energy_half_of_test_applied"] is True
+    assert report["by_state"]["HH1"]["energy_half_of_test_applied"] is False
+
+
+# ---------------------------------------------------------------------------
+# Regression anchors from the validated ladder
+# ---------------------------------------------------------------------------
+
+
+def test_legacy_regression_anchor_matches_demo16e_case02():
+    """The load-bearing check: two independent evaluators, one number."""
+
+    assert conv.LADDER_REGRESSION_PM_PER_V["legacy"] == pytest.approx(
+        conv.DEMO16E_CASE02_CHI2_AT_1550, rel=1e-3
+    )
+
+
+def test_regression_anchors_encode_the_exact_nz_doubling():
+    anchors = conv.LADDER_REGRESSION_PM_PER_V
+    assert anchors["paper_Nz"] == pytest.approx(2.0 * anchors["legacy"], rel=2e-3)
+
+
+def test_regression_anchors_have_the_two_k_implementations_agreeing():
+    anchors = conv.LADDER_REGRESSION_PM_PER_V
+    assert anchors["independent_cartesian"] == pytest.approx(
+        anchors["paper_Nz_and_zone"], rel=kspace.K_METHOD_AGREEMENT_TOLERANCE
+    )
+
+
+def test_regression_check_flags_drift_and_never_silently_passes():
+    good = [
+        {"variant": name, "chi2_at_1550_pm_per_V": value, "promotable": False}
+        for name, value in conv.LADDER_REGRESSION_PM_PER_V.items()
+    ]
+    assert conv.check_ladder_regression(good)["all_agree"] is True
+
+    drifted = [dict(row) for row in good]
+    drifted[0]["chi2_at_1550_pm_per_V"] *= 1.5
+    report = conv.check_ladder_regression(drifted)
+    assert report["all_agree"] is False
+    assert report["comparisons"][0]["agrees"] is False
+
+    empty = conv.check_ladder_regression([])
+    assert empty["all_agree"] is None
+    assert empty["variants_checked"] == 0
+
+
+# ---------------------------------------------------------------------------
+# The licensed solve path, without a licence
+# ---------------------------------------------------------------------------
+
+
+def test_paper_case_is_the_abrupt_structure_demo16e_calls_case_02():
+    import solve16f
+
+    case = solve16f.paper_case(1, 18.2)
+    assert case.is_abrupt
+    assert case.expected_representation == "abrupt"
+    assert case.central_barrier_nm == pytest.approx(1.8)
+    assert case.left_grading_width_nm == case.right_grading_width_nm == 0.0
+    thick, thin = case.well_widths_nm()
+    assert thick == pytest.approx(7.1)
+    assert thin == pytest.approx(2.9)
+    assert case.physics_label == "p01"
+
+
+def test_config_for_domain_changes_only_the_outer_barrier():
+    import solve16f
+
+    base = {
+        "geometry": {"domain_padding_nm": 20.0, "total_well_thickness_nm": 10.0},
+        "chi2": {"mode": "absolute"},
+    }
+    updated = solve16f.config_for_domain(base, 35.0)
+    assert updated["geometry"]["domain_padding_nm"] == 35.0
+    assert updated["geometry"]["total_well_thickness_nm"] == 10.0
+    assert updated["chi2"] == base["chi2"]
+    # The original must not have been mutated: three domains sharing one dict
+    # would silently solve the same geometry three times and look converged.
+    assert base["geometry"]["domain_padding_nm"] == 20.0
+
+
+def test_strict_abort_sets_fail_case_and_is_off_by_default():
+    import solve16f
+
+    base = {"geometry": {"domain_padding_nm": 20.0}}
+    assert "validation" not in solve16f.config_for_domain(base, 18.2)
+    strict = solve16f.config_for_domain(base, 18.2, strict_abort=True)
+    assert strict["validation"]["quasi_bound_state_policy"] == "fail_case"
+
+
+def test_adapter_default_policy_is_unchanged_for_demos_that_do_not_ask():
+    """The shared adapter change must not alter Demo 13/14/16B-16E behaviour."""
+
+    DEMO14 = DEMOS / "14_absolute_chi2_graded_acqw_bo"
+    source = (DEMO14 / "adapter14.py").read_text(encoding="utf-8")
+    assert '"quasi_bound_state_policy", "warn"' in source
+
+
+def test_report_never_applies_the_unresolved_ambiguities():
+    import solve16f
+
+    report = solve16f.build_report({"demo_id": conv.DEMO_ID}, [])
+    assert report["scale_factor_applied"] is None
+    names = {item["name"] for item in report["unresolved_published_ambiguities"]}
+    assert names == {"eq1_eq2_prefactor", "heavy_hole_mj_multiplicity"}
+    assert all(
+        item["applied"] is False
+        for item in report["unresolved_published_ambiguities"]
+    )
+    assert report["best_physically_justified"]["chi2_at_1550_pm_per_V"] is None
+    assert report["remaining_factor_vs_target"] is None
+
+
+def test_report_marks_domains_without_a_certified_gate():
+    import solve16f
+
+    report = solve16f.build_report({}, [
+        {"case_id": "domain_01", "passed": True, "outer_barrier_nm": 18.2,
+         "bound_state_gate": {"passed": None, "failing_states": []}},
+        {"case_id": "domain_02", "passed": True, "outer_barrier_nm": 25.0,
+         "bound_state_gate": {"passed": False, "failing_states": ["E2"]}},
+    ])
+    assert report["domains_without_a_certified_bound_gate"] == [
+        "domain_01", "domain_02",
+    ]
+    assert report["non_bound_states"] == {"domain_02": ["E2"]}
 
 
 def test_domain_convergence_separates_energies_from_dipoles():

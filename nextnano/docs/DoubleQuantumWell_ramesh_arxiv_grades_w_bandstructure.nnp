@@ -1,0 +1,260 @@
+!TEXT 
+    ========================================================================================================================= 
+    "Double Quantum Well" 
+    https://www.nextnano.com/docu/nextnanoplus/tutorials/1D_double_qw.html
+    ------------------------------------------------------------------------------------------------------------------------- 
+    This input file is provided to you by nextnano GmbH (https://www.nextnano.com)
+    It is compatible with nextnano++ 3.0.0
+    Last modified on 2026/06/11
+    ========================================================================================================================= 
+    References: 
+    ------------------------------------------------------------------------------------------------------------------------- 
+    Quantum Wells, Wires and Dots
+    P. Harrison
+    Theoretical and Computational Physics of Semiconductor Nanostructures, 2nd ed., John Wiley & Sons, Ltd (2005)
+    https://doi.org/10.1002/0470010827
+    ========================================================================================================================= 
+!ENDTEXT 
+
+#---------------------------------------------------------------------------!
+
+$QW_WIDTH1     = 7.1                                            # widths of both quantum wells (DisplayUnit:nm)
+$QW_WIDTH2     = 2.9                                            # widths of both quantum wells (DisplayUnit:nm)
+$QW_SEPARATION = 1.8                                            # separation of the QWs        (RangeOfValues:From=1.0,To=14.0,Step=1.0)(ListOfValues:1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0,9.0,10,15,20,30) (DisplayUnit:nm) (HighlightInUserInterface)
+$GRADE_WIDTH   = 0.7
+$middle        = 18.0                                           # middle of the structure (DisplayUnit:nm) (DoNotShowInUserInterface)
+
+$QW1_min = $middle - $QW_SEPARATION / 2 - $QW_WIDTH1            # minimum coordinate of quantum well #1 (DisplayUnit:nm) (DoNotShowInUserInterface)
+$QW1_max = $middle - $QW_SEPARATION / 2                         # maximum coordinate of quantum well #1 (DisplayUnit:nm) (DoNotShowInUserInterface)
+$QW2_min = $middle + $QW_SEPARATION / 2                         # minimum coordinate of quantum well #2 (DisplayUnit:nm) (DoNotShowInUserInterface)
+$QW2_max = $middle + $QW_SEPARATION / 2 + $QW_WIDTH2            # maximum coordinate of quantum well #2 (DisplayUnit:nm) (DoNotShowInUserInterface)
+
+
+$QWlgrade_min = $QW1_min - $GRADE_WIDTH                                    # minimum coordinate of quantum well #1 (DisplayUnit:nm) (DoNotShowInUserInterface)
+$QWlgrade_max = $QW1_max + $GRADE_WIDTH                                    # minimum coordinate of quantum well #1 (DisplayUnit:nm) (DoNotShowInUserInterface)
+
+$QW2grade_min = $QW2_min - $GRADE_WIDTH                                    # minimum coordinate of quantum well #1 (DisplayUnit:nm) (DoNotShowInUserInterface)
+$QW2grade_max = $QW2_max + $GRADE_WIDTH                                    # minimum coordinate of quantum well #1 (DisplayUnit:nm) (DoNotShowInUserInterface)
+
+
+
+$left_dispersion  = -0.1
+$right_dispersion =  0.1
+$num_points_dispersion = 7
+#---------------------------------------------------------------------------!
+
+run{ 
+    quantum{
+#        $quantum-model-holes
+#        model-name                     = '6x6kp'
+#        model-number                   = 1     
+#        cluster-numbers                = 1
+#        valence-band-numbers           = [1,2,3]
+#        number-of-eigenvalues-per-band = [3,3,3]
+#         $end_quantum-model-holes
+    }
+}
+
+global{ 
+    simulate1D{}
+    
+    crystal_zb{ 
+        x_hkl = [1, 0, 0]
+        y_hkl = [0, 1, 0]
+    }
+    
+    substrate{ 
+        name = "GaAs"
+    }
+    
+    temperature = 300.0  # 300 Kelvin
+    
+}
+
+impurities{ 
+}
+
+contacts{ 
+    fermi{ name = "fermi_zero" bias = 0}  # define reference energy
+}
+
+structure{ 
+    output_region_index{ boxes = no }
+    output_material_index{ boxes = no }
+    output_alloy_composition{ boxes = no }
+    
+    region{ 
+        everywhere{                   # (default region in nextnano3)
+        }
+        contact { name = fermi_zero }
+        ternary_constant{ 
+            name = "Al(x)Ga(1-x)As"   # AlGaAs barriers
+            alloy_x = 0.55E0           # Al0.2Ga0.8As
+        }
+    }
+    region{ 
+        line{ 
+            x = [0E0, 56E0]           # AlGaAs barrier
+        }
+        ternary_constant{ 
+            name = "Al(x)Ga(1-x)As"   # AlGaAs barriers
+            alloy_x = 0.55E0           # Al0.2Ga0.8As
+        }
+    }
+    region{ 
+        line{ 
+            x = [$QW1_min, $QW1_max]  # !  GaAs quantum well
+        }
+        binary{ 
+            name = "GaAs"             # GaAs quantum wells
+        }
+    }
+    region{ 
+        line{ 
+            x = [$QWlgrade_min, $QW1_min]  # !  GRADE
+        }
+        ternary_linear{ 
+            name = "Al(x)Ga(1-x)As"   # AlGaAs barriers
+            alloy_x = [0.55, 0.0]      # GRADE
+            x       = [$QWlgrade_min, $QW1_min]     # x coordinates of start and end point [nm]
+        }
+    }
+    region{ 
+        line{ 
+            x = [$QW1_max, $QWlgrade_max]  # !  GRADE
+        }
+        ternary_linear{ 
+            name = "Al(x)Ga(1-x)As"   # AlGaAs barriers
+            alloy_x = [0.0, 0.55]      # GRADE
+            x       = [$QW1_max, $QWlgrade_max]   # x coordinates of start and end point [nm]
+        }
+    }
+
+    region{ 
+        line{ 
+            x = [$QW2_min, $QW2_max]  # !  GaAs quantum well
+        }
+        binary{ 
+            name = "GaAs"             # GaAs quantum wells
+        }
+    }
+    region{ 
+        line{ 
+            x = [$QW2grade_min, $QW2_min]  # !  GRADE
+        }
+        ternary_linear{ 
+            name = "Al(x)Ga(1-x)As"   # AlGaAs barriers
+            alloy_x = [0.55, 0.0]      # GRADE
+            x       = [$QW2grade_min, $QW2_min]     # x coordinates of start and end point [nm]
+        }
+    }
+    region{ 
+        line{ 
+            x = [$QW2_max, $QW2grade_max]  # !  GRADE
+        }
+        ternary_linear{ 
+            name = "Al(x)Ga(1-x)As"   # AlGaAs barriers
+            alloy_x = [0.0, 0.55]      # GRADE
+            x       = [$QW2_max, $QW2grade_max]   # x coordinates of start and end point [nm]
+        }
+    }
+
+}
+
+grid{ 
+    xgrid{ 
+        line{  pos = 0.0        spacing = 1 }
+        line{  pos = $QWlgrade_min   spacing = 0.01 }
+        line{  pos = $QWlgrade_max   spacing = 0.01 }
+        line{  pos = 56.0       spacing = 1 }
+    }
+}
+
+classical{ 
+    Gamma{ output_bandedge{ averaged = no } } 
+    HH{}
+    LH{}
+    SO{}
+    output_bandedges{ averaged = no }
+    bulk_dispersion{
+        Gamma{}
+        KP8{}
+#        full{ kxgrid{ 
+#                line{ pos =-1.0   spacing = 0.2 }
+#                line{ pos = 0.0   spacing = 0.2 }
+#                line{ pos = 1.0   spacing = 0.2 }
+#                } 
+#           name = "name"
+#        }
+#        position{
+#                x = 10.5
+#        }
+        path{
+            name = "name_1"
+            position{
+                x = ($QW1_max + $QW2_min)/2
+            }
+            point{ k = [-1.11,-1.11,-1.11 ] }
+            point{ k = [ 0.0, 0.0, 0.0 ] }
+            point{ k = [ 0.96, 0.0, 0.0 ] }
+            spacing = 0.02
+        }
+#        path{
+#            name = "name_2"
+#        }
+#        full{
+#            name = "name_3"
+#        }
+        output_bulk_dispersions{}
+    }
+}
+
+poisson{ 
+    between_fermi_levels{}
+}
+
+currents{ 
+    recombination_model{ 
+        SRH         = no
+        Auger       = no
+        radiative   = no
+    }
+}
+
+quantum{ 
+
+    region{ 
+        name = "quantum_region"
+        x = [0E0, 36E0]
+        no_density = yes
+        boundary{ 
+            x = dirichlet
+        }
+        kp_6band{ # 6-band k.p model
+            num_ev = 10 # number of hole states
+            k_integration_disabled{ }
+        }
+        
+#        dispersion{
+#            output_dispersions{}
+#            path{
+#                name = "superlattice_dispersion"
+#                point{ k = [$left_dispersion,  0.0, 0.0] }
+#                point{ k = [$right_dispersion, 0.0, 0.0] }
+#                num_points = $num_points_dispersion          number of superlattice vectors along x direction
+#            }
+#        }
+
+        Gamma{ 
+            num_ev = 4
+        }
+        
+        output_states{
+            max_num = 8
+            all_k_points = yes
+            envelopes = yes
+            probabilities = yes
+                  # in_one_file = no   
+        }
+    }
+}
