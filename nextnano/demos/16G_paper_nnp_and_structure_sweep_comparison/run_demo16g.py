@@ -4,7 +4,10 @@
 ``--nnp-comparison``   Group 1 only: the two supplied .nnp files
 ``--paper-benchmark``  Group 3 only: the paper's ideal-abrupt structure
 ``--sweep``            Group 2 only: the 20 generated structures
-``--analyze``          rebuild every summary and plot from completed results
+``--analyze``          rebuild every summary and plot from completed results.
+                       Repeat ``--run-dir`` to merge several run directories,
+                       which is what running the three solve modes separately
+                       produces; ``--out`` chooses where the merged result lands.
 ``--all``              all three groups then the analysis, in one go
 
 The three solve modes are separate on purpose: if the ``.nnp`` comparison fails
@@ -67,12 +70,55 @@ def _latest_run(cfg: dict, machine=None) -> Path:
 
 
 def _load_records(run_dir: Path) -> list[dict]:
-    """Every case's provenance.json, for --analyze."""
+    """Every case's provenance.json, for --analyze.
+
+    Each record is tagged with the run directory it came from, so a merged
+    analysis can say where any row originated.
+    """
 
     records = []
     for path in sorted((Path(run_dir) / "cases").rglob("provenance.json")):
-        records.append(json.loads(path.read_text(encoding="utf-8")))
+        record = json.loads(path.read_text(encoding="utf-8"))
+        record["_source_run_dir"] = str(Path(run_dir))
+        records.append(record)
     return records
+
+
+def _merge_records(run_dirs: list[Path]) -> tuple[list[dict], dict]:
+    """Records from several run directories, newest wins on a repeated case.
+
+    Running the three solve modes separately produces three run directories, so
+    a combined figure has to read all of them. A case repeated across two runs
+    (a mode re-run after a fix) would otherwise be plotted twice; the newer one
+    wins, and the drop is reported rather than done quietly.
+
+    Ordering is by directory name, which encodes a UTC timestamp, so "newest"
+    is well defined without stat-ing anything.
+    """
+
+    ordered = sorted(run_dirs, key=lambda p: Path(p).name)
+    merged: dict[tuple, dict] = {}
+    duplicates: list[dict] = []
+    per_directory: dict[str, int] = {}
+    for run_dir in ordered:
+        records = _load_records(run_dir)
+        per_directory[str(run_dir)] = len(records)
+        for record in records:
+            key = (record.get("group"), record.get("case_id"))
+            if key in merged:
+                duplicates.append({
+                    "group": key[0], "case_id": key[1],
+                    "superseded_run_dir": merged[key]["_source_run_dir"],
+                    "kept_run_dir": str(run_dir),
+                })
+            merged[key] = record
+    return list(merged.values()), {
+        "run_directories": [str(p) for p in ordered],
+        "records_per_directory": per_directory,
+        "cases_after_merge": len(merged),
+        "duplicates_superseded": duplicates,
+        "merge_rule": "newest run directory wins on a repeated (group, case_id)",
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -211,23 +257,49 @@ def run_groups(
 # ---------------------------------------------------------------------------
 
 
-def run_analyze(cfg: dict, run_dir: Path | None, verbose: bool) -> int:
+def run_analyze(
+    cfg: dict, run_dirs: list[Path] | None, out_dir: Path | None, verbose: bool
+) -> int:
     try:
         machine = demo16g.resolve_machine(require_solver=False)
     except Exception:  # noqa: BLE001 - analysis must work without a licence
         machine = None
-    root = Path(run_dir) if run_dir else _latest_run(cfg, machine)
-    records = _load_records(root)
+    directories = [Path(p) for p in (run_dirs or [])] or [_latest_run(cfg, machine)]
+    records, merge = _merge_records(directories)
     if not records:
-        raise SystemExit(f"no case records under {root / 'cases'}")
+        raise SystemExit(
+            "no case records found under "
+            + ", ".join(str(p / "cases") for p in directories)
+        )
+    # Combined output lands in the newest supplied directory unless told
+    # otherwise, so a merged analysis never scatters itself across the inputs.
+    root = Path(out_dir) if out_dir else directories[-1]
 
     print(RULE)
-    print(f"  DEMO 16G -- ANALYZE  {root}")
+    print(f"  DEMO 16G -- ANALYZE")
+    print(RULE)
+    for directory in merge["run_directories"]:
+        print(f"  reading : {directory}  "
+              f"({merge['records_per_directory'][directory]} case(s))")
+    print(f"  writing : {root}")
+    if merge["duplicates_superseded"]:
+        print(f"  {len(merge['duplicates_superseded'])} repeated case(s) "
+              "superseded by a newer run:")
+        for row in merge["duplicates_superseded"]:
+            print(f"    {row['group']}/{row['case_id']} kept from "
+                  f"{Path(row['kept_run_dir']).name}")
+    groups = {}
+    for record in records:
+        groups[record.get("group")] = groups.get(record.get("group"), 0) + 1
+    print(f"  cases   : {merge['cases_after_merge']} total {groups}")
     print(RULE)
     written = report16g.write_master(
         root / "summaries", records, cfg,
-        extra={"comparison_against_paper":
-               report16g.comparison_against_paper(records, cfg)},
+        extra={
+            "comparison_against_paper":
+                report16g.comparison_against_paper(records, cfg),
+            "merge": merge,
+        },
     )
     figures = plots16g.write_all(root / "plots", records, cfg)
     print(report16g.console_table(records))
@@ -268,18 +340,30 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--nnp-file", action="append", metavar="PATH",
                         help="override a supplied .nnp path, positionally; "
                              "repeatable")
-    parser.add_argument("--run-dir", metavar="DIR",
-                        help="reuse or analyze this run directory")
+    parser.add_argument("--run-dir", action="append", metavar="DIR",
+                        help="reuse this run directory for a solve mode, or "
+                             "analyze it. Repeatable for --analyze, which then "
+                             "merges every directory given")
+    parser.add_argument("--out", metavar="DIR",
+                        help="where a merged --analyze writes its summaries and "
+                             "plots (default: the newest --run-dir given)")
     parser.add_argument("--verbose", action="store_true")
     args = parser.parse_args(argv)
 
     cfg = cases16g.load_config(Path(args.config) if args.config else None)
-    run_dir = Path(args.run_dir) if args.run_dir else None
+    run_dirs = [Path(p) for p in (args.run_dir or [])]
+    # A solve mode writes to exactly one directory; only --analyze merges.
+    run_dir = run_dirs[0] if run_dirs else None
+    if run_dirs and len(run_dirs) > 1 and not args.analyze:
+        print(f"  NOTE: {len(run_dirs)} --run-dir values given; a solve mode "
+              f"uses only the first ({run_dir}).")
 
     if args.plan:
         return run_plan(cfg, args.nnp_file, args.verbose)
     if args.analyze:
-        return run_analyze(cfg, run_dir, args.verbose)
+        return run_analyze(
+            cfg, run_dirs, Path(args.out) if args.out else None, args.verbose
+        )
     if args.nnp_comparison:
         return run_groups(cfg, [cases16g.GROUP_NNP], args.nnp_file,
                           args.verbose, run_dir)[0]
@@ -295,7 +379,7 @@ def main(argv: list[str] | None = None) -> int:
             [cases16g.GROUP_NNP, cases16g.GROUP_PAPER, cases16g.GROUP_SWEEP],
             args.nnp_file, args.verbose, run_dir,
         )
-        analyze = run_analyze(cfg, root, args.verbose)
+        analyze = run_analyze(cfg, [root], None, args.verbose)
         return status or analyze
     return run_plan(cfg, args.nnp_file, args.verbose)
 

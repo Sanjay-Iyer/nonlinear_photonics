@@ -178,6 +178,28 @@ runner passes an effective padding so `active_start` lands on `well1_start`.
 
 ## Commands
 
-See the bottom of this file's companion message, or run `--plan` — it prints
-every resolved path, both file hashes, all twenty structures with both grading
-widths, and the paper targets, without launching a solver.
+Run `--plan` first — it prints every resolved path, both file hashes, all twenty
+structures with both grading widths, and the paper targets, without launching a
+solver.
+
+### Merging separate run directories
+
+Each solve mode writes its own run directory, so running `--nnp-comparison`,
+`--paper-benchmark` and `--sweep` separately gives three of them. Bare
+`--analyze` reads only the newest, which would produce a combined plot missing
+two of the three groups.
+
+Repeat `--run-dir` to merge them:
+
+```powershell
+python .\nextnano\demos\16G_paper_nnp_and_structure_sweep_comparison\run_demo16g.py --analyze --verbose --run-dir <dir1> --run-dir <dir2> --run-dir <dir3>
+```
+
+Directories are ordered by name, which encodes a UTC timestamp. A case appearing
+in two of them — a mode re-run after a fix — is taken from the newer directory,
+and every supersession is printed and recorded in the master JSON under `merge`.
+The merged summaries and plots land in the newest directory given, or wherever
+`--out` says.
+
+`--all` needs none of this: one run directory for all three groups, analyzed in
+place.
