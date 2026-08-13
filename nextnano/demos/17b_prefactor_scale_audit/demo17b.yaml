@@ -1,0 +1,206 @@
+# Demo 17b -- prefactor, degeneracy and unit-cell matrix scale audit.
+#
+# Demo 17 closed the envelope side: matrix elements moved <=2.4 % and transition
+# energies <=0.22 % when the Dirichlet box went from 2 nm to 30 nm, origin
+# independence held at 2.7e-13, and two independently written Eq. 2 evaluators
+# agreed to 0.8 % on case_02 (84.70 vs 16F's 84.04 pm/V). The residual 27.6x
+# against 2340 pm/V is therefore in the PREFACTOR, and this file lists every
+# candidate factor with the reading that would justify it.
+#
+# NO SOLVER RUNS. Demo 17b loads Demo 17's saved artifacts and does arithmetic.
+#
+# `promotable: true` means a cited source REQUIRES the change, and only those
+# enter the "defensible" cumulative. Everything else is reported so its size is
+# visible and never folded into a headline. A factor is never promoted because
+# it makes the number bigger.
+
+experiment:
+  name: demo17b_prefactor_scale_audit
+  demo_id: 17b_prefactor_scale_audit
+  description: >-
+    Pure-Python decomposition of the residual absolute chi(2) scale gap into
+    exact multiplicative factors: N_z counting length, permutation/degeneracy
+    counting, heavy-hole spin weight, and the unit-cell dipole from the Kane
+    parameter.
+
+# --- what is being audited -------------------------------------------------
+source:
+  demo_id: 17_paper_chi2_reproduction_corrected
+  # Either spelling is accepted; see prefactor_audit17b.RESULTS_DIR_NAMES and
+  # the .gitignore note. Leave null to auto-resolve under demo_results/.
+  results_dir: null
+  cases: [case_02, case_01]
+  # case_02 is the abrupt structure the paper quotes 2340 pm/V for; case_01 is
+  # its graded twin, carried so a factor that looked structure-specific would
+  # show up as one.
+  primary_case: case_02
+
+target:
+  chi2_pm_per_V: 2340.0
+  source: "arXiv:2602.23246v1 Section 3.1, ideal abrupt interfaces, stated in words"
+
+# --- Demo 17's production settings ------------------------------------------
+# Read from the run's own corrections_applied record where present; these are
+# the fallbacks, and they must match what Demo 17 actually used.
+baseline:
+  target_wavelength_nm: 1550.0
+  n_wells_per_metre: 6.666666666666667e7   # 2 wells / 30 nm period
+  r_e_hh_nm: 0.751
+  k_max_per_nm: 1.1114288784645268         # 0.10 * 2*pi/a
+  k_parallel_points: 192
+  spin_degeneracy: 2
+  broadening_meV: 5.0
+  electron_mass_m0: 0.067
+  heavy_hole_inplane_mass_m0: 0.112
+
+# --- the sweeps -------------------------------------------------------------
+sweeps:
+
+  # ---------------------------------------------------------------------
+  # A. What length does N_z count wells per?
+  # ---------------------------------------------------------------------
+  # chi(2) is LINEAR in N_z, so every entry here is exact.
+  #
+  # The physical question is what medium the susceptibility describes. Counting
+  # 2 wells per 30 nm period describes the grown stack, barriers included, and
+  # is what a bulk-equivalent chi(2) for the MQW means. Counting 2 wells per
+  # 10 nm of GaAs describes a hypothetical medium that is entirely quantum well
+  # -- a legitimate quantity, but one that must have the fill factor put back
+  # before it can be compared to anything grown. Both are computed; only the
+  # period reading is promotable, because it is the one that describes the
+  # structure the paper actually reports.
+  A_nz:
+    variants:
+      - id: period_pair
+        wells: 1
+        length_nm: 30.0
+        promotable: false
+        rationale: >-
+          Demo 14/16E legacy: one coupled PAIR per 30 nm period. Superseded by
+          Demo 17's correction A and kept only so the ladder starts where the
+          record does.
+      - id: period_two_wells
+        wells: 2
+        length_nm: 30.0
+        promotable: true
+        rationale: >-
+          Demo 17 production. Ramesh 2023 Eq. 1 counts quantum wells per unit
+          length and Fig. 1a shows two GaAs wells (7.1 nm, 2.9 nm) per 30 nm
+          period. This is the baseline, so its multiplier is 1.0 by definition.
+      - id: active_layer_two_wells
+        wells: 2
+        length_nm: 10.0
+        promotable: false
+        rationale: >-
+          REPORTED ONLY, multiplier 3.0. Counts the two wells per 10 nm of GaAs
+          (7.1 + 2.9), i.e. per ACTIVE thickness rather than per period. This
+          describes a medium with no barriers at all, so the resulting chi(2) is
+          a well-material property that would need the 10/30 fill factor
+          reapplied before comparison with a grown stack -- which returns
+          exactly the period reading. Promoting it would make the paper's number
+          describe a material nobody grew.
+
+  # ---------------------------------------------------------------------
+  # B. Permutation and degeneracy counting
+  # ---------------------------------------------------------------------
+  # CAUTION, and this is the whole point of splitting them out: these two are
+  # very likely NOT independent. The Bloembergen/Boyd degeneracy factor for SHG
+  # is precisely what a permutation sum over the two input photons produces, and
+  # Demo 16F measured Eq. 1 / Eq. 2 = 3.000000 using `identity_only` -- with no
+  # permutation sum applied. Multiplying both would probably count one piece of
+  # bookkeeping twice, so neither is promotable and the maximal product carries
+  # an explicit warning.
+  B_permutation:
+    variants:
+      - id: shg_degeneracy_2
+        factor: 2.0
+        promotable: false
+        mutually_exclusive_with: eq1_over_eq2_3
+        rationale: >-
+          REPORTED ONLY. Standard degenerate-SHG factor: E(w)E(w) carries half
+          the permutation multiplicity of E(w1)E(w2), so a convention that
+          writes chi(2) for non-degenerate mixing and then specialises to SHG
+          picks up a 2. Whether Eq. 2 already carries it cannot be decided from
+          the published text.
+      - id: eq1_over_eq2_3
+        factor: 3.0
+        promotable: false
+        mutually_exclusive_with: shg_degeneracy_2
+        rationale: >-
+          REPORTED ONLY. Demo 16F fed identical matrix elements to Eq. 1
+          (1/(2 eps0 hbar^2) with an explicit sum_P) and Eq. 2 (1/(6 eps0
+          hbar^2) with none) and measured the ratio at exactly 3.000000; no
+          integer permutation multiplicity closes it. This is an open
+          discrepancy in the published pair of equations, running in the
+          direction of the production number being too small by 3 if Eq. 1 is
+          taken as the authority.
+
+  # ---------------------------------------------------------------------
+  # C. Heavy-hole spin / Kramers doublet
+  # ---------------------------------------------------------------------
+  # Not a free multiplier: the audit INSPECTS where spin_degeneracy is applied
+  # in the shared evaluator and measures the g_s = 1 vs g_s = 2 ratio, then
+  # reports already_included_once (1.0), double_counted (0.5) or missing (2.0).
+  # No variants to configure -- the answer is read out of the code.
+  C_spin_degeneracy:
+    expected_verdict: already_included_once
+    note: >-
+      The one-band HH solver returns orbital envelopes and does not resolve
+      m_j = +-3/2, so a spin weight of 2 IS the Kramers doublet. If it is
+      already applied in the k weights, an additional m_j factor of 2 is double
+      counting.
+
+  # ---------------------------------------------------------------------
+  # D. Unit-cell dipole from the Kane parameter
+  # ---------------------------------------------------------------------
+  # r_e,hh = (hbar / E_g) * sqrt(E_p / (2 m_0)),  chi(2) goes as r^2.
+  #
+  # FINDING, stated in advance because the audit will print it: for GaAs this
+  # gives 0.736 nm, NOT the ~1.28 nm sometimes assumed. That is 2 % from the
+  # published VASP/HSE06 value of 0.751 nm, so the Kane relation CONFIRMS the
+  # legacy constant and the multiplier is 0.96, slightly BELOW one. Reaching
+  # 1.28 nm would require E_p = 87 eV or E_g = 0.82 eV; neither is GaAs, and
+  # `expected_r_nm` below makes the audit print exactly that.
+  D_kane_dipole:
+    expected_r_nm: 1.28
+    variants:
+      - id: kane_300K
+        kane_energy_eV: 28.8
+        band_gap_eV: 1.424
+        promotable: false
+        rationale: >-
+          GaAs Kane parameter E_p = 28.8 eV with the 300 K gap, the temperature
+          Demo 17 solved at. Reported as a CROSS-CHECK of r_e,hh = 0.751 nm, not
+          as a replacement: agreement at the 2 % level is evidence the published
+          constant is right, and swapping a 0.96 multiplier in would be moving a
+          published number to chase a target.
+      - id: kane_0K
+        kane_energy_eV: 28.8
+        band_gap_eV: 1.519
+        promotable: false
+        rationale: >-
+          REPORTED ONLY. The 0 K gap, for sensitivity. r goes as 1/E_g, so the
+          low-temperature gap gives a smaller r still.
+      - id: kane_qw_transition
+        kane_energy_eV: 28.8
+        band_gap_eV: 1.4927
+        promotable: false
+        rationale: >-
+          REPORTED ONLY. Uses Demo 17's own E1-HH1 confined transition instead
+          of the bulk gap. Defensible only if the unit-cell matrix element is
+          taken at the confined transition rather than the band edge; the Kane
+          relation is a band-edge statement, so this is a sensitivity.
+
+# --- reporting --------------------------------------------------------------
+reporting:
+  # Cross-checks that need no wavefunctions, so they run at every loading tier.
+  cross_checks:
+    # chi2.py's absolute scale, recomputed from CODATA here.
+    production_prefactor_pm_per_V_per_summand: 113.39633764994086
+    prefactor_relative_tolerance: 1.0e-12
+    # Demo 16F's ladder on 16E's states, for context in the printed report.
+    demo16f_legacy_pm_per_V: 30.99
+    demo16f_nz_and_zone_pm_per_V: 84.04
+    # Demo 18 rows G/H measured the g_s = 1 vs 2 ratio independently.
+    demo18_spin_ratio: 2.0
+  decimal_places: 4

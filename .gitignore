@@ -58,17 +58,27 @@ nextnano/demos/**/*.dat
 !nextnano/demos/**/docs/*.nnp
 
 # ─── curated demo results ───────────────────────────────────────────────────
-# NOTE, because this deliberately does NOT match the literal request to ignore
-# `demo_results/demo_17/*`: `demo_results/` is the split-machine hand-off. The
-# work laptop runs the licensed solve and commits the curated summaries and
-# figures; the home laptop reads them back through `git pull`. That is how
-# demo_results/demo_16E's 10 figures, 2 CSVs and physics_summary.json got here,
-# and blanket-ignoring demo_17 would mean a licensed Demo 17 run could never
-# reach the home laptop at all.
+# `demo_results/` is the split-machine hand-off. The work laptop runs the
+# licensed solve and commits the curated summaries and figures; the home laptop
+# reads them back through `git pull`. That is how demo_results/demo_16E's 10
+# figures, 2 CSVs and physics_summary.json got here, and blanket-ignoring a demo
+# would mean its licensed run could never reach the home laptop at all.
 #
-# So the BULK is ignored and the CURATED SET stays tracked. To ignore Demo 17's
-# results outright instead, replace this whole block with `demo_results/demo_17/`.
-demo_results/demo_17/cases/
-demo_results/demo_17/p[0-9][0-9]/
-demo_results/demo_17/**/*.log
-demo_results/demo_17/**/*.dat
+# So the BULK is ignored and the CURATED SET stays tracked, for every demo.
+#
+# NAMING: the convention is `demo_<id>` with the underscore -- demo_16E,
+# demo_17, demo_17b. The un-underscored `demo17`/`demo18` spellings are matched
+# too, because both have been created by hand at least once and a rule that only
+# covers one spelling silently stops protecting the moment somebody types the
+# other. Demo 17b's loader accepts either spelling for the same reason.
+demo_results/demo_1[0-9]*/cases/
+demo_results/demo_1[0-9]*/p[0-9][0-9]/
+demo_results/demo_1[0-9]*/**/raw/
+demo_results/demo_1[0-9]*/**/*.log
+demo_results/demo_1[0-9]*/**/*.dat
+# ...but the Demo 17/17b hand-off DOES carry envelopes and matrix elements, which
+# are the inputs Demo 17b re-evaluates Eq. 2 from. Those are curated inputs, not
+# bulk solver output, so they stay tracked wherever they land.
+!demo_results/**/envelopes.csv
+!demo_results/**/matrix_elements.json
+!demo_results/**/paper_target_*/**

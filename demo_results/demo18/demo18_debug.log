@@ -1,0 +1,572 @@
+
+==============================================================================
+DEMO 18 START
+==============================================================================
+RUN DIRECTORY = C:\nn_results\18_absolute_chi2_scale_audit\demo18_20260813T204956Z_b5273cbc_80ab7e
+GIT / VERSION INFO
+{
+  "demo18_version": "demo18-1.0.0",
+  "git_branch": "main",
+  "git_commit": "b5273cbce52489631cf78cafcae936865ff2a3c3",
+  "git_commit_short": "b5273cbc",
+  "git_diff_sha256": null,
+  "git_dirty": false,
+  "git_dirty_files": []
+}
+MACHINE CONFIG
+{
+  "config_source": "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\nextnano\\config\\machines\\nextnano_machine.work.yaml",
+  "database": "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\database\\database.nnp",
+  "discovery_notes": [
+    "machine configuration selected by NEXTNANO_MACHINE_CONFIG: C:\\Code\\optics\\nextnano\\nonlinear_photonics\\nextnano\\config\\machines\\nextnano_machine.work.yaml",
+    "portable_root resolved from YAML: C:\\Code\\optics\\nextnano\\2026_07_03",
+    "licensed execution enabled automatically from portable_root",
+    "executable selected explicitly: C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\bin\\nextnano++_Intel_64bit.exe",
+    "database selected explicitly: C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\database\\database.nnp",
+    "license selected explicitly: License_nnp.lic"
+  ],
+  "executable": "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\bin\\nextnano++_Intel_64bit.exe",
+  "license_filename": "License_nnp.lic",
+  "portable_root": "C:\\Code\\optics\\nextnano\\2026_07_03",
+  "results_root": "C:\\nn_results",
+  "run_solver": true,
+  "threads": 1
+}
+NEXTNANO EXECUTABLE = C:\Code\optics\nextnano\2026_07_03\nextnano++\bin\nextnano++_Intel_64bit.exe
+REFERENCE STRUCTURE = 7.1 / 1.8 / 2.9 nm abrupt ACQW
+GENERATED INPUT FILE = C:\nn_results\18_absolute_chi2_scale_audit\demo18_20260813T204956Z_b5273cbc_80ab7e\inputs\reference_abrupt.in
+
+==============================================================================
+NEXTNANO SOLVER
+==============================================================================
+COMMAND
+C:\Code\optics\nextnano\2026_07_03\nextnano++\bin\nextnano++_Intel_64bit.exe -d C:\Code\optics\nextnano\2026_07_03\nextnano++\database\database.nnp -l C:\Code\optics\nextnano\2026_07_03\License\License_nnp.lic --threads 1 -o C:\nn_results\18_absolute_chi2_scale_audit\demo18_20260813T204956Z_b5273cbc_80ab7e\solver C:\nn_results\18_absolute_chi2_scale_audit\demo18_20260813T204956Z_b5273cbc_80ab7e\reference_case\physics\nextnano_input\case.in
+RETURN CODE = 0
+STDOUT LOCATION = C:\nn_results\18_absolute_chi2_scale_audit\demo18_20260813T204956Z_b5273cbc_80ab7e\reference_case\physics\logs\stdout.txt
+STDERR LOCATION = C:\nn_results\18_absolute_chi2_scale_audit\demo18_20260813T204956Z_b5273cbc_80ab7e\reference_case\physics\logs\stderr.txt
+OUTPUT FILES FOUND = 37
+[
+  {
+    "bytes": 134816,
+    "path": "case\\bias_00000\\bandedges.dat"
+  },
+  {
+    "bytes": 26082,
+    "path": "case\\bias_00000\\bandgap.dat"
+  },
+  {
+    "bytes": 54,
+    "path": "case\\bias_00000\\bias_points.log"
+  },
+  {
+    "bytes": 165,
+    "path": "case\\bias_00000\\Quantum\\acqw\\Gamma\\energy_spectrum_k00000.dat"
+  },
+  {
+    "bytes": 42485,
+    "path": "case\\bias_00000\\Quantum\\acqw\\Gamma\\envelopes_k00000.dat"
+  },
+  {
+    "bytes": 79058,
+    "path": "case\\bias_00000\\Quantum\\acqw\\Gamma\\envelopes_shift_k00000.dat"
+  },
+  {
+    "bytes": 42561,
+    "path": "case\\bias_00000\\Quantum\\acqw\\Gamma\\probabilities_k00000.dat"
+  },
+  {
+    "bytes": 79065,
+    "path": "case\\bias_00000\\Quantum\\acqw\\Gamma\\probabilities_shift_k00000.dat"
+  },
+  {
+    "bytes": 2169,
+    "path": "case\\bias_00000\\Quantum\\acqw\\Gamma_Gamma\\dipole_moment_matrix_elements_k00000_growth_z.fld"
+  },
+  {
+    "bytes": 5395,
+    "path": "case\\bias_00000\\Quantum\\acqw\\Gamma_Gamma\\dipole_moment_matrix_elements_k00000_growth_z.txt"
+  },
+  {
+    "bytes": 1618,
+    "path": "case\\bias_00000\\Quantum\\acqw\\Gamma_HH\\overlap_integrals_k00000.fld"
+  },
+  {
+    "bytes": 2956,
+    "path": "case\\bias_00000\\Quantum\\acqw\\Gamma_HH\\overlap_integrals_k00000.txt"
+  },
+  {
+    "bytes": 807,
+    "path": "case\\bias_00000\\Quantum\\acqw\\Gamma_HH\\transition_energies_k00000.fld"
+  },
+  {
+    "bytes": 1116,
+    "path": "case\\bias_00000\\Quantum\\acqw\\Gamma_HH\\transition_energies_k00000.txt"
+  },
+  {
+    "bytes": 165,
+    "path": "case\\bias_00000\\Quantum\\acqw\\HH\\energy_spectrum_k00000.dat"
+  },
+  {
+    "bytes": 42505,
+    "path": "case\\bias_00000\\Quantum\\acqw\\HH\\envelopes_k00000.dat"
+  },
+  {
+    "bytes": 79088,
+    "path": "case\\bias_00000\\Quantum\\acqw\\HH\\envelopes_shift_k00000.dat"
+  },
+  {
+    "bytes": 42609,
+    "path": "case\\bias_00000\\Quantum\\acqw\\HH\\probabilities_k00000.dat"
+  },
+  {
+    "bytes": 79066,
+    "path": "case\\bias_00000\\Quantum\\acqw\\HH\\probabilities_shift_k00000.dat"
+  },
+  {
+    "bytes": 2169,
+    "path": "case\\bias_00000\\Quantum\\acqw\\HH_HH\\dipole_moment_matrix_elements_k00000_growth_z.fld"
+  },
+  {
+    "bytes": 4501,
+    "path": "case\\bias_00000\\Quantum\\acqw\\HH_HH\\dipole_moment_matrix_elements_k00000_growth_z.txt"
+  },
+  {
+    "bytes": 236,
+    "path": "case\\bias_00000\\total_charges.txt"
+  },
+  {
+    "bytes": 54,
+    "path": "case\\bias_points.log"
+  },
+  {
+    "bytes": 2194,
+    "path": "case\\case.in"
+  },
+  {
+    "bytes": 6315,
+    "path": "case\\grid_x.dat"
+  },
+  {
+    "bytes": 37,
+    "path": "case\\job_done.txt"
+  },
+  {
+    "bytes": 240022,
+    "path": "case\\simulation_database.txt"
+  },
+  {
+    "bytes": 356,
+    "path": "case\\simulation_info.txt"
+  },
+  {
+    "bytes": 2336,
+    "path": "case\\simulation_input.txt"
+  },
+  {
+    "bytes": 29125,
+    "path": "case\\Structure\\alloy_composition.dat"
+  },
+  {
+    "bytes": 85,
+    "path": "case\\Structure\\material_indices.txt"
+  },
+  {
+    "bytes": 11043,
+    "path": "case\\Structure\\materials.dat"
+  },
+  {
+    "bytes": 10603,
+    "path": "case\\Structure\\regions_all.dat"
+  },
+  {
+    "bytes": 10603,
+    "path": "case\\Structure\\regions_material.dat"
+  },
+  {
+    "bytes": 288,
+    "path": "case\\summary.log"
+  },
+  {
+    "bytes": 48,
+    "path": "case\\variables_database.txt"
+  },
+  {
+    "bytes": 45,
+    "path": "case\\variables_input.txt"
+  }
+]
+
+==============================================================================
+PARSED STATES
+==============================================================================
+Ee1_eV = 2.937986086841
+Ee2_eV = 3.048057749389
+Ehh1_eV = 1.448521135589
+Ehh2_eV = 1.41546399868
+E1_minus_HH1_eV = 1.4894649512520002
+E2_minus_HH2_eV = 1.6325937507090003
+electron_orthonormality_error = 2.7949864644938316e-14
+heavy_hole_orthonormality_error = 2.0160956237802452e-14
+
+==============================================================================
+MATRIX ELEMENTS
+==============================================================================
+electron-hole overlap matrix
+[
+  [
+    0.9826407464256932,
+    0.024859992221794358
+  ],
+  [
+    -0.08826890844209587,
+    0.45773075641152466
+  ]
+]
+electron z matrix (nm)
+[
+  [
+    23.63669600060111,
+    1.0344880855925829
+  ],
+  [
+    1.0344880855925833,
+    29.65340020832502
+  ]
+]
+heavy-hole z matrix (nm)
+[
+  [
+    23.551515902296412,
+    1.4510036831796351
+  ],
+  [
+    1.4510036831796342,
+    23.86718496035008
+  ]
+]
+
+==============================================================================
+ABSOLUTE SCALE AUDIT
+==============================================================================
+Nz conventions
+{
+  "pair_per_period": 33333333.33333333,
+  "two_wells_per_period": 66666666.66666666
+}
+kmax conventions
+{
+  "bz_2pi_over_a": {
+    "formula": "0.1*2*pi/a",
+    "fraction_for_chi2_settings": 0.2
+  },
+  "legacy_pi_over_a": {
+    "formula": "0.1*pi/a",
+    "fraction_for_chi2_settings": 0.1
+  }
+}
+spin factor is a separate Chi2Settings field in every case
+r_ehh default = 0.751 nm
+production/independent prefactors
+[
+  {
+    "case_id": "A_baseline",
+    "independent": 56.698168824970445,
+    "passed": true,
+    "production": 56.69816882497043,
+    "relative_difference": 2.506404529407553e-16
+  },
+  {
+    "case_id": "B_two_wells_Nz",
+    "independent": 113.39633764994089,
+    "passed": true,
+    "production": 113.39633764994086,
+    "relative_difference": 2.506404529407553e-16
+  },
+  {
+    "case_id": "C_large_kmax",
+    "independent": 56.698168824970445,
+    "passed": true,
+    "production": 56.69816882497043,
+    "relative_difference": 2.506404529407553e-16
+  },
+  {
+    "case_id": "D_Nz_plus_large_kmax",
+    "independent": 113.39633764994089,
+    "passed": true,
+    "production": 113.39633764994086,
+    "relative_difference": 2.506404529407553e-16
+  },
+  {
+    "case_id": "E_kgrid_192",
+    "independent": 113.39633764994089,
+    "passed": true,
+    "production": 113.39633764994086,
+    "relative_difference": 2.506404529407553e-16
+  },
+  {
+    "case_id": "F_kgrid_384",
+    "independent": 113.39633764994089,
+    "passed": true,
+    "production": 113.39633764994086,
+    "relative_difference": 2.506404529407553e-16
+  },
+  {
+    "case_id": "G_spin1",
+    "independent": 113.39633764994089,
+    "passed": true,
+    "production": 113.39633764994086,
+    "relative_difference": 2.506404529407553e-16
+  },
+  {
+    "case_id": "H_spin2",
+    "independent": 113.39633764994089,
+    "passed": true,
+    "production": 113.39633764994086,
+    "relative_difference": 2.506404529407553e-16
+  }
+]
+
+==============================================================================
+CASE RESULTS
+==============================================================================
+[
+  {
+    "Nz_convention": "pair_per_period",
+    "Nz_per_metre": 33333333.33333333,
+    "broadening_meV": 5.0,
+    "case_id": "A_baseline",
+    "chi2_at_1550_pm_per_V": 30.994195587364835,
+    "chi2_imag_at_1550_pm_per_V": 0.046087915707145995,
+    "chi2_magnitude_at_1550_pm_per_V": 30.994195587364835,
+    "chi2_real_at_1550_pm_per_V": 30.994161321317467,
+    "chi2_units": "pm/V",
+    "independent_si_prefactor": 56.698168824970445,
+    "k_points": 96,
+    "k_space_normalization": "integral d^2k/(2*pi)^2; radial k/(2*pi) dk",
+    "kmax_convention": "legacy_pi_over_a",
+    "kmax_per_nm": 0.5557144392322634,
+    "label": "Baseline",
+    "nz_convention": "pair_per_period",
+    "peak_chi2_pm_per_V": 63.73985996757755,
+    "peak_wavelength_nm": 1517.0,
+    "prefactor_cross_check_passed": true,
+    "prefactor_relative_difference": 2.506404529407553e-16,
+    "production_prefactor": 56.69816882497043,
+    "r_e_hh_nm": 0.751,
+    "r_scale": 1.0,
+    "spectrum_path": "C:\\nn_results\\18_absolute_chi2_scale_audit\\demo18_20260813T204956Z_b5273cbc_80ab7e\\summaries\\spectra\\A_baseline_chi2.csv",
+    "spin_degeneracy": 2
+  },
+  {
+    "Nz_convention": "two_wells_per_period",
+    "Nz_per_metre": 66666666.66666666,
+    "broadening_meV": 5.0,
+    "case_id": "B_two_wells_Nz",
+    "chi2_at_1550_pm_per_V": 61.98839117472967,
+    "chi2_imag_at_1550_pm_per_V": 0.09217583141429199,
+    "chi2_magnitude_at_1550_pm_per_V": 61.98839117472967,
+    "chi2_real_at_1550_pm_per_V": 61.988322642634934,
+    "chi2_units": "pm/V",
+    "independent_si_prefactor": 113.39633764994089,
+    "k_points": 96,
+    "k_space_normalization": "integral d^2k/(2*pi)^2; radial k/(2*pi) dk",
+    "kmax_convention": "legacy_pi_over_a",
+    "kmax_per_nm": 0.5557144392322634,
+    "label": "Two-well Nz",
+    "nz_convention": "two_wells_per_period",
+    "peak_chi2_pm_per_V": 127.4797199351551,
+    "peak_wavelength_nm": 1517.0,
+    "prefactor_cross_check_passed": true,
+    "prefactor_relative_difference": 2.506404529407553e-16,
+    "production_prefactor": 113.39633764994086,
+    "r_e_hh_nm": 0.751,
+    "r_scale": 1.0,
+    "spectrum_path": "C:\\nn_results\\18_absolute_chi2_scale_audit\\demo18_20260813T204956Z_b5273cbc_80ab7e\\summaries\\spectra\\B_two_wells_Nz_chi2.csv",
+    "spin_degeneracy": 2
+  },
+  {
+    "Nz_convention": "pair_per_period",
+    "Nz_per_metre": 33333333.33333333,
+    "broadening_meV": 5.0,
+    "case_id": "C_large_kmax",
+    "chi2_at_1550_pm_per_V": 42.02074352974486,
+    "chi2_imag_at_1550_pm_per_V": -0.07285357755423959,
+    "chi2_magnitude_at_1550_pm_per_V": 42.02074352974486,
+    "chi2_real_at_1550_pm_per_V": 42.020680374654006,
+    "chi2_units": "pm/V",
+    "independent_si_prefactor": 56.698168824970445,
+    "k_points": 96,
+    "k_space_normalization": "integral d^2k/(2*pi)^2; radial k/(2*pi) dk",
+    "kmax_convention": "bz_2pi_over_a",
+    "kmax_per_nm": 1.1114288784645268,
+    "label": "Larger kmax",
+    "nz_convention": "pair_per_period",
+    "peak_chi2_pm_per_V": 74.76723682932392,
+    "peak_wavelength_nm": 1517.0,
+    "prefactor_cross_check_passed": true,
+    "prefactor_relative_difference": 2.506404529407553e-16,
+    "production_prefactor": 56.69816882497043,
+    "r_e_hh_nm": 0.751,
+    "r_scale": 1.0,
+    "spectrum_path": "C:\\nn_results\\18_absolute_chi2_scale_audit\\demo18_20260813T204956Z_b5273cbc_80ab7e\\summaries\\spectra\\C_large_kmax_chi2.csv",
+    "spin_degeneracy": 2
+  },
+  {
+    "Nz_convention": "two_wells_per_period",
+    "Nz_per_metre": 66666666.66666666,
+    "broadening_meV": 5.0,
+    "case_id": "D_Nz_plus_large_kmax",
+    "chi2_at_1550_pm_per_V": 84.04148705948973,
+    "chi2_imag_at_1550_pm_per_V": -0.14570715510847917,
+    "chi2_magnitude_at_1550_pm_per_V": 84.04148705948973,
+    "chi2_real_at_1550_pm_per_V": 84.04136074930801,
+    "chi2_units": "pm/V",
+    "independent_si_prefactor": 113.39633764994089,
+    "k_points": 96,
+    "k_space_normalization": "integral d^2k/(2*pi)^2; radial k/(2*pi) dk",
+    "kmax_convention": "bz_2pi_over_a",
+    "kmax_per_nm": 1.1114288784645268,
+    "label": "Nz + larger kmax",
+    "nz_convention": "two_wells_per_period",
+    "peak_chi2_pm_per_V": 149.53447365864784,
+    "peak_wavelength_nm": 1517.0,
+    "prefactor_cross_check_passed": true,
+    "prefactor_relative_difference": 2.506404529407553e-16,
+    "production_prefactor": 113.39633764994086,
+    "r_e_hh_nm": 0.751,
+    "r_scale": 1.0,
+    "spectrum_path": "C:\\nn_results\\18_absolute_chi2_scale_audit\\demo18_20260813T204956Z_b5273cbc_80ab7e\\summaries\\spectra\\D_Nz_plus_large_kmax_chi2.csv",
+    "spin_degeneracy": 2
+  },
+  {
+    "Nz_convention": "two_wells_per_period",
+    "Nz_per_metre": 66666666.66666666,
+    "broadening_meV": 5.0,
+    "case_id": "E_kgrid_192",
+    "chi2_at_1550_pm_per_V": 84.13362957413378,
+    "chi2_imag_at_1550_pm_per_V": -0.18756429512389208,
+    "chi2_magnitude_at_1550_pm_per_V": 84.13362957413378,
+    "chi2_real_at_1550_pm_per_V": 84.13342049954198,
+    "chi2_units": "pm/V",
+    "independent_si_prefactor": 113.39633764994089,
+    "k_points": 192,
+    "k_space_normalization": "integral d^2k/(2*pi)^2; radial k/(2*pi) dk",
+    "kmax_convention": "bz_2pi_over_a",
+    "kmax_per_nm": 1.1114288784645268,
+    "label": "k grid 192",
+    "nz_convention": "two_wells_per_period",
+    "peak_chi2_pm_per_V": 149.47578224244526,
+    "peak_wavelength_nm": 1517.0,
+    "prefactor_cross_check_passed": true,
+    "prefactor_relative_difference": 2.506404529407553e-16,
+    "production_prefactor": 113.39633764994086,
+    "r_e_hh_nm": 0.751,
+    "r_scale": 1.0,
+    "spectrum_path": "C:\\nn_results\\18_absolute_chi2_scale_audit\\demo18_20260813T204956Z_b5273cbc_80ab7e\\summaries\\spectra\\E_kgrid_192_chi2.csv",
+    "spin_degeneracy": 2
+  },
+  {
+    "Nz_convention": "two_wells_per_period",
+    "Nz_per_metre": 66666666.66666666,
+    "broadening_meV": 5.0,
+    "case_id": "F_kgrid_384",
+    "chi2_at_1550_pm_per_V": 84.13778453632841,
+    "chi2_imag_at_1550_pm_per_V": -0.18896181600885772,
+    "chi2_magnitude_at_1550_pm_per_V": 84.13778453632841,
+    "chi2_real_at_1550_pm_per_V": 84.13757234502143,
+    "chi2_units": "pm/V",
+    "independent_si_prefactor": 113.39633764994089,
+    "k_points": 384,
+    "k_space_normalization": "integral d^2k/(2*pi)^2; radial k/(2*pi) dk",
+    "kmax_convention": "bz_2pi_over_a",
+    "kmax_per_nm": 1.1114288784645268,
+    "label": "k grid 384",
+    "nz_convention": "two_wells_per_period",
+    "peak_chi2_pm_per_V": 149.47701976826184,
+    "peak_wavelength_nm": 1517.0,
+    "prefactor_cross_check_passed": true,
+    "prefactor_relative_difference": 2.506404529407553e-16,
+    "production_prefactor": 113.39633764994086,
+    "r_e_hh_nm": 0.751,
+    "r_scale": 1.0,
+    "spectrum_path": "C:\\nn_results\\18_absolute_chi2_scale_audit\\demo18_20260813T204956Z_b5273cbc_80ab7e\\summaries\\spectra\\F_kgrid_384_chi2.csv",
+    "spin_degeneracy": 2
+  },
+  {
+    "Nz_convention": "two_wells_per_period",
+    "Nz_per_metre": 66666666.66666666,
+    "broadening_meV": 5.0,
+    "case_id": "G_spin1",
+    "chi2_at_1550_pm_per_V": 42.068892268164205,
+    "chi2_imag_at_1550_pm_per_V": -0.09448090800442886,
+    "chi2_magnitude_at_1550_pm_per_V": 42.068892268164205,
+    "chi2_real_at_1550_pm_per_V": 42.06878617251071,
+    "chi2_units": "pm/V",
+    "independent_si_prefactor": 113.39633764994089,
+    "k_points": 384,
+    "k_space_normalization": "integral d^2k/(2*pi)^2; radial k/(2*pi) dk",
+    "kmax_convention": "bz_2pi_over_a",
+    "kmax_per_nm": 1.1114288784645268,
+    "label": "Spin 1",
+    "nz_convention": "two_wells_per_period",
+    "peak_chi2_pm_per_V": 74.73850988413092,
+    "peak_wavelength_nm": 1517.0,
+    "prefactor_cross_check_passed": true,
+    "prefactor_relative_difference": 2.506404529407553e-16,
+    "production_prefactor": 113.39633764994086,
+    "r_e_hh_nm": 0.751,
+    "r_scale": 1.0,
+    "spectrum_path": "C:\\nn_results\\18_absolute_chi2_scale_audit\\demo18_20260813T204956Z_b5273cbc_80ab7e\\summaries\\spectra\\G_spin1_chi2.csv",
+    "spin_degeneracy": 1
+  },
+  {
+    "Nz_convention": "two_wells_per_period",
+    "Nz_per_metre": 66666666.66666666,
+    "broadening_meV": 5.0,
+    "case_id": "H_spin2",
+    "chi2_at_1550_pm_per_V": 84.13778453632841,
+    "chi2_imag_at_1550_pm_per_V": -0.18896181600885772,
+    "chi2_magnitude_at_1550_pm_per_V": 84.13778453632841,
+    "chi2_real_at_1550_pm_per_V": 84.13757234502143,
+    "chi2_units": "pm/V",
+    "independent_si_prefactor": 113.39633764994089,
+    "k_points": 384,
+    "k_space_normalization": "integral d^2k/(2*pi)^2; radial k/(2*pi) dk",
+    "kmax_convention": "bz_2pi_over_a",
+    "kmax_per_nm": 1.1114288784645268,
+    "label": "Spin 2",
+    "nz_convention": "two_wells_per_period",
+    "peak_chi2_pm_per_V": 149.47701976826184,
+    "peak_wavelength_nm": 1517.0,
+    "prefactor_cross_check_passed": true,
+    "prefactor_relative_difference": 2.506404529407553e-16,
+    "production_prefactor": 113.39633764994086,
+    "r_e_hh_nm": 0.751,
+    "r_scale": 1.0,
+    "spectrum_path": "C:\\nn_results\\18_absolute_chi2_scale_audit\\demo18_20260813T204956Z_b5273cbc_80ab7e\\summaries\\spectra\\H_spin2_chi2.csv",
+    "spin_degeneracy": 2
+  }
+]
+
+==============================================================================
+FINAL STATUS
+==============================================================================
+PASS
+warnings
+[]
+output paths
+{
+  "debug_log": "C:\\nn_results\\18_absolute_chi2_scale_audit\\demo18_20260813T204956Z_b5273cbc_80ab7e\\demo18_debug.log",
+  "generated_input": "C:\\nn_results\\18_absolute_chi2_scale_audit\\demo18_20260813T204956Z_b5273cbc_80ab7e\\inputs\\reference_abrupt.in",
+  "json_summary": "C:\\nn_results\\18_absolute_chi2_scale_audit\\demo18_20260813T204956Z_b5273cbc_80ab7e\\summaries\\demo18_summary.json",
+  "kgrid_convergence": "C:\\nn_results\\18_absolute_chi2_scale_audit\\demo18_20260813T204956Z_b5273cbc_80ab7e\\summaries\\kgrid_convergence.csv",
+  "master_summary": "C:\\nn_results\\18_absolute_chi2_scale_audit\\demo18_20260813T204956Z_b5273cbc_80ab7e\\summaries\\demo18_master_summary.csv",
+  "plots": "C:\\nn_results\\18_absolute_chi2_scale_audit\\demo18_20260813T204956Z_b5273cbc_80ab7e\\plots",
+  "r_ehh_sensitivity": "C:\\nn_results\\18_absolute_chi2_scale_audit\\demo18_20260813T204956Z_b5273cbc_80ab7e\\summaries\\r_ehh_sensitivity.csv",
+  "resolved_config": "C:\\nn_results\\18_absolute_chi2_scale_audit\\demo18_20260813T204956Z_b5273cbc_80ab7e\\resolved_demo18_config.yaml",
+  "result_directory": "C:\\nn_results\\18_absolute_chi2_scale_audit\\demo18_20260813T204956Z_b5273cbc_80ab7e",
+  "solver_output": "C:\\nn_results\\18_absolute_chi2_scale_audit\\demo18_20260813T204956Z_b5273cbc_80ab7e\\solver",
+  "solver_quantities": "C:\\nn_results\\18_absolute_chi2_scale_audit\\demo18_20260813T204956Z_b5273cbc_80ab7e\\summaries\\solver_quantities.json",
+  "solver_record": "C:\\nn_results\\18_absolute_chi2_scale_audit\\demo18_20260813T204956Z_b5273cbc_80ab7e\\solver_record.json",
+  "spectra": "C:\\nn_results\\18_absolute_chi2_scale_audit\\demo18_20260813T204956Z_b5273cbc_80ab7e\\summaries\\spectra"
+}

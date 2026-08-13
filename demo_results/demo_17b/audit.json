@@ -1,0 +1,447 @@
+{
+  "demo_id": "17b_prefactor_scale_audit",
+  "source_results_dir": "C:\\code\\nonlinear_photonics\\demo_results\\demo_17",
+  "target_pm_per_V": 2340.0,
+  "cases": [
+    {
+      "case_id": "case_02",
+      "loading_tier": "summary",
+      "sum_recomputed": false,
+      "sum_recomputed_note": "the recorded chi(2) is used as the baseline; the sum was NOT rebuilt. Every multiplier below is still exact, because all four sweeps are prefactors that multiply the whole sum.",
+      "source_paths": [
+        "C:\\code\\nonlinear_photonics\\demo_results\\demo_17\\physics_summary.json"
+      ],
+      "baseline_pm_per_V": 84.70092866117757,
+      "recorded_pm_per_V": 84.70092866117757,
+      "independent_recompute_pm_per_V": null,
+      "independent_recompute_relative_difference": null,
+      "production_prefactor_pm_per_V_per_summand": 113.39633764994086,
+      "baseline_settings": {
+        "n_wells_per_metre": 66666666.66666666,
+        "r_e_hh_nm": 0.751,
+        "k_max_per_nm": 1.1114288784645268,
+        "k_points": 192,
+        "spin_degeneracy": 2,
+        "broadening_meV": 5.0,
+        "electron_mass_m0": 0.067,
+        "heavy_hole_inplane_mass_m0": 0.112
+      },
+      "multipliers": [
+        {
+          "sweep": "A_nz",
+          "variant": "period_pair",
+          "multiplier": 0.5,
+          "exact": true,
+          "promotable": false,
+          "verified_numerically": null,
+          "rationale": "Demo 14/16E legacy: one coupled PAIR per 30 nm period. Superseded by Demo 17's correction A and kept only so the ladder starts where the record does.",
+          "detail_wells": 1.0,
+          "detail_length_nm": 30.0,
+          "detail_n_wells_per_metre": 33333333.33333333,
+          "detail_baseline_n_wells_per_metre": 66666666.66666666
+        },
+        {
+          "sweep": "A_nz",
+          "variant": "period_two_wells",
+          "multiplier": 1.0,
+          "exact": true,
+          "promotable": true,
+          "verified_numerically": null,
+          "rationale": "Demo 17 production. Ramesh 2023 Eq. 1 counts quantum wells per unit length and Fig. 1a shows two GaAs wells (7.1 nm, 2.9 nm) per 30 nm period. This is the baseline, so its multiplier is 1.0 by definition.",
+          "detail_wells": 2.0,
+          "detail_length_nm": 30.0,
+          "detail_n_wells_per_metre": 66666666.66666666,
+          "detail_baseline_n_wells_per_metre": 66666666.66666666
+        },
+        {
+          "sweep": "A_nz",
+          "variant": "active_layer_two_wells",
+          "multiplier": 3.0000000000000004,
+          "exact": true,
+          "promotable": false,
+          "verified_numerically": null,
+          "rationale": "REPORTED ONLY, multiplier 3.0. Counts the two wells per 10 nm of GaAs (7.1 + 2.9), i.e. per ACTIVE thickness rather than per period. This describes a medium with no barriers at all, so the resulting chi(2) is a well-material property that would need the 10/30 fill factor reapplied before comparison with a grown stack -- which returns exactly the period reading. Promoting it would make the paper's number describe a material nobody grew.",
+          "detail_wells": 2.0,
+          "detail_length_nm": 10.0,
+          "detail_n_wells_per_metre": 200000000.0,
+          "detail_baseline_n_wells_per_metre": 66666666.66666666
+        },
+        {
+          "sweep": "B_permutation",
+          "variant": "shg_degeneracy_2",
+          "multiplier": 2.0,
+          "exact": true,
+          "promotable": false,
+          "verified_numerically": null,
+          "rationale": "REPORTED ONLY. Standard degenerate-SHG factor: E(w)E(w) carries half the permutation multiplicity of E(w1)E(w2), so a convention that writes chi(2) for non-degenerate mixing and then specialises to SHG picks up a 2. Whether Eq. 2 already carries it cannot be decided from the published text.",
+          "detail_factor": 2.0,
+          "detail_mutually_exclusive_with": "eq1_over_eq2_3"
+        },
+        {
+          "sweep": "B_permutation",
+          "variant": "eq1_over_eq2_3",
+          "multiplier": 3.0,
+          "exact": true,
+          "promotable": false,
+          "verified_numerically": null,
+          "rationale": "REPORTED ONLY. Demo 16F fed identical matrix elements to Eq. 1 (1/(2 eps0 hbar^2) with an explicit sum_P) and Eq. 2 (1/(6 eps0 hbar^2) with none) and measured the ratio at exactly 3.000000; no integer permutation multiplicity closes it. This is an open discrepancy in the published pair of equations, running in the direction of the production number being too small by 3 if Eq. 1 is taken as the authority.",
+          "detail_factor": 3.0,
+          "detail_mutually_exclusive_with": "shg_degeneracy_2"
+        },
+        {
+          "sweep": "C_spin_degeneracy",
+          "variant": "already_included_once",
+          "multiplier": 1.0,
+          "exact": true,
+          "promotable": false,
+          "verified_numerically": null,
+          "rationale": "g_s = 2 is applied exactly once, in the k-space weight vector, and the one-band HH solver does not resolve m_j = +-3/2 separately. The Kramers doublet is therefore ALREADY counted, and an additional m_j factor of 2 would be double counting. Multiplier is 1.0.",
+          "detail_baseline_spin_degeneracy": 2,
+          "detail_source_inspection": {
+            "inspected": true,
+            "occurrences_by_function": {
+              "_k_grid": 1,
+              "chi2_spectrum": 0,
+              "_transition_energies_eV": 0
+            },
+            "applied_in_k_weights": true,
+            "applied_again_in_state_sum": false,
+            "total_occurrences": 1
+          },
+          "detail_g1_over_g2_ratio_matches_analytic": null
+        },
+        {
+          "sweep": "D_kane_dipole",
+          "variant": "kane_300K",
+          "multiplier": 0.959435031695265,
+          "exact": true,
+          "promotable": false,
+          "verified_numerically": null,
+          "rationale": "GaAs Kane parameter E_p = 28.8 eV with the 300 K gap, the temperature Demo 17 solved at. Reported as a CROSS-CHECK of r_e,hh = 0.751 nm, not as a replacement: agreement at the 2 % level is evidence the published constant is right, and swapping a 0.96 multiplier in would be moving a published number to chase a target.",
+          "detail_kane_energy_eV": 28.8,
+          "detail_band_gap_eV": 1.424,
+          "detail_r_kane_nm": 0.7356101666719684,
+          "detail_r_legacy_nm": 0.751,
+          "detail_r_ratio": 0.9795075455019553,
+          "detail_p_cv_kg_m_per_s": 1.449709352664339e-24,
+          "detail_percent_from_legacy": -2.0492454498044697
+        },
+        {
+          "sweep": "D_kane_dipole",
+          "variant": "kane_0K",
+          "multiplier": 0.8431794291534342,
+          "exact": true,
+          "promotable": false,
+          "verified_numerically": null,
+          "rationale": "REPORTED ONLY. The 0 K gap, for sensitivity. r goes as 1/E_g, so the low-temperature gap gives a smaller r still.",
+          "detail_kane_energy_eV": 28.8,
+          "detail_band_gap_eV": 1.519,
+          "detail_r_kane_nm": 0.6896042642138794,
+          "detail_r_legacy_nm": 0.751,
+          "detail_r_ratio": 0.9182480215897196,
+          "detail_p_cv_kg_m_per_s": 1.449709352664339e-24,
+          "detail_percent_from_legacy": -8.175197841028037
+        },
+        {
+          "sweep": "D_kane_dipole",
+          "variant": "kane_qw_transition",
+          "multiplier": 0.873153269823234,
+          "exact": true,
+          "promotable": false,
+          "verified_numerically": null,
+          "rationale": "REPORTED ONLY. Uses Demo 17's own E1-HH1 confined transition instead of the bulk gap. Defensible only if the unit-cell matrix element is taken at the confined transition rather than the band edge; the Kane relation is a band-edge statement, so this is a sensitivity.",
+          "detail_kane_energy_eV": 28.8,
+          "detail_band_gap_eV": 1.4927,
+          "detail_r_kane_nm": 0.7017544565826239,
+          "detail_r_legacy_nm": 0.751,
+          "detail_r_ratio": 0.9344267065014966,
+          "detail_p_cv_kg_m_per_s": 1.449709352664339e-24,
+          "detail_percent_from_legacy": -6.557329349850343
+        },
+        {
+          "sweep": "D_kane_dipole",
+          "variant": "expectation_check",
+          "multiplier": 2.9049593883698788,
+          "exact": true,
+          "promotable": false,
+          "verified_numerically": null,
+          "rationale": "REPORTED ONLY. An r of 1.28 nm was expected, but the Kane formula gives 0.7356 nm for GaAs. The inputs that WOULD produce the expected value are recorded beside this row; neither is GaAs.",
+          "detail_target_r_nm": 1.28,
+          "detail_required_kane_energy_eV_at_given_gap": 87.20009966409634,
+          "detail_required_band_gap_eV_at_given_kane_energy": 0.8183663104225647,
+          "detail_given_kane_energy_eV": 28.8,
+          "detail_given_band_gap_eV": 1.424
+        }
+      ],
+      "cumulative": {
+        "defensible_product": 1.0,
+        "defensible_choices": {
+          "A_nz": {
+            "variant": "period_two_wells",
+            "multiplier": 1.0
+          },
+          "B_permutation": {
+            "variant": "none promotable",
+            "multiplier": 1.0
+          },
+          "C_spin_degeneracy": {
+            "variant": "none promotable",
+            "multiplier": 1.0
+          },
+          "D_kane_dipole": {
+            "variant": "none promotable",
+            "multiplier": 1.0
+          }
+        },
+        "maximal_product": 8.634915285257387,
+        "maximal_choices": {
+          "A_nz": {
+            "variant": "active_layer_two_wells",
+            "multiplier": 3.0000000000000004
+          },
+          "B_permutation": {
+            "variant": "eq1_over_eq2_3",
+            "multiplier": 3.0
+          },
+          "C_spin_degeneracy": {
+            "variant": "already_included_once",
+            "multiplier": 1.0
+          },
+          "D_kane_dipole": {
+            "variant": "kane_300K",
+            "multiplier": 0.959435031695265
+          }
+        },
+        "maximal_warning": "UPPER BOUND, not a result. It includes reported-only factors, and in sweep B it multiplies a permutation factor by an Eq.1/Eq.2 factor that very likely describe the same counting."
+      },
+      "target_pm_per_V": 2340.0,
+      "defensible_total_pm_per_V": 84.70092866117757,
+      "maximal_total_pm_per_V": 731.3853435718977,
+      "remaining_factor_before": 27.626615634410776,
+      "remaining_factor_after_defensible": 27.626615634410776,
+      "remaining_factor_after_maximal": 3.1994078368757606,
+      "no_scale_factor_was_fitted": true
+    },
+    {
+      "case_id": "case_01",
+      "loading_tier": "summary",
+      "sum_recomputed": false,
+      "sum_recomputed_note": "the recorded chi(2) is used as the baseline; the sum was NOT rebuilt. Every multiplier below is still exact, because all four sweeps are prefactors that multiply the whole sum.",
+      "source_paths": [
+        "C:\\code\\nonlinear_photonics\\demo_results\\demo_17\\physics_summary.json"
+      ],
+      "baseline_pm_per_V": 53.82697949242898,
+      "recorded_pm_per_V": 53.82697949242898,
+      "independent_recompute_pm_per_V": null,
+      "independent_recompute_relative_difference": null,
+      "production_prefactor_pm_per_V_per_summand": 113.39633764994086,
+      "baseline_settings": {
+        "n_wells_per_metre": 66666666.66666666,
+        "r_e_hh_nm": 0.751,
+        "k_max_per_nm": 1.1114288784645268,
+        "k_points": 192,
+        "spin_degeneracy": 2,
+        "broadening_meV": 5.0,
+        "electron_mass_m0": 0.067,
+        "heavy_hole_inplane_mass_m0": 0.112
+      },
+      "multipliers": [
+        {
+          "sweep": "A_nz",
+          "variant": "period_pair",
+          "multiplier": 0.5,
+          "exact": true,
+          "promotable": false,
+          "verified_numerically": null,
+          "rationale": "Demo 14/16E legacy: one coupled PAIR per 30 nm period. Superseded by Demo 17's correction A and kept only so the ladder starts where the record does.",
+          "detail_wells": 1.0,
+          "detail_length_nm": 30.0,
+          "detail_n_wells_per_metre": 33333333.33333333,
+          "detail_baseline_n_wells_per_metre": 66666666.66666666
+        },
+        {
+          "sweep": "A_nz",
+          "variant": "period_two_wells",
+          "multiplier": 1.0,
+          "exact": true,
+          "promotable": true,
+          "verified_numerically": null,
+          "rationale": "Demo 17 production. Ramesh 2023 Eq. 1 counts quantum wells per unit length and Fig. 1a shows two GaAs wells (7.1 nm, 2.9 nm) per 30 nm period. This is the baseline, so its multiplier is 1.0 by definition.",
+          "detail_wells": 2.0,
+          "detail_length_nm": 30.0,
+          "detail_n_wells_per_metre": 66666666.66666666,
+          "detail_baseline_n_wells_per_metre": 66666666.66666666
+        },
+        {
+          "sweep": "A_nz",
+          "variant": "active_layer_two_wells",
+          "multiplier": 3.0000000000000004,
+          "exact": true,
+          "promotable": false,
+          "verified_numerically": null,
+          "rationale": "REPORTED ONLY, multiplier 3.0. Counts the two wells per 10 nm of GaAs (7.1 + 2.9), i.e. per ACTIVE thickness rather than per period. This describes a medium with no barriers at all, so the resulting chi(2) is a well-material property that would need the 10/30 fill factor reapplied before comparison with a grown stack -- which returns exactly the period reading. Promoting it would make the paper's number describe a material nobody grew.",
+          "detail_wells": 2.0,
+          "detail_length_nm": 10.0,
+          "detail_n_wells_per_metre": 200000000.0,
+          "detail_baseline_n_wells_per_metre": 66666666.66666666
+        },
+        {
+          "sweep": "B_permutation",
+          "variant": "shg_degeneracy_2",
+          "multiplier": 2.0,
+          "exact": true,
+          "promotable": false,
+          "verified_numerically": null,
+          "rationale": "REPORTED ONLY. Standard degenerate-SHG factor: E(w)E(w) carries half the permutation multiplicity of E(w1)E(w2), so a convention that writes chi(2) for non-degenerate mixing and then specialises to SHG picks up a 2. Whether Eq. 2 already carries it cannot be decided from the published text.",
+          "detail_factor": 2.0,
+          "detail_mutually_exclusive_with": "eq1_over_eq2_3"
+        },
+        {
+          "sweep": "B_permutation",
+          "variant": "eq1_over_eq2_3",
+          "multiplier": 3.0,
+          "exact": true,
+          "promotable": false,
+          "verified_numerically": null,
+          "rationale": "REPORTED ONLY. Demo 16F fed identical matrix elements to Eq. 1 (1/(2 eps0 hbar^2) with an explicit sum_P) and Eq. 2 (1/(6 eps0 hbar^2) with none) and measured the ratio at exactly 3.000000; no integer permutation multiplicity closes it. This is an open discrepancy in the published pair of equations, running in the direction of the production number being too small by 3 if Eq. 1 is taken as the authority.",
+          "detail_factor": 3.0,
+          "detail_mutually_exclusive_with": "shg_degeneracy_2"
+        },
+        {
+          "sweep": "C_spin_degeneracy",
+          "variant": "already_included_once",
+          "multiplier": 1.0,
+          "exact": true,
+          "promotable": false,
+          "verified_numerically": null,
+          "rationale": "g_s = 2 is applied exactly once, in the k-space weight vector, and the one-band HH solver does not resolve m_j = +-3/2 separately. The Kramers doublet is therefore ALREADY counted, and an additional m_j factor of 2 would be double counting. Multiplier is 1.0.",
+          "detail_baseline_spin_degeneracy": 2,
+          "detail_source_inspection": {
+            "inspected": true,
+            "occurrences_by_function": {
+              "_k_grid": 1,
+              "chi2_spectrum": 0,
+              "_transition_energies_eV": 0
+            },
+            "applied_in_k_weights": true,
+            "applied_again_in_state_sum": false,
+            "total_occurrences": 1
+          },
+          "detail_g1_over_g2_ratio_matches_analytic": null
+        },
+        {
+          "sweep": "D_kane_dipole",
+          "variant": "kane_300K",
+          "multiplier": 0.959435031695265,
+          "exact": true,
+          "promotable": false,
+          "verified_numerically": null,
+          "rationale": "GaAs Kane parameter E_p = 28.8 eV with the 300 K gap, the temperature Demo 17 solved at. Reported as a CROSS-CHECK of r_e,hh = 0.751 nm, not as a replacement: agreement at the 2 % level is evidence the published constant is right, and swapping a 0.96 multiplier in would be moving a published number to chase a target.",
+          "detail_kane_energy_eV": 28.8,
+          "detail_band_gap_eV": 1.424,
+          "detail_r_kane_nm": 0.7356101666719684,
+          "detail_r_legacy_nm": 0.751,
+          "detail_r_ratio": 0.9795075455019553,
+          "detail_p_cv_kg_m_per_s": 1.449709352664339e-24,
+          "detail_percent_from_legacy": -2.0492454498044697
+        },
+        {
+          "sweep": "D_kane_dipole",
+          "variant": "kane_0K",
+          "multiplier": 0.8431794291534342,
+          "exact": true,
+          "promotable": false,
+          "verified_numerically": null,
+          "rationale": "REPORTED ONLY. The 0 K gap, for sensitivity. r goes as 1/E_g, so the low-temperature gap gives a smaller r still.",
+          "detail_kane_energy_eV": 28.8,
+          "detail_band_gap_eV": 1.519,
+          "detail_r_kane_nm": 0.6896042642138794,
+          "detail_r_legacy_nm": 0.751,
+          "detail_r_ratio": 0.9182480215897196,
+          "detail_p_cv_kg_m_per_s": 1.449709352664339e-24,
+          "detail_percent_from_legacy": -8.175197841028037
+        },
+        {
+          "sweep": "D_kane_dipole",
+          "variant": "kane_qw_transition",
+          "multiplier": 0.873153269823234,
+          "exact": true,
+          "promotable": false,
+          "verified_numerically": null,
+          "rationale": "REPORTED ONLY. Uses Demo 17's own E1-HH1 confined transition instead of the bulk gap. Defensible only if the unit-cell matrix element is taken at the confined transition rather than the band edge; the Kane relation is a band-edge statement, so this is a sensitivity.",
+          "detail_kane_energy_eV": 28.8,
+          "detail_band_gap_eV": 1.4927,
+          "detail_r_kane_nm": 0.7017544565826239,
+          "detail_r_legacy_nm": 0.751,
+          "detail_r_ratio": 0.9344267065014966,
+          "detail_p_cv_kg_m_per_s": 1.449709352664339e-24,
+          "detail_percent_from_legacy": -6.557329349850343
+        },
+        {
+          "sweep": "D_kane_dipole",
+          "variant": "expectation_check",
+          "multiplier": 2.9049593883698788,
+          "exact": true,
+          "promotable": false,
+          "verified_numerically": null,
+          "rationale": "REPORTED ONLY. An r of 1.28 nm was expected, but the Kane formula gives 0.7356 nm for GaAs. The inputs that WOULD produce the expected value are recorded beside this row; neither is GaAs.",
+          "detail_target_r_nm": 1.28,
+          "detail_required_kane_energy_eV_at_given_gap": 87.20009966409634,
+          "detail_required_band_gap_eV_at_given_kane_energy": 0.8183663104225647,
+          "detail_given_kane_energy_eV": 28.8,
+          "detail_given_band_gap_eV": 1.424
+        }
+      ],
+      "cumulative": {
+        "defensible_product": 1.0,
+        "defensible_choices": {
+          "A_nz": {
+            "variant": "period_two_wells",
+            "multiplier": 1.0
+          },
+          "B_permutation": {
+            "variant": "none promotable",
+            "multiplier": 1.0
+          },
+          "C_spin_degeneracy": {
+            "variant": "none promotable",
+            "multiplier": 1.0
+          },
+          "D_kane_dipole": {
+            "variant": "none promotable",
+            "multiplier": 1.0
+          }
+        },
+        "maximal_product": 8.634915285257387,
+        "maximal_choices": {
+          "A_nz": {
+            "variant": "active_layer_two_wells",
+            "multiplier": 3.0000000000000004
+          },
+          "B_permutation": {
+            "variant": "eq1_over_eq2_3",
+            "multiplier": 3.0
+          },
+          "C_spin_degeneracy": {
+            "variant": "already_included_once",
+            "multiplier": 1.0
+          },
+          "D_kane_dipole": {
+            "variant": "kane_300K",
+            "multiplier": 0.959435031695265
+          }
+        },
+        "maximal_warning": "UPPER BOUND, not a result. It includes reported-only factors, and in sweep B it multiplies a permutation factor by an Eq.1/Eq.2 factor that very likely describe the same counting."
+      },
+      "target_pm_per_V": 2340.0,
+      "defensible_total_pm_per_V": 53.82697949242898,
+      "maximal_total_pm_per_V": 464.7914079784109,
+      "remaining_factor_before": 43.47262324703046,
+      "remaining_factor_after_defensible": 43.47262324703046,
+      "remaining_factor_after_maximal": 5.034516473051263,
+      "no_scale_factor_was_fitted": true
+    }
+  ],
+  "skipped": [],
+  "no_scale_factor_was_fitted": true
+}
