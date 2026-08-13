@@ -51,6 +51,19 @@ def test_fixed_case_and_compact_matrix():
     assert len(cases18.audit_cases()) == 8
 
 
+def test_resolved_snapshot_contains_numerical_audit_settings(cfg):
+    snapshot = config18.resolved_snapshot(
+        cfg, machine=None, solver_cfg=config18.solver_config(cfg)
+    )
+    rows = {row["case_id"]: row for row in snapshot["post_processing_cases"]}
+    assert rows["A_baseline"]["Nz_per_metre"] == pytest.approx(1.0 / 30.0e-9)
+    assert rows["F_kgrid_384"]["kmax_per_nm"] == pytest.approx(
+        0.1 * 2.0 * np.pi / 0.565325
+    )
+    assert rows["F_kgrid_384"]["k_points"] == 384
+    assert snapshot["wavelength_step_nm"] == pytest.approx(1.0)
+
+
 def test_nz_scaling_is_exactly_linear(cfg, states):
     rows = {case.case_id: case for case in cases18.audit_cases()}
     assert _value(cfg, states, rows["B_two_wells_Nz"]) / _value(

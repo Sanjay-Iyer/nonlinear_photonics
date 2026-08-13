@@ -444,11 +444,30 @@ def run_physics(verbose: bool = False) -> int:
         log.line("PASS" if all_checks["passed"] else "FAIL")
         log.line("warnings")
         log.json(warnings)
-        log.line(f"results = {root}")
-        log.line(f"master summary = {root / 'summaries' / 'demo18_master_summary.csv'}")
+        log.line("output paths")
+        log.json({
+            "result_directory": root,
+            "debug_log": log.path,
+            "resolved_config": root / "resolved_demo18_config.yaml",
+            "generated_input": root / "inputs" / "reference_abrupt.in",
+            "solver_output": root / "solver",
+            "solver_record": root / "solver_record.json",
+            "master_summary": root / "summaries" / "demo18_master_summary.csv",
+            "json_summary": root / "summaries" / "demo18_summary.json",
+            "solver_quantities": root / "summaries" / "solver_quantities.json",
+            "kgrid_convergence": root / "summaries" / "kgrid_convergence.csv",
+            "r_ehh_sensitivity": root / "summaries" / "r_ehh_sensitivity.csv",
+            "spectra": root / "summaries" / "spectra",
+            "plots": root / "plots",
+        })
         residual = max(float(row["prefactor_relative_difference"]) for row in rows)
-        _final_terminal_summary(root, rows, convergence, residual)
-        return 0 if all_checks["passed"] else 1
+        if all_checks["passed"]:
+            _final_terminal_summary(root, rows, convergence, residual)
+            return 0
+        print("Demo 18 completed, but one or more scale audits failed.", file=sys.stderr)
+        print(f"Result directory: {root}", file=sys.stderr)
+        print(f"Debug log: {log.path}", file=sys.stderr)
+        return 1
     except Exception as exc:  # noqa: BLE001
         _copy_solver_logs(case_dir, root)
         trace = traceback.format_exc()
@@ -457,6 +476,9 @@ def run_physics(verbose: bool = False) -> int:
         log.line(f"{type(exc).__name__}: {exc}")
         log.line("FULL PYTHON TRACEBACK")
         log.line(trace)
+        log.line(f"PRESERVED RESULT DIRECTORY = {root}")
+        log.line(f"PRESERVED GENERATED INPUT = {root / 'inputs' / 'reference_abrupt.in'}")
+        log.line(f"PRESERVED SOLVER OUTPUT = {root / 'solver'}")
         _write_json(status_path, {
             "run_id": run_id,
             "demo_id": cases18.DEMO_ID,

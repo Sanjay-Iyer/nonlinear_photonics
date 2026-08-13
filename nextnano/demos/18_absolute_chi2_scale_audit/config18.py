@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+import math
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -103,7 +104,23 @@ def resolved_snapshot(
     cfg: Mapping[str, Any], *, machine: Any | None, solver_cfg: Mapping[str, Any]
 ) -> dict[str, Any]:
     copy = deepcopy(dict(cfg))
-    copy["post_processing_cases"] = [row.as_record() for row in cases18.audit_cases()]
+    lattice_nm = float(cfg["chi2"]["lattice_constant_nm"])
+    default_r_nm = float(cfg["chi2"]["r_e_hh_nm"])
+    copy["post_processing_cases"] = [
+        {
+            **row.as_record(),
+            "Nz_per_metre": cases18.NZ_CONVENTIONS[row.nz_convention],
+            "kmax_per_nm": (
+                cases18.KMAX_CONVENTIONS[row.kmax_convention][
+                    "fraction_for_chi2_settings"
+                ]
+                * math.pi
+                / lattice_nm
+            ),
+            "r_e_hh_nm": default_r_nm * row.r_scale,
+        }
+        for row in cases18.audit_cases()
+    ]
     copy["resolved_conventions"] = {
         "Nz_per_metre": dict(cases18.NZ_CONVENTIONS),
         "kmax": dict(cases18.KMAX_CONVENTIONS),
@@ -123,5 +140,8 @@ def resolved_snapshot(
         "states_used_in_eq2": solver_cfg["states"]["max_states_per_band"],
         "quantum_region_name": solver_cfg["nextnano"]["quantum_region_name"],
     }
+    copy["wavelength_step_nm"] = (
+        float(cfg["chi2"]["wavelength_stop_nm"])
+        - float(cfg["chi2"]["wavelength_start_nm"])
+    ) / (int(cfg["chi2"]["wavelength_points"]) - 1)
     return copy
-
