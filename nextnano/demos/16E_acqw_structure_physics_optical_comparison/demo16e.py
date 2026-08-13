@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any, Callable, Mapping, Sequence
 
 import numpy as np
 
@@ -561,8 +561,17 @@ def run_case(
     cfg: Mapping[str, Any], case: cases16e.GeometryCase, case_dir: Path,
     *, exe: Path | None, database: Path | None, license_path: Path | None = None,
     do_parse: bool = True, do_structure: bool = False,
+    build: Callable[..., tuple] | None = None,
 ) -> CaseOutcome:
-    """Render, parse and validate in order, stopping after the first failure."""
+    """Render, parse and validate in order, stopping after the first failure.
+
+    ``build`` defaults to :func:`build_case`, which renders through Demo 14's
+    template. A caller that renders the same ten structures from a different
+    deck -- Demo 17, whose template widens the Dirichlet box -- passes its own
+    builder, so the deck that is parsed and structure-gated is the deck it will
+    later solve, while the gates, the metrology and the artifacts stay this one.
+    Same injection point, and same reason, as ``demo16b.solve_case``.
+    """
 
     case_dir = Path(case_dir)
     case_dir.mkdir(parents=True, exist_ok=True)
@@ -572,7 +581,7 @@ def run_case(
         {**case.as_record(), "demo16e_version": DEMO_VERSION},
     )
     try:
-        geometry, profile, blocks, deck = build_case(cfg, case)
+        geometry, profile, blocks, deck = (build or build_case)(cfg, case)
     except Exception as exc:  # noqa: BLE001
         outcome.status = "render_failed"
         outcome.failure_reason = f"{type(exc).__name__}: {exc}"

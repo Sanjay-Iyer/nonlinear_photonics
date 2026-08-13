@@ -1,0 +1,42 @@
+demo_id: 18_absolute_chi2_scale_audit
+version: demo18-1.0.0
+
+reference_structure:
+  well_1_nm: 7.1
+  tunneling_barrier_nm: 1.8
+  well_2_nm: 2.9
+  period_barrier_nm: 18.2
+  nominal_period_nm: 30.0
+  barrier_al_fraction: 0.55
+  interfaces: abrupt
+
+solver:
+  mesh_nm: 0.05
+  number_of_electron_states: 6
+  number_of_hole_states: 6
+  output_state_count: 6
+  states_used_in_eq2: 2
+  timeout_seconds: 3600
+
+chi2:
+  broadening_meV: 5.0
+  r_e_hh_nm: 0.751
+  r_e_hh_provenance: >-
+    Ramesh et al., Applied Physics Letters 123, 251111 (2023),
+    GaAs unit-cell interband position matrix element from VASP/HSE06.
+  wavelength_start_nm: 1400.0
+  wavelength_stop_nm: 1800.0
+  wavelength_points: 401
+  target_wavelength_nm: 1550.0
+  lattice_constant_nm: 0.565325
+  electron_mass_m0: 0.067
+  heavy_hole_inplane_mass_m0: 0.112
+  prefactor_relative_tolerance: 1.0e-14
+
+audits:
+  nz_conventions: [pair_per_period, two_wells_per_period]
+  kmax_conventions: [legacy_pi_over_a, bz_2pi_over_a]
+  k_point_counts: [96, 192, 384]
+  spin_degeneracies: [1, 2]
+  r_sensitivity_scales: [0.90, 1.00, 1.10]
+

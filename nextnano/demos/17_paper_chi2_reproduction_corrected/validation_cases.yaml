@@ -1,0 +1,267 @@
+demo: 17_paper_chi2_reproduction_corrected
+purpose: Demo 16E's ten fixed ACQW structures re-solved with a per-well N_z, a zincblende
+  2*pi/a zone edge and a Dirichlet box moved far enough out not to truncate the excited
+  states.
+structures_identical_to: 16E_acqw_structure_physics_optical_comparison
+total_cases: 10
+deterministic: true
+optimization_performed: false
+random_seed: null
+grading_profile: linear
+grading_families_supported:
+- linear
+reference_case: case_01
+paper_target_case: case_02
+paper_target_pm_per_V: 2340.0
+equivalence_pair:
+- case_09
+- case_10
+abrupt_vs_graded_pair:
+- case_01
+- case_02
+fixed_materials:
+  well: GaAs
+  barrier: AlGaAs
+  aluminium_fraction: 0.55
+  total_gaas_well_nm: 10.0
+  mesh_nm: 0.05
+  target_wavelength_nm: 1550.0
+abrupt_sentinel_width_nm: 0.001
+cases:
+- case_id: case_01
+  name: reference_graded
+  description: Paper-like 7.10 / 1.80 / 2.90 nm with 0.70 nm linear grades; the reference
+    every energy shift is measured against.
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 1.8
+  left_grading_width_nm: 0.7
+  right_grading_width_nm: 0.7
+  interface_mode: graded
+  render_request: auto
+  overlap: false
+  grading_profile: linear
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  expected_representation: native_linear
+  build_left_grading_width_nm: 0.7
+  build_right_grading_width_nm: 0.7
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 0.875
+  overlap_width_nm: 0.0
+  is_reference_case: true
+  is_paper_target_case: false
+- case_id: case_02
+  name: abrupt_reference
+  description: 'Case 01''s layer geometry with abrupt interfaces and no grading. THE
+    PAPER TARGET: the 2340 pm/V ideal-abrupt value is quoted for this structure, so
+    this is the one case Demo 17 can hit or miss outright rather than compare as a
+    trend.'
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 1.8
+  left_grading_width_nm: 0.0
+  right_grading_width_nm: 0.0
+  interface_mode: abrupt
+  render_request: auto
+  overlap: false
+  grading_profile: linear
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  expected_representation: abrupt
+  build_left_grading_width_nm: 0.001
+  build_right_grading_width_nm: 0.001
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 0.00125
+  overlap_width_nm: 0.0
+  is_reference_case: false
+  is_paper_target_case: true
+- case_id: case_03
+  name: thin_barrier
+  description: 0.85 nm central barrier with 0.40 nm grades; strongest coupling.
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 0.85
+  left_grading_width_nm: 0.4
+  right_grading_width_nm: 0.4
+  interface_mode: graded
+  render_request: auto
+  overlap: false
+  grading_profile: linear
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  expected_representation: native_linear
+  build_left_grading_width_nm: 0.4
+  build_right_grading_width_nm: 0.4
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 0.5
+  overlap_width_nm: 0.0
+  is_reference_case: false
+  is_paper_target_case: false
+- case_id: case_04
+  name: thick_barrier
+  description: 2.50 nm central barrier with reference 0.70 nm grades.
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 2.5
+  left_grading_width_nm: 0.7
+  right_grading_width_nm: 0.7
+  interface_mode: graded
+  render_request: auto
+  overlap: false
+  grading_profile: linear
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  expected_representation: native_linear
+  build_left_grading_width_nm: 0.7
+  build_right_grading_width_nm: 0.7
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 0.875
+  overlap_width_nm: 0.0
+  is_reference_case: false
+  is_paper_target_case: false
+- case_id: case_05
+  name: low_asymmetry
+  description: The fixed 10 nm GaAs total redistributed as s=0.30 (6.50 / 3.50 nm).
+  asymmetry_s: 0.3
+  central_barrier_nm: 1.8
+  left_grading_width_nm: 0.7
+  right_grading_width_nm: 0.7
+  interface_mode: graded
+  render_request: auto
+  overlap: false
+  grading_profile: linear
+  well_1_nm: 6.5
+  well_2_nm: 3.5
+  total_gaas_well_nm: 10.0
+  expected_representation: native_linear
+  build_left_grading_width_nm: 0.7
+  build_right_grading_width_nm: 0.7
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 0.875
+  overlap_width_nm: 0.0
+  is_reference_case: false
+  is_paper_target_case: false
+- case_id: case_06
+  name: high_asymmetry
+  description: The fixed 10 nm GaAs total redistributed as s=0.55 (7.75 / 2.25 nm).
+  asymmetry_s: 0.55
+  central_barrier_nm: 1.8
+  left_grading_width_nm: 0.7
+  right_grading_width_nm: 0.7
+  interface_mode: graded
+  render_request: auto
+  overlap: false
+  grading_profile: linear
+  well_1_nm: 7.75
+  well_2_nm: 2.25
+  total_gaas_well_nm: 10.0
+  expected_representation: native_linear
+  build_left_grading_width_nm: 0.7
+  build_right_grading_width_nm: 0.7
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 0.875
+  overlap_width_nm: 0.0
+  is_reference_case: false
+  is_paper_target_case: false
+- case_id: case_07
+  name: asymmetric_grading
+  description: Independent 0.40 / 1.40 nm grades on a 2.50 nm barrier, non-overlapping.
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 2.5
+  left_grading_width_nm: 0.4
+  right_grading_width_nm: 1.4
+  interface_mode: graded
+  render_request: auto
+  overlap: false
+  grading_profile: linear
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  expected_representation: native_linear
+  build_left_grading_width_nm: 0.4
+  build_right_grading_width_nm: 1.4
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 1.125
+  overlap_width_nm: 0.0
+  is_reference_case: false
+  is_paper_target_case: false
+- case_id: case_08
+  name: controlled_overlap
+  description: 1.40 / 1.40 nm grades across a 0.85 nm barrier; the grades overlap
+    and the barrier never reaches Al0.55.
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 0.85
+  left_grading_width_nm: 1.4
+  right_grading_width_nm: 1.4
+  interface_mode: graded
+  render_request: auto
+  overlap: true
+  grading_profile: linear
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  expected_representation: imported_profile
+  build_left_grading_width_nm: 1.4
+  build_right_grading_width_nm: 1.4
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 1.75
+  overlap_width_nm: 0.9
+  is_reference_case: false
+  is_paper_target_case: false
+- case_id: case_09
+  name: native_linear_wide_grade
+  description: Reference layers with 1.00 nm grades, written as native ternary_linear
+    ramps; the native half of the equivalence pair.
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 1.8
+  left_grading_width_nm: 1.0
+  right_grading_width_nm: 1.0
+  interface_mode: graded
+  render_request: auto
+  overlap: false
+  grading_profile: linear
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  expected_representation: native_linear
+  build_left_grading_width_nm: 1.0
+  build_right_grading_width_nm: 1.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 1.25
+  overlap_width_nm: 0.0
+  is_reference_case: false
+  is_paper_target_case: false
+- case_id: case_10
+  name: imported_linear_equivalent
+  description: The same structure as case_09 written as an imported composition table;
+    the imported half of the equivalence pair.
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 1.8
+  left_grading_width_nm: 1.0
+  right_grading_width_nm: 1.0
+  interface_mode: graded
+  render_request: imported
+  overlap: false
+  grading_profile: linear
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  expected_representation: imported_profile
+  build_left_grading_width_nm: 1.0
+  build_right_grading_width_nm: 1.0
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 1.25
+  overlap_width_nm: 0.0
+  is_reference_case: false
+  is_paper_target_case: false

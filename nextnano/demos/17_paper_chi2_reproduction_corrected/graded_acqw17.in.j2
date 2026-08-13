@@ -1,0 +1,109 @@
+# Demo 17: absolute chi(2) graded GaAs/Al(x)Ga(1-x)As asymmetric coupled
+# quantum well, one fixed structure, with CORRECTION C applied.
+#
+# Grammar is Demo 14's, unchanged:
+#   * linear interfaces use the native ternary_linear{} grammar;
+#   * fermi / erf / cosine are generated in Python and supplied through
+#     import{ file{} } + ternary_import{}.
+# There is no 16-sublayer staircase. Growth coordinate is x, confirmed against
+# keywords_nnp.xml for nextnano++ 3.0.0.
+#
+# CORRECTION C -- what is different from graded_acqw14.in.j2
+# ==========================================================
+# Nothing in the GRAMMAR. What changed is the two numbers demo17.render_deck
+# substitutes into the grid{} and quantum{} blocks below:
+#
+#                              Demo 14 / 16E     Demo 17
+#   geometry.domain_padding_nm        20.0 nm     35.0 nm
+#   geometry.quantum_region_padding    2.0 nm     30.0 nm
+#
+# The second one is the load-bearing change. `boundary{ x = dirichlet }` sets
+# psi = 0 at the two ends of the quantum{} region, so that region is not merely
+# an analysis window -- it is a hard-walled box, and its walls quantize the
+# states just as the wells do. At 2.0 nm padding the wall sits 2 nm outside a
+# ~15 nm active region: Demo 16E's case_01 recorded 7.3% of E2 outside the
+# wells and a boundary probability of 3.1e-3 against a 1.0e-3 constraint, and
+# all ten of its cases came back physical_qc_valid = False.
+#
+# That matters more for chi(2) than for the level positions. The absolute
+# susceptibility rides on <psi|z|psi> and on the electron-hole overlaps, and
+# those converge with domain size more slowly than the eigenvalues do -- the
+# failure mode is a correct resonance wavelength with a wrong amplitude, which
+# is exactly the symptom this reproduction has.
+#
+# At 35.0 / 30.0 the wall sits 30 nm outside the active region with a further
+# 5.0 nm of Al0.55Ga0.45As beyond it, so the box is closed in material the
+# bound states have already decayed through.
+#
+# COST. The domain is ~85 nm instead of ~35 nm and the quantum box ~75 nm
+# instead of ~19 nm, so this deck is slower and larger than Demo 14's. The
+# active-region mesh is NOT coarsened to compensate: widening the domain must
+# not silently reduce the resolution of the region the physics lives in.
+#
+# The import block below is empty for linear designs and populated otherwise;
+# demo17.render_deck substitutes it.
+
+global{
+    simulate1D{}
+    temperature = {{temperature_K}}
+    substrate{ name = "GaAs" }
+    crystal_zb{ x_hkl = [1, 0, 0]  y_hkl = [0, 1, 0] }
+}
+
+{{import_block}}
+
+contacts{ fermi{ name = qw_contact  bias = 0.0 } }
+
+# Four grid lines: coarse at both domain edges, fine across the active region.
+# nextnano++ grades the spacing between them, so the wide Demo 17 cladding is
+# carried at outer_grid_spacing_nm and costs far fewer points than it would at
+# the active-region spacing.
+grid{
+    xgrid{
+{{grid_lines}}
+    }
+}
+
+structure{
+    output_region_index{ boxes = no }
+    output_material_index{ boxes = no }
+    output_alloy_composition{ boxes = no }
+{{structure_regions}}
+}
+
+classical{
+    Gamma{}
+    HH{}
+    LH{}
+    SO{}
+    output_bandedges{ averaged = no }
+    output_bandgap{}
+}
+
+quantum{
+    region{
+        name = "{{quantum_region_name}}"
+        # CORRECTION C lands here: this span is
+        #   [active_start - quantum_region_padding, active_end + padding],
+        # clamped to the domain. With padding = 30.0 nm the Dirichlet walls are
+        # 30 nm clear of the wells instead of 2 nm.
+        x = [{{quantum_start_nm}}, {{quantum_end_nm}}]
+        no_density = yes
+        boundary{ x = dirichlet }
+        Gamma{ num_ev = {{number_of_electron_states}} }
+        HH{ num_ev = {{number_of_hole_states}} }
+        # envelopes = yes is required, not optional: Eq. 2 needs SIGNED
+        # amplitudes for the overlaps and for the off-diagonal <psi|z|psi>.
+        # Probability densities alone cannot produce either.
+        output_states{ max_num = {{output_state_count}} envelopes = yes probabilities = yes }
+        transition_energies{ Gamma_HH{} }
+        overlap_integrals{ Gamma_HH{} }
+        dipole_moment_matrix_elements{
+            polarization{ name = "{{dipole_polarization_name}}" re = [1, 0, 0] }
+            Gamma{}
+            HH{}
+        }
+    }
+}
+
+run{ quantum{} }

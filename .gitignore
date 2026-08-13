@@ -42,3 +42,33 @@ __pycache__/
 *.pyc
 .pytest_cache/
 .ipynb_checkpoints/
+
+# ─── generated run artifacts inside a demo directory ────────────────────────
+# A demo directory holds SOURCE: the orchestrator, the config, the template and
+# the frozen case list. Runs write to `results_root` (C:\nn_results on the work
+# laptop, nextnano/results/demo_runs elsewhere -- both already ignored above), so
+# a solver artifact appearing beside the source means a run was pointed at the
+# wrong root. Ignored so it cannot be committed by accident; the demo's own
+# .in.j2 template and .yaml config are source and stay tracked.
+nextnano/demos/**/raw/
+nextnano/demos/**/nextnano_input/
+nextnano/demos/**/*.log
+nextnano/demos/**/*.dat
+# ...except the reference decks Demo 16G ships as fixtures, which ARE source.
+!nextnano/demos/**/docs/*.nnp
+
+# ─── curated demo results ───────────────────────────────────────────────────
+# NOTE, because this deliberately does NOT match the literal request to ignore
+# `demo_results/demo_17/*`: `demo_results/` is the split-machine hand-off. The
+# work laptop runs the licensed solve and commits the curated summaries and
+# figures; the home laptop reads them back through `git pull`. That is how
+# demo_results/demo_16E's 10 figures, 2 CSVs and physics_summary.json got here,
+# and blanket-ignoring demo_17 would mean a licensed Demo 17 run could never
+# reach the home laptop at all.
+#
+# So the BULK is ignored and the CURATED SET stays tracked. To ignore Demo 17's
+# results outright instead, replace this whole block with `demo_results/demo_17/`.
+demo_results/demo_17/cases/
+demo_results/demo_17/p[0-9][0-9]/
+demo_results/demo_17/**/*.log
+demo_results/demo_17/**/*.dat

@@ -1,0 +1,428 @@
+# Demo 17 -- paper absolute chi(2) reproduction, corrected.
+#
+# This is Demo 16E's ten-structure study re-run with THREE named corrections
+# applied to the absolute scale. Nothing else changes: the same ten structures,
+# the same renderer, the same solver path, the same Eq. 2 evaluator. That is
+# deliberate -- holding everything else fixed is what makes the per-case ratio
+# Demo 17 / Demo 16E a measurement of the corrections rather than of ten
+# different things at once.
+#
+# The three corrections, and where each one lives in this file:
+#
+#   A. N_z counts INDIVIDUAL WELLS, not coupled pairs      -> chi2.nz_mode
+#      3.333333e7 m^-1 (1 pair / 30 nm)  ->  6.666667e7 m^-1 (2 wells / 30 nm)
+#
+#   B. Brillouin-zone edge is the zincblende 2*pi/a,       -> k_parallel.*
+#      not the simple-cubic pi/a
+#      k_max = 0.10 * pi/a = 0.5557 nm^-1  ->  0.10 * 2*pi/a = 1.1114 nm^-1
+#
+#   C. The Dirichlet box is moved far enough out that       -> geometry.*
+#      E2 and HH2 are not truncated by it
+#      cladding 20.0 -> 35.0 nm, quantum-region padding 2.0 -> 30.0 nm
+#
+# Corrections A and B were each measured independently by Demo 16F's convention
+# ladder on 16E's licensed case_02 envelopes: 30.99 -> 61.99 -> 84.04 pm/V.
+# Correction C has never been measured on a solved structure; that is the new
+# information this demo produces. See README.md.
+#
+# NOT DONE HERE, ON PURPOSE: there is no absolute_scale_factor and no fitted
+# constant anywhere in this file. r_e_hh_nm, Gamma, the 0.10 BZ fraction and the
+# two-states-per-band truncation are all published values and all stay.
+
+experiment:
+  name: demo17_paper_chi2_reproduction_corrected
+  demo_id: 17_paper_chi2_reproduction_corrected
+  description: >-
+    Demo 16E's ten fixed GaAs/Al0.55Ga0.45As asymmetric coupled quantum wells,
+    re-solved with a per-well N_z, a zincblende 2*pi/a zone edge and a cladding
+    thick enough to stop the Dirichlet boundary truncating the excited states,
+    reported against the paper's 2340 pm/V ideal-abrupt value.
+
+# --- materials -------------------------------------------------------------
+# Unchanged from Demo 14/16E.
+materials:
+  well: GaAs
+  barrier: Al(x)Ga(1-x)As
+  substrate: GaAs
+  barrier_al_fraction: 0.55
+  temperature_K: 300.0
+
+# --- geometry --------------------------------------------------------------
+geometry:
+  # Fixed total GaAs well thickness; asymmetry redistributes it between wells:
+  #   d_thick = D (1 + s) / 2,  d_thin = D (1 - s) / 2
+  total_well_thickness_nm: 10.0
+
+  # --- CORRECTION C ------------------------------------------------------
+  # `period_barrier_nm` is NOT the simulation cladding. It is the AlGaAs
+  # barrier of the PHYSICAL 30 nm period (18.2 + 7.1 + 1.8 + 2.9 = 30.0), and
+  # it is what N_z counts wells inside. Changing it would contradict
+  # correction A, so it is held at the paper value.
+  period_barrier_nm: 18.2
+  #
+  # These two are the numerical domain, and they are what correction C moves.
+  # `domain_padding_nm` is the flat Al0.55Ga0.45As slab the renderer puts on
+  # each side of the active region; `quantum_region_padding_nm` is how far
+  # beyond the active region the quantum{} box -- and therefore the Dirichlet
+  # wall psi = 0 -- is placed.
+  #
+  # Demo 16E ran 20.0 / 2.0. A 2.0 nm padding puts the hard wall 2 nm from the
+  # wells, which quantizes the box as much as the wells do: 16E's case_01
+  # recorded 7.3% of E2 outside the wells and a boundary probability of 3.1e-3,
+  # against a 1.0e-3 constraint. chi(2) rides on <psi|z|psi>, which converges
+  # with domain size more slowly than the eigenvalues do, so a truncated tail
+  # gives a correct resonance position with a wrong amplitude.
+  #
+  # 35.0 / 30.0 leaves 5.0 nm of AlGaAs outside the quantum box, so the wall
+  # sits in material the bound states have already decayed through rather than
+  # in the barrier that confines them.
+  domain_padding_nm: 35.0
+  quantum_region_padding_nm: 30.0
+
+# --- grading ---------------------------------------------------------------
+# Unchanged from Demo 14/16E. Demo 17 studies the same ten structures.
+grading:
+  width_definition: 10_90_percent_of_transition
+  realized_width_reference: peak
+  nominal_reference_low_fraction: 0.10
+  nominal_reference_high_fraction: 0.90
+  continuous_oversample: 20
+  render:
+    linear: ternary_linear      # native nextnano++
+    fermi: ternary_import       # Python-generated x_Al(x)
+    erf: ternary_import
+    cosine: ternary_import
+  growth_coordinate: x
+  import_name: al_profile
+
+# --- nextnano++ ------------------------------------------------------------
+nextnano:
+  # Demo 17's own template. Identical grammar to Demo 14's; the header documents
+  # correction C and the quantum{} region it produces is much wider.
+  template: graded_acqw17.in.j2
+  parser_profile: nextnano_pp_3_0_0
+  quantum_region_name: acqw
+  dipole_polarization_name: growth_z
+  bandedge_columns:
+    position_nm: 0
+    conduction_eV: 1
+    heavy_hole_eV: 2
+    light_hole_eV: 3
+    split_off_eV: 4
+  # The domain is ~2.4x Demo 16E's and the quantum box is ~4x, so the solve is
+  # slower. Still finite: an hour means something has hung.
+  solver_timeout_seconds: 3600
+  threads: 1
+
+# --- mesh ------------------------------------------------------------------
+# Unchanged. The active-region spacing is what resolves the grades, and it is
+# not part of any correction; widening the domain must not silently coarsen the
+# region the physics lives in.
+mesh:
+  active_region_grid_spacing_nm: 0.05
+  outer_grid_spacing_nm: 0.5
+
+# --- states ----------------------------------------------------------------
+states:
+  number_of_electron_states: 6
+  number_of_hole_states: 6
+  output_state_count: 6
+  # Eq. 2 uses the first two bound states of each band -- the paper says so
+  # explicitly. This is NOT a correction and does not move.
+  max_states_per_band: 2
+
+# --- absolute chi(2) -------------------------------------------------------
+chi2:
+  mode: absolute
+  target_wavelength_nm: 1550.0
+  broadening_meV: 5.0
+  max_states_per_band: 2
+
+  # Bloch interband POSITION matrix element <u_e|r|u_hh>, 7.51 Angstrom.
+  # Ramesh et al., Appl. Phys. Lett. 123, 251111 (2023), VASP/HSE06.
+  # Corroborated by the GaAs Kane value r_cv = hbar*p_cv/(m0*Eg) = 0.738 nm.
+  # Eq. (3) already carries e^3 -- this is never multiplied by the charge.
+  # UNCHANGED: raising it to raise chi(2) would be parameter fitting.
+  r_e_hh_nm: 0.751
+
+  # --- CORRECTION A ------------------------------------------------------
+  # Ramesh 2023 Eq. 1 defines N_z as "the number of quantum wells per unit
+  # length". Fig. 1a of arXiv:2602.23246v1 puts TWO GaAs wells (7.1 nm and
+  # 2.9 nm) in each 30 nm period, so the well count per period is 2, not 1.
+  # Demo 14/16E read it as the period density and got 1/30 nm = 3.333333e7;
+  # Demo 17 reads it as the well density and gets 2/30 nm = 6.666667e7.
+  #
+  # n_wells_per_metre stays null so the value is DERIVED from nz_mode and the
+  # period rather than typed twice. preflight17 asserts the derived value is
+  # 2 / 30e-9 m^-1 = 6.666667e7 m^-1 exactly.
+  #
+  # chi(2) is linear in N_z, so this correction is exactly x2.
+  nz_mode: well_density         # was: period_density
+  reference_period_nm: 30.0     # 18.2 + 7.1 + 1.8 + 2.9; the PHYSICAL period
+  wells_per_period: 2
+  n_wells_per_metre: null       # derived; never typed by hand
+
+  broad_wavelength_nm: [400.0, 1800.0]
+  broad_wavelength_points: 701
+  focused_wavelength_nm: [1400.0, 1800.0]
+  focused_wavelength_points: 401
+
+# --- in-plane integration --------------------------------------------------
+k_parallel:
+  # --- CORRECTION B ------------------------------------------------------
+  # Both papers say the in-plane sum runs to "one tenth of the Brillouin zone"
+  # without saying which edge. GaAs is zincblende, i.e. FCC: the X point sits
+  # at (1, 0, 0) in units of 2*pi/a, so the Gamma->X zone edge is 2*pi/a.
+  # pi/a is the SIMPLE-CUBIC edge and does not describe this lattice.
+  #
+  #   corrected  k_max = 0.10 * 2*pi/a = 1.111429 nm^-1   (a = 0.565325 nm)
+  #   legacy     k_max = 0.10 *   pi/a = 0.555714 nm^-1
+  #
+  # HOW IT IS APPLIED. `chi2.Chi2Settings.k_max_per_nm` hardcodes the pi/a edge
+  # (it is shared code that Demos 11, 13, 14 and 16B-16E all depend on, and
+  # Demo 17 does not get to change their results). The physically correct radius
+  # is therefore requested through the fraction, which is the only knob that
+  # reaches it:
+  #
+  #     fraction_of_bz * (pi/a) == fraction_of_brillouin_zone_physical * (2*pi/a)
+  #     0.20           * (pi/a) == 0.10                                * (2*pi/a)
+  #
+  # So `fraction_of_bz: 0.20` below is a FRACTION OF THE LEGACY pi/a EDGE, not a
+  # physical claim, and the physical statement is the pair of keys under it.
+  # `demo17.verify_k_space_convention` recomputes the identity and raises if the
+  # three numbers ever stop agreeing, and preflight17 asserts the resulting
+  # k_max equals 0.10 * 2*pi/a to 1e-12 relative. Neither number can drift
+  # silently.
+  fraction_of_bz: 0.20                                  # of the legacy pi/a edge
+  zone_edge_convention: crystallographic_two_pi_over_a  # was: legacy_pi_over_a
+  fraction_of_brillouin_zone_physical: 0.10             # the paper's stated 1/10
+  target_k_max_per_nm: 1.111429                         # checked, not used
+
+  # Doubling the radius quadruples the k-space area but adds far less than that
+  # to chi(2): the transition energies disperse as hbar^2 k^2 / 2mu, so the
+  # extra shell is 0.28-1.12 eV off resonance and the integral has largely
+  # saturated -- which is exactly the saturation the paper reports. 16F measured
+  # the whole-sum effect at x1.356 on case_02 at 1550 nm.
+  points: 192                   # was 96; the integrand now spans twice the radius
+  lattice_constant_nm: 0.565325
+  electron_mass_m0: 0.067
+  heavy_hole_inplane_mass_m0: 0.112
+  # Kept separate from N_z on purpose; one paper conflates them.
+  spin_degeneracy: 2
+  convergence:
+    enabled: true
+    point_counts: [96, 192, 384, 768]
+    relative_tolerance: 1.0e-3
+
+# --- the three corrections, and the baseline they are measured against ------
+corrections:
+  baseline_demo_id: 16E_acqw_structure_physics_optical_comparison
+  baseline_config: ../14_absolute_chi2_graded_acqw_bo/demo.yaml
+  # Every correction carries the source that REQUIRES it. A correction with no
+  # such source does not belong in this file.
+  applied:
+    - id: A_well_density_Nz
+      changed: chi2.nz_mode
+      from: period_density
+      to: well_density
+      from_value_per_m: 3.3333333333333336e7
+      to_value_per_m: 6.666666666666667e7
+      expected_factor: 2.0
+      exact: true
+      source: >-
+        Ramesh et al., APL 123, 251111 (2023) Eq. 1: "N_z is the number of
+        quantum wells per unit length". arXiv:2602.23246v1 Fig. 1a shows two
+        GaAs wells (7.1 nm, 2.9 nm) per 30 nm period.
+    - id: B_zincblende_zone_edge
+      changed: k_parallel.zone_edge_convention
+      from: legacy_pi_over_a
+      to: crystallographic_two_pi_over_a
+      from_k_max_per_nm: 0.5557143
+      to_k_max_per_nm: 1.1114287
+      expected_factor: null       # measured, not assumed; ~1.36 on 16F case_02
+      exact: false
+      source: >-
+        GaAs is zincblende (FCC). X = (1,0,0) in units of 2*pi/a, so the
+        Gamma->X zone edge is 2*pi/a. pi/a is the simple-cubic edge.
+    - id: C_cladding_and_dirichlet_box
+      changed: geometry.domain_padding_nm, geometry.quantum_region_padding_nm
+      from: [20.0, 2.0]
+      to: [35.0, 30.0]
+      expected_factor: null       # unmeasured before this demo; that is the point
+      exact: false
+      source: >-
+        Demo 16E recorded boundary probabilities up to 3.1e-3 against a 1.0e-3
+        constraint, with physical_qc_valid = False on all ten cases. Absolute
+        chi(2) depends on <psi|z|psi>, which converges with domain size more
+        slowly than the eigenvalues do.
+  # Recorded so demo17 can rebuild the pre-correction settings on the SAME
+  # solved wavefunctions and report a measured per-correction budget.
+  ablation:
+    enabled: true
+    legacy_nz_mode: period_density
+    legacy_k_parallel_fraction_of_bz: 0.10
+    legacy_k_parallel_points: 96
+  # Reported for context; never applied, never promoted. Both are open factors
+  # Demo 16F identified and could not close from the published text.
+  known_open_factors:
+    eq1_over_eq2_prefactor: 3.0
+    heavy_hole_mj_multiplicity: 2.0
+
+# --- domain convergence ----------------------------------------------------
+# Correction C is a numerical claim, so it has to be demonstrated rather than
+# asserted. The sweep re-solves ONE structure at three claddings and reports the
+# eigenenergies and the position matrix elements against SEPARATE budgets:
+# energies converging while <z> has not is exactly the pattern that produces a
+# right resonance position with a wrong amplitude.
+domain_convergence:
+  enabled: true
+  case_id: case_02                      # the abrupt case; the paper's 2340 pm/V
+  domain_padding_nm: [20.0, 35.0, 50.0]
+  quantum_region_padding_nm: [2.0, 30.0, 45.0]
+  energy_tolerance_meV: 1.0
+  position_matrix_relative_tolerance: 0.01
+
+# --- optimization ----------------------------------------------------------
+# PRESENT BUT NEVER RUN. Demo 17 solves ten fixed structures and ranks nothing;
+# there is no optimizer, no surrogate and no acquisition function anywhere in
+# this demo. The section is retained verbatim only because `demo14.validate_config`
+# -- which Demo 17 reuses so its config is held to the same schema -- requires
+# it. `run_demo17.py` has no code path that reads it.
+optimization:
+  library: ax
+  required_ax_version: "1.3.1"
+  minimum_ax_version: "1.0.0"
+
+  objective: chi2_xzx_abs_at_1550_pm_per_V
+  direction: maximize
+
+  target_completed_trials: 30
+  initialization_trials: 10
+  bo_trials: 20
+  batch_size: 1
+  random_seed: 1414
+
+  stratify_initialization_by_profile: true
+  minimum_initial_per_profile: 2
+
+  search_space:
+    asymmetry_s:
+      type: range
+      lower: 0.30
+      upper: 0.55
+    nominal_central_barrier_thickness_nm:
+      type: range
+      lower: 0.85
+      upper: 2.50
+    gaas_to_algaas_grading_width_10_90_nm:
+      type: range
+      lower: 0.40
+      upper: 1.40
+    algaas_to_gaas_grading_width_10_90_nm:
+      type: range
+      lower: 0.40
+      upper: 1.40
+    grading_profile:
+      type: choice
+      values: [linear, fermi, erf, cosine]
+
+  max_candidate_regeneration_attempts: 20
+
+# --- constraints -----------------------------------------------------------
+constraints:
+  maximum_detuning_nm: 40.0
+  # Now expected to be MET rather than warned about: that is what correction C
+  # is for. It is still not a hard abort -- see quasi_bound_state_policy below --
+  # because a failing state must be diagnosed from its envelope, and Demo 11
+  # raises before the envelopes are written.
+  maximum_boundary_probability: 1.0e-3
+  minimum_state_tracking_confidence: 0.80
+  maximum_orthonormality_error: 1.0e-3
+  require_origin_independence: true
+  require_expected_states: true
+  require_physical_qc: true
+  require_absolute_units_valid: true
+  require_k_parallel_converged: false   # reported; not a feasibility gate
+
+# --- state selection -------------------------------------------------------
+# This block must be called `validation`, not `analysis`: `adapter14` reads the
+# policy from `cfg["validation"]["quasi_bound_state_policy"]` and defaults it to
+# "warn" when the key is absent, so the same key under any other section is dead
+# config that looks live. `preflight17` asserts the value actually arrives in the
+# derived Demo 11 config, so this cannot silently stop working.
+#
+# 'warn' is deliberate. Demo 11 raises on 'fail_case' at the point the diagnosis
+# is written -- BEFORE envelopes.csv exists -- which would deny Demo 17 both the
+# per-state verdict and the correction ablation, the two things this demo exists
+# to produce. So the analysis runs under 'warn' and `demo17.bound_state_verdict`
+# applies the strict verdict itself, per state, over the states inside Eq. 2's
+# window. Same verdict, all artifacts preserved. A failing state never silently
+# becomes a passing case, and "could not tell" is reported as NOT CERTIFIED
+# rather than as a pass.
+#
+# The other two analysis thresholds are NOT set here because `adapter14` does not
+# read them from the config: `boundary_edge_fraction` is hardcoded at 0.05 and
+# `orthonormality_tolerance` is taken from constraints.maximum_orthonormality_error
+# above. Writing them here would be decoration.
+validation:
+  quasi_bound_state_policy: warn
+
+# --- failure policy --------------------------------------------------------
+failure_policy:
+  stop_on_technical_failure: true
+  subresolution_grade_is_a_bug: true
+  fabricate_objective_for_failed_trials: false
+
+# --- logging ---------------------------------------------------------------
+logging:
+  console_level: INFO
+  file_level: DEBUG
+  events_jsonl: true
+  timing_jsonl: true
+  intermediate_plot_every_n_trials: 5
+
+# --- checkpointing ---------------------------------------------------------
+checkpointing:
+  after_every_trial: true
+  atomic_writes: true
+  keep_per_trial_snapshots: true
+
+# --- plotting --------------------------------------------------------------
+plotting:
+  enabled: true
+  failure_is_fatal: false
+  dpi: 150
+  formats: [png]
+
+# --- paper reference -------------------------------------------------------
+paper_reference:
+  enabled: true
+  targets_file: ../11_paper_validation_interband_chi2_acqw/paper_targets.yaml
+  structure:
+    thick_well_nm: 7.1
+    tunnel_barrier_nm: 1.8
+    thin_well_nm: 2.9
+    period_barrier_nm: 18.2
+    al_fraction: 0.55
+    asymmetry_s: 0.42
+  # Validation targets, never fit targets. Demo 17's headline comparison is
+  # chi2_ideal_abrupt_pm_per_V against the abrupt case (case_02).
+  expectations:
+    chi2_ideal_abrupt_pm_per_V: 2340.0
+    chi2_eds_al_profile_pm_per_V: 1200.0
+    chi2_eds_ga_profile_pm_per_V: 1363.0
+    simulated_resonance_nm: 1520.0
+  # The case the 2340 pm/V number describes.
+  ideal_abrupt_case_id: case_02
+  # Order-of-magnitude plausibility only. A miss is recorded and reported; it
+  # does not silently rescale anything.
+  plausibility_band_pm_per_V: [50.0, 50000.0]
+
+# --- workflow / paths ------------------------------------------------------
+workflow:
+  mode: fixed_case_study
+  run_solver: true
+  mock_solver: false
+
+paths:
+  results_subdir: 17_paper_chi2_reproduction_corrected
