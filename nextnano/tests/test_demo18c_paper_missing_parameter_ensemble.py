@@ -110,3 +110,15 @@ def test_cli_rejects_any_non_frozen_ensemble() -> None:
     with pytest.raises(run_demo18c.Runner18CError):
         run_demo18c._validate_cli(20, 7)
 
+
+def test_plotting_is_lazy_and_reports_environment_failure(monkeypatch: pytest.MonkeyPatch) -> None:
+    source = (DEMO / "run_demo18c.py").read_text(encoding="utf-8")
+    assert "\nimport plots18c\n" not in source
+
+    def broken_import(name: str):
+        assert name == "plots18c"
+        raise ImportError("DLL load failed while importing pyexpat")
+
+    monkeypatch.setattr(run_demo18c.importlib, "import_module", broken_import)
+    with pytest.raises(run_demo18c.Runner18CError, match="licensed physics was not started"):
+        run_demo18c._load_plots18c()

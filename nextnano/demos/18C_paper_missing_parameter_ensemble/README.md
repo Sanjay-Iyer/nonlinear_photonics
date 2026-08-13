@@ -103,6 +103,18 @@ python .\nextnano\demos\18C_paper_missing_parameter_ensemble\run_demo18c.py `
     --verbose
 ```
 
+`--preflight` deliberately does not import Matplotlib. `--physics` imports and
+validates the plotting runtime before creating the run directory or starting any
+licensed solve. If the active conda environment reports a `pyexpat` DLL error, test
+it directly before physics:
+
+```powershell
+python -c "import pyexpat; import matplotlib.pyplot as plt; print('plotting OK')"
+```
+
+Repair or switch the active Python environment until that command succeeds; do not
+start the 17-solve campaign with a broken plotting runtime.
+
 The expected result family is:
 
 ```text

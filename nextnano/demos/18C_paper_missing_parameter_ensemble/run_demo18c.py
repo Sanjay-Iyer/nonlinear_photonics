@@ -6,6 +6,7 @@ import argparse
 import csv
 import datetime as dt
 import hashlib
+import importlib
 import json
 import math
 from pathlib import Path
@@ -45,7 +46,6 @@ import demo16b
 import demo16e
 import demo_workflow
 import outputs
-import plots18c
 import runlog14
 
 
@@ -54,6 +54,26 @@ RULE = "=" * 76
 
 class Runner18CError(RuntimeError):
     pass
+
+
+def _load_plots18c() -> Any:
+    """Load plotting only when plots are actually needed.
+
+    A solver-free preflight must not depend on Matplotlib's compiled runtime.
+    Physics checks this dependency before creating a run directory or starting
+    any licensed solve, so a broken workstation Python cannot waste 17 solves.
+    """
+
+    try:
+        return importlib.import_module("plots18c")
+    except Exception as exc:  # compiled Matplotlib/XML dependencies can fail here
+        raise Runner18CError(
+            "Demo 18C plotting is unavailable, so licensed physics was not started. "
+            f"The active Python environment failed to import Matplotlib: "
+            f"{type(exc).__name__}: {exc}. First test `python -c \"import pyexpat; "
+            "import matplotlib.pyplot as plt; print('plotting OK')\"`; repair the "
+            "active environment if that command fails, then rerun --preflight and --physics."
+        ) from exc
 
 
 class DebugLog:
@@ -427,7 +447,9 @@ def _analyze_all(
                    _spectrum_rows(spectra[combo_id]))
     plot_ids = [combo_id for combo_id in ["Combo_00", *top3_nonbaseline]
                 if combo_id in spectra]
-    plot_paths = plots18c.generate_all(root / "plots", results, ranked, spectra, plot_ids)
+    plot_paths = _load_plots18c().generate_all(
+        root / "plots", results, ranked, spectra, plot_ids
+    )
 
     summaries = root / "summaries"
     _write_csv(summaries / "demo18c_combo_results.csv", results)
@@ -585,6 +607,7 @@ def run_preflight(n_combos: int = 20, seed: int = 1803, verbose: bool = False) -
     passed = bool(checks) and all(row[1] for row in checks)
     print(RULE)
     print("CODE READY FOR LICENSED DEMO 18C RUN" if passed else "PREFLIGHT FAILED")
+    print("Plotting is imported only by --physics and is checked before any licensed solve.")
     print(RULE)
     return 0 if passed else 1
 
@@ -593,6 +616,9 @@ def run_physics(n_combos: int, seed: int, verbose: bool = False) -> int:
     _validate_cli(n_combos, seed)
     cfg = config18c.load_config()
     combos = config18c.load_combinations()
+    # Fail before allocating a result directory or consuming a licence if the
+    # active workstation Python has a broken compiled plotting dependency.
+    _load_plots18c()
     machine = demo_workflow.load_machine_config()
     if not machine.run_solver:
         raise Runner18CError("--physics requires a licensed machine configuration")
