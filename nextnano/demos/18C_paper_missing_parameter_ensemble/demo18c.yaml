@@ -1,0 +1,67 @@
+demo_id: 18C_paper_missing_parameter_ensemble
+version: demo18c-1.0.0
+
+ensemble:
+  seed: 1803
+  combination_count: 20
+  unique_licensed_solve_count: 17
+  sampling: best_of_512_maximin_latin_hypercube_candidates
+  combinations_file: demo18c_combinations.csv
+
+reference_structure:
+  nominal_period_nm: 30.0
+  barrier_al_fraction: 0.55
+  interfaces: abrupt
+  period_barrier_rule: nominal_period_minus_both_wells_and_tunneling_barrier
+
+solver:
+  number_of_electron_states: 6
+  number_of_hole_states: 6
+  output_state_count: 6
+  states_used_in_eq2: 2
+  timeout_seconds: 3600
+  domain_padding_nm: 60.0
+  quantum_region_padding_nm: 42.0
+  mesh_nm: 0.025
+  field_implementation: imposed_poisson_electric_field_with_quantum_only_run
+  field_direction: positive_growth_x
+  current_equation_mode: schrodinger_only_no_density_yes
+  electron_mass_override_implemented: false
+  hh_mass_override_implemented: false
+  cb_offset_override_implemented: false
+  hh_offset_override_implemented: false
+
+chi2:
+  broadening_meV: 5.0
+  wavelength_start_nm: 1400.0
+  wavelength_stop_nm: 1800.0
+  wavelength_points: 401
+  target_wavelength_nm: 1550.0
+  paper_target_pm_per_V: 2340.0
+  demo18b_baseline_pm_per_V: 84.90955241650195
+  lattice_constant_nm: 0.565325
+  electron_inplane_mass_m0: 0.067
+  heavy_hole_inplane_mass_m0: 0.112
+  k_points: 768
+
+bound_state_criteria:
+  minimum_binding_energy_meV: 5.0
+  minimum_active_region_probability: 0.50
+  maximum_each_boundary_probability: 0.001
+  maximum_each_boundary_amplitude_nm_minus_half: 0.05
+  boundary_window_nm: 2.0
+  maximum_orthonormality_error: 0.001
+
+spectral_gate:
+  baseline_peak_wavelength_nm: 1520.0
+  maximum_peak_shift_from_baseline_nm: 100.0
+  edge_peak_is_mismatch: true
+
+outcomes:
+  factor_of_two_lower_pm_per_V: 1170.0
+  factor_of_two_upper_pm_per_V: 3510.0
+  within_20_percent_lower_pm_per_V: 1872.0
+  within_20_percent_upper_pm_per_V: 2808.0
+  within_10_percent_lower_pm_per_V: 2106.0
+  within_10_percent_upper_pm_per_V: 2574.0
+

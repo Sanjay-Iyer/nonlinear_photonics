@@ -1,0 +1,11 @@
+Combo_ID,Combo_Name,Multiplier,Peak_chi2_pmV,Peak_Wavelength_nm,chi2_1550nm_pmV,Target_Error_Percent,Factor_Signature,Weakest_Active_Status,Graded_Peak_chi2_pmV,Graded_Peak_Wavelength_nm,Graded_chi2_1550nm_pmV,Aggregate_Error_Percent,Error_vs_abrupt_peak_Percent,Error_vs_abrupt_at_1550_Percent,Error_vs_graded_peak_Percent
+01,Raw Baseline,1.0,145.78,1520.0,84.7,-93.77,1 x 1 x 1 x 1,established,106.09,1508.0,53.83,92.53,-93.77,-92.63,-91.16
+02,Conservative Active Density,3.0,437.35,1520.0,254.1,-81.31,3 x 1 x 1 x 1,reported,318.26,1508.0,161.48,77.63,-81.31,-77.9,-73.48
+03,Standard SHG Permutation,2.0,291.56,1520.0,169.4,-87.54,1 x 2 x 1 x 1,reported,212.17,1508.0,107.65,85.07,-87.54,-85.27,-82.32
+04,Density + Standard Permutation,6.0,874.69,1520.0,508.21,-62.62,3 x 2 x 1 x 1,reported,636.52,1508.0,322.96,55.5,-62.62,-55.81,-46.96
+05,Density + Boyd Full Permutation,9.0,1312.04,1520.0,762.31,-43.93,3 x 3 x 1 x 1,reported,954.78,1508.0,484.44,34.08,-43.93,-33.71,-20.44
+06,Tensor Inversion Only,2.8,408.19,1520.0,237.16,-82.56,1 x 1 x 2.8 x 1,speculative,297.04,1508.0,150.72,79.12,-82.56,-79.38,-75.25
+07,Density + Tensor Inversion,8.4,1224.57,1520.0,711.49,-47.67,3 x 1 x 2.8 x 1,speculative,891.13,1508.0,452.15,38.25,-47.67,-38.13,-25.74
+08,Full Permutation + Tensor Inversion,8.4,1224.57,1520.0,711.49,-47.67,1 x 3 x 2.8 x 1,speculative,891.13,1508.0,452.15,38.25,-47.67,-38.13,-25.74
+09,Combined Standard,16.8,2449.14,1520.0,1422.98,4.66,3 x 2 x 2.8 x 1,speculative,1782.25,1508.0,904.29,31.3,4.66,23.74,48.52
+10,Full Reconciliation Budget,27.72,4041.08,1520.0,2347.91,72.7,3 x 3 x 2.8 x 1.1,contradicted,2940.72,1508.0,1492.08,111.32,72.7,104.17,145.06

@@ -56,7 +56,7 @@ convergence_tolerances:
 diagnostics:
   origin_shifts_nm: [10.0, 50.0]
   state_counts: [2, 3, 4]
-  kmax_fractions_of_2pi_over_a: [0.05, 0.10, 0.15, 0.20]
+  kmax_fractions_of_2pi_over_a: [0.05, 0.10, 0.15, 0.20, 0.25, 0.30]
   k_points: 768
   paper_target_pm_per_V: 2340.0
   demo18_baseline_pm_per_V: 30.994195587364835

@@ -1,0 +1,1025 @@
+{
+  "demo_id": "17d_prefactor_ensemble_sweep",
+  "source_results_dir": "C:\\code\\nonlinear_photonics\\demo_results\\demo_17",
+  "units": "pm/V (Demo 17 raw value x a declared multiplier)",
+  "targets_profile": "paper",
+  "no_scale_factor_was_fitted": true,
+  "degrees_of_freedom_fitted_to_published_values": 0,
+  "target_wavelength_nm": 1550.0,
+  "scan_window_nm": [
+    1400.0,
+    1800.0
+  ],
+  "cases": [
+    {
+      "case_id": "case_02",
+      "label": "abrupt",
+      "role": "primary",
+      "description": "Ideal abrupt interfaces. THE PAPER TARGET CASE: the published absolute values are quoted for this structure.",
+      "stored_chi2_at_1550_pm_per_V": 84.70092866117757,
+      "stored_peak_pm_per_V": 145.78227349698668,
+      "stored_peak_wavelength_nm": 1520.0,
+      "peak_over_1550_contrast": 1.7211413829964957,
+      "curve_provenance": "eq2_rebuilt_from_recorded_matrix_elements",
+      "curve_available": true,
+      "curve_points": 401,
+      "rebuild_fidelity": {
+        "model": "fit_to_stored_anchors",
+        "fitted_overlap_e1_hh2": 0.02499999999999999,
+        "fitted_overlap_e2_hh1": -0.08854166666666669,
+        "unknowns_fitted": 2,
+        "constraints": 3,
+        "fitted_to": "Demo 17's own stored chi2 at 1550 nm, peak height and peak wavelength -- NOT to any published number",
+        "cost_at_zero_cross_overlaps": 0.00012561783301851987,
+        "cost_at_fit": 1.3416059993783595e-07,
+        "search_limit": 0.3,
+        "grid_points_per_axis": 25,
+        "refinements": 3,
+        "affects_reported_numbers": false,
+        "rebuilt_at_1550_pm_per_V": 84.71649232665399,
+        "stored_at_1550_pm_per_V": 84.70092866117757,
+        "at_1550_error_percent": 0.018374846323915707,
+        "rebuilt_peak_pm_per_V": 145.73608165214816,
+        "stored_peak_pm_per_V": 145.78227349698668,
+        "peak_error_percent": -0.03168550176264912,
+        "rebuilt_peak_wavelength_nm": 1520.0,
+        "stored_peak_wavelength_nm": 1520.0,
+        "peak_wavelength_error_nm": 0.0,
+        "worst_anchor_error_percent": 0.03168550176264912,
+        "warn_threshold_percent": 5.0,
+        "high_fidelity": true,
+        "reported_numbers_use_stored_anchors_not_this_curve": true
+      },
+      "diagnostics": {
+        "loading_tier": "summary",
+        "source_paths": [
+          "C:\\code\\nonlinear_photonics\\demo_results\\demo_17\\physics_summary.json"
+        ],
+        "production_settings": {
+          "broadening_meV": 5.0,
+          "calibration_source": null,
+          "calibration_target_pm_per_V": null,
+          "calibration_wavelength_nm": null,
+          "electron_mass_m0": 0.067,
+          "heavy_hole_inplane_mass_m0": 0.112,
+          "k_max_per_nm": 1.1114288784645268,
+          "k_parallel_fraction_of_bz": 0.2,
+          "k_parallel_points": 192,
+          "lattice_constant_nm": 0.565325,
+          "max_states_per_band": 2,
+          "mode": "absolute",
+          "n_wells_per_metre": 66666666.66666666,
+          "r_e_hh_nm": 0.751,
+          "spin_degeneracy": 2,
+          "units": "pm/V"
+        },
+        "origin_independence": {
+          "shift_nm": 100.0,
+          "chi2_unshifted_pm_per_V": 84.71649232665399,
+          "chi2_shifted_pm_per_V": 84.71649232665355,
+          "relative_error": 5.200126729428551e-15,
+          "tolerance": 1e-09,
+          "passed": true
+        },
+        "kernel_agreement": {
+          "wavelengths_nm": [
+            1400.0,
+            1550.0,
+            1520.0
+          ],
+          "demo17b_angular_frequency_kernel_pm_per_V": [
+            86.98775003592098,
+            84.71649232665405,
+            145.73608165214836
+          ],
+          "demo17d_vectorised_energy_form_pm_per_V": [
+            86.98775003592259,
+            84.71649232665399,
+            145.73608165214816
+          ],
+          "max_relative_deviation": 1.8460376112207887e-14,
+          "agrees": true,
+          "note": "two independently written forms of Eq. 2 -- angular frequency with an explicit hbar^2, and energy denominators where it cancels"
+        }
+      }
+    },
+    {
+      "case_id": "case_01",
+      "label": "graded",
+      "role": "secondary",
+      "description": "Case 02's layer geometry with 0.70 nm linear grades; the graded twin, carried so a multiplier that looked structure-specific would show up.",
+      "stored_chi2_at_1550_pm_per_V": 53.82697949242898,
+      "stored_peak_pm_per_V": 106.08652742903536,
+      "stored_peak_wavelength_nm": 1508.0,
+      "peak_over_1550_contrast": 1.970880187396674,
+      "curve_provenance": "eq2_rebuilt_from_recorded_matrix_elements",
+      "curve_available": true,
+      "curve_points": 401,
+      "rebuild_fidelity": {
+        "model": "fit_to_stored_anchors",
+        "fitted_overlap_e1_hh2": 0.009375000000000001,
+        "fitted_overlap_e2_hh1": -0.07673611111111113,
+        "unknowns_fitted": 2,
+        "constraints": 3,
+        "fitted_to": "Demo 17's own stored chi2 at 1550 nm, peak height and peak wavelength -- NOT to any published number",
+        "cost_at_zero_cross_overlaps": 0.0008933889712371282,
+        "cost_at_fit": 3.3022883990019484e-08,
+        "search_limit": 0.3,
+        "grid_points_per_axis": 25,
+        "refinements": 3,
+        "affects_reported_numbers": false,
+        "rebuilt_at_1550_pm_per_V": 53.83287123379723,
+        "stored_at_1550_pm_per_V": 53.82697949242898,
+        "at_1550_error_percent": 0.010945703109857405,
+        "rebuilt_peak_pm_per_V": 106.07113864946948,
+        "stored_peak_pm_per_V": 106.08652742903536,
+        "peak_error_percent": -0.01450587547620111,
+        "rebuilt_peak_wavelength_nm": 1508.0,
+        "stored_peak_wavelength_nm": 1508.0,
+        "peak_wavelength_error_nm": 0.0,
+        "worst_anchor_error_percent": 0.01450587547620111,
+        "warn_threshold_percent": 5.0,
+        "high_fidelity": true,
+        "reported_numbers_use_stored_anchors_not_this_curve": true
+      },
+      "diagnostics": {
+        "loading_tier": "summary",
+        "source_paths": [
+          "C:\\code\\nonlinear_photonics\\demo_results\\demo_17\\physics_summary.json"
+        ],
+        "production_settings": {
+          "broadening_meV": 5.0,
+          "calibration_source": null,
+          "calibration_target_pm_per_V": null,
+          "calibration_wavelength_nm": null,
+          "electron_mass_m0": 0.067,
+          "heavy_hole_inplane_mass_m0": 0.112,
+          "k_max_per_nm": 1.1114288784645268,
+          "k_parallel_fraction_of_bz": 0.2,
+          "k_parallel_points": 192,
+          "lattice_constant_nm": 0.565325,
+          "max_states_per_band": 2,
+          "mode": "absolute",
+          "n_wells_per_metre": 66666666.66666666,
+          "r_e_hh_nm": 0.751,
+          "spin_degeneracy": 2,
+          "units": "pm/V"
+        },
+        "origin_independence": {
+          "shift_nm": 100.0,
+          "chi2_unshifted_pm_per_V": 53.83287123379723,
+          "chi2_shifted_pm_per_V": 53.83287123379659,
+          "relative_error": 1.1879144610488619e-14,
+          "tolerance": 1e-09,
+          "passed": true
+        },
+        "kernel_agreement": {
+          "wavelengths_nm": [
+            1400.0,
+            1550.0,
+            1508.0
+          ],
+          "demo17b_angular_frequency_kernel_pm_per_V": [
+            64.86624211221806,
+            53.83287123379703,
+            106.07113864946973
+          ],
+          "demo17d_vectorised_energy_form_pm_per_V": [
+            64.86624211221823,
+            53.83287123379723,
+            106.07113864946948
+          ],
+          "max_relative_deviation": 3.695733878818695e-15,
+          "agrees": true,
+          "note": "two independently written forms of Eq. 2 -- angular frequency with an explicit hbar^2, and energy denominators where it cancels"
+        }
+      }
+    }
+  ],
+  "targets": [
+    {
+      "key": "abrupt_peak",
+      "label": "abrupt, spectral peak",
+      "case_id": "case_02",
+      "quantity": "peak",
+      "value_pm_per_V": 2340.0,
+      "source": "arXiv:2602.23246v1 Section 3.1, ideal abrupt interfaces",
+      "note": "READ AS A PEAK VALUE HERE. Demo 17c reads the same published 2340 pm/V as a value AT 1550 nm and anchors on it there; demo17c.yaml records that reading. The two readings cannot both hold, because our spectrum's peak/1550 contrast is 1.72 and the 2340/1150 pair implies 2.03. Which is right changes which combination wins, so `--targets-profile demo17c` switches to the other reading and prints the whole table again."
+    },
+    {
+      "key": "abrupt_at_1550",
+      "label": "abrupt, at 1550 nm",
+      "case_id": "case_02",
+      "quantity": "at_target_wavelength",
+      "value_pm_per_V": 1150.0,
+      "source": "arXiv:2602.23246v1 Section 3.1, abrupt value at the 1550 nm design point",
+      "note": "Paired with abrupt_peak above. Together they fix the paper's implied peak/1550 contrast at 2.03 against our 1.72 -- a 15 % SHAPE difference that no scalar multiplier can remove, which is the main finding here."
+    },
+    {
+      "key": "graded_peak",
+      "label": "graded, spectral peak",
+      "case_id": "case_01",
+      "quantity": "peak",
+      "value_pm_per_V": 1200.0,
+      "source": "arXiv:2602.23246v1 Section 3.1, EDS Al profile",
+      "note": "The paper quotes 1200 pm/V (EDS Al profile) and 1363 pm/V (EDS Ga profile) for graded interfaces. Only the 1200 is scored, as requested; demo17c.yaml carries the pair as a band."
+    }
+  ],
+  "headline_target": "abrupt_peak",
+  "combinations": [
+    {
+      "combo_id": "01",
+      "name": "Raw Baseline",
+      "description": "Demo 17 exactly as it stands. Every other row is measured against this one.",
+      "multiplier": 1.0,
+      "declared_total": 1.0,
+      "factor_signature": "1 x 1 x 1 x 1",
+      "weakest_active_status": "established",
+      "is_reconciliation_budget": false,
+      "factors": [
+        {
+          "factor": "n_z",
+          "label": "active-layer density",
+          "multiplier": 1.0,
+          "status": "established",
+          "active": false,
+          "rationale": "Demo 17 production N_z = 2 wells / 30 nm period. Ramesh 2023 Eq. 1 counts wells per unit length and Fig. 1a shows two GaAs wells per period, so this is the baseline by definition."
+        },
+        {
+          "factor": "permutation",
+          "label": "SHG permutation / degeneracy counting",
+          "multiplier": 1.0,
+          "status": "established",
+          "active": false,
+          "rationale": "Eq. 2 as printed. The baseline."
+        },
+        {
+          "factor": "tensor",
+          "label": "tensor-component inversion",
+          "multiplier": 1.0,
+          "status": "established",
+          "active": false,
+          "rationale": "Eq. 2's own tensor component, unmodified. The baseline."
+        },
+        {
+          "factor": "dipole",
+          "label": "DFT unit-cell dipole tweak",
+          "multiplier": 1.0,
+          "status": "established",
+          "active": false,
+          "rationale": "r_e,hh = 0.751 nm as published. chi(2) goes as r^2, so this is the baseline."
+        }
+      ],
+      "values_pm_per_V": {
+        "case_02": {
+          "at_target_wavelength": 84.70092866117757,
+          "peak": 145.78227349698668,
+          "peak_wavelength_nm": 1520.0
+        },
+        "case_01": {
+          "at_target_wavelength": 53.82697949242898,
+          "peak": 106.08652742903536,
+          "peak_wavelength_nm": 1508.0
+        }
+      },
+      "target_errors_percent": {
+        "abrupt_peak": -93.76998831209458,
+        "abrupt_at_1550": -92.63470185554978,
+        "graded_peak": -91.15945604758038
+      },
+      "aggregate_error_percent": 92.52755467572473,
+      "headline_target": "abrupt_peak",
+      "headline_error_percent": -93.76998831209458
+    },
+    {
+      "combo_id": "02",
+      "name": "Conservative Active Density",
+      "description": "The N_z active-layer reading on its own.",
+      "multiplier": 3.0,
+      "declared_total": 3.0,
+      "factor_signature": "3 x 1 x 1 x 1",
+      "weakest_active_status": "reported",
+      "is_reconciliation_budget": false,
+      "factors": [
+        {
+          "factor": "n_z",
+          "label": "active-layer density",
+          "multiplier": 3.0,
+          "status": "reported",
+          "active": true,
+          "rationale": "Demo 17b sweep A, variant active_layer_two_wells: 2 wells per 10 nm of GaAs instead of per 30 nm period. chi(2) is exactly linear in N_z so the 3.0 is exact, but it describes a medium with no barriers, and the 10/30 fill factor has to be reapplied before comparing to a grown stack -- which returns the baseline. Demo 17b declined to promote it."
+        },
+        {
+          "factor": "permutation",
+          "label": "SHG permutation / degeneracy counting",
+          "multiplier": 1.0,
+          "status": "established",
+          "active": false,
+          "rationale": "Eq. 2 as printed. The baseline."
+        },
+        {
+          "factor": "tensor",
+          "label": "tensor-component inversion",
+          "multiplier": 1.0,
+          "status": "established",
+          "active": false,
+          "rationale": "Eq. 2's own tensor component, unmodified. The baseline."
+        },
+        {
+          "factor": "dipole",
+          "label": "DFT unit-cell dipole tweak",
+          "multiplier": 1.0,
+          "status": "established",
+          "active": false,
+          "rationale": "r_e,hh = 0.751 nm as published. chi(2) goes as r^2, so this is the baseline."
+        }
+      ],
+      "values_pm_per_V": {
+        "case_02": {
+          "at_target_wavelength": 254.10278598353273,
+          "peak": 437.34682049096,
+          "peak_wavelength_nm": 1520.0
+        },
+        "case_01": {
+          "at_target_wavelength": 161.48093847728694,
+          "peak": 318.25958228710607,
+          "peak_wavelength_nm": 1508.0
+        }
+      },
+      "target_errors_percent": {
+        "abrupt_peak": -81.30996493628376,
+        "abrupt_at_1550": -77.90410556664933,
+        "graded_peak": -73.47836814274118
+      },
+      "aggregate_error_percent": 77.63038633378801,
+      "headline_target": "abrupt_peak",
+      "headline_error_percent": -81.30996493628376
+    },
+    {
+      "combo_id": "03",
+      "name": "Standard SHG Permutation",
+      "description": "The degenerate-SHG factor on its own.",
+      "multiplier": 2.0,
+      "declared_total": 2.0,
+      "factor_signature": "1 x 2 x 1 x 1",
+      "weakest_active_status": "reported",
+      "is_reconciliation_budget": false,
+      "factors": [
+        {
+          "factor": "n_z",
+          "label": "active-layer density",
+          "multiplier": 1.0,
+          "status": "established",
+          "active": false,
+          "rationale": "Demo 17 production N_z = 2 wells / 30 nm period. Ramesh 2023 Eq. 1 counts wells per unit length and Fig. 1a shows two GaAs wells per period, so this is the baseline by definition."
+        },
+        {
+          "factor": "permutation",
+          "label": "SHG permutation / degeneracy counting",
+          "multiplier": 2.0,
+          "status": "reported",
+          "active": true,
+          "rationale": "Demo 17b sweep B, variant shg_degeneracy_2. Standard degenerate-SHG factor: E(w)E(w) carries half the permutation multiplicity of E(w1)E(w2). Whether Eq. 2 already carries it cannot be decided from the published text."
+        },
+        {
+          "factor": "tensor",
+          "label": "tensor-component inversion",
+          "multiplier": 1.0,
+          "status": "established",
+          "active": false,
+          "rationale": "Eq. 2's own tensor component, unmodified. The baseline."
+        },
+        {
+          "factor": "dipole",
+          "label": "DFT unit-cell dipole tweak",
+          "multiplier": 1.0,
+          "status": "established",
+          "active": false,
+          "rationale": "r_e,hh = 0.751 nm as published. chi(2) goes as r^2, so this is the baseline."
+        }
+      ],
+      "values_pm_per_V": {
+        "case_02": {
+          "at_target_wavelength": 169.40185732235514,
+          "peak": 291.56454699397335,
+          "peak_wavelength_nm": 1520.0
+        },
+        "case_01": {
+          "at_target_wavelength": 107.65395898485797,
+          "peak": 212.1730548580707,
+          "peak_wavelength_nm": 1508.0
+        }
+      },
+      "target_errors_percent": {
+        "abrupt_peak": -87.53997662418918,
+        "abrupt_at_1550": -85.26940371109956,
+        "graded_peak": -82.31891209516078
+      },
+      "aggregate_error_percent": 85.06962247700581,
+      "headline_target": "abrupt_peak",
+      "headline_error_percent": -87.53997662418918
+    },
+    {
+      "combo_id": "04",
+      "name": "Density + Standard Permutation",
+      "description": "The two factors Demo 17b computed but declined to promote, compounded.",
+      "multiplier": 6.0,
+      "declared_total": 6.0,
+      "factor_signature": "3 x 2 x 1 x 1",
+      "weakest_active_status": "reported",
+      "is_reconciliation_budget": false,
+      "factors": [
+        {
+          "factor": "n_z",
+          "label": "active-layer density",
+          "multiplier": 3.0,
+          "status": "reported",
+          "active": true,
+          "rationale": "Demo 17b sweep A, variant active_layer_two_wells: 2 wells per 10 nm of GaAs instead of per 30 nm period. chi(2) is exactly linear in N_z so the 3.0 is exact, but it describes a medium with no barriers, and the 10/30 fill factor has to be reapplied before comparing to a grown stack -- which returns the baseline. Demo 17b declined to promote it."
+        },
+        {
+          "factor": "permutation",
+          "label": "SHG permutation / degeneracy counting",
+          "multiplier": 2.0,
+          "status": "reported",
+          "active": true,
+          "rationale": "Demo 17b sweep B, variant shg_degeneracy_2. Standard degenerate-SHG factor: E(w)E(w) carries half the permutation multiplicity of E(w1)E(w2). Whether Eq. 2 already carries it cannot be decided from the published text."
+        },
+        {
+          "factor": "tensor",
+          "label": "tensor-component inversion",
+          "multiplier": 1.0,
+          "status": "established",
+          "active": false,
+          "rationale": "Eq. 2's own tensor component, unmodified. The baseline."
+        },
+        {
+          "factor": "dipole",
+          "label": "DFT unit-cell dipole tweak",
+          "multiplier": 1.0,
+          "status": "established",
+          "active": false,
+          "rationale": "r_e,hh = 0.751 nm as published. chi(2) goes as r^2, so this is the baseline."
+        }
+      ],
+      "values_pm_per_V": {
+        "case_02": {
+          "at_target_wavelength": 508.20557196706545,
+          "peak": 874.69364098192,
+          "peak_wavelength_nm": 1520.0
+        },
+        "case_01": {
+          "at_target_wavelength": 322.9618769545739,
+          "peak": 636.5191645742121,
+          "peak_wavelength_nm": 1508.0
+        }
+      },
+      "target_errors_percent": {
+        "abrupt_peak": -62.619929872567525,
+        "abrupt_at_1550": -55.808211133298656,
+        "graded_peak": -46.95673628548232
+      },
+      "aggregate_error_percent": 55.499991380565234,
+      "headline_target": "abrupt_peak",
+      "headline_error_percent": -62.619929872567525
+    },
+    {
+      "combo_id": "05",
+      "name": "Density + Boyd Full Permutation",
+      "description": "As Combo 04 with the Eq.1/Eq.2 reading of the permutation factor instead of the degeneracy reading. These two are alternatives, never both.",
+      "multiplier": 9.0,
+      "declared_total": 9.0,
+      "factor_signature": "3 x 3 x 1 x 1",
+      "weakest_active_status": "reported",
+      "is_reconciliation_budget": false,
+      "factors": [
+        {
+          "factor": "n_z",
+          "label": "active-layer density",
+          "multiplier": 3.0,
+          "status": "reported",
+          "active": true,
+          "rationale": "Demo 17b sweep A, variant active_layer_two_wells: 2 wells per 10 nm of GaAs instead of per 30 nm period. chi(2) is exactly linear in N_z so the 3.0 is exact, but it describes a medium with no barriers, and the 10/30 fill factor has to be reapplied before comparing to a grown stack -- which returns the baseline. Demo 17b declined to promote it."
+        },
+        {
+          "factor": "permutation",
+          "label": "SHG permutation / degeneracy counting",
+          "multiplier": 3.0,
+          "status": "reported",
+          "active": true,
+          "rationale": "Demo 17b sweep B, variant eq1_over_eq2_3. Demo 16F fed identical matrix elements to Eq. 1 and Eq. 2 and measured the ratio at exactly 3.000000. An open discrepancy in the published pair of equations, running in the direction of the production number being too small."
+        },
+        {
+          "factor": "tensor",
+          "label": "tensor-component inversion",
+          "multiplier": 1.0,
+          "status": "established",
+          "active": false,
+          "rationale": "Eq. 2's own tensor component, unmodified. The baseline."
+        },
+        {
+          "factor": "dipole",
+          "label": "DFT unit-cell dipole tweak",
+          "multiplier": 1.0,
+          "status": "established",
+          "active": false,
+          "rationale": "r_e,hh = 0.751 nm as published. chi(2) goes as r^2, so this is the baseline."
+        }
+      ],
+      "values_pm_per_V": {
+        "case_02": {
+          "at_target_wavelength": 762.3083579505982,
+          "peak": 1312.04046147288,
+          "peak_wavelength_nm": 1520.0
+        },
+        "case_01": {
+          "at_target_wavelength": 484.4428154318608,
+          "peak": 954.7787468613183,
+          "peak_wavelength_nm": 1508.0
+        }
+      },
+      "target_errors_percent": {
+        "abrupt_peak": -43.92989480885128,
+        "abrupt_at_1550": -33.71231669994798,
+        "graded_peak": -20.43510442822348
+      },
+      "aggregate_error_percent": 34.07809388344527,
+      "headline_target": "abrupt_peak",
+      "headline_error_percent": -43.92989480885128
+    },
+    {
+      "combo_id": "06",
+      "name": "Tensor Inversion Only",
+      "description": "The speculative tensor factor in isolation, so its size is visible.",
+      "multiplier": 2.8,
+      "declared_total": 2.8,
+      "factor_signature": "1 x 1 x 2.8 x 1",
+      "weakest_active_status": "speculative",
+      "is_reconciliation_budget": false,
+      "factors": [
+        {
+          "factor": "n_z",
+          "label": "active-layer density",
+          "multiplier": 1.0,
+          "status": "established",
+          "active": false,
+          "rationale": "Demo 17 production N_z = 2 wells / 30 nm period. Ramesh 2023 Eq. 1 counts wells per unit length and Fig. 1a shows two GaAs wells per period, so this is the baseline by definition."
+        },
+        {
+          "factor": "permutation",
+          "label": "SHG permutation / degeneracy counting",
+          "multiplier": 1.0,
+          "status": "established",
+          "active": false,
+          "rationale": "Eq. 2 as printed. The baseline."
+        },
+        {
+          "factor": "tensor",
+          "label": "tensor-component inversion",
+          "multiplier": 2.8,
+          "status": "speculative",
+          "active": true,
+          "rationale": "NO SOURCE IN THIS REPOSITORY ESTABLISHES THIS FACTOR. It is carried because it was asked for and because its size is worth seeing, not because anything supports it. Two things to note. First, no audit here has measured a tensor-inversion ratio at all -- Demos 16F, 17b and 18 swept N_z, permutation, spin and the unit-cell dipole, and none of them produced a 2.8. Second, 3.0 * 3.0 * 2.8 * 1.1 = 27.72, which is the measured residual 27.63 to within 0.3 %, so this value looks reverse-engineered from the gap rather than derived from a tensor relation. A factor chosen to close a gap cannot then be evidence that the gap is closed."
+        },
+        {
+          "factor": "dipole",
+          "label": "DFT unit-cell dipole tweak",
+          "multiplier": 1.0,
+          "status": "established",
+          "active": false,
+          "rationale": "r_e,hh = 0.751 nm as published. chi(2) goes as r^2, so this is the baseline."
+        }
+      ],
+      "values_pm_per_V": {
+        "case_02": {
+          "at_target_wavelength": 237.1626002512972,
+          "peak": 408.19036579156267,
+          "peak_wavelength_nm": 1520.0
+        },
+        "case_01": {
+          "at_target_wavelength": 150.71554257880115,
+          "peak": 297.04227680129895,
+          "peak_wavelength_nm": 1508.0
+        }
+      },
+      "target_errors_percent": {
+        "abrupt_peak": -82.55596727386484,
+        "abrupt_at_1550": -79.37716519553938,
+        "graded_peak": -75.2464769332251
+      },
+      "aggregate_error_percent": 79.11648453991907,
+      "headline_target": "abrupt_peak",
+      "headline_error_percent": -82.55596727386484
+    },
+    {
+      "combo_id": "07",
+      "name": "Density + Tensor Inversion",
+      "description": "Active-layer density with the speculative tensor factor.",
+      "multiplier": 8.399999999999999,
+      "declared_total": 8.4,
+      "factor_signature": "3 x 1 x 2.8 x 1",
+      "weakest_active_status": "speculative",
+      "is_reconciliation_budget": false,
+      "factors": [
+        {
+          "factor": "n_z",
+          "label": "active-layer density",
+          "multiplier": 3.0,
+          "status": "reported",
+          "active": true,
+          "rationale": "Demo 17b sweep A, variant active_layer_two_wells: 2 wells per 10 nm of GaAs instead of per 30 nm period. chi(2) is exactly linear in N_z so the 3.0 is exact, but it describes a medium with no barriers, and the 10/30 fill factor has to be reapplied before comparing to a grown stack -- which returns the baseline. Demo 17b declined to promote it."
+        },
+        {
+          "factor": "permutation",
+          "label": "SHG permutation / degeneracy counting",
+          "multiplier": 1.0,
+          "status": "established",
+          "active": false,
+          "rationale": "Eq. 2 as printed. The baseline."
+        },
+        {
+          "factor": "tensor",
+          "label": "tensor-component inversion",
+          "multiplier": 2.8,
+          "status": "speculative",
+          "active": true,
+          "rationale": "NO SOURCE IN THIS REPOSITORY ESTABLISHES THIS FACTOR. It is carried because it was asked for and because its size is worth seeing, not because anything supports it. Two things to note. First, no audit here has measured a tensor-inversion ratio at all -- Demos 16F, 17b and 18 swept N_z, permutation, spin and the unit-cell dipole, and none of them produced a 2.8. Second, 3.0 * 3.0 * 2.8 * 1.1 = 27.72, which is the measured residual 27.63 to within 0.3 %, so this value looks reverse-engineered from the gap rather than derived from a tensor relation. A factor chosen to close a gap cannot then be evidence that the gap is closed."
+        },
+        {
+          "factor": "dipole",
+          "label": "DFT unit-cell dipole tweak",
+          "multiplier": 1.0,
+          "status": "established",
+          "active": false,
+          "rationale": "r_e,hh = 0.751 nm as published. chi(2) goes as r^2, so this is the baseline."
+        }
+      ],
+      "values_pm_per_V": {
+        "case_02": {
+          "at_target_wavelength": 711.4878007538915,
+          "peak": 1224.571097374688,
+          "peak_wavelength_nm": 1520.0
+        },
+        "case_01": {
+          "at_target_wavelength": 452.1466277364034,
+          "peak": 891.1268304038969,
+          "peak_wavelength_nm": 1508.0
+        }
+      },
+      "target_errors_percent": {
+        "abrupt_peak": -47.66790182159453,
+        "abrupt_at_1550": -38.13149558661813,
+        "graded_peak": -25.73943079967526
+      },
+      "aggregate_error_percent": 38.248129007123666,
+      "headline_target": "abrupt_peak",
+      "headline_error_percent": -47.66790182159453
+    },
+    {
+      "combo_id": "08",
+      "name": "Full Permutation + Tensor Inversion",
+      "description": "Same total as Combo 07 by a different route. The pair is a control: the spectra are identical, which is a reminder that this sweep resolves the PRODUCT and can never attribute it.",
+      "multiplier": 8.399999999999999,
+      "declared_total": 8.4,
+      "factor_signature": "1 x 3 x 2.8 x 1",
+      "weakest_active_status": "speculative",
+      "is_reconciliation_budget": false,
+      "factors": [
+        {
+          "factor": "n_z",
+          "label": "active-layer density",
+          "multiplier": 1.0,
+          "status": "established",
+          "active": false,
+          "rationale": "Demo 17 production N_z = 2 wells / 30 nm period. Ramesh 2023 Eq. 1 counts wells per unit length and Fig. 1a shows two GaAs wells per period, so this is the baseline by definition."
+        },
+        {
+          "factor": "permutation",
+          "label": "SHG permutation / degeneracy counting",
+          "multiplier": 3.0,
+          "status": "reported",
+          "active": true,
+          "rationale": "Demo 17b sweep B, variant eq1_over_eq2_3. Demo 16F fed identical matrix elements to Eq. 1 and Eq. 2 and measured the ratio at exactly 3.000000. An open discrepancy in the published pair of equations, running in the direction of the production number being too small."
+        },
+        {
+          "factor": "tensor",
+          "label": "tensor-component inversion",
+          "multiplier": 2.8,
+          "status": "speculative",
+          "active": true,
+          "rationale": "NO SOURCE IN THIS REPOSITORY ESTABLISHES THIS FACTOR. It is carried because it was asked for and because its size is worth seeing, not because anything supports it. Two things to note. First, no audit here has measured a tensor-inversion ratio at all -- Demos 16F, 17b and 18 swept N_z, permutation, spin and the unit-cell dipole, and none of them produced a 2.8. Second, 3.0 * 3.0 * 2.8 * 1.1 = 27.72, which is the measured residual 27.63 to within 0.3 %, so this value looks reverse-engineered from the gap rather than derived from a tensor relation. A factor chosen to close a gap cannot then be evidence that the gap is closed."
+        },
+        {
+          "factor": "dipole",
+          "label": "DFT unit-cell dipole tweak",
+          "multiplier": 1.0,
+          "status": "established",
+          "active": false,
+          "rationale": "r_e,hh = 0.751 nm as published. chi(2) goes as r^2, so this is the baseline."
+        }
+      ],
+      "values_pm_per_V": {
+        "case_02": {
+          "at_target_wavelength": 711.4878007538915,
+          "peak": 1224.571097374688,
+          "peak_wavelength_nm": 1520.0
+        },
+        "case_01": {
+          "at_target_wavelength": 452.1466277364034,
+          "peak": 891.1268304038969,
+          "peak_wavelength_nm": 1508.0
+        }
+      },
+      "target_errors_percent": {
+        "abrupt_peak": -47.66790182159453,
+        "abrupt_at_1550": -38.13149558661813,
+        "graded_peak": -25.73943079967526
+      },
+      "aggregate_error_percent": 38.248129007123666,
+      "headline_target": "abrupt_peak",
+      "headline_error_percent": -47.66790182159453
+    },
+    {
+      "combo_id": "09",
+      "name": "Combined Standard",
+      "description": "Everything except the contradicted dipole tweak, with the degeneracy reading of the permutation factor.",
+      "multiplier": 16.799999999999997,
+      "declared_total": 16.8,
+      "factor_signature": "3 x 2 x 2.8 x 1",
+      "weakest_active_status": "speculative",
+      "is_reconciliation_budget": false,
+      "factors": [
+        {
+          "factor": "n_z",
+          "label": "active-layer density",
+          "multiplier": 3.0,
+          "status": "reported",
+          "active": true,
+          "rationale": "Demo 17b sweep A, variant active_layer_two_wells: 2 wells per 10 nm of GaAs instead of per 30 nm period. chi(2) is exactly linear in N_z so the 3.0 is exact, but it describes a medium with no barriers, and the 10/30 fill factor has to be reapplied before comparing to a grown stack -- which returns the baseline. Demo 17b declined to promote it."
+        },
+        {
+          "factor": "permutation",
+          "label": "SHG permutation / degeneracy counting",
+          "multiplier": 2.0,
+          "status": "reported",
+          "active": true,
+          "rationale": "Demo 17b sweep B, variant shg_degeneracy_2. Standard degenerate-SHG factor: E(w)E(w) carries half the permutation multiplicity of E(w1)E(w2). Whether Eq. 2 already carries it cannot be decided from the published text."
+        },
+        {
+          "factor": "tensor",
+          "label": "tensor-component inversion",
+          "multiplier": 2.8,
+          "status": "speculative",
+          "active": true,
+          "rationale": "NO SOURCE IN THIS REPOSITORY ESTABLISHES THIS FACTOR. It is carried because it was asked for and because its size is worth seeing, not because anything supports it. Two things to note. First, no audit here has measured a tensor-inversion ratio at all -- Demos 16F, 17b and 18 swept N_z, permutation, spin and the unit-cell dipole, and none of them produced a 2.8. Second, 3.0 * 3.0 * 2.8 * 1.1 = 27.72, which is the measured residual 27.63 to within 0.3 %, so this value looks reverse-engineered from the gap rather than derived from a tensor relation. A factor chosen to close a gap cannot then be evidence that the gap is closed."
+        },
+        {
+          "factor": "dipole",
+          "label": "DFT unit-cell dipole tweak",
+          "multiplier": 1.0,
+          "status": "established",
+          "active": false,
+          "rationale": "r_e,hh = 0.751 nm as published. chi(2) goes as r^2, so this is the baseline."
+        }
+      ],
+      "values_pm_per_V": {
+        "case_02": {
+          "at_target_wavelength": 1422.975601507783,
+          "peak": 2449.142194749376,
+          "peak_wavelength_nm": 1520.0
+        },
+        "case_01": {
+          "at_target_wavelength": 904.2932554728068,
+          "peak": 1782.2536608077937,
+          "peak_wavelength_nm": 1508.0
+        }
+      },
+      "target_errors_percent": {
+        "abrupt_peak": 4.664196356810936,
+        "abrupt_at_1550": 23.73700882676374,
+        "graded_peak": 48.52113840064948
+      },
+      "aggregate_error_percent": 31.30229590829683,
+      "headline_target": "abrupt_peak",
+      "headline_error_percent": 4.664196356810936
+    },
+    {
+      "combo_id": "10",
+      "name": "Full Reconciliation Budget",
+      "description": "Every candidate at its largest, product 27.72 against a measured residual of 27.63. CONSTRUCTED TO CLOSE THE GAP: reproducing 2340 pm/V at 1550 nm is therefore arithmetic, exactly as Demo 17c's fitted K is arithmetic, and is not evidence. What it does show honestly is where the OTHER published numbers land once the 1550 nm one is forced.",
+      "multiplier": 27.720000000000002,
+      "declared_total": 27.72,
+      "factor_signature": "3 x 3 x 2.8 x 1.1",
+      "weakest_active_status": "contradicted",
+      "is_reconciliation_budget": true,
+      "factors": [
+        {
+          "factor": "n_z",
+          "label": "active-layer density",
+          "multiplier": 3.0,
+          "status": "reported",
+          "active": true,
+          "rationale": "Demo 17b sweep A, variant active_layer_two_wells: 2 wells per 10 nm of GaAs instead of per 30 nm period. chi(2) is exactly linear in N_z so the 3.0 is exact, but it describes a medium with no barriers, and the 10/30 fill factor has to be reapplied before comparing to a grown stack -- which returns the baseline. Demo 17b declined to promote it."
+        },
+        {
+          "factor": "permutation",
+          "label": "SHG permutation / degeneracy counting",
+          "multiplier": 3.0,
+          "status": "reported",
+          "active": true,
+          "rationale": "Demo 17b sweep B, variant eq1_over_eq2_3. Demo 16F fed identical matrix elements to Eq. 1 and Eq. 2 and measured the ratio at exactly 3.000000. An open discrepancy in the published pair of equations, running in the direction of the production number being too small."
+        },
+        {
+          "factor": "tensor",
+          "label": "tensor-component inversion",
+          "multiplier": 2.8,
+          "status": "speculative",
+          "active": true,
+          "rationale": "NO SOURCE IN THIS REPOSITORY ESTABLISHES THIS FACTOR. It is carried because it was asked for and because its size is worth seeing, not because anything supports it. Two things to note. First, no audit here has measured a tensor-inversion ratio at all -- Demos 16F, 17b and 18 swept N_z, permutation, spin and the unit-cell dipole, and none of them produced a 2.8. Second, 3.0 * 3.0 * 2.8 * 1.1 = 27.72, which is the measured residual 27.63 to within 0.3 %, so this value looks reverse-engineered from the gap rather than derived from a tensor relation. A factor chosen to close a gap cannot then be evidence that the gap is closed."
+        },
+        {
+          "factor": "dipole",
+          "label": "DFT unit-cell dipole tweak",
+          "multiplier": 1.1,
+          "status": "contradicted",
+          "active": true,
+          "rationale": "POINTS THE WRONG WAY. Demo 17b sweep D evaluated the Kane relation r = (hbar/E_g) sqrt(E_p / 2 m_0) for GaAs and got 0.736 nm against the published 0.751 nm -- a multiplier of 0.96, slightly BELOW one, and a 2 % confirmation that the published constant is right. Raising the dipole by 10 % (chi(2) by 1.1x) is not supported by that measurement; it is carried so its contribution to Combo 10 stays visible."
+        }
+      ],
+      "values_pm_per_V": {
+        "case_02": {
+          "at_target_wavelength": 2347.9097424878423,
+          "peak": 4041.084621336471,
+          "peak_wavelength_nm": 1520.0
+        },
+        "case_01": {
+          "at_target_wavelength": 1492.0838715301315,
+          "peak": 2940.7185403328604,
+          "peak_wavelength_nm": 1508.0
+        }
+      },
+      "target_errors_percent": {
+        "abrupt_peak": 72.69592398873809,
+        "abrupt_at_1550": 104.1660645641602,
+        "graded_peak": 145.0598783610717
+      },
+      "aggregate_error_percent": 111.32180780884772,
+      "headline_target": "abrupt_peak",
+      "headline_error_percent": 72.69592398873809
+    }
+  ],
+  "ranking": {
+    "aggregate_metric": "rms_percent",
+    "match_threshold_percent": 15.0,
+    "closest_overall": {
+      "combo_id": "09",
+      "combo_name": "Combined Standard",
+      "multiplier": 16.799999999999997,
+      "aggregate_error_percent": 31.30229590829683,
+      "weakest_active_status": "speculative",
+      "inside_threshold": false
+    },
+    "closest_per_target": {
+      "abrupt_peak": {
+        "combo_id": "09",
+        "combo_name": "Combined Standard",
+        "multiplier": 16.799999999999997,
+        "value_pm_per_V": 2449.142194749376,
+        "target_pm_per_V": 2340.0,
+        "error_percent": 4.664196356810936
+      },
+      "abrupt_at_1550": {
+        "combo_id": "09",
+        "combo_name": "Combined Standard",
+        "multiplier": 16.799999999999997,
+        "value_pm_per_V": 1422.975601507783,
+        "target_pm_per_V": 1150.0,
+        "error_percent": 23.73700882676374
+      },
+      "graded_peak": {
+        "combo_id": "05",
+        "combo_name": "Density + Boyd Full Permutation",
+        "multiplier": 9.0,
+        "value_pm_per_V": 954.7787468613183,
+        "target_pm_per_V": 1200.0,
+        "error_percent": -20.43510442822348
+      }
+    },
+    "targets_agree_on_a_single_combination": false,
+    "combinations_winning_at_least_one_target": [
+      "05",
+      "09"
+    ],
+    "ranking": [
+      {
+        "rank": 1,
+        "combo_id": "09",
+        "combo_name": "Combined Standard",
+        "multiplier": 16.799999999999997,
+        "aggregate_error_percent": 31.30229590829683
+      },
+      {
+        "rank": 2,
+        "combo_id": "05",
+        "combo_name": "Density + Boyd Full Permutation",
+        "multiplier": 9.0,
+        "aggregate_error_percent": 34.07809388344527
+      },
+      {
+        "rank": 3,
+        "combo_id": "07",
+        "combo_name": "Density + Tensor Inversion",
+        "multiplier": 8.399999999999999,
+        "aggregate_error_percent": 38.248129007123666
+      },
+      {
+        "rank": 4,
+        "combo_id": "08",
+        "combo_name": "Full Permutation + Tensor Inversion",
+        "multiplier": 8.399999999999999,
+        "aggregate_error_percent": 38.248129007123666
+      },
+      {
+        "rank": 5,
+        "combo_id": "04",
+        "combo_name": "Density + Standard Permutation",
+        "multiplier": 6.0,
+        "aggregate_error_percent": 55.499991380565234
+      },
+      {
+        "rank": 6,
+        "combo_id": "02",
+        "combo_name": "Conservative Active Density",
+        "multiplier": 3.0,
+        "aggregate_error_percent": 77.63038633378801
+      },
+      {
+        "rank": 7,
+        "combo_id": "06",
+        "combo_name": "Tensor Inversion Only",
+        "multiplier": 2.8,
+        "aggregate_error_percent": 79.11648453991907
+      },
+      {
+        "rank": 8,
+        "combo_id": "03",
+        "combo_name": "Standard SHG Permutation",
+        "multiplier": 2.0,
+        "aggregate_error_percent": 85.06962247700581
+      },
+      {
+        "rank": 9,
+        "combo_id": "01",
+        "combo_name": "Raw Baseline",
+        "multiplier": 1.0,
+        "aggregate_error_percent": 92.52755467572473
+      },
+      {
+        "rank": 10,
+        "combo_id": "10",
+        "combo_name": "Full Reconciliation Budget",
+        "multiplier": 27.720000000000002,
+        "aggregate_error_percent": 111.32180780884772
+      }
+    ],
+    "caveat": "Every multiplier here is DECLARED, not derived. A combination that lands near a published number has not thereby been shown to be the right physics: the sweep resolves the product of four factors and can never attribute it, two of the ten combinations are numerically identical by different routes, and one was constructed from the known residual. Read the ranking as a map of what each hypothesis would imply, not as evidence for any of them."
+  },
+  "shape_versus_scale": {
+    "definition": "spectral peak divided by the value at 1550 nm, same case",
+    "why_it_matters": "a scalar multiplier cannot change a ratio, so this mismatch survives every combination in the ensemble and sets a floor on how well any of them can do on both quantities at once",
+    "comparisons": [
+      {
+        "case_id": "case_02",
+        "label": "abrupt",
+        "our_peak_over_1550": 1.7211413829964957,
+        "published_peak_over_1550": 2.034782608695652,
+        "mismatch_percent": -15.413991861283325,
+        "best_possible_split_error_percent": 8.029348083904143
+      }
+    ],
+    "no_scalar_can_fix_these": [
+      "case_02"
+    ]
+  },
+  "mutual_exclusions": {
+    "permutation": {
+      "note": "2.0 and 3.0 are two readings of the SAME piece of bookkeeping, so a combination must not carry both. Demo 17b flagged this explicitly: the Bloembergen/Boyd degenerate-SHG factor is what a permutation sum over the two input photons produces, and Demo 16F measured Eq.1/Eq.2 = 3.000000 with no permutation sum applied. No combination below multiplies them.",
+      "readings_used": {
+        "2x": [
+          "03",
+          "04",
+          "09"
+        ],
+        "3x": [
+          "05",
+          "08",
+          "10"
+        ]
+      },
+      "any_combination_multiplies_two_readings": false,
+      "why_not": "each combination states one value per factor, so two readings of the same counting cannot compound within a row"
+    }
+  },
+  "combinations_reported": 10,
+  "warning": "Every multiplier here is DECLARED, not derived. A combination that lands near a published number has not thereby been shown to be the right physics: the sweep resolves the product of four factors and can never attribute it, two of the ten combinations are numerically identical by different routes, and one was constructed from the known residual. Read the ranking as a map of what each hypothesis would imply, not as evidence for any of them."
+}

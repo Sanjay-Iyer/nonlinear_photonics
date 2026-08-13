@@ -252,6 +252,31 @@ def _analyze_all(cfg: Mapping[str, Any], root: Path, log: DebugLog) -> dict[str,
     )
     conventions = audit18b.convention_audit(cfg, e, h)
     k_rows = audit18b.k_saturation_audit(cfg, e, h)
+    k_cutoff_relative_change = float(k_rows[-1]["incremental_relative_change"])
+    k_grid_relative_change = float(k_rows[-1]["grid_refinement_relative_change"])
+    k_tolerance = float(cfg["convergence_tolerances"]["chi2_relative"])
+    k_convergence = {
+        "passed": k_cutoff_relative_change <= k_tolerance
+        and k_grid_relative_change <= k_tolerance,
+        "cutoff_comparison": (
+            f"{k_rows[-2]['fraction_of_2pi_over_a']:.2f} to "
+            f"{k_rows[-1]['fraction_of_2pi_over_a']:.2f} times 2pi/a"
+        ),
+        "cutoff_relative_change": k_cutoff_relative_change,
+        "grid_comparison": (
+            f"{k_rows[-1]['k_points']} to {k_rows[-1]['grid_refinement_points']} points"
+        ),
+        "grid_relative_change": k_grid_relative_change,
+        "tolerance": k_tolerance,
+    }
+    converged_k_settings = replace(
+        audit18b.primary_settings(cfg),
+        k_parallel_fraction_of_bz=2.0 * float(k_rows[-1]["fraction_of_2pi_over_a"]),
+        k_parallel_points=int(k_rows[-1]["grid_refinement_points"]),
+    )
+    eq2_converged_k = audit18b.eq2_cross_check(
+        e, h, converged_k_settings, float(cfg["chi2"]["target_wavelength_nm"])
+    )
     r_audit = audit18b.r_ehh_audit(cfg, best["row"]["chi2_1550_pm_per_V"])
     ledger = audit18b.degeneracy_ledger()
     native_pass = (
@@ -263,11 +288,14 @@ def _analyze_all(cfg: Mapping[str, Any], root: Path, log: DebugLog) -> dict[str,
     independent_pass = (
         eq2["relative_difference"]
         <= float(cfg["convergence_tolerances"]["independent_eq2_relative"])
+        and eq2_converged_k["relative_difference"]
+        <= float(cfg["convergence_tolerances"]["independent_eq2_relative"])
     )
     bound_pass = bool(best["row"]["strict_selected_states_bound_pass"])
     classification = audit18b.classify(
         bound_pass=bound_pass, domain_converged=domain_verdict["passed"],
-        mesh_converged=mesh_verdict["passed"], native_pass=native_pass,
+        mesh_converged=mesh_verdict["passed"], k_converged=k_convergence["passed"],
+        native_pass=native_pass,
         independent_pass=independent_pass,
         best_chi2=float(best["row"]["chi2_1550_pm_per_V"]),
         paper_target=float(cfg["diagnostics"]["paper_target_pm_per_V"]),
@@ -285,8 +313,10 @@ def _analyze_all(cfg: Mapping[str, Any], root: Path, log: DebugLog) -> dict[str,
         abs(hh_delta_best), 1.0e-30
     )
     selected_hh = [int(value) for value in best["row"]["selected_heavy_hole_states"]]
-    if hh_delta_relative_change > float(cfg["convergence_tolerances"]["matrix_relative"]):
-        hh_delta_diagnosis = "domain_truncation_or_boundary_sensitivity"
+    if not domain_verdict["passed"]:
+        hh_delta_diagnosis = "unresolved_domain_truncation_or_boundary_sensitivity"
+    elif hh_delta_relative_change > float(cfg["convergence_tolerances"]["matrix_relative"]):
+        hh_delta_diagnosis = "reference_domain_was_boundary_sensitive_but_large_domain_converged"
     elif selected_hh != [1, 2]:
         hh_delta_diagnosis = "state_ordering_or_wrong_heavy_hole_state_identity"
     elif native_pass:
@@ -312,15 +342,6 @@ def _analyze_all(cfg: Mapping[str, Any], root: Path, log: DebugLog) -> dict[str,
     dominant_terms = {
         path: next(row for row in eq2["term_rows"] if row["path"] == path)
         for path in ("electron", "heavy_hole")
-    }
-    k_last = float(k_rows[-1]["chi2_1550_pm_per_V"])
-    k_previous = float(k_rows[-2]["chi2_1550_pm_per_V"])
-    k_relative_change = abs(k_last - k_previous) / max(abs(k_last), 1.0e-30)
-    k_convergence = {
-        "passed": k_relative_change <= float(cfg["convergence_tolerances"]["chi2_relative"]),
-        "comparison": "0.15 to 0.20 times 2pi/a",
-        "relative_change": k_relative_change,
-        "tolerance": float(cfg["convergence_tolerances"]["chi2_relative"]),
     }
 
     _write_csv(root / "summaries" / "state_audit.csv", all_states)
@@ -361,6 +382,9 @@ def _analyze_all(cfg: Mapping[str, Any], root: Path, log: DebugLog) -> dict[str,
         "mesh_convergence": mesh_verdict,
         "native_matrix_validation": {**native_summary, "passed": native_pass},
         "independent_eq2": {key: value for key, value in eq2.items() if key != "term_rows"},
+        "independent_eq2_converged_k": {
+            key: value for key, value in eq2_converged_k.items() if key != "term_rows"
+        },
         "independent_eq2_passed": independent_pass,
         "origin_invariance": origin,
         "state_count_convergence": state_counts,
@@ -493,6 +517,7 @@ def _terminal_summary(summary: Mapping[str, Any], root: Path) -> None:
     best = summary["best_reproduction"]
     native = summary["native_matrix_validation"]
     independent = summary["independent_eq2"]
+    terms_path = root / "summaries" / "eq2_terms.csv"
     state_rows = list(csv.DictReader((root / "summaries" / "state_audit.csv").open(
         encoding="utf-8", newline=""
     )))
@@ -515,9 +540,10 @@ def _terminal_summary(summary: Mapping[str, Any], root: Path) -> None:
     print("\nCONVERGENCE")
     print(f"Domain converged: {summary['domain_convergence']['passed']}")
     print(f"Mesh converged: {summary['mesh_convergence']['passed']}")
-    print(f"k integral converged (0.15 -> 0.20 times 2pi/a): "
+    print(f"k cutoff converged ({summary['k_convergence']['cutoff_comparison']}): "
           f"{summary['k_convergence']['passed']} "
-          f"(relative change {summary['k_convergence']['relative_change']:.3e})")
+          f"(cutoff change {summary['k_convergence']['cutoff_relative_change']:.3e}, "
+          f"grid change {summary['k_convergence']['grid_relative_change']:.3e})")
     print("\nMATRIX VALIDATION")
     print(f"Python vs Nextnano overlap max abs: {native['max_absolute_overlap_difference']:.3e}")
     print(f"Python vs Nextnano dipole max abs: {native['max_absolute_dipole_difference_nm']:.3e} nm")
@@ -600,6 +626,15 @@ def analyze_existing(root: Path, verbose: bool = False) -> int:
     log = DebugLog(root / "demo18b_reanalysis.log", verbose)
     summary = _analyze_all(config18b.load_config(), root, log)
     _terminal_summary(summary, root)
+    _write_json(root / "RUN_STATUS.json", {
+        "run_id": root.name,
+        "status": "completed",
+        "completion_mode": "reanalyzed_existing_solver_outputs",
+        "classification": summary["classification"],
+        "result_directory": root,
+    })
+    log.section("FINAL STATUS")
+    log.line("COMPLETED FROM PRESERVED SOLVER OUTPUTS")
     return 0
 
 

@@ -191,8 +191,12 @@ def test_convention_table_has_case_safe_headers(cfg, states):
 
 def test_k_saturation_extends_beyond_paper_limit(cfg, states):
     rows = audit18b.k_saturation_audit(cfg, *states)
-    assert [row["fraction_of_2pi_over_a"] for row in rows] == [0.05, 0.10, 0.15, 0.20]
+    assert [row["fraction_of_2pi_over_a"] for row in rows] == [
+        0.05, 0.10, 0.15, 0.20, 0.25, 0.30
+    ]
     assert next(row for row in rows if row["role"] == "paper_limit")["fraction_of_2pi_over_a"] == 0.10
+    assert rows[-1]["grid_refinement_points"] == 2 * cfg["diagnostics"]["k_points"]
+    assert rows[-1]["grid_refinement_relative_change"] < 1e-5
 
 
 def test_poisson_audit_does_not_invent_missing_charge_inputs():
@@ -217,5 +221,67 @@ def test_degeneracy_ledger_keeps_open_hh_factor_unapplied():
     assert ledger["tensor_input_permutation"]["value"] == 1
 
 
+def test_classification_cannot_be_converged_when_k_tail_is_not():
+    result = audit18b.classify(
+        bound_pass=True, domain_converged=True, mesh_converged=True,
+        k_converged=False, native_pass=True, independent_pass=True,
+        best_chi2=84.9, paper_target=2340.0,
+    )
+    assert result["category"] == "A"
+    assert "convergence" in result["primary_diagnosis"]
+
+
 def test_preflight_contract():
     assert run_demo18b.run_preflight() == 0
+
+
+def test_terminal_summary_prints_all_artifact_paths(tmp_path, capsys):
+    summaries = tmp_path / "summaries"
+    run_demo18b._write_csv(summaries / "state_audit.csv", [
+        {"case_id": "M2_0p025nm", "band": band, "state": state, "bound_pass": True}
+        for band in ("electron", "heavy_hole") for state in (1, 2)
+    ])
+    summary = {
+        "best_reproduction": {
+            "chi2_1550_pm_per_V": 84.9,
+            "selected_electron_states": [1, 2],
+            "selected_heavy_hole_states": [1, 2],
+            "r_e_hh_nm": 0.751,
+        },
+        "native_matrix_validation": {
+            "max_absolute_overlap_difference": 1e-7,
+            "max_absolute_dipole_difference_nm": 1e-5,
+        },
+        "independent_eq2": {
+            "relative_difference": 1e-14,
+            "electron_contribution": 10 + 2j,
+            "heavy_hole_contribution": -9 - 2j,
+            "cancellation_factor": 19.0,
+        },
+        "reference_reproduction": {"demo18b_reference_pm_per_V": 84.1},
+        "paper_target_pm_per_V": 2340.0,
+        "remaining_ratio": 27.5,
+        "domain_convergence": {"passed": True},
+        "mesh_convergence": {"passed": True},
+        "k_convergence": {
+            "passed": False,
+            "cutoff_comparison": "0.25 to 0.30 times 2pi/a",
+            "cutoff_relative_change": 0.033,
+            "grid_relative_change": 1e-6,
+        },
+        "dominant_terms": {
+            path: {
+                "m_hh_state": 1, "n_electron_state": 1,
+                "l_partner_state": 1, "contribution_pm_per_V_magnitude": value,
+            }
+            for path, value in (("electron", 11.0), ("heavy_hole", 10.0))
+        },
+        "diagonal_matrix_physics": {"diagnosis": "stable"},
+        "classification": {"category": "C", "primary_diagnosis": "validated"},
+    }
+
+    run_demo18b._terminal_summary(summary, tmp_path)
+
+    output = capsys.readouterr().out
+    assert str(summaries / "demo18b_master_summary.csv") in output
+    assert str(summaries / "eq2_terms.csv") in output

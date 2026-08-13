@@ -1,0 +1,2171 @@
+
+==============================================================================
+DEMO 18B START
+==============================================================================
+{
+  "git": {
+    "git_branch": "main",
+    "git_commit": "280685a39d743aab8d7c6fe9d014179f8d03f1db",
+    "git_commit_short": "280685a3",
+    "git_diff_sha256": null,
+    "git_dirty": false,
+    "git_dirty_files": []
+  },
+  "machine": {
+    "config_source": "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\nextnano\\config\\machines\\nextnano_machine.work.yaml",
+    "database": "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\database\\database.nnp",
+    "discovery_notes": [
+      "machine configuration selected by NEXTNANO_MACHINE_CONFIG: C:\\Code\\optics\\nextnano\\nonlinear_photonics\\nextnano\\config\\machines\\nextnano_machine.work.yaml",
+      "portable_root resolved from YAML: C:\\Code\\optics\\nextnano\\2026_07_03",
+      "licensed execution enabled automatically from portable_root",
+      "executable selected explicitly: C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\bin\\nextnano++_Intel_64bit.exe",
+      "database selected explicitly: C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\database\\database.nnp",
+      "license selected explicitly: License_nnp.lic"
+    ],
+    "executable": "C:\\Code\\optics\\nextnano\\2026_07_03\\nextnano++\\bin\\nextnano++_Intel_64bit.exe",
+    "license_filename": "License_nnp.lic",
+    "portable_root": "C:\\Code\\optics\\nextnano\\2026_07_03",
+    "results_root": "C:\\nn_results",
+    "run_solver": true,
+    "threads": 1
+  },
+  "run_id": "demo18b_20260813T214542Z_280685a3_012c1f"
+}
+
+==============================================================================
+LICENSED SOLVE 1/6: D0_reference
+==============================================================================
+{
+  "case_id": "D0_reference",
+  "description": "Exact Demo 18 numerical domain and mesh.",
+  "domain_nm": [
+    0.0,
+    51.800000000000004
+  ],
+  "domain_padding_nm": 20.0,
+  "experiment": "domain",
+  "generated_input": "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\inputs\\D0_reference.in",
+  "mesh_nm": 0.05,
+  "quantum_padding_nm": 2.0
+}
+{
+  "physical_gate_passed": true,
+  "physical_gate_reason": null,
+  "preanalysis_gate": {
+    "completion_evidence": {
+      "completion_files": [
+        "job_done.txt"
+      ],
+      "job_done_file_present": true,
+      "no_stale_job_running_file": true
+    },
+    "log_markers": {
+      "completion_marker_found": true,
+      "fatal_markers_found": [],
+      "no_convergence_warning": true,
+      "no_fatal_marker": true,
+      "warning_markers_found": []
+    },
+    "passed": true,
+    "quantum_outputs": {
+      "artifacts_with_unconfirmed_patterns": [],
+      "missing_optional_artifacts": [],
+      "parser_profile": "nextnano_pp_3_0_0",
+      "parser_profile_path": "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\nextnano\\config\\parsers\\nextnano_pp_3_0_0.yaml",
+      "resolved_artifacts": {
+        "bandedges": [
+          "case/bias_00000/bandedges.dat"
+        ],
+        "energy_spectrum_gamma": [
+          "case/bias_00000/Quantum/acqw/Gamma/energy_spectrum_k00000.dat"
+        ],
+        "energy_spectrum_hh": [
+          "case/bias_00000/Quantum/acqw/HH/energy_spectrum_k00000.dat"
+        ],
+        "envelopes_gamma": [
+          "case/bias_00000/Quantum/acqw/Gamma/envelopes_k00000.dat"
+        ],
+        "envelopes_hh": [
+          "case/bias_00000/Quantum/acqw/HH/envelopes_k00000.dat"
+        ],
+        "probabilities_gamma": [
+          "case/bias_00000/Quantum/acqw/Gamma/probabilities_k00000.dat"
+        ],
+        "probabilities_hh": [
+          "case/bias_00000/Quantum/acqw/HH/probabilities_k00000.dat"
+        ]
+      },
+      "solver_version": "nextnano++ 3.0.0 (2026_07_03 package)"
+    },
+    "solver_return_code_is_zero": true
+  },
+  "raw_output": "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\solver\\D0_reference",
+  "return_code": 0,
+  "stderr": "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\cases\\D0_reference\\physics\\logs\\stderr.txt",
+  "stdout": "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\cases\\D0_reference\\physics\\logs\\stdout.txt"
+}
+
+==============================================================================
+LICENSED SOLVE 2/6: D1_plus10
+==============================================================================
+{
+  "case_id": "D1_plus10",
+  "description": "Ten additional nanometres of AlGaAs and Dirichlet padding per side.",
+  "domain_nm": [
+    0.0,
+    71.8
+  ],
+  "domain_padding_nm": 30.0,
+  "experiment": "domain",
+  "generated_input": "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\inputs\\D1_plus10.in",
+  "mesh_nm": 0.05,
+  "quantum_padding_nm": 12.0
+}
+{
+  "physical_gate_passed": true,
+  "physical_gate_reason": null,
+  "preanalysis_gate": {
+    "completion_evidence": {
+      "completion_files": [
+        "job_done.txt"
+      ],
+      "job_done_file_present": true,
+      "no_stale_job_running_file": true
+    },
+    "log_markers": {
+      "completion_marker_found": true,
+      "fatal_markers_found": [],
+      "no_convergence_warning": true,
+      "no_fatal_marker": true,
+      "warning_markers_found": []
+    },
+    "passed": true,
+    "quantum_outputs": {
+      "artifacts_with_unconfirmed_patterns": [],
+      "missing_optional_artifacts": [],
+      "parser_profile": "nextnano_pp_3_0_0",
+      "parser_profile_path": "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\nextnano\\config\\parsers\\nextnano_pp_3_0_0.yaml",
+      "resolved_artifacts": {
+        "bandedges": [
+          "case/bias_00000/bandedges.dat"
+        ],
+        "energy_spectrum_gamma": [
+          "case/bias_00000/Quantum/acqw/Gamma/energy_spectrum_k00000.dat"
+        ],
+        "energy_spectrum_hh": [
+          "case/bias_00000/Quantum/acqw/HH/energy_spectrum_k00000.dat"
+        ],
+        "envelopes_gamma": [
+          "case/bias_00000/Quantum/acqw/Gamma/envelopes_k00000.dat"
+        ],
+        "envelopes_hh": [
+          "case/bias_00000/Quantum/acqw/HH/envelopes_k00000.dat"
+        ],
+        "probabilities_gamma": [
+          "case/bias_00000/Quantum/acqw/Gamma/probabilities_k00000.dat"
+        ],
+        "probabilities_hh": [
+          "case/bias_00000/Quantum/acqw/HH/probabilities_k00000.dat"
+        ]
+      },
+      "solver_version": "nextnano++ 3.0.0 (2026_07_03 package)"
+    },
+    "solver_return_code_is_zero": true
+  },
+  "raw_output": "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\solver\\D1_plus10",
+  "return_code": 0,
+  "stderr": "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\cases\\D1_plus10\\physics\\logs\\stderr.txt",
+  "stdout": "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\cases\\D1_plus10\\physics\\logs\\stdout.txt"
+}
+
+==============================================================================
+LICENSED SOLVE 3/6: D2_plus20
+==============================================================================
+{
+  "case_id": "D2_plus20",
+  "description": "Twenty additional nanometres of AlGaAs and Dirichlet padding per side.",
+  "domain_nm": [
+    0.0,
+    91.8
+  ],
+  "domain_padding_nm": 40.0,
+  "experiment": "domain",
+  "generated_input": "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\inputs\\D2_plus20.in",
+  "mesh_nm": 0.05,
+  "quantum_padding_nm": 22.0
+}
+{
+  "physical_gate_passed": true,
+  "physical_gate_reason": null,
+  "preanalysis_gate": {
+    "completion_evidence": {
+      "completion_files": [
+        "job_done.txt"
+      ],
+      "job_done_file_present": true,
+      "no_stale_job_running_file": true
+    },
+    "log_markers": {
+      "completion_marker_found": true,
+      "fatal_markers_found": [],
+      "no_convergence_warning": true,
+      "no_fatal_marker": true,
+      "warning_markers_found": []
+    },
+    "passed": true,
+    "quantum_outputs": {
+      "artifacts_with_unconfirmed_patterns": [],
+      "missing_optional_artifacts": [],
+      "parser_profile": "nextnano_pp_3_0_0",
+      "parser_profile_path": "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\nextnano\\config\\parsers\\nextnano_pp_3_0_0.yaml",
+      "resolved_artifacts": {
+        "bandedges": [
+          "case/bias_00000/bandedges.dat"
+        ],
+        "energy_spectrum_gamma": [
+          "case/bias_00000/Quantum/acqw/Gamma/energy_spectrum_k00000.dat"
+        ],
+        "energy_spectrum_hh": [
+          "case/bias_00000/Quantum/acqw/HH/energy_spectrum_k00000.dat"
+        ],
+        "envelopes_gamma": [
+          "case/bias_00000/Quantum/acqw/Gamma/envelopes_k00000.dat"
+        ],
+        "envelopes_hh": [
+          "case/bias_00000/Quantum/acqw/HH/envelopes_k00000.dat"
+        ],
+        "probabilities_gamma": [
+          "case/bias_00000/Quantum/acqw/Gamma/probabilities_k00000.dat"
+        ],
+        "probabilities_hh": [
+          "case/bias_00000/Quantum/acqw/HH/probabilities_k00000.dat"
+        ]
+      },
+      "solver_version": "nextnano++ 3.0.0 (2026_07_03 package)"
+    },
+    "solver_return_code_is_zero": true
+  },
+  "raw_output": "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\solver\\D2_plus20",
+  "return_code": 0,
+  "stderr": "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\cases\\D2_plus20\\physics\\logs\\stderr.txt",
+  "stdout": "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\cases\\D2_plus20\\physics\\logs\\stdout.txt"
+}
+
+==============================================================================
+LICENSED SOLVE 4/6: D3_plus40
+==============================================================================
+{
+  "case_id": "D3_plus40",
+  "description": "Forty additional nanometres of AlGaAs and Dirichlet padding per side.",
+  "domain_nm": [
+    0.0,
+    131.8
+  ],
+  "domain_padding_nm": 60.0,
+  "experiment": "domain",
+  "generated_input": "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\inputs\\D3_plus40.in",
+  "mesh_nm": 0.05,
+  "quantum_padding_nm": 42.0
+}
+{
+  "physical_gate_passed": true,
+  "physical_gate_reason": null,
+  "preanalysis_gate": {
+    "completion_evidence": {
+      "completion_files": [
+        "job_done.txt"
+      ],
+      "job_done_file_present": true,
+      "no_stale_job_running_file": true
+    },
+    "log_markers": {
+      "completion_marker_found": true,
+      "fatal_markers_found": [],
+      "no_convergence_warning": true,
+      "no_fatal_marker": true,
+      "warning_markers_found": []
+    },
+    "passed": true,
+    "quantum_outputs": {
+      "artifacts_with_unconfirmed_patterns": [],
+      "missing_optional_artifacts": [],
+      "parser_profile": "nextnano_pp_3_0_0",
+      "parser_profile_path": "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\nextnano\\config\\parsers\\nextnano_pp_3_0_0.yaml",
+      "resolved_artifacts": {
+        "bandedges": [
+          "case/bias_00000/bandedges.dat"
+        ],
+        "energy_spectrum_gamma": [
+          "case/bias_00000/Quantum/acqw/Gamma/energy_spectrum_k00000.dat"
+        ],
+        "energy_spectrum_hh": [
+          "case/bias_00000/Quantum/acqw/HH/energy_spectrum_k00000.dat"
+        ],
+        "envelopes_gamma": [
+          "case/bias_00000/Quantum/acqw/Gamma/envelopes_k00000.dat"
+        ],
+        "envelopes_hh": [
+          "case/bias_00000/Quantum/acqw/HH/envelopes_k00000.dat"
+        ],
+        "probabilities_gamma": [
+          "case/bias_00000/Quantum/acqw/Gamma/probabilities_k00000.dat"
+        ],
+        "probabilities_hh": [
+          "case/bias_00000/Quantum/acqw/HH/probabilities_k00000.dat"
+        ]
+      },
+      "solver_version": "nextnano++ 3.0.0 (2026_07_03 package)"
+    },
+    "solver_return_code_is_zero": true
+  },
+  "raw_output": "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\solver\\D3_plus40",
+  "return_code": 0,
+  "stderr": "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\cases\\D3_plus40\\physics\\logs\\stderr.txt",
+  "stdout": "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\cases\\D3_plus40\\physics\\logs\\stdout.txt"
+}
+
+==============================================================================
+LICENSED SOLVE 5/6: M0_0p10nm
+==============================================================================
+{
+  "case_id": "M0_0p10nm",
+  "description": "Coarse mesh on the largest numerical domain.",
+  "domain_nm": [
+    0.0,
+    131.8
+  ],
+  "domain_padding_nm": 60.0,
+  "experiment": "mesh",
+  "generated_input": "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\inputs\\M0_0p10nm.in",
+  "mesh_nm": 0.1,
+  "quantum_padding_nm": 42.0
+}
+{
+  "physical_gate_passed": true,
+  "physical_gate_reason": null,
+  "preanalysis_gate": {
+    "completion_evidence": {
+      "completion_files": [
+        "job_done.txt"
+      ],
+      "job_done_file_present": true,
+      "no_stale_job_running_file": true
+    },
+    "log_markers": {
+      "completion_marker_found": true,
+      "fatal_markers_found": [],
+      "no_convergence_warning": true,
+      "no_fatal_marker": true,
+      "warning_markers_found": []
+    },
+    "passed": true,
+    "quantum_outputs": {
+      "artifacts_with_unconfirmed_patterns": [],
+      "missing_optional_artifacts": [],
+      "parser_profile": "nextnano_pp_3_0_0",
+      "parser_profile_path": "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\nextnano\\config\\parsers\\nextnano_pp_3_0_0.yaml",
+      "resolved_artifacts": {
+        "bandedges": [
+          "case/bias_00000/bandedges.dat"
+        ],
+        "energy_spectrum_gamma": [
+          "case/bias_00000/Quantum/acqw/Gamma/energy_spectrum_k00000.dat"
+        ],
+        "energy_spectrum_hh": [
+          "case/bias_00000/Quantum/acqw/HH/energy_spectrum_k00000.dat"
+        ],
+        "envelopes_gamma": [
+          "case/bias_00000/Quantum/acqw/Gamma/envelopes_k00000.dat"
+        ],
+        "envelopes_hh": [
+          "case/bias_00000/Quantum/acqw/HH/envelopes_k00000.dat"
+        ],
+        "probabilities_gamma": [
+          "case/bias_00000/Quantum/acqw/Gamma/probabilities_k00000.dat"
+        ],
+        "probabilities_hh": [
+          "case/bias_00000/Quantum/acqw/HH/probabilities_k00000.dat"
+        ]
+      },
+      "solver_version": "nextnano++ 3.0.0 (2026_07_03 package)"
+    },
+    "solver_return_code_is_zero": true
+  },
+  "raw_output": "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\solver\\M0_0p10nm",
+  "return_code": 0,
+  "stderr": "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\cases\\M0_0p10nm\\physics\\logs\\stderr.txt",
+  "stdout": "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\cases\\M0_0p10nm\\physics\\logs\\stdout.txt"
+}
+
+==============================================================================
+LICENSED SOLVE 6/6: M2_0p025nm
+==============================================================================
+{
+  "case_id": "M2_0p025nm",
+  "description": "Fine mesh on the largest numerical domain.",
+  "domain_nm": [
+    0.0,
+    131.8
+  ],
+  "domain_padding_nm": 60.0,
+  "experiment": "mesh",
+  "generated_input": "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\inputs\\M2_0p025nm.in",
+  "mesh_nm": 0.025,
+  "quantum_padding_nm": 42.0
+}
+{
+  "physical_gate_passed": true,
+  "physical_gate_reason": null,
+  "preanalysis_gate": {
+    "completion_evidence": {
+      "completion_files": [
+        "job_done.txt"
+      ],
+      "job_done_file_present": true,
+      "no_stale_job_running_file": true
+    },
+    "log_markers": {
+      "completion_marker_found": true,
+      "fatal_markers_found": [],
+      "no_convergence_warning": true,
+      "no_fatal_marker": true,
+      "warning_markers_found": []
+    },
+    "passed": true,
+    "quantum_outputs": {
+      "artifacts_with_unconfirmed_patterns": [],
+      "missing_optional_artifacts": [],
+      "parser_profile": "nextnano_pp_3_0_0",
+      "parser_profile_path": "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\nextnano\\config\\parsers\\nextnano_pp_3_0_0.yaml",
+      "resolved_artifacts": {
+        "bandedges": [
+          "case/bias_00000/bandedges.dat"
+        ],
+        "energy_spectrum_gamma": [
+          "case/bias_00000/Quantum/acqw/Gamma/energy_spectrum_k00000.dat"
+        ],
+        "energy_spectrum_hh": [
+          "case/bias_00000/Quantum/acqw/HH/energy_spectrum_k00000.dat"
+        ],
+        "envelopes_gamma": [
+          "case/bias_00000/Quantum/acqw/Gamma/envelopes_k00000.dat"
+        ],
+        "envelopes_hh": [
+          "case/bias_00000/Quantum/acqw/HH/envelopes_k00000.dat"
+        ],
+        "probabilities_gamma": [
+          "case/bias_00000/Quantum/acqw/Gamma/probabilities_k00000.dat"
+        ],
+        "probabilities_hh": [
+          "case/bias_00000/Quantum/acqw/HH/probabilities_k00000.dat"
+        ]
+      },
+      "solver_version": "nextnano++ 3.0.0 (2026_07_03 package)"
+    },
+    "solver_return_code_is_zero": true
+  },
+  "raw_output": "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\solver\\M2_0p025nm",
+  "return_code": 0,
+  "stderr": "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\cases\\M2_0p025nm\\physics\\logs\\stderr.txt",
+  "stdout": "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\cases\\M2_0p025nm\\physics\\logs\\stdout.txt"
+}
+
+==============================================================================
+ANALYSIS: D0_reference
+==============================================================================
+{
+  "broadening_meV": 5.0,
+  "case_id": "D0_reference",
+  "chi2_1550_imag_pm_per_V": -0.18896181600885778,
+  "chi2_1550_pm_per_V": 84.13778453632843,
+  "chi2_1550_real_pm_per_V": 84.13757234502144,
+  "delta_z_e_nm": 6.016704207723912,
+  "delta_z_hh_nm": 0.3156690580536683,
+  "description": "Exact Demo 18 numerical domain and mesh.",
+  "domain_padding_nm": 20.0,
+  "e1_eV": 2.937986086841,
+  "e2_eV": 3.048057749389,
+  "electron_orthonormality_error": 1.3600232051658168e-15,
+  "experiment": "domain",
+  "heavy_hole_orthonormality_error": 9.853229343548264e-16,
+  "hh1_eV": 1.448521135589,
+  "hh2_eV": 1.41546399868,
+  "k_points": 384,
+  "kmax_convention": "0.1_times_2pi_over_a",
+  "kmax_per_nm": 1.1114288784645268,
+  "mesh_nm": 0.05,
+  "nz_convention": "two_wells_per_period",
+  "nz_per_metre": 66666666.66666667,
+  "overlap_e1_hh1": 0.9826407464256932,
+  "overlap_e1_hh2": 0.024859992221794358,
+  "overlap_e2_hh1": -0.08826890844209587,
+  "overlap_e2_hh2": 0.45773075641152466,
+  "peak_chi2_pm_per_V": 149.47701976826193,
+  "peak_wavelength_nm": 1517.0,
+  "prefactor": 113.39633764994089,
+  "quantum_padding_nm": 2.0,
+  "r_e_hh_nm": 0.751,
+  "selected_electron_states": [
+    1,
+    2
+  ],
+  "selected_heavy_hole_states": [
+    1,
+    2
+  ],
+  "spin_degeneracy": 2,
+  "state_selection": "fallback_first_two_eigenstates_not_certified: strict selection needs 2 bound states per band; found {'electron': [], 'heavy_hole': []}",
+  "states_per_band": 2,
+  "strict_first_two_bound_pass": false,
+  "strict_selected_states_bound_pass": false,
+  "transition_e1_hh1_eV": 1.4894649512520002,
+  "transition_e1_hh2_eV": 1.5225220881610002,
+  "transition_e2_hh1_eV": 1.5995366138000002,
+  "transition_e2_hh2_eV": 1.6325937507090003,
+  "z_e11_nm": 23.63669600060111,
+  "z_e12_nm": 1.0344880855925829,
+  "z_e21_nm": 1.0344880855925833,
+  "z_e22_nm": 29.65340020832502,
+  "z_hh11_nm": 23.551515902296412,
+  "z_hh12_nm": 1.4510036831796351,
+  "z_hh21_nm": 1.4510036831796342,
+  "z_hh22_nm": 23.86718496035008
+}
+BOUND STATES
+[
+  {
+    "active_region_probability": 0.984278760374207,
+    "band": "electron",
+    "barrier_edge_eV": 3.3244289271371,
+    "binding_energy_meV": 386.4428402961,
+    "bound_checks": {
+      "active_probability": true,
+      "binding": true,
+      "left_boundary_amplitude": true,
+      "left_boundary_probability": false,
+      "right_boundary_amplitude": true,
+      "right_boundary_probability": true
+    },
+    "bound_pass": false,
+    "case": "D0_reference",
+    "case_id": "D0_reference",
+    "centroid_nm": 23.63669600060111,
+    "energy_eV": 2.937986086841,
+    "left_barrier_edge_eV": 3.3244289271371,
+    "left_boundary_amplitude_nm_minus_half": 0.0,
+    "left_boundary_probability": 0.015496250625190344,
+    "left_padding_probability": 0.015496250625190344,
+    "quantum_end_nm": 33.800000000000004,
+    "quantum_start_nm": 18.0,
+    "right_barrier_edge_eV": 3.3244289271371,
+    "right_boundary_amplitude_nm_minus_half": 0.0,
+    "right_boundary_probability": 0.00019959818733091044,
+    "right_padding_probability": 0.00019959818733091044,
+    "rms_width_nm": 1.8654385601896837,
+    "state": 1
+  },
+  {
+    "active_region_probability": 0.9268085543880322,
+    "band": "electron",
+    "barrier_edge_eV": 3.3244289271371,
+    "binding_energy_meV": 276.37117774809997,
+    "bound_checks": {
+      "active_probability": true,
+      "binding": true,
+      "left_boundary_amplitude": true,
+      "left_boundary_probability": false,
+      "right_boundary_amplitude": true,
+      "right_boundary_probability": false
+    },
+    "bound_pass": false,
+    "case": "D0_reference",
+    "case_id": "D0_reference",
+    "centroid_nm": 29.653400208325017,
+    "energy_eV": 3.048057749389,
+    "left_barrier_edge_eV": 3.3244289271371,
+    "left_boundary_amplitude_nm_minus_half": 0.0,
+    "left_boundary_probability": 0.004308561977648029,
+    "left_padding_probability": 0.004308561977648029,
+    "quantum_end_nm": 33.800000000000004,
+    "quantum_start_nm": 18.0,
+    "right_barrier_edge_eV": 3.3244289271371,
+    "right_boundary_amplitude_nm_minus_half": 0.0,
+    "right_boundary_probability": 0.0617995982316665,
+    "right_padding_probability": 0.0617995982316665,
+    "rms_width_nm": 2.3528066023640095,
+    "state": 2
+  },
+  {
+    "active_region_probability": 0.9974646377787819,
+    "band": "heavy_hole",
+    "barrier_edge_eV": 1.1795333333333,
+    "binding_energy_meV": 268.98780225569993,
+    "bound_checks": {
+      "active_probability": true,
+      "binding": true,
+      "left_boundary_amplitude": true,
+      "left_boundary_probability": false,
+      "right_boundary_amplitude": true,
+      "right_boundary_probability": true
+    },
+    "bound_pass": false,
+    "case": "D0_reference",
+    "case_id": "D0_reference",
+    "centroid_nm": 23.55151590229642,
+    "energy_eV": 1.448521135589,
+    "left_barrier_edge_eV": 1.1795333333333,
+    "left_boundary_amplitude_nm_minus_half": 0.0,
+    "left_boundary_probability": 0.0025349304438580917,
+    "left_padding_probability": 0.0025349304438580917,
+    "quantum_end_nm": 33.800000000000004,
+    "quantum_start_nm": 18.0,
+    "right_barrier_edge_eV": 1.1795333333333,
+    "right_boundary_amplitude_nm_minus_half": 0.0,
+    "right_boundary_probability": 3.569572905822434e-07,
+    "right_padding_probability": 3.569572905822434e-07,
+    "rms_width_nm": 1.4796568496780924,
+    "state": 1
+  },
+  {
+    "active_region_probability": 0.9889547017278681,
+    "band": "heavy_hole",
+    "barrier_edge_eV": 1.1795333333333,
+    "binding_energy_meV": 235.93066534669993,
+    "bound_checks": {
+      "active_probability": true,
+      "binding": true,
+      "left_boundary_amplitude": true,
+      "left_boundary_probability": false,
+      "right_boundary_amplitude": true,
+      "right_boundary_probability": true
+    },
+    "bound_pass": false,
+    "case": "D0_reference",
+    "case_id": "D0_reference",
+    "centroid_nm": 23.86718496035008,
+    "energy_eV": 1.41546399868,
+    "left_barrier_edge_eV": 1.1795333333333,
+    "left_boundary_amplitude_nm_minus_half": 0.0,
+    "left_boundary_probability": 0.010094441319150054,
+    "left_padding_probability": 0.010094441319150054,
+    "quantum_end_nm": 33.800000000000004,
+    "quantum_start_nm": 18.0,
+    "right_barrier_edge_eV": 1.1795333333333,
+    "right_boundary_amplitude_nm_minus_half": 0.0,
+    "right_boundary_probability": 0.0007950161426986042,
+    "right_padding_probability": 0.0007950161426986042,
+    "rms_width_nm": 2.566260435482026,
+    "state": 2
+  }
+]
+
+==============================================================================
+ANALYSIS: D1_plus10
+==============================================================================
+{
+  "broadening_meV": 5.0,
+  "case_id": "D1_plus10",
+  "chi2_1550_imag_pm_per_V": 0.322638124670626,
+  "chi2_1550_pm_per_V": 84.70139058111343,
+  "chi2_1550_real_pm_per_V": 84.7007760945249,
+  "delta_z_e_nm": 6.124780336260791,
+  "delta_z_hh_nm": 0.31741058154757695,
+  "description": "Ten additional nanometres of AlGaAs and Dirichlet padding per side.",
+  "domain_padding_nm": 30.0,
+  "e1_eV": 2.937538495004,
+  "e2_eV": 3.045028417151,
+  "electron_orthonormality_error": 1.0796918914479647e-14,
+  "experiment": "domain",
+  "heavy_hole_orthonormality_error": 1.547373340571312e-14,
+  "hh1_eV": 1.448523118792,
+  "hh2_eV": 1.415475771308,
+  "k_points": 384,
+  "kmax_convention": "0.1_times_2pi_over_a",
+  "kmax_per_nm": 1.1114288784645268,
+  "mesh_nm": 0.05,
+  "nz_convention": "two_wells_per_period",
+  "nz_per_metre": 66666666.66666667,
+  "overlap_e1_hh1": 0.9816355215008331,
+  "overlap_e1_hh2": 0.020416686547125723,
+  "overlap_e2_hh1": -0.08551506294611218,
+  "overlap_e2_hh2": 0.4503009588021984,
+  "peak_chi2_pm_per_V": 145.77994147517816,
+  "peak_wavelength_nm": 1520.0,
+  "prefactor": 113.39633764994089,
+  "quantum_padding_nm": 12.0,
+  "r_e_hh_nm": 0.751,
+  "selected_electron_states": [
+    1,
+    2
+  ],
+  "selected_heavy_hole_states": [
+    1,
+    2
+  ],
+  "spin_degeneracy": 2,
+  "state_selection": "first_two_strictly_bound_states",
+  "states_per_band": 2,
+  "strict_first_two_bound_pass": true,
+  "strict_selected_states_bound_pass": true,
+  "transition_e1_hh1_eV": 1.489015376212,
+  "transition_e1_hh2_eV": 1.522062723696,
+  "transition_e2_hh1_eV": 1.5965052983589998,
+  "transition_e2_hh2_eV": 1.6295526458429999,
+  "z_e11_nm": 33.61112782566054,
+  "z_e12_nm": 1.0300637781006055,
+  "z_e21_nm": 1.0300637781006055,
+  "z_e22_nm": 39.73590816192133,
+  "z_hh11_nm": 33.55105366587344,
+  "z_hh12_nm": 1.4510586527263536,
+  "z_hh21_nm": 1.4510586527263545,
+  "z_hh22_nm": 33.86846424742102
+}
+BOUND STATES
+[
+  {
+    "active_region_probability": 0.981777587212525,
+    "band": "electron",
+    "barrier_edge_eV": 3.3244289271371,
+    "binding_energy_meV": 386.89043213310015,
+    "bound_checks": {
+      "active_probability": true,
+      "binding": true,
+      "left_boundary_amplitude": true,
+      "left_boundary_probability": true,
+      "right_boundary_amplitude": true,
+      "right_boundary_probability": true
+    },
+    "bound_pass": true,
+    "case": "D1_plus10",
+    "case_id": "D1_plus10",
+    "centroid_nm": 33.611127825660525,
+    "energy_eV": 2.937538495004,
+    "left_barrier_edge_eV": 3.3244289271371,
+    "left_boundary_amplitude_nm_minus_half": 0.0,
+    "left_boundary_probability": 5.889529432873611e-12,
+    "left_padding_probability": 0.0179629157448941,
+    "quantum_end_nm": 53.8,
+    "quantum_start_nm": 18.0,
+    "right_barrier_edge_eV": 3.3244289271371,
+    "right_boundary_amplitude_nm_minus_half": 0.0,
+    "right_boundary_probability": 8.508170342328858e-14,
+    "right_padding_probability": 0.0002594970425810448,
+    "rms_width_nm": 1.881742442187526,
+    "state": 1
+  },
+  {
+    "active_region_probability": 0.9104616547921549,
+    "band": "electron",
+    "barrier_edge_eV": 3.3244289271371,
+    "binding_energy_meV": 279.40050998610036,
+    "bound_checks": {
+      "active_probability": true,
+      "binding": true,
+      "left_boundary_amplitude": true,
+      "left_boundary_probability": true,
+      "right_boundary_amplitude": true,
+      "right_boundary_probability": true
+    },
+    "bound_pass": true,
+    "case": "D1_plus10",
+    "case_id": "D1_plus10",
+    "centroid_nm": 39.73590816192134,
+    "energy_eV": 3.045028417151,
+    "left_barrier_edge_eV": 3.3244289271371,
+    "left_boundary_amplitude_nm_minus_half": 0.0,
+    "left_boundary_probability": 3.77616680935701e-11,
+    "left_padding_probability": 0.005041035280286551,
+    "quantum_end_nm": 53.8,
+    "quantum_start_nm": 18.0,
+    "right_barrier_edge_eV": 3.3244289271371,
+    "right_boundary_amplitude_nm_minus_half": 0.0,
+    "right_boundary_probability": 6.329571595664001e-10,
+    "right_padding_probability": 0.08449730992755858,
+    "rms_width_nm": 2.365347693627379,
+    "state": 2
+  },
+  {
+    "active_region_probability": 0.9974371181357803,
+    "band": "heavy_hole",
+    "barrier_edge_eV": 1.1795333333333,
+    "binding_energy_meV": 268.9897854587,
+    "bound_checks": {
+      "active_probability": true,
+      "binding": true,
+      "left_boundary_amplitude": true,
+      "left_boundary_probability": true,
+      "right_boundary_amplitude": true,
+      "right_boundary_probability": true
+    },
+    "bound_pass": true,
+    "case": "D1_plus10",
+    "case_id": "D1_plus10",
+    "centroid_nm": 33.55105366587343,
+    "energy_eV": 1.448523118792,
+    "left_barrier_edge_eV": 1.1795333333333,
+    "left_boundary_amplitude_nm_minus_half": 0.0,
+    "left_boundary_probability": 7.148877460499892e-20,
+    "left_padding_probability": 0.002562445492114029,
+    "quantum_end_nm": 53.8,
+    "quantum_start_nm": 18.0,
+    "right_barrier_edge_eV": 1.1795333333333,
+    "right_boundary_amplitude_nm_minus_half": 0.0,
+    "right_boundary_probability": 1.2174193490715735e-23,
+    "right_padding_probability": 4.3637210567757807e-07,
+    "rms_width_nm": 1.4799311827251787,
+    "state": 1
+  },
+  {
+    "active_region_probability": 0.9887778294130176,
+    "band": "heavy_hole",
+    "barrier_edge_eV": 1.1795333333333,
+    "binding_energy_meV": 235.94243797469994,
+    "bound_checks": {
+      "active_probability": true,
+      "binding": true,
+      "left_boundary_amplitude": true,
+      "left_boundary_probability": true,
+      "right_boundary_amplitude": true,
+      "right_boundary_probability": true
+    },
+    "bound_pass": true,
+    "case": "D1_plus10",
+    "case_id": "D1_plus10",
+    "centroid_nm": 33.86846424742101,
+    "energy_eV": 1.415475771308,
+    "left_barrier_edge_eV": 1.1795333333333,
+    "left_boundary_amplitude_nm_minus_half": 0.0,
+    "left_boundary_probability": 3.1385742971258096e-18,
+    "left_padding_probability": 0.010249304211045997,
+    "quantum_end_nm": 53.8,
+    "quantum_start_nm": 18.0,
+    "right_barrier_edge_eV": 1.1795333333333,
+    "right_boundary_amplitude_nm_minus_half": 0.0,
+    "right_boundary_probability": 2.979142133986594e-19,
+    "right_padding_probability": 0.0009728663759363512,
+    "rms_width_nm": 2.569669132059504,
+    "state": 2
+  }
+]
+
+==============================================================================
+ANALYSIS: D2_plus20
+==============================================================================
+{
+  "broadening_meV": 5.0,
+  "case_id": "D2_plus20",
+  "chi2_1550_imag_pm_per_V": 0.3222603982694878,
+  "chi2_1550_pm_per_V": 84.70684497876215,
+  "chi2_1550_real_pm_per_V": 84.70623196962399,
+  "delta_z_e_nm": 6.124808593240267,
+  "delta_z_hh_nm": 0.31745988721153395,
+  "description": "Twenty additional nanometres of AlGaAs and Dirichlet padding per side.",
+  "domain_padding_nm": 40.0,
+  "e1_eV": 2.937538071706,
+  "e2_eV": 3.045027084599,
+  "electron_orthonormality_error": 1.3461454173580023e-14,
+  "experiment": "domain",
+  "heavy_hole_orthonormality_error": 2.498001805406602e-16,
+  "hh1_eV": 1.448523182651,
+  "hh2_eV": 1.415476004469,
+  "k_points": 384,
+  "kmax_convention": "0.1_times_2pi_over_a",
+  "kmax_per_nm": 1.1114288784645268,
+  "mesh_nm": 0.05,
+  "nz_convention": "two_wells_per_period",
+  "nz_per_metre": 66666666.66666667,
+  "overlap_e1_hh1": 0.9816356827839633,
+  "overlap_e1_hh2": 0.020417049562162143,
+  "overlap_e2_hh1": -0.08551504923206861,
+  "overlap_e2_hh2": 0.45031191346473276,
+  "peak_chi2_pm_per_V": 145.7866584769114,
+  "peak_wavelength_nm": 1520.0,
+  "prefactor": 113.39633764994089,
+  "quantum_padding_nm": 22.0,
+  "r_e_hh_nm": 0.751,
+  "selected_electron_states": [
+    1,
+    2
+  ],
+  "selected_heavy_hole_states": [
+    1,
+    2
+  ],
+  "spin_degeneracy": 2,
+  "state_selection": "first_two_strictly_bound_states",
+  "states_per_band": 2,
+  "strict_first_two_bound_pass": true,
+  "strict_selected_states_bound_pass": true,
+  "transition_e1_hh1_eV": 1.4890148890549997,
+  "transition_e1_hh2_eV": 1.5220620672369998,
+  "transition_e2_hh1_eV": 1.5965039019479998,
+  "transition_e2_hh2_eV": 1.62955108013,
+  "z_e11_nm": 43.61111474758496,
+  "z_e12_nm": 1.030061194080922,
+  "z_e21_nm": 1.030061194080922,
+  "z_e22_nm": 49.73592334082523,
+  "z_hh11_nm": 43.551042703411746,
+  "z_hh12_nm": 1.4510578798733187,
+  "z_hh21_nm": 1.4510578798733187,
+  "z_hh22_nm": 43.86850259062328
+}
+BOUND STATES
+[
+  {
+    "active_region_probability": 0.981777841910023,
+    "band": "electron",
+    "barrier_edge_eV": 3.3244289271371,
+    "binding_energy_meV": 386.89085543110036,
+    "bound_checks": {
+      "active_probability": true,
+      "binding": true,
+      "left_boundary_amplitude": true,
+      "left_boundary_probability": true,
+      "right_boundary_amplitude": true,
+      "right_boundary_probability": true
+    },
+    "bound_pass": true,
+    "case": "D2_plus20",
+    "case_id": "D2_plus20",
+    "centroid_nm": 43.61111474758496,
+    "energy_eV": 2.937538071706,
+    "left_barrier_edge_eV": 3.3244289271371,
+    "left_boundary_amplitude_nm_minus_half": 0.0,
+    "left_boundary_probability": 2.6768547036574194e-21,
+    "left_padding_probability": 0.01796266588747341,
+    "quantum_end_nm": 73.8,
+    "quantum_start_nm": 18.0,
+    "right_barrier_edge_eV": 3.3244289271371,
+    "right_boundary_amplitude_nm_minus_half": 0.0,
+    "right_boundary_probability": 3.867036926398935e-23,
+    "right_padding_probability": 0.00025949220250368684,
+    "rms_width_nm": 1.881745722448727,
+    "state": 1
+  },
+  {
+    "active_region_probability": 0.9104639077383646,
+    "band": "electron",
+    "barrier_edge_eV": 3.3244289271371,
+    "binding_energy_meV": 279.4018425381002,
+    "bound_checks": {
+      "active_probability": true,
+      "binding": true,
+      "left_boundary_amplitude": true,
+      "left_boundary_probability": true,
+      "right_boundary_amplitude": true,
+      "right_boundary_probability": true
+    },
+    "bound_pass": true,
+    "case": "D2_plus20",
+    "case_id": "D2_plus20",
+    "centroid_nm": 49.73592334082524,
+    "energy_eV": 3.045027084599,
+    "left_barrier_edge_eV": 3.3244289271371,
+    "left_boundary_amplitude_nm_minus_half": 0.0,
+    "left_boundary_probability": 4.2992162193604003e-19,
+    "left_padding_probability": 0.00504080993687132,
+    "quantum_end_nm": 73.8,
+    "quantum_start_nm": 18.0,
+    "right_barrier_edge_eV": 3.3244289271371,
+    "right_boundary_amplitude_nm_minus_half": 0.0,
+    "right_boundary_probability": 7.206450804122442e-18,
+    "right_padding_probability": 0.08449528232476418,
+    "rms_width_nm": 2.365334380239814,
+    "state": 2
+  },
+  {
+    "active_region_probability": 0.9974371224645757,
+    "band": "heavy_hole",
+    "barrier_edge_eV": 1.1795333333333,
+    "binding_energy_meV": 268.9898493177001,
+    "bound_checks": {
+      "active_probability": true,
+      "binding": true,
+      "left_boundary_amplitude": true,
+      "left_boundary_probability": true,
+      "right_boundary_amplitude": true,
+      "right_boundary_probability": true
+    },
+    "bound_pass": true,
+    "case": "D2_plus20",
+    "case_id": "D2_plus20",
+    "centroid_nm": 43.55104270341174,
+    "energy_eV": 1.448523182651,
+    "left_barrier_edge_eV": 1.1795333333333,
+    "left_boundary_amplitude_nm_minus_half": 0.0,
+    "left_boundary_probability": 2.775777835172447e-36,
+    "left_padding_probability": 0.0025624411670147184,
+    "quantum_end_nm": 73.8,
+    "quantum_start_nm": 18.0,
+    "right_barrier_edge_eV": 1.1795333333333,
+    "right_boundary_amplitude_nm_minus_half": 0.0,
+    "right_boundary_probability": 4.7269887837349526e-40,
+    "right_padding_probability": 4.3636840966620405e-07,
+    "rms_width_nm": 1.4799346938708688,
+    "state": 1
+  },
+  {
+    "active_region_probability": 0.9887778869659897,
+    "band": "heavy_hole",
+    "barrier_edge_eV": 1.1795333333333,
+    "binding_energy_meV": 235.9426711357,
+    "bound_checks": {
+      "active_probability": true,
+      "binding": true,
+      "left_boundary_amplitude": true,
+      "left_boundary_probability": true,
+      "right_boundary_amplitude": true,
+      "right_boundary_probability": true
+    },
+    "bound_pass": true,
+    "case": "D2_plus20",
+    "case_id": "D2_plus20",
+    "centroid_nm": 43.86850259062328,
+    "energy_eV": 1.415476004469,
+    "left_barrier_edge_eV": 1.1795333333333,
+    "left_boundary_amplitude_nm_minus_half": 0.0,
+    "left_boundary_probability": 1.3012857634602619e-33,
+    "left_padding_probability": 0.010249116617898742,
+    "quantum_end_nm": 73.8,
+    "quantum_start_nm": 18.0,
+    "right_barrier_edge_eV": 1.1795333333333,
+    "right_boundary_amplitude_nm_minus_half": 0.0,
+    "right_boundary_probability": 1.2353712456835706e-34,
+    "right_padding_probability": 0.0009729964161114049,
+    "rms_width_nm": 2.569722309794535,
+    "state": 2
+  }
+]
+
+==============================================================================
+ANALYSIS: D3_plus40
+==============================================================================
+{
+  "broadening_meV": 5.0,
+  "case_id": "D3_plus40",
+  "chi2_1550_imag_pm_per_V": 0.32189058039800256,
+  "chi2_1550_pm_per_V": 84.7121237413088,
+  "chi2_1550_real_pm_per_V": 84.71151217642773,
+  "delta_z_e_nm": 6.12483505911095,
+  "delta_z_hh_nm": 0.31750778869835017,
+  "description": "Forty additional nanometres of AlGaAs and Dirichlet padding per side.",
+  "domain_padding_nm": 60.0,
+  "e1_eV": 2.937537669387,
+  "e2_eV": 3.045025828637,
+  "electron_orthonormality_error": 1.3655743202889425e-14,
+  "experiment": "domain",
+  "heavy_hole_orthonormality_error": 1.6375789613221059e-15,
+  "hh1_eV": 1.44852324474,
+  "hh2_eV": 1.415476230679,
+  "k_points": 384,
+  "kmax_convention": "0.1_times_2pi_over_a",
+  "kmax_per_nm": 1.1114288784645268,
+  "mesh_nm": 0.05,
+  "nz_convention": "two_wells_per_period",
+  "nz_per_metre": 66666666.66666667,
+  "overlap_e1_hh1": 0.9816358457773114,
+  "overlap_e1_hh2": 0.020417488964808828,
+  "overlap_e2_hh1": -0.08551506388524815,
+  "overlap_e2_hh2": 0.45032260657100637,
+  "peak_chi2_pm_per_V": 145.79320856442178,
+  "peak_wavelength_nm": 1520.0,
+  "prefactor": 113.39633764994089,
+  "quantum_padding_nm": 42.0,
+  "r_e_hh_nm": 0.751,
+  "selected_electron_states": [
+    1,
+    2
+  ],
+  "selected_heavy_hole_states": [
+    1,
+    2
+  ],
+  "spin_degeneracy": 2,
+  "state_selection": "first_two_strictly_bound_states",
+  "states_per_band": 2,
+  "strict_first_two_bound_pass": true,
+  "strict_selected_states_bound_pass": true,
+  "transition_e1_hh1_eV": 1.4890144246469998,
+  "transition_e1_hh2_eV": 1.5220614387079998,
+  "transition_e2_hh1_eV": 1.5965025838970002,
+  "transition_e2_hh2_eV": 1.6295495979580001,
+  "z_e11_nm": 63.611102405276384,
+  "z_e12_nm": 1.0300587473509975,
+  "z_e21_nm": 1.0300587473509975,
+  "z_e22_nm": 69.73593746438733,
+  "z_hh11_nm": 63.55103205795698,
+  "z_hh12_nm": 1.4510571231408917,
+  "z_hh21_nm": 1.4510571231408935,
+  "z_hh22_nm": 63.86853984665533
+}
+BOUND STATES
+[
+  {
+    "active_region_probability": 0.98177810876985,
+    "band": "electron",
+    "barrier_edge_eV": 3.3244289271371,
+    "binding_energy_meV": 386.89125775010024,
+    "bound_checks": {
+      "active_probability": true,
+      "binding": true,
+      "left_boundary_amplitude": true,
+      "left_boundary_probability": true,
+      "right_boundary_amplitude": true,
+      "right_boundary_probability": true
+    },
+    "bound_pass": true,
+    "case": "D3_plus40",
+    "case_id": "D3_plus40",
+    "centroid_nm": 63.61110240527638,
+    "energy_eV": 2.937537669387,
+    "left_barrier_edge_eV": 3.3244289271371,
+    "left_boundary_amplitude_nm_minus_half": 0.0,
+    "left_boundary_probability": 9.163909404523894e-40,
+    "left_padding_probability": 0.01796240398076084,
+    "quantum_end_nm": 113.8,
+    "quantum_start_nm": 18.0,
+    "right_barrier_edge_eV": 3.3244289271371,
+    "right_boundary_amplitude_nm_minus_half": 0.0,
+    "right_boundary_probability": 1.32383040019861e-41,
+    "right_padding_probability": 0.0002594872493890384,
+    "rms_width_nm": 1.8817487638544481,
+    "state": 1
+  },
+  {
+    "active_region_probability": 0.9104661427370359,
+    "band": "electron",
+    "barrier_edge_eV": 3.3244289271371,
+    "binding_energy_meV": 279.40309850009993,
+    "bound_checks": {
+      "active_probability": true,
+      "binding": true,
+      "left_boundary_amplitude": true,
+      "left_boundary_probability": true,
+      "right_boundary_amplitude": true,
+      "right_boundary_probability": true
+    },
+    "bound_pass": true,
+    "case": "D3_plus40",
+    "case_id": "D3_plus40",
+    "centroid_nm": 69.73593746438733,
+    "energy_eV": 3.045025828637,
+    "left_barrier_edge_eV": 3.3244289271371,
+    "left_boundary_amplitude_nm_minus_half": 0.0,
+    "left_boundary_probability": 8.55044319932319e-35,
+    "left_padding_probability": 0.0050405912721688964,
+    "quantum_end_nm": 113.8,
+    "quantum_start_nm": 18.0,
+    "right_barrier_edge_eV": 3.3244289271371,
+    "right_boundary_amplitude_nm_minus_half": 0.0,
+    "right_boundary_probability": 1.4332740596736095e-33,
+    "right_padding_probability": 0.08449326599079524,
+    "rms_width_nm": 2.3653216744027947,
+    "state": 2
+  },
+  {
+    "active_region_probability": 0.9974371303656483,
+    "band": "heavy_hole",
+    "barrier_edge_eV": 1.1795333333333,
+    "binding_energy_meV": 268.98991140670006,
+    "bound_checks": {
+      "active_probability": true,
+      "binding": true,
+      "left_boundary_amplitude": true,
+      "left_boundary_probability": true,
+      "right_boundary_amplitude": true,
+      "right_boundary_probability": true
+    },
+    "bound_pass": true,
+    "case": "D3_plus40",
+    "case_id": "D3_plus40",
+    "centroid_nm": 63.551032057956974,
+    "energy_eV": 1.44852324474,
+    "left_barrier_edge_eV": 1.1795333333333,
+    "left_boundary_amplitude_nm_minus_half": 0.0,
+    "left_boundary_probability": 1.1412685676912449e-68,
+    "left_padding_probability": 0.002562433270164232,
+    "quantum_end_nm": 113.8,
+    "quantum_start_nm": 18.0,
+    "right_barrier_edge_eV": 1.1795333333333,
+    "right_boundary_amplitude_nm_minus_half": 0.0,
+    "right_boundary_probability": 6.827274001165788e-74,
+    "right_padding_probability": 4.3636418746216994e-07,
+    "rms_width_nm": 1.4799380940561329,
+    "state": 1
+  },
+  {
+    "active_region_probability": 0.9887779588022447,
+    "band": "heavy_hole",
+    "barrier_edge_eV": 1.1795333333333,
+    "binding_energy_meV": 235.94289734570006,
+    "bound_checks": {
+      "active_probability": true,
+      "binding": true,
+      "left_boundary_amplitude": true,
+      "left_boundary_probability": true,
+      "right_boundary_amplitude": true,
+      "right_boundary_probability": true
+    },
+    "bound_pass": true,
+    "case": "D3_plus40",
+    "case_id": "D3_plus40",
+    "centroid_nm": 63.86853984665531,
+    "energy_eV": 1.415476230679,
+    "left_barrier_edge_eV": 1.1795333333333,
+    "left_boundary_amplitude_nm_minus_half": 0.0,
+    "left_boundary_probability": 5.560719655719102e-64,
+    "left_padding_probability": 0.010248919980944158,
+    "quantum_end_nm": 113.8,
+    "quantum_start_nm": 18.0,
+    "right_barrier_edge_eV": 1.1795333333333,
+    "right_boundary_amplitude_nm_minus_half": 0.0,
+    "right_boundary_probability": 5.27911110563616e-65,
+    "right_padding_probability": 0.0009731212168113106,
+    "rms_width_nm": 2.569773869364786,
+    "state": 2
+  }
+]
+
+==============================================================================
+ANALYSIS: M0_0p10nm
+==============================================================================
+{
+  "broadening_meV": 5.0,
+  "case_id": "M0_0p10nm",
+  "chi2_1550_imag_pm_per_V": 0.3629498990905413,
+  "chi2_1550_pm_per_V": 83.94801419720486,
+  "chi2_1550_real_pm_per_V": 83.94722958516772,
+  "delta_z_e_nm": 6.123358901892615,
+  "delta_z_hh_nm": 0.3102602206537597,
+  "description": "Coarse mesh on the largest numerical domain.",
+  "domain_padding_nm": 60.0,
+  "e1_eV": 2.937567781812,
+  "e2_eV": 3.045110315251,
+  "electron_orthonormality_error": 7.549516567451064e-15,
+  "experiment": "mesh",
+  "heavy_hole_orthonormality_error": 1.3239409568654992e-14,
+  "hh1_eV": 1.448514587664,
+  "hh2_eV": 1.415453590299,
+  "k_points": 384,
+  "kmax_convention": "0.1_times_2pi_over_a",
+  "kmax_per_nm": 1.1114288784645268,
+  "mesh_nm": 0.1,
+  "nz_convention": "two_wells_per_period",
+  "nz_per_metre": 66666666.66666667,
+  "overlap_e1_hh1": 0.9815933350010375,
+  "overlap_e1_hh2": 0.020244671520031537,
+  "overlap_e2_hh1": -0.08553357815306988,
+  "overlap_e2_hh2": 0.4484097775387029,
+  "peak_chi2_pm_per_V": 144.67165233025304,
+  "peak_wavelength_nm": 1520.0,
+  "prefactor": 113.39633764994089,
+  "quantum_padding_nm": 42.0,
+  "r_e_hh_nm": 0.751,
+  "selected_electron_states": [
+    1,
+    2
+  ],
+  "selected_heavy_hole_states": [
+    1,
+    2
+  ],
+  "spin_degeneracy": 2,
+  "state_selection": "first_two_strictly_bound_states",
+  "states_per_band": 2,
+  "strict_first_two_bound_pass": true,
+  "strict_selected_states_bound_pass": true,
+  "transition_e1_hh1_eV": 1.489053194148,
+  "transition_e1_hh2_eV": 1.522114191513,
+  "transition_e2_hh1_eV": 1.5965957275870002,
+  "transition_e2_hh2_eV": 1.6296567249520002,
+  "z_e11_nm": 63.61115093420972,
+  "z_e12_nm": 1.0306304168565514,
+  "z_e21_nm": 1.0306304168565514,
+  "z_e22_nm": 69.73450983610233,
+  "z_hh11_nm": 63.55104692170704,
+  "z_hh12_nm": 1.4511376128692781,
+  "z_hh21_nm": 1.4511376128692781,
+  "z_hh22_nm": 63.8613071423608
+}
+BOUND STATES
+[
+  {
+    "active_region_probability": 0.9817402170439676,
+    "band": "electron",
+    "barrier_edge_eV": 3.3244289271371,
+    "binding_energy_meV": 386.8611453251001,
+    "bound_checks": {
+      "active_probability": true,
+      "binding": true,
+      "left_boundary_amplitude": true,
+      "left_boundary_probability": true,
+      "right_boundary_amplitude": true,
+      "right_boundary_probability": true
+    },
+    "bound_pass": true,
+    "case": "M0_0p10nm",
+    "case_id": "M0_0p10nm",
+    "centroid_nm": 63.611150934209704,
+    "energy_eV": 2.937567781812,
+    "left_barrier_edge_eV": 3.3244289271371,
+    "left_boundary_amplitude_nm_minus_half": 0.0,
+    "left_boundary_probability": 1.1046041837263122e-39,
+    "left_padding_probability": 0.017999672200353006,
+    "quantum_end_nm": 113.8,
+    "quantum_start_nm": 18.0,
+    "right_barrier_edge_eV": 3.3244289271371,
+    "right_boundary_amplitude_nm_minus_half": 0.0,
+    "right_boundary_probability": 1.5962481191750144e-41,
+    "right_padding_probability": 0.0002601107556794217,
+    "rms_width_nm": 1.8815768446826147,
+    "state": 1
+  },
+  {
+    "active_region_probability": 0.9103115939953729,
+    "band": "electron",
+    "barrier_edge_eV": 3.3244289271371,
+    "binding_energy_meV": 279.3186118861,
+    "bound_checks": {
+      "active_probability": true,
+      "binding": true,
+      "left_boundary_amplitude": true,
+      "left_boundary_probability": true,
+      "right_boundary_amplitude": true,
+      "right_boundary_probability": true
+    },
+    "bound_pass": true,
+    "case": "M0_0p10nm",
+    "case_id": "M0_0p10nm",
+    "centroid_nm": 69.73450983610232,
+    "energy_eV": 3.045110315251,
+    "left_barrier_edge_eV": 3.3244289271371,
+    "left_boundary_amplitude_nm_minus_half": 0.0,
+    "left_boundary_probability": 1.0128879545400038e-34,
+    "left_padding_probability": 0.005060685940122608,
+    "quantum_end_nm": 113.8,
+    "quantum_start_nm": 18.0,
+    "right_barrier_edge_eV": 3.3244289271371,
+    "right_boundary_amplitude_nm_minus_half": 0.0,
+    "right_boundary_probability": 1.693809876521981e-33,
+    "right_padding_probability": 0.08462772006450457,
+    "rms_width_nm": 2.367142464378861,
+    "state": 2
+  },
+  {
+    "active_region_probability": 0.9974257147412334,
+    "band": "heavy_hole",
+    "barrier_edge_eV": 1.1795333333333,
+    "binding_energy_meV": 268.9812543307,
+    "bound_checks": {
+      "active_probability": true,
+      "binding": true,
+      "left_boundary_amplitude": true,
+      "left_boundary_probability": true,
+      "right_boundary_amplitude": true,
+      "right_boundary_probability": true
+    },
+    "bound_pass": true,
+    "case": "M0_0p10nm",
+    "case_id": "M0_0p10nm",
+    "centroid_nm": 63.551046921707034,
+    "energy_eV": 1.448514587664,
+    "left_barrier_edge_eV": 1.1795333333333,
+    "left_boundary_amplitude_nm_minus_half": 0.0,
+    "left_boundary_probability": 1.8154413358601915e-68,
+    "left_padding_probability": 0.0025738460342715056,
+    "quantum_end_nm": 113.8,
+    "quantum_start_nm": 18.0,
+    "right_barrier_edge_eV": 1.1795333333333,
+    "right_boundary_amplitude_nm_minus_half": 0.0,
+    "right_boundary_probability": 3.0980340457840854e-72,
+    "right_padding_probability": 4.392244950700874e-07,
+    "rms_width_nm": 1.4793319741071733,
+    "state": 1
+  },
+  {
+    "active_region_probability": 0.9887463414713977,
+    "band": "heavy_hole",
+    "barrier_edge_eV": 1.1795333333333,
+    "binding_energy_meV": 235.92025696569996,
+    "bound_checks": {
+      "active_probability": true,
+      "binding": true,
+      "left_boundary_amplitude": true,
+      "left_boundary_probability": true,
+      "right_boundary_amplitude": true,
+      "right_boundary_probability": true
+    },
+    "bound_pass": true,
+    "case": "M0_0p10nm",
+    "case_id": "M0_0p10nm",
+    "centroid_nm": 63.861307142360786,
+    "energy_eV": 1.415453590299,
+    "left_barrier_edge_eV": 1.1795333333333,
+    "left_boundary_amplitude_nm_minus_half": 0.0,
+    "left_boundary_probability": 8.46401603013414e-64,
+    "left_padding_probability": 0.010299427955376047,
+    "quantum_end_nm": 113.8,
+    "quantum_start_nm": 18.0,
+    "right_barrier_edge_eV": 1.1795333333333,
+    "right_boundary_amplitude_nm_minus_half": 0.0,
+    "right_boundary_probability": 7.841816946751705e-65,
+    "right_padding_probability": 0.0009542305732262655,
+    "rms_width_nm": 2.56134996334854,
+    "state": 2
+  }
+]
+
+==============================================================================
+ANALYSIS: M2_0p025nm
+==============================================================================
+{
+  "broadening_meV": 5.0,
+  "case_id": "M2_0p025nm",
+  "chi2_1550_imag_pm_per_V": 0.31120684457899345,
+  "chi2_1550_pm_per_V": 84.90955241650195,
+  "chi2_1550_real_pm_per_V": 84.90898210360656,
+  "delta_z_e_nm": 6.12521552407253,
+  "delta_z_hh_nm": 0.319391472091894,
+  "description": "Fine mesh on the largest numerical domain.",
+  "domain_padding_nm": 60.0,
+  "e1_eV": 2.937529942754,
+  "e2_eV": 3.045004118842,
+  "electron_orthonormality_error": 2.0011770018868447e-14,
+  "experiment": "mesh",
+  "heavy_hole_orthonormality_error": 1.0766387781302456e-13,
+  "hh1_eV": 1.448525453986,
+  "hh2_eV": 1.415482054683,
+  "k_points": 384,
+  "kmax_convention": "0.1_times_2pi_over_a",
+  "kmax_per_nm": 1.1114288784645268,
+  "mesh_nm": 0.025,
+  "nz_convention": "two_wells_per_period",
+  "nz_per_metre": 66666666.66666667,
+  "overlap_e1_hh1": 0.9816465917796985,
+  "overlap_e1_hh2": 0.020461928073581215,
+  "overlap_e2_hh1": -0.08551048643041244,
+  "overlap_e2_hh2": 0.45081628193777923,
+  "peak_chi2_pm_per_V": 146.08132348821414,
+  "peak_wavelength_nm": 1520.0,
+  "prefactor": 113.39633764994089,
+  "quantum_padding_nm": 42.0,
+  "r_e_hh_nm": 0.751,
+  "selected_electron_states": [
+    1,
+    2
+  ],
+  "selected_heavy_hole_states": [
+    1,
+    2
+  ],
+  "spin_degeneracy": 2,
+  "state_selection": "first_two_strictly_bound_states",
+  "states_per_band": 2,
+  "strict_first_two_bound_pass": true,
+  "strict_selected_states_bound_pass": true,
+  "transition_e1_hh1_eV": 1.4890044887679998,
+  "transition_e1_hh2_eV": 1.5220478880709998,
+  "transition_e2_hh1_eV": 1.5964786648559999,
+  "transition_e2_hh2_eV": 1.6295220641589998,
+  "z_e11_nm": 63.61108467764518,
+  "z_e12_nm": 1.0299145818605986,
+  "z_e21_nm": 1.0299145818605986,
+  "z_e22_nm": 69.73630020171771,
+  "z_hh11_nm": 63.55102288391265,
+  "z_hh12_nm": 1.4510322677788023,
+  "z_hh21_nm": 1.451032267778806,
+  "z_hh22_nm": 63.870414356004545
+}
+BOUND STATES
+[
+  {
+    "active_region_probability": 0.9817877838901864,
+    "band": "electron",
+    "barrier_edge_eV": 3.3244289271371,
+    "binding_energy_meV": 386.89898438310036,
+    "bound_checks": {
+      "active_probability": true,
+      "binding": true,
+      "left_boundary_amplitude": true,
+      "left_boundary_probability": true,
+      "right_boundary_amplitude": true,
+      "right_boundary_probability": true
+    },
+    "bound_pass": true,
+    "case": "M2_0p025nm",
+    "case_id": "M2_0p025nm",
+    "centroid_nm": 63.611084677645174,
+    "energy_eV": 2.937529942754,
+    "left_barrier_edge_eV": 3.3244289271371,
+    "left_boundary_amplitude_nm_minus_half": 0.0,
+    "left_boundary_probability": 5.361788330934798e-40,
+    "left_padding_probability": 0.017952888159113868,
+    "quantum_end_nm": 113.8,
+    "quantum_start_nm": 18.0,
+    "right_barrier_edge_eV": 3.3244289271371,
+    "right_boundary_amplitude_nm_minus_half": 0.0,
+    "right_boundary_probability": 7.745057884951791e-42,
+    "right_padding_probability": 0.0002593279506997103,
+    "rms_width_nm": 1.8817929539758933,
+    "state": 1
+  },
+  {
+    "active_region_probability": 0.9105060717995547,
+    "band": "electron",
+    "barrier_edge_eV": 3.3244289271371,
+    "binding_energy_meV": 279.4248082951003,
+    "bound_checks": {
+      "active_probability": true,
+      "binding": true,
+      "left_boundary_amplitude": true,
+      "left_boundary_probability": true,
+      "right_boundary_amplitude": true,
+      "right_boundary_probability": true
+    },
+    "bound_pass": true,
+    "case": "M2_0p025nm",
+    "case_id": "M2_0p025nm",
+    "centroid_nm": 69.73630020171771,
+    "energy_eV": 3.045004118842,
+    "left_barrier_edge_eV": 3.3244289271371,
+    "left_boundary_amplitude_nm_minus_half": 0.0,
+    "left_boundary_probability": 5.038925726665735e-35,
+    "left_padding_probability": 0.005035460756833466,
+    "quantum_end_nm": 113.8,
+    "quantum_start_nm": 18.0,
+    "right_barrier_edge_eV": 3.3244289271371,
+    "right_boundary_amplitude_nm_minus_half": 0.0,
+    "right_boundary_probability": 8.451658447695127e-34,
+    "right_padding_probability": 0.08445846744361198,
+    "rms_width_nm": 2.3648603794424408,
+    "state": 2
+  },
+  {
+    "active_region_probability": 0.9974400397887698,
+    "band": "heavy_hole",
+    "barrier_edge_eV": 1.1795333333333,
+    "binding_energy_meV": 268.99212065269995,
+    "bound_checks": {
+      "active_probability": true,
+      "binding": true,
+      "left_boundary_amplitude": true,
+      "left_boundary_probability": true,
+      "right_boundary_amplitude": true,
+      "right_boundary_probability": true
+    },
+    "bound_pass": true,
+    "case": "M2_0p025nm",
+    "case_id": "M2_0p025nm",
+    "centroid_nm": 63.551022883912644,
+    "energy_eV": 1.448525453986,
+    "left_barrier_edge_eV": 1.1795333333333,
+    "left_boundary_amplitude_nm_minus_half": 0.0,
+    "left_boundary_probability": 7.718519357330314e-69,
+    "left_padding_probability": 0.0025595245725915836,
+    "quantum_end_nm": 113.8,
+    "quantum_start_nm": 18.0,
+    "right_barrier_edge_eV": 1.1795333333333,
+    "right_boundary_amplitude_nm_minus_half": 0.0,
+    "right_boundary_probability": 3.735665421508456e-70,
+    "right_padding_probability": 4.3563863855133564e-07,
+    "rms_width_nm": 1.4800918506934593,
+    "state": 1
+  },
+  {
+    "active_region_probability": 0.9887860397534203,
+    "band": "heavy_hole",
+    "barrier_edge_eV": 1.1795333333333,
+    "binding_energy_meV": 235.9487213497,
+    "bound_checks": {
+      "active_probability": true,
+      "binding": true,
+      "left_boundary_amplitude": true,
+      "left_boundary_probability": true,
+      "right_boundary_amplitude": true,
+      "right_boundary_probability": true
+    },
+    "bound_pass": true,
+    "case": "M2_0p025nm",
+    "case_id": "M2_0p025nm",
+    "centroid_nm": 63.87041435600455,
+    "energy_eV": 1.415482054683,
+    "left_barrier_edge_eV": 1.1795333333333,
+    "left_boundary_amplitude_nm_minus_half": 0.0,
+    "left_boundary_probability": 2.73173636310753e-64,
+    "left_padding_probability": 0.010235949358654699,
+    "quantum_end_nm": 113.8,
+    "quantum_start_nm": 18.0,
+    "right_barrier_edge_eV": 1.1795333333333,
+    "right_boundary_amplitude_nm_minus_half": 0.0,
+    "right_boundary_probability": 2.56865558041379e-65,
+    "right_padding_probability": 0.0009780108879251627,
+    "rms_width_nm": 2.5719488790799243,
+    "state": 2
+  }
+]
+
+==============================================================================
+FINAL AUDIT SUMMARY
+==============================================================================
+{
+  "best_reproduction": {
+    "broadening_meV": 5.0,
+    "case_id": "M2_0p025nm",
+    "chi2_1550_imag_pm_per_V": 0.31120684457899345,
+    "chi2_1550_pm_per_V": 84.90955241650195,
+    "chi2_1550_real_pm_per_V": 84.90898210360656,
+    "delta_z_e_nm": 6.12521552407253,
+    "delta_z_hh_nm": 0.319391472091894,
+    "description": "Fine mesh on the largest numerical domain.",
+    "domain_padding_nm": 60.0,
+    "e1_eV": 2.937529942754,
+    "e2_eV": 3.045004118842,
+    "electron_orthonormality_error": 2.0011770018868447e-14,
+    "experiment": "mesh",
+    "heavy_hole_orthonormality_error": 1.0766387781302456e-13,
+    "hh1_eV": 1.448525453986,
+    "hh2_eV": 1.415482054683,
+    "k_points": 384,
+    "kmax_convention": "0.1_times_2pi_over_a",
+    "kmax_per_nm": 1.1114288784645268,
+    "mesh_nm": 0.025,
+    "nz_convention": "two_wells_per_period",
+    "nz_per_metre": 66666666.66666667,
+    "overlap_e1_hh1": 0.9816465917796985,
+    "overlap_e1_hh2": 0.020461928073581215,
+    "overlap_e2_hh1": -0.08551048643041244,
+    "overlap_e2_hh2": 0.45081628193777923,
+    "peak_chi2_pm_per_V": 146.08132348821414,
+    "peak_wavelength_nm": 1520.0,
+    "prefactor": 113.39633764994089,
+    "quantum_padding_nm": 42.0,
+    "r_e_hh_nm": 0.751,
+    "selected_electron_states": [
+      1,
+      2
+    ],
+    "selected_heavy_hole_states": [
+      1,
+      2
+    ],
+    "spin_degeneracy": 2,
+    "state_selection": "first_two_strictly_bound_states",
+    "states_per_band": 2,
+    "strict_first_two_bound_pass": true,
+    "strict_selected_states_bound_pass": true,
+    "transition_e1_hh1_eV": 1.4890044887679998,
+    "transition_e1_hh2_eV": 1.5220478880709998,
+    "transition_e2_hh1_eV": 1.5964786648559999,
+    "transition_e2_hh2_eV": 1.6295220641589998,
+    "z_e11_nm": 63.61108467764518,
+    "z_e12_nm": 1.0299145818605986,
+    "z_e21_nm": 1.0299145818605986,
+    "z_e22_nm": 69.73630020171771,
+    "z_hh11_nm": 63.55102288391265,
+    "z_hh12_nm": 1.4510322677788023,
+    "z_hh21_nm": 1.451032267778806,
+    "z_hh22_nm": 63.870414356004545
+  },
+  "bound_state_audit_passed": true,
+  "classification": {
+    "category": "C",
+    "primary_diagnosis": "Numerics and implementation are internally consistent, while the paper's numerical HSE06 r_e_hh, heavy-hole multiplicity, and Schr\u00f6dinger-Poisson charge/boundary setup remain unpublished or unresolved."
+  },
+  "demo_id": "18B_absolute_chi2_reproduction_audit",
+  "diagonal_matrix_physics": {
+    "delta_z_e_nm": 6.12521552407253,
+    "delta_z_hh_domain_relative_change": 0.011654707039750611,
+    "delta_z_hh_nm": 0.319391472091894,
+    "delta_z_hh_reference_nm": 0.3156690580536683,
+    "diagnosis": "domain_truncation_or_boundary_sensitivity",
+    "interpretation": "A material domain effect is indicated if delta_z_hh changes materially across the domain ladder; otherwise the small value is stable for this solved state identity and points to state/model physics rather than extraction.",
+    "term_group_magnitudes_pm_per_V": {
+      "electron_diagonal": 5609.243743198445,
+      "electron_off_diagonal": 15.92636678792286,
+      "heavy_hole_diagonal": 5553.25574526564,
+      "heavy_hole_off_diagonal": 7.841193396737586
+    },
+    "term_group_sums_pm_per_V": {
+      "electron_diagonal": {
+        "imag": -4782.848791198835,
+        "real": 2930.5243235876324
+      },
+      "electron_off_diagonal": {
+        "imag": 10.485449393400602,
+        "real": -11.987681597451912
+      },
+      "heavy_hole_diagonal": {
+        "imag": 4771.308571087686,
+        "real": -2841.348956357003
+      },
+      "heavy_hole_off_diagonal": {
+        "imag": 1.3659775623269752,
+        "real": 7.721296470429068
+      }
+    }
+  },
+  "domain_convergence": {
+    "checks": {
+      "chi2": true,
+      "energies": true,
+      "matrices": true,
+      "overlaps": true,
+      "peak_wavelength": true
+    },
+    "comparison_row": {
+      "broadening_meV": 5.0,
+      "case_id": "D2_plus20",
+      "chi2_1550_imag_pm_per_V": 0.3222603982694878,
+      "chi2_1550_pm_per_V": 84.70684497876215,
+      "chi2_1550_pm_per_V_relative_change": 6.231413301326594e-05,
+      "chi2_1550_real_pm_per_V": 84.70623196962399,
+      "convergence_reference_case": "D3_plus40",
+      "delta_z_e_nm": 6.124808593240267,
+      "delta_z_e_nm_relative_change": 4.321074841548268e-06,
+      "delta_z_hh_nm": 0.31745988721153395,
+      "delta_z_hh_nm_relative_change": 0.00015086712364629378,
+      "description": "Twenty additional nanometres of AlGaAs and Dirichlet padding per side.",
+      "domain_padding_nm": 40.0,
+      "e1_eV": 2.937538071706,
+      "e1_eV_absolute_change": 4.0231899989251474e-07,
+      "e2_eV": 3.045027084599,
+      "e2_eV_absolute_change": 1.2559619997354332e-06,
+      "electron_orthonormality_error": 1.3461454173580023e-14,
+      "experiment": "domain",
+      "heavy_hole_orthonormality_error": 2.498001805406602e-16,
+      "hh1_eV": 1.448523182651,
+      "hh1_eV_absolute_change": 6.208899994142314e-08,
+      "hh2_eV": 1.415476004469,
+      "hh2_eV_absolute_change": 2.262100000649525e-07,
+      "k_points": 384,
+      "kmax_convention": "0.1_times_2pi_over_a",
+      "kmax_per_nm": 1.1114288784645268,
+      "mesh_nm": 0.05,
+      "nz_convention": "two_wells_per_period",
+      "nz_per_metre": 66666666.66666667,
+      "overlap_e1_hh1": 0.9816356827839633,
+      "overlap_e1_hh1_absolute_change": 1.6299334815172983e-07,
+      "overlap_e1_hh2": 0.020417049562162143,
+      "overlap_e1_hh2_absolute_change": 4.3940264668473894e-07,
+      "overlap_e2_hh1": -0.08551504923206861,
+      "overlap_e2_hh1_absolute_change": 1.4653179544743544e-08,
+      "overlap_e2_hh2": 0.45031191346473276,
+      "overlap_e2_hh2_absolute_change": 1.069310627360709e-05,
+      "peak_chi2_pm_per_V": 145.7866584769114,
+      "peak_chi2_pm_per_V_relative_change": 4.492724712528741e-05,
+      "peak_wavelength_nm": 1520.0,
+      "peak_wavelength_nm_absolute_change": 0.0,
+      "prefactor": 113.39633764994089,
+      "quantum_padding_nm": 22.0,
+      "r_e_hh_nm": 0.751,
+      "selected_electron_states": [
+        1,
+        2
+      ],
+      "selected_heavy_hole_states": [
+        1,
+        2
+      ],
+      "spin_degeneracy": 2,
+      "state_selection": "first_two_strictly_bound_states",
+      "states_per_band": 2,
+      "strict_first_two_bound_pass": true,
+      "strict_selected_states_bound_pass": true,
+      "transition_e1_hh1_eV": 1.4890148890549997,
+      "transition_e1_hh1_eV_absolute_change": 4.644079998339379e-07,
+      "transition_e1_hh2_eV": 1.5220620672369998,
+      "transition_e1_hh2_eV_absolute_change": 6.285289999574672e-07,
+      "transition_e2_hh1_eV": 1.5965039019479998,
+      "transition_e2_hh1_eV_absolute_change": 1.3180509996768563e-06,
+      "transition_e2_hh2_eV": 1.62955108013,
+      "transition_e2_hh2_eV_absolute_change": 1.4821719998003857e-06,
+      "z_e11_nm": 43.61111474758496,
+      "z_e11_nm_relative_change": 0.31441032935207347,
+      "z_e12_nm": 1.030061194080922,
+      "z_e12_nm_relative_change": 2.3753304660882296e-06,
+      "z_e21_nm": 1.030061194080922,
+      "z_e21_nm_relative_change": 2.3753304660882296e-06,
+      "z_e22_nm": 49.73592334082523,
+      "z_e22_nm_relative_change": 0.2867963757392046,
+      "z_hh11_nm": 43.551042703411746,
+      "z_hh11_nm_relative_change": 0.31470754615449414,
+      "z_hh12_nm": 1.4510578798733187,
+      "z_hh12_nm_relative_change": 5.215042294855256e-07,
+      "z_hh21_nm": 1.4510578798733187,
+      "z_hh21_nm_relative_change": 5.215042282613437e-07,
+      "z_hh22_nm": 43.86850259062328,
+      "z_hh22_nm_relative_change": 0.31314379981209817
+    },
+    "passed": true
+  },
+  "dominant_terms": {
+    "electron": {
+      "contribution_pm_per_V_imag": -4697.739743524194,
+      "contribution_pm_per_V_magnitude": 5064.976556823785,
+      "contribution_pm_per_V_real": 1893.4700481623086,
+      "first_denominator_k0_eV_imag": 0.005,
+      "first_denominator_k0_eV_real": -0.11079161961909678,
+      "integrated_term_before_prefactor_imag": -41.427614338183545,
+      "integrated_term_before_prefactor_real": 16.697806008581402,
+      "l_partner_state": 1,
+      "m_hh_state": 1,
+      "magnitude_rank": 1,
+      "n_electron_state": 1,
+      "numerator_nm": 61.29755150957613,
+      "overlap_product": 0.963630031152698,
+      "path": "electron",
+      "second_denominator_k0_eV_imag": 0.005,
+      "second_denominator_k0_eV_real": 0.6891064345744515,
+      "sign": 1.0,
+      "z_kind": "diagonal",
+      "z_matrix_element_nm": 63.61108467764518
+    },
+    "heavy_hole": {
+      "contribution_pm_per_V_imag": 4693.304122328383,
+      "contribution_pm_per_V_magnitude": 5060.1941894304655,
+      "contribution_pm_per_V_real": -1891.6822275639372,
+      "first_denominator_k0_eV_imag": 0.005,
+      "first_denominator_k0_eV_real": -0.11079161961909678,
+      "integrated_term_before_prefactor_imag": 41.3884982495361,
+      "integrated_term_before_prefactor_real": -16.682039885658718,
+      "l_partner_state": 1,
+      "m_hh_state": 1,
+      "magnitude_rank": 2,
+      "n_electron_state": 1,
+      "numerator_nm": 61.23967416141057,
+      "overlap_product": 0.963630031152698,
+      "path": "heavy_hole",
+      "second_denominator_k0_eV_imag": 0.005,
+      "second_denominator_k0_eV_real": 0.6891064345744515,
+      "sign": -1.0,
+      "z_kind": "diagonal",
+      "z_matrix_element_nm": 63.55102288391265
+    }
+  },
+  "independent_eq2": {
+    "cancellation_factor": 131.25173150237234,
+    "electron_contribution": {
+      "imag": -4772.363341805434,
+      "real": 2918.53664199018
+    },
+    "grid_checks": [
+      {
+        "grid": "small_artificial_grid",
+        "independent_imag": -1.4487086492397339,
+        "independent_real": 82.45189182034198,
+        "k_points": 8,
+        "production_imag": -1.4487086492393504,
+        "production_real": 82.45189182034127,
+        "relative_difference": 9.791062842796232e-15
+      },
+      {
+        "grid": "full_grid",
+        "independent_imag": 0.3112068445786065,
+        "independent_real": 84.90898210360626,
+        "k_points": 384,
+        "production_imag": 0.31120684457899345,
+        "production_real": 84.90898210360656,
+        "relative_difference": 5.7552465603380415e-15
+      }
+    ],
+    "heavy_hole_contribution": {
+      "imag": 4772.674548650013,
+      "real": -2833.627659886574
+    },
+    "independent_chi2": {
+      "imag": 0.3112068445786065,
+      "real": 84.90898210360626
+    },
+    "prefactor_independent": 113.39633764994089,
+    "prefactor_production": 113.39633764994089,
+    "production_chi2": {
+      "imag": 0.31120684457899345,
+      "real": 84.90898210360656
+    },
+    "relative_difference": 5.7552465603380415e-15,
+    "single_k0_control_state_sum_nm_per_eV2": {
+      "imag": -8.460504414400162,
+      "real": 50.804066812604106
+    },
+    "single_k0_relative_difference": 2.275286258540666e-15,
+    "single_k0_state_sum_nm_per_eV2": {
+      "imag": -8.46050441440019,
+      "real": 50.80406681260422
+    }
+  },
+  "independent_eq2_passed": true,
+  "k_convergence": {
+    "comparison": "0.15 to 0.20 times 2pi/a",
+    "passed": false,
+    "relative_change": 0.033760238037313726,
+    "tolerance": 0.02
+  },
+  "mesh_convergence": {
+    "checks": {
+      "chi2": true,
+      "energies": true,
+      "matrices": true,
+      "overlaps": true,
+      "peak_wavelength": true
+    },
+    "comparison_row": {
+      "broadening_meV": 5.0,
+      "case_id": "D3_plus40",
+      "chi2_1550_imag_pm_per_V": 0.32189058039800256,
+      "chi2_1550_pm_per_V": 84.7121237413088,
+      "chi2_1550_pm_per_V_relative_change": 0.0023251644788411558,
+      "chi2_1550_real_pm_per_V": 84.71151217642773,
+      "convergence_reference_case": "M2_0p025nm",
+      "delta_z_e_nm": 6.12483505911095,
+      "delta_z_e_nm_relative_change": 6.211454275933956e-05,
+      "delta_z_hh_nm": 0.31750778869835017,
+      "delta_z_hh_nm_relative_change": 0.005897726013804989,
+      "description": "Forty additional nanometres of AlGaAs and Dirichlet padding per side.",
+      "domain_padding_nm": 60.0,
+      "e1_eV": 2.937537669387,
+      "e1_eV_absolute_change": 7.726633000082472e-06,
+      "e2_eV": 3.045025828637,
+      "e2_eV_absolute_change": 2.1709795000379728e-05,
+      "electron_orthonormality_error": 1.3655743202889425e-14,
+      "experiment": "domain",
+      "heavy_hole_orthonormality_error": 1.6375789613221059e-15,
+      "hh1_eV": 1.44852324474,
+      "hh1_eV_absolute_change": 2.209245999917897e-06,
+      "hh2_eV": 1.415476230679,
+      "hh2_eV_absolute_change": 5.824003999954641e-06,
+      "k_points": 384,
+      "kmax_convention": "0.1_times_2pi_over_a",
+      "kmax_per_nm": 1.1114288784645268,
+      "mesh_nm": 0.05,
+      "nz_convention": "two_wells_per_period",
+      "nz_per_metre": 66666666.66666667,
+      "overlap_e1_hh1": 0.9816358457773114,
+      "overlap_e1_hh1_absolute_change": 1.0746002387040932e-05,
+      "overlap_e1_hh2": 0.020417488964808828,
+      "overlap_e1_hh2_absolute_change": 4.4439108772387215e-05,
+      "overlap_e2_hh1": -0.08551506388524815,
+      "overlap_e2_hh1_absolute_change": 4.577454835716366e-06,
+      "overlap_e2_hh2": 0.45032260657100637,
+      "overlap_e2_hh2_absolute_change": 0.0004936753667728611,
+      "peak_chi2_pm_per_V": 145.79320856442178,
+      "peak_chi2_pm_per_V_relative_change": 0.0019722913026291745,
+      "peak_wavelength_nm": 1520.0,
+      "peak_wavelength_nm_absolute_change": 0.0,
+      "prefactor": 113.39633764994089,
+      "quantum_padding_nm": 42.0,
+      "r_e_hh_nm": 0.751,
+      "selected_electron_states": [
+        1,
+        2
+      ],
+      "selected_heavy_hole_states": [
+        1,
+        2
+      ],
+      "spin_degeneracy": 2,
+      "state_selection": "first_two_strictly_bound_states",
+      "states_per_band": 2,
+      "strict_first_two_bound_pass": true,
+      "strict_selected_states_bound_pass": true,
+      "transition_e1_hh1_eV": 1.4890144246469998,
+      "transition_e1_hh1_eV_absolute_change": 9.93587900000037e-06,
+      "transition_e1_hh2_eV": 1.5220614387079998,
+      "transition_e1_hh2_eV_absolute_change": 1.3550637000037113e-05,
+      "transition_e2_hh1_eV": 1.5965025838970002,
+      "transition_e2_hh1_eV_absolute_change": 2.3919041000297625e-05,
+      "transition_e2_hh2_eV": 1.6295495979580001,
+      "transition_e2_hh2_eV_absolute_change": 2.753379900033437e-05,
+      "z_e11_nm": 63.611102405276384,
+      "z_e11_nm_relative_change": 2.786877679077167e-07,
+      "z_e12_nm": 1.0300587473509975,
+      "z_e12_nm_relative_change": 0.00013997810394957125,
+      "z_e21_nm": 1.0300587473509975,
+      "z_e21_nm_relative_change": 0.00013997810394957125,
+      "z_e22_nm": 69.73593746438733,
+      "z_e22_nm_relative_change": 5.2015568552952445e-06,
+      "z_hh11_nm": 63.55103205795698,
+      "z_hh11_nm_relative_change": 1.44357146639461e-07,
+      "z_hh12_nm": 1.4510571231408917,
+      "z_hh12_nm_relative_change": 1.7129434431842213e-05,
+      "z_hh21_nm": 1.4510571231408935,
+      "z_hh21_nm_relative_change": 1.712943443061797e-05,
+      "z_hh22_nm": 63.86853984665533,
+      "z_hh22_nm_relative_change": 2.9348632979990486e-05
+    },
+    "passed": true
+  },
+  "native_matrix_validation": {
+    "diagonal_dipoles_comparable": false,
+    "dipole_definition": "nextnano |<i|eps.d|j>| in e*nm; e factored out gives nm",
+    "max_absolute_dipole_difference_nm": 1.9998094465734084e-05,
+    "max_absolute_overlap_difference": 4.082203015620678e-07,
+    "overlap_definition": "nextnano |<Gamma_i|HH_j>|, dimensionless",
+    "passed": true,
+    "paths": {
+      "electron_z": "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\solver\\M2_0p025nm\\case\\bias_00000\\Quantum\\acqw\\Gamma_Gamma\\dipole_moment_matrix_elements_k00000_growth_z.txt",
+      "heavy_hole_z": "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\solver\\M2_0p025nm\\case\\bias_00000\\Quantum\\acqw\\HH_HH\\dipole_moment_matrix_elements_k00000_growth_z.txt",
+      "overlap": "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\solver\\M2_0p025nm\\case\\bias_00000\\Quantum\\acqw\\Gamma_HH\\overlap_integrals_k00000.txt"
+    }
+  },
+  "origin_invariance": [
+    {
+      "absolute_residual_pm_per_V": 4.256608942595151e-12,
+      "passed": true,
+      "relative_residual": 5.0131096224785784e-14,
+      "shift_nm": 10.0,
+      "tolerance": 1e-11
+    },
+    {
+      "absolute_residual_pm_per_V": 2.3392192398891877e-11,
+      "passed": true,
+      "relative_residual": 2.754954152172126e-13,
+      "shift_nm": 50.0,
+      "tolerance": 1e-11
+    }
+  ],
+  "paper_target_pm_per_V": 2340.0,
+  "plots": [
+    "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\plots\\01_electron_wavefunctions.png",
+    "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\plots\\02_hh_wavefunctions.png",
+    "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\plots\\03_electron_probabilities.png",
+    "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\plots\\04_hh_probabilities.png",
+    "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\plots\\05_state_localization.png",
+    "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\plots\\06_domain_energies.png",
+    "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\plots\\07_domain_matrices.png",
+    "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\plots\\08_domain_chi2.png",
+    "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\plots\\09_mesh_chi2.png",
+    "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\plots\\10_k_saturation.png",
+    "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\plots\\11_eq2_terms.png",
+    "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\plots\\12_electron_vs_hh.png",
+    "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\plots\\13_final_spectrum.png",
+    "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\plots\\14_demo18_demo18b_paper.png"
+  ],
+  "poisson_audit": {
+    "current_deck_setting": "no_density = yes",
+    "current_equation": "one-band Schrodinger eigenproblem without carrier-density feedback",
+    "licensed_comparison_run": false,
+    "missing_from_paper": [
+      "doping profile",
+      "carrier density or quasi-Fermi level",
+      "electrostatic boundary conditions",
+      "fixed/interface charge"
+    ],
+    "paper_statement": "envelopes determined using Schrodinger-Poisson methods with Nextnano",
+    "reason": "A nontrivial Poisson solution cannot be reproduced uniquely without charge and boundary data. An undoped zero-charge Poisson solve would be physically equivalent to the present flat electrostatic solution and would not test the paper's unknown setup.",
+    "status": "scientifically_underdetermined_not_fabricated"
+  },
+  "r_e_hh_audit": {
+    "classification": "fitted_hypothetical_not_a_paper_value",
+    "comparison_chi2_pm_per_V": 84.90955241650195,
+    "hypothetical_fitted_r_e_hh_nm": 3.94248082663975,
+    "paper_2026_method": "VASP with HSE06 hybrid orbitals",
+    "paper_2026_published_numeric_r_e_hh": null,
+    "paper_target_pm_per_V": 2340.0,
+    "plausibility": "not remotely plausible as a GaAs unit-cell position matrix element",
+    "repository_assumed_r_e_hh_nm": 0.751,
+    "repository_provenance": "Ramesh et al., Applied Physics Letters 123, 251111 (2023), VASP/HSE06; repository physics14.py records 0.751 nm",
+    "required_chi2_factor": 27.55873671930023,
+    "required_r_factor": 5.249641580079561
+  },
+  "reference_reproduction": {
+    "demo18_expected_pm_per_V": 84.13778453632841,
+    "demo18b_reference_pm_per_V": 84.13778453632843,
+    "ratio": 1.0000000000000002
+  },
+  "remaining_ratio": 27.55873671930023,
+  "state_count_convergence": [
+    {
+      "available": true,
+      "broadening_meV": 5.0,
+      "chi2_1550_imag_pm_per_V": 0.31120684457899345,
+      "chi2_1550_pm_per_V": 84.90955241650195,
+      "chi2_1550_real_pm_per_V": 84.90898210360656,
+      "k_points": 384,
+      "kmax_convention": "0.1_times_2pi_over_a",
+      "kmax_per_nm": 1.1114288784645268,
+      "nz_convention": "two_wells_per_period",
+      "nz_per_metre": 66666666.66666667,
+      "peak_chi2_pm_per_V": 146.08132348821414,
+      "peak_wavelength_nm": 1520.0,
+      "prefactor": 113.39633764994089,
+      "r_e_hh_nm": 0.751,
+      "ratio_to_two_state": 1.0,
+      "role": "paper_primary",
+      "selected_bound_states": {
+        "electron": [
+          1,
+          2
+        ],
+        "heavy_hole": [
+          1,
+          2
+        ]
+      },
+      "spin_degeneracy": 2,
+      "states_per_band": 2
+    },
+    {
+      "available": true,
+      "broadening_meV": 5.0,
+      "chi2_1550_imag_pm_per_V": 0.9990289378530496,
+      "chi2_1550_pm_per_V": 2.1496437273446736,
+      "chi2_1550_real_pm_per_V": -1.9033941619760497,
+      "k_points": 384,
+      "kmax_convention": "0.1_times_2pi_over_a",
+      "kmax_per_nm": 1.1114288784645268,
+      "nz_convention": "two_wells_per_period",
+      "nz_per_metre": 66666666.66666667,
+      "peak_chi2_pm_per_V": 7.118931827076912,
+      "peak_wavelength_nm": 1461.0,
+      "prefactor": 113.39633764994089,
+      "r_e_hh_nm": 0.751,
+      "ratio_to_two_state": 0.02531686560777225,
+      "role": "diagnostic_extension_only",
+      "selected_bound_states": {
+        "electron": [
+          1,
+          2,
+          3
+        ],
+        "heavy_hole": [
+          1,
+          2,
+          3
+        ]
+      },
+      "spin_degeneracy": 2,
+      "states_per_band": 3
+    },
+    {
+      "available": false,
+      "reason": "strict selection needs 4 bound states per band; found {'electron': [0, 1, 2], 'heavy_hole': [0, 1, 2, 3]}",
+      "role": "diagnostic_extension_only",
+      "states_per_band": 4
+    }
+  ]
+}
+
+==============================================================================
+FINAL STATUS
+==============================================================================
+COMPLETED
+{
+  "classification": {
+    "category": "C",
+    "primary_diagnosis": "Numerics and implementation are internally consistent, while the paper's numerical HSE06 r_e_hh, heavy-hole multiplicity, and Schr\u00f6dinger-Poisson charge/boundary setup remain unpublished or unresolved."
+  },
+  "master_summary": "C:\\nn_results\\18B_absolute_chi2_reproduction_audit\\demo18b_20260813T214542Z_280685a3_012c1f\\summaries\\demo18b_master_summary.csv"
+}
+
+==============================================================================
+FINAL STATUS
+==============================================================================
+FAILED
+Traceback (most recent call last):
+  File "C:\Code\optics\nextnano\nonlinear_photonics\nextnano\demos\18B_absolute_chi2_reproduction_audit\run_demo18b.py", line 578, in run_physics
+    _terminal_summary(summary, root)
+  File "C:\Code\optics\nextnano\nonlinear_photonics\nextnano\demos\18B_absolute_chi2_reproduction_audit\run_demo18b.py", line 548, in _terminal_summary
+    print(f"\nTERM TABLE:\n{terms_path}")
+                            ^^^^^^^^^^
+NameError: name 'terms_path' is not defined
+

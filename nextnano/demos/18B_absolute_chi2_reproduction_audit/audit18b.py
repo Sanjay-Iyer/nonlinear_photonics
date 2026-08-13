@@ -882,8 +882,36 @@ def k_saturation_audit(
             "role": "paper_limit" if abs(float(fraction) - 0.10) < 1e-12 else "diagnostic_only",
         })
     final = rows[-1]["chi2_1550_pm_per_V"]
-    for row in rows:
+    for index, row in enumerate(rows):
         row["relative_to_largest_cutoff"] = row["chi2_1550_pm_per_V"] / max(final, 1e-30)
+        row["incremental_relative_change"] = (
+            None if index == 0 else
+            abs(row["chi2_1550_pm_per_V"] - rows[index - 1]["chi2_1550_pm_per_V"])
+            / max(abs(row["chi2_1550_pm_per_V"]), 1e-30)
+        )
+
+    # Independently refine the radial grid at the largest diagnostic cutoff.
+    final_fraction = float(rows[-1]["fraction_of_2pi_over_a"])
+    base = primary_settings(cfg)
+    refined_settings = production_chi2.Chi2Settings(
+        mode="absolute", broadening_meV=base.broadening_meV,
+        k_parallel_fraction_of_bz=2.0 * final_fraction,
+        k_parallel_points=2 * int(cfg["diagnostics"]["k_points"]),
+        lattice_constant_nm=base.lattice_constant_nm,
+        electron_mass_m0=base.electron_mass_m0,
+        heavy_hole_inplane_mass_m0=base.heavy_hole_inplane_mass_m0,
+        spin_degeneracy=base.spin_degeneracy,
+        max_states_per_band=2, r_e_hh_nm=base.r_e_hh_nm,
+        n_wells_per_metre=base.n_wells_per_metre,
+    )
+    refined = complex(production_chi2.chi2_spectrum(
+        electron, heavy_hole, [hw], refined_settings
+    ).chi2[0])
+    rows[-1]["grid_refinement_points"] = int(refined_settings.k_parallel_points)
+    rows[-1]["grid_refinement_chi2_1550_pm_per_V"] = abs(refined)
+    rows[-1]["grid_refinement_relative_change"] = abs(abs(refined) - final) / max(
+        abs(refined), 1e-30
+    )
     return rows
 
 
@@ -1044,12 +1072,15 @@ def convergence_verdict(
 
 def classify(
     *, bound_pass: bool, domain_converged: bool, mesh_converged: bool,
-    native_pass: bool, independent_pass: bool, best_chi2: float,
+    k_converged: bool, native_pass: bool, independent_pass: bool, best_chi2: float,
     paper_target: float,
 ) -> dict[str, str]:
-    if not bound_pass or not domain_converged or not mesh_converged:
+    if not bound_pass or not domain_converged or not mesh_converged or not k_converged:
         category = "A"
-        diagnosis = "Numerical-domain/state-selection problem remains."
+        diagnosis = (
+            "A numerical convergence or state-selection problem remains; inspect the "
+            "bound-state, domain, mesh, and k-space verdicts."
+        )
     elif not native_pass or not independent_pass:
         category = "B"
         diagnosis = "Matrix extraction or Eq. 2 implementation failed independent validation."

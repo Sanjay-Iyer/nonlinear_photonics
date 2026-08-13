@@ -93,6 +93,11 @@ python .\nextnano\demos\18B_absolute_chi2_reproduction_audit\run_demo18b.py `
   --analyze-existing C:\nn_results\18B_absolute_chi2_reproduction_audit\demo18b_...
 ```
 
+This reanalysis path also rewrites `RUN_STATUS.json` as completed after a prior
+reporting-only failure. It extends the solver-free k-tail diagnostic through
+`0.30(2pi/a)` and doubles the radial grid at that final cutoff; it does not
+launch any licensed solve.
+
 Inspect the master table with:
 
 ```powershell

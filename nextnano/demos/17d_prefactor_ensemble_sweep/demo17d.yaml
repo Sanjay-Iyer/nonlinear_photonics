@@ -1,0 +1,394 @@
+# Demo 17d -- prefactor estimation ensemble sweep.
+#
+# Demo 17 closed the envelope side: wavefunctions, energies and the 1520 nm
+# resonance shape are converged, and two independently written Eq. 2 evaluators
+# agree to 0.8 %. What is left is ONE global scalar -- case_02 sits 27.63x below
+# the published 2340 pm/V.
+#
+# Demo 17b decomposed that scalar into candidate factors and marked which ones a
+# cited source actually REQUIRES. Demo 17c removed the offset with a single
+# fitted K. Demo 17d asks the remaining question: if the candidate factors are
+# instead COMPOUNDED, which combination lands closest to the published numbers,
+# and does any of them land close on more than one at a time?
+#
+# NOTHING IS FITTED HERE. Every multiplier below is declared, not derived, and
+# the residual against each published number is measured and reported as-is.
+# A combination is never "chosen" because it hits a target -- the whole point is
+# that several of them do, for different targets, which is itself the result.
+#
+# NO SOLVER RUNS. Demo 17d reads Demo 17's saved artifacts.
+
+experiment:
+  name: demo17d_prefactor_ensemble_sweep
+  demo_id: 17d_prefactor_ensemble_sweep
+  description: >-
+    Ten declared estimation combinations, each a product of four candidate
+    prefactor multipliers, evaluated across the 1400-1800 nm window for the
+    abrupt and graded structures and scored against every published absolute
+    value.
+
+# --- what is being swept ----------------------------------------------------
+source:
+  demo_id: 17_paper_chi2_reproduction_corrected
+  # null -> auto-resolve demo_results/demo_17 or demo_results/demo17.
+  results_dir: null
+  target_wavelength_nm: 1550.0
+  scan_window_nm: [1400.0, 1800.0]
+  scan_step_nm: 1.0
+  cases:
+    - case_id: case_02
+      role: primary
+      label: abrupt
+      description: >-
+        Ideal abrupt interfaces. THE PAPER TARGET CASE: the published absolute
+        values are quoted for this structure.
+    - case_id: case_01
+      role: secondary
+      label: graded
+      description: >-
+        Case 02's layer geometry with 0.70 nm linear grades; the graded twin,
+        carried so a multiplier that looked structure-specific would show up.
+
+# --- how the 1400-1800 nm curve is obtained ---------------------------------
+# The two numbers this demo REPORTS per case -- chi2 at 1550 nm and the spectral
+# peak -- are read straight out of Demo 17's stored scalars and multiplied. They
+# never come from the reconstruction below. The reconstruction supplies only the
+# SHAPE between those points, so the ten curves can be drawn.
+spectrum:
+  # Tier 1: a real chi2_focused.csv, if the hand-off or a raw run tree has one.
+  # Tier 2: Eq. 2 re-evaluated from the matrix elements Demo 17 recorded per
+  #         case, using Demo 17b's independent angular-frequency kernel.
+  # Tier 3: no curve at all -- the plot falls back to markers and says so.
+  prefer_csv: true
+
+  # Demo 17 recorded <e1|hh1> and <e2|hh2> but not the two cross overlaps
+  # <e1|hh2> and <e2|hh1>, so tier 2 has to say what it does about them.
+  #
+  #   zero                   -- set both to 0. Nothing is fitted at all; the
+  #                             rebuild then lands within 3 % of Demo 17's own
+  #                             stored anchors, which is reported.
+  #   fit_to_stored_anchors  -- recover the two missing matrix elements by
+  #                             matching Demo 17's OWN stored outputs (not any
+  #                             published number). Two unknowns, three anchors,
+  #                             so it is over-determined and the residual is a
+  #                             real check rather than a guarantee.
+  #
+  # This choice moves the drawn curve by ~1 % and moves NO reported number.
+  cross_overlap_model: fit_to_stored_anchors
+  cross_overlap_search_limit: 0.30
+  cross_overlap_grid: 25
+  cross_overlap_refinements: 3
+  # Rebuild fidelity against Demo 17's stored anchors. Exceeding these does not
+  # abort the demo -- it stamps the curve "low fidelity" in every artifact.
+  fidelity_warn_percent: 5.0
+  # Eq. 2's diagonal position matrix elements are ~38 nm because Demo 17's z
+  # origin sits at the domain edge, and the conduction and valence terms are
+  # supposed to cancel that exactly. Shifting the origin and re-evaluating is a
+  # free correctness check on the assembled matrices.
+  origin_independence_shift_nm: 100.0
+  origin_independence_tolerance: 1.0e-9
+
+# --- the four candidate factors ---------------------------------------------
+# `status` carries Demo 17b's verdict forward. It is descriptive: a combination
+# is evaluated whatever its factors are marked, and the marks appear next to the
+# result so a headline can never quietly rest on a speculative factor.
+#
+#   established  -- a cited source requires it
+#   reported     -- Demo 17b computed it and declined to promote it
+#   speculative  -- no source in this repository establishes it
+#   contradicted -- a measurement in this repository points the other way
+factors:
+  n_z:
+    label: active-layer density
+    baseline_note: >-
+      1.0x is Demo 17 production: 2 wells per 30 nm period, the grown stack.
+    variants:
+      1.0:
+        status: established
+        rationale: >-
+          Demo 17 production N_z = 2 wells / 30 nm period. Ramesh 2023 Eq. 1
+          counts wells per unit length and Fig. 1a shows two GaAs wells per
+          period, so this is the baseline by definition.
+      3.0:
+        status: reported
+        rationale: >-
+          Demo 17b sweep A, variant active_layer_two_wells: 2 wells per 10 nm of
+          GaAs instead of per 30 nm period. chi(2) is exactly linear in N_z so
+          the 3.0 is exact, but it describes a medium with no barriers, and the
+          10/30 fill factor has to be reapplied before comparing to a grown
+          stack -- which returns the baseline. Demo 17b declined to promote it.
+
+  permutation:
+    label: SHG permutation / degeneracy counting
+    baseline_note: >-
+      1.0x is Eq. 2 exactly as published, with no permutation sum.
+    mutually_exclusive_above_one: true
+    exclusion_note: >-
+      2.0 and 3.0 are two readings of the SAME piece of bookkeeping, so a
+      combination must not carry both. Demo 17b flagged this explicitly: the
+      Bloembergen/Boyd degenerate-SHG factor is what a permutation sum over the
+      two input photons produces, and Demo 16F measured Eq.1/Eq.2 = 3.000000
+      with no permutation sum applied. No combination below multiplies them.
+    variants:
+      1.0:
+        status: established
+        rationale: Eq. 2 as printed. The baseline.
+      2.0:
+        status: reported
+        rationale: >-
+          Demo 17b sweep B, variant shg_degeneracy_2. Standard degenerate-SHG
+          factor: E(w)E(w) carries half the permutation multiplicity of
+          E(w1)E(w2). Whether Eq. 2 already carries it cannot be decided from
+          the published text.
+      3.0:
+        status: reported
+        rationale: >-
+          Demo 17b sweep B, variant eq1_over_eq2_3. Demo 16F fed identical
+          matrix elements to Eq. 1 and Eq. 2 and measured the ratio at exactly
+          3.000000. An open discrepancy in the published pair of equations,
+          running in the direction of the production number being too small.
+
+  tensor:
+    label: tensor-component inversion
+    baseline_note: >-
+      1.0x reports chi(2)_xzx as Eq. 2 defines it, which is what Demo 17 computes.
+    variants:
+      1.0:
+        status: established
+        rationale: Eq. 2's own tensor component, unmodified. The baseline.
+      2.8:
+        status: speculative
+        rationale: >-
+          NO SOURCE IN THIS REPOSITORY ESTABLISHES THIS FACTOR. It is carried
+          because it was asked for and because its size is worth seeing, not
+          because anything supports it. Two things to note. First, no audit here
+          has measured a tensor-inversion ratio at all -- Demos 16F, 17b and 18
+          swept N_z, permutation, spin and the unit-cell dipole, and none of them
+          produced a 2.8. Second, 3.0 * 3.0 * 2.8 * 1.1 = 27.72, which is the
+          measured residual 27.63 to within 0.3 %, so this value looks
+          reverse-engineered from the gap rather than derived from a tensor
+          relation. A factor chosen to close a gap cannot then be evidence that
+          the gap is closed.
+
+  dipole:
+    label: DFT unit-cell dipole tweak
+    baseline_note: >-
+      1.0x is r_e,hh = 0.751 nm, the published VASP/HSE06 value Demo 17 used.
+    variants:
+      1.0:
+        status: established
+        rationale: >-
+          r_e,hh = 0.751 nm as published. chi(2) goes as r^2, so this is the
+          baseline.
+      1.1:
+        status: contradicted
+        rationale: >-
+          POINTS THE WRONG WAY. Demo 17b sweep D evaluated the Kane relation
+          r = (hbar/E_g) sqrt(E_p / 2 m_0) for GaAs and got 0.736 nm against the
+          published 0.751 nm -- a multiplier of 0.96, slightly BELOW one, and a
+          2 % confirmation that the published constant is right. Raising the
+          dipole by 10 % (chi(2) by 1.1x) is not supported by that measurement;
+          it is carried so its contribution to Combo 10 stays visible.
+
+# --- the ten estimation combinations ----------------------------------------
+# `total` is declared and CHECKED against the product of the four factors at
+# load time; a mismatch is an error, not a rounding note.
+combinations:
+  - id: "01"
+    name: Raw Baseline
+    n_z: 1.0
+    permutation: 1.0
+    tensor: 1.0
+    dipole: 1.0
+    total: 1.00
+    description: >-
+      Demo 17 exactly as it stands. Every other row is measured against this one.
+
+  - id: "02"
+    name: Conservative Active Density
+    n_z: 3.0
+    permutation: 1.0
+    tensor: 1.0
+    dipole: 1.0
+    total: 3.00
+    description: The N_z active-layer reading on its own.
+
+  - id: "03"
+    name: Standard SHG Permutation
+    n_z: 1.0
+    permutation: 2.0
+    tensor: 1.0
+    dipole: 1.0
+    total: 2.00
+    description: The degenerate-SHG factor on its own.
+
+  - id: "04"
+    name: Density + Standard Permutation
+    n_z: 3.0
+    permutation: 2.0
+    tensor: 1.0
+    dipole: 1.0
+    total: 6.00
+    description: >-
+      The two factors Demo 17b computed but declined to promote, compounded.
+
+  - id: "05"
+    name: Density + Boyd Full Permutation
+    n_z: 3.0
+    permutation: 3.0
+    tensor: 1.0
+    dipole: 1.0
+    total: 9.00
+    description: >-
+      As Combo 04 with the Eq.1/Eq.2 reading of the permutation factor instead
+      of the degeneracy reading. These two are alternatives, never both.
+
+  - id: "06"
+    name: Tensor Inversion Only
+    n_z: 1.0
+    permutation: 1.0
+    tensor: 2.8
+    dipole: 1.0
+    total: 2.80
+    description: The speculative tensor factor in isolation, so its size is visible.
+
+  - id: "07"
+    name: Density + Tensor Inversion
+    n_z: 3.0
+    permutation: 1.0
+    tensor: 2.8
+    dipole: 1.0
+    total: 8.40
+    description: Active-layer density with the speculative tensor factor.
+
+  - id: "08"
+    name: Full Permutation + Tensor Inversion
+    n_z: 1.0
+    permutation: 3.0
+    tensor: 2.8
+    dipole: 1.0
+    total: 8.40
+    description: >-
+      Same total as Combo 07 by a different route. The pair is a control: the
+      spectra are identical, which is a reminder that this sweep resolves the
+      PRODUCT and can never attribute it.
+
+  - id: "09"
+    name: Combined Standard
+    n_z: 3.0
+    permutation: 2.0
+    tensor: 2.8
+    dipole: 1.0
+    total: 16.80
+    description: >-
+      Everything except the contradicted dipole tweak, with the degeneracy
+      reading of the permutation factor.
+
+  - id: "10"
+    name: Full Reconciliation Budget
+    n_z: 3.0
+    permutation: 3.0
+    tensor: 2.8
+    dipole: 1.1
+    total: 27.72
+    is_reconciliation_budget: true
+    description: >-
+      Every candidate at its largest, product 27.72 against a measured residual
+      of 27.63. CONSTRUCTED TO CLOSE THE GAP: reproducing 2340 pm/V at 1550 nm
+      is therefore arithmetic, exactly as Demo 17c's fitted K is arithmetic, and
+      is not evidence. What it does show honestly is where the OTHER published
+      numbers land once the 1550 nm one is forced.
+
+# --- the published numbers being scored against ------------------------------
+# Errors are reported against every target for every combination. No target is
+# privileged in the arithmetic; `headline` only picks which residual goes in the
+# single Target_Error_Percent column the CSV schema asks for.
+targets:
+  headline: abrupt_peak
+  entries:
+    - key: abrupt_peak
+      label: abrupt, spectral peak
+      case_id: case_02
+      quantity: peak
+      value_pm_per_V: 2340.0
+      source: "arXiv:2602.23246v1 Section 3.1, ideal abrupt interfaces"
+      note: >-
+        READ AS A PEAK VALUE HERE. Demo 17c reads the same published 2340 pm/V
+        as a value AT 1550 nm and anchors on it there; demo17c.yaml records that
+        reading. The two readings cannot both hold, because our spectrum's
+        peak/1550 contrast is 1.72 and the 2340/1150 pair implies 2.03. Which is
+        right changes which combination wins, so `--targets-profile demo17c`
+        switches to the other reading and prints the whole table again.
+
+    - key: abrupt_at_1550
+      label: abrupt, at 1550 nm
+      case_id: case_02
+      quantity: at_target_wavelength
+      value_pm_per_V: 1150.0
+      source: "arXiv:2602.23246v1 Section 3.1, abrupt value at the 1550 nm design point"
+      note: >-
+        Paired with abrupt_peak above. Together they fix the paper's implied
+        peak/1550 contrast at 2.03 against our 1.72 -- a 15 % SHAPE difference
+        that no scalar multiplier can remove, which is the main finding here.
+
+    - key: graded_peak
+      label: graded, spectral peak
+      case_id: case_01
+      quantity: peak
+      value_pm_per_V: 1200.0
+      source: "arXiv:2602.23246v1 Section 3.1, EDS Al profile"
+      note: >-
+        The paper quotes 1200 pm/V (EDS Al profile) and 1363 pm/V (EDS Ga
+        profile) for graded interfaces. Only the 1200 is scored, as requested;
+        demo17c.yaml carries the pair as a band.
+
+# Alternative reading of the same published values, selectable with
+# `--targets-profile demo17c`. Same numbers, different quantity assignment.
+targets_demo17c:
+  headline: abrupt_at_1550
+  entries:
+    - key: abrupt_at_1550
+      label: abrupt, at 1550 nm
+      case_id: case_02
+      quantity: at_target_wavelength
+      value_pm_per_V: 2340.0
+      source: "arXiv:2602.23246v1 Section 3.1, stated in words at 1550 nm"
+      note: Demo 17c's reading, and the anchor its fitted K = 27.63 was built on.
+
+    - key: abrupt_peak
+      label: abrupt, spectral peak
+      case_id: case_02
+      quantity: peak
+      value_pm_per_V: 4000.0
+      source: "Fig. 2d, digitised, +-15 %"
+      note: >-
+        Demo 17c carries this as an unfitted prediction with a 15 % tolerance
+        because it was read off a figure.
+
+    - key: graded_at_1550
+      label: graded, at 1550 nm
+      case_id: case_01
+      quantity: at_target_wavelength
+      value_pm_per_V: 1200.0
+      source: "Section 3.1, EDS Al profile"
+      note: The lower of the paper's two EDS-profile values.
+
+# --- scoring ----------------------------------------------------------------
+scoring:
+  # How the "closest to the paper" row is chosen. Per-target winners are always
+  # printed as well, because they disagree -- and that disagreement is the
+  # finding, not a tie to be broken.
+  aggregate: rms_percent
+  # A combination is only allowed to be called a match if it lands inside this
+  # on the aggregate. Nothing is suppressed if none does; the demo says so.
+  match_threshold_percent: 15.0
+
+# --- reporting --------------------------------------------------------------
+reporting:
+  output_subdir: demo_results/demo_17d
+  csv_filename: estimation_ensemble_summary.csv
+  plot_filename: chi2_10_estimation_combos_spectrum.png
+  json_filename: estimation_ensemble_report.json
+  decimal_places: 2
+  log_scale: true
+  target_band_percent: 10.0
