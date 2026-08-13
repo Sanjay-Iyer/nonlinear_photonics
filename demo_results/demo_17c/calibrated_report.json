@@ -1,0 +1,328 @@
+{
+  "demo_id": "17c_bulk_calibration_and_enhancement",
+  "source_results_dir": "C:\\code\\nonlinear_photonics\\demo_results\\demo_17",
+  "units": "pm/V (calibrated reproduction: one global scalar fitted to 2340 pm/V)",
+  "calibration": {
+    "calibration_factor_K": 27.626615634410776,
+    "anchor_mode": "paper_ideal_abrupt",
+    "anchor_case_id": "case_02",
+    "anchor_quantity": "at_target_wavelength",
+    "anchor_raw_pm_per_V": 84.70092866117757,
+    "anchor_target_pm_per_V": 2340.0,
+    "anchor_source": "arXiv:2602.23246v1 Section 3.1: simulation prediction of 2340 pm/V for abrupt interfaces, stated in words at 1550 nm.",
+    "degrees_of_freedom_fitted": 1,
+    "warning": "One global scale factor was fitted to a single published value. The anchor case reproduces that value by construction and is NOT evidence. Every other number here is a prediction at the same scale, and the absolute magnitudes are a calibrated reproduction rather than an independent prediction."
+  },
+  "bulk_reference": {
+    "bulk_gaas_pm_per_V": 377.0,
+    "bulk_algaas_pm_per_V": 290.0,
+    "source": "arXiv:2602.23246v1 Section 2.1, quoting refs 17/33/34/39",
+    "evaluator_can_compute_bulk": false,
+    "reason": "Eq. 2 sums envelope asymmetry: every factor is a confined-subband integral, and its two terms cancel EXACTLY for a symmetric structure (the paper's own chi2_zero_at_symmetric_limits target). Bulk GaAs has no confined envelopes, so the same evaluator returns zero and K = 377/0 is undefined. Bulk GaAs's 377 pm/V arises from the zincblende unit-cell bond asymmetry (d14), which is the mechanism r_e_hh parameterises -- not the envelope mechanism Eq. 2 computes. The two are different physics, which is why the paper reports the well as an enhancement OVER bulk rather than bulk plus a term.",
+    "externally_supplied_raw_chi2_calc_bulk": null,
+    "roles_this_value_may_play": [
+      "denominator of the enhancement ratio",
+      "horizontal reference line on the calibrated spectrum plot"
+    ],
+    "roles_this_value_may_not_play": [
+      "anchor of the calibration, unless a raw bulk chi(2) is supplied by a theory that can produce one -- Eq. 2 cannot"
+    ]
+  },
+  "degrees_of_freedom_fitted": 1,
+  "cases": [
+    {
+      "case": "case_01",
+      "name": "reference_graded",
+      "interface_mode": "graded",
+      "grading_nm": 0.7,
+      "is_anchor": false,
+      "raw_at_1550_pm_per_V": 53.82697949242898,
+      "raw_peak_pm_per_V": 106.08652742903536,
+      "calibration_factor_K": 27.626615634410776,
+      "calibrated_at_1550_pm_per_V": 1487.0572731986467,
+      "calibrated_peak_pm_per_V": 2930.811717271336,
+      "peak_wavelength_nm": 1508.0,
+      "enhancement_at_1550_vs_bulk_gaas": 3.9444490005269146,
+      "enhancement_peak_vs_bulk_gaas": 7.774036385335108,
+      "spectrum_available": false
+    },
+    {
+      "case": "case_02",
+      "name": "abrupt_reference",
+      "interface_mode": "abrupt",
+      "grading_nm": 0.0,
+      "is_anchor": true,
+      "raw_at_1550_pm_per_V": 84.70092866117757,
+      "raw_peak_pm_per_V": 145.78227349698668,
+      "calibration_factor_K": 27.626615634410776,
+      "calibrated_at_1550_pm_per_V": 2340.0,
+      "calibrated_peak_pm_per_V": 4027.4708362118,
+      "peak_wavelength_nm": 1520.0,
+      "enhancement_at_1550_vs_bulk_gaas": 6.206896551724138,
+      "enhancement_peak_vs_bulk_gaas": 10.682946515150663,
+      "spectrum_available": false
+    },
+    {
+      "case": "case_03",
+      "name": "thin_barrier",
+      "interface_mode": "graded",
+      "grading_nm": 0.4,
+      "is_anchor": false,
+      "raw_at_1550_pm_per_V": 143.76859641665376,
+      "raw_peak_pm_per_V": 232.10202868931714,
+      "calibration_factor_K": 27.626615634410776,
+      "calibrated_at_1550_pm_per_V": 3971.8397535016197,
+      "calibrated_peak_pm_per_V": 6412.193534566747,
+      "peak_wavelength_nm": 1526.0,
+      "enhancement_at_1550_vs_bulk_gaas": 10.535383961542758,
+      "enhancement_peak_vs_bulk_gaas": 17.00847091397015,
+      "spectrum_available": false
+    },
+    {
+      "case": "case_04",
+      "name": "thick_barrier",
+      "interface_mode": "graded",
+      "grading_nm": 0.7,
+      "is_anchor": false,
+      "raw_at_1550_pm_per_V": 16.44039049847783,
+      "raw_peak_pm_per_V": 33.11191773615134,
+      "calibration_factor_K": 27.626615634410776,
+      "calibrated_at_1550_pm_per_V": 454.19234918106594,
+      "calibrated_peak_pm_per_V": 914.7702242148821,
+      "peak_wavelength_nm": 1506.0,
+      "enhancement_at_1550_vs_bulk_gaas": 1.2047542418595913,
+      "enhancement_peak_vs_bulk_gaas": 2.4264462180766104,
+      "spectrum_available": false
+    },
+    {
+      "case": "case_05",
+      "name": "low_asymmetry",
+      "interface_mode": "graded",
+      "grading_nm": 0.7,
+      "is_anchor": false,
+      "raw_at_1550_pm_per_V": 13.62389899947073,
+      "raw_peak_pm_per_V": 15.718935186964169,
+      "calibration_factor_K": 27.626615634410776,
+      "calibrated_at_1550_pm_per_V": 376.3822211004114,
+      "calibrated_peak_pm_per_V": 434.26098059247397,
+      "peak_wavelength_nm": 1542.0,
+      "enhancement_at_1550_vs_bulk_gaas": 0.9983613291788102,
+      "enhancement_peak_vs_bulk_gaas": 1.1518858901657134,
+      "spectrum_available": false
+    },
+    {
+      "case": "case_06",
+      "name": "high_asymmetry",
+      "interface_mode": "graded",
+      "grading_nm": 0.7,
+      "is_anchor": false,
+      "raw_at_1550_pm_per_V": 68.11571485161028,
+      "raw_peak_pm_per_V": 148.1713199200176,
+      "calibration_factor_K": 27.626615634410776,
+      "calibrated_at_1550_pm_per_V": 1881.8066728685628,
+      "calibrated_peak_pm_per_V": 4093.472103473639,
+      "peak_wavelength_nm": 1496.0,
+      "enhancement_at_1550_vs_bulk_gaas": 4.991529636256135,
+      "enhancement_peak_vs_bulk_gaas": 10.85801618958525,
+      "spectrum_available": false
+    },
+    {
+      "case": "case_07",
+      "name": "asymmetric_grading",
+      "interface_mode": "graded",
+      "grading_nm": 0.4,
+      "is_anchor": false,
+      "raw_at_1550_pm_per_V": 15.651995999394785,
+      "raw_peak_pm_per_V": 33.73211783012291,
+      "calibration_factor_K": 27.626615634410776,
+      "calibrated_at_1550_pm_per_V": 432.4116773866149,
+      "calibrated_peak_pm_per_V": 931.90425382746,
+      "peak_wavelength_nm": 1498.0,
+      "enhancement_at_1550_vs_bulk_gaas": 1.1469805766223207,
+      "enhancement_peak_vs_bulk_gaas": 2.4718945724866312,
+      "spectrum_available": false
+    },
+    {
+      "case": "case_08",
+      "name": "controlled_overlap",
+      "interface_mode": "graded",
+      "grading_nm": 1.4,
+      "is_anchor": false,
+      "raw_at_1550_pm_per_V": 101.80158965078347,
+      "raw_peak_pm_per_V": 218.35618229154005,
+      "calibration_factor_K": 27.626615634410776,
+      "calibrated_at_1550_pm_per_V": 2812.4333882542046,
+      "calibrated_peak_pm_per_V": 6032.44231956571,
+      "peak_wavelength_nm": 1501.0,
+      "enhancement_at_1550_vs_bulk_gaas": 7.460035512610622,
+      "enhancement_peak_vs_bulk_gaas": 16.001173261447505,
+      "spectrum_available": false
+    },
+    {
+      "case": "case_09",
+      "name": "native_linear_wide_grade",
+      "interface_mode": "graded",
+      "grading_nm": 1.0,
+      "is_anchor": false,
+      "raw_at_1550_pm_per_V": 45.168351310847164,
+      "raw_peak_pm_per_V": 96.16118728242,
+      "calibration_factor_K": 27.626615634410776,
+      "calibrated_at_1550_pm_per_V": 1247.8486805048087,
+      "calibrated_peak_pm_per_V": 2656.608160000007,
+      "peak_wavelength_nm": 1500.0,
+      "enhancement_at_1550_vs_bulk_gaas": 3.3099434496148774,
+      "enhancement_peak_vs_bulk_gaas": 7.046705994694979,
+      "spectrum_available": false
+    },
+    {
+      "case": "case_10",
+      "name": "imported_linear_equivalent",
+      "interface_mode": "graded",
+      "grading_nm": 1.0,
+      "is_anchor": false,
+      "raw_at_1550_pm_per_V": 45.16835131083867,
+      "raw_peak_pm_per_V": 96.16118728240168,
+      "calibration_factor_K": 27.626615634410776,
+      "calibrated_at_1550_pm_per_V": 1247.848680504574,
+      "calibrated_peak_pm_per_V": 2656.608159999501,
+      "peak_wavelength_nm": 1500.0,
+      "enhancement_at_1550_vs_bulk_gaas": 3.309943449614255,
+      "enhancement_peak_vs_bulk_gaas": 7.046705994693636,
+      "spectrum_available": false
+    }
+  ],
+  "predictions": [
+    {
+      "label": "ideal abrupt @1550",
+      "case_id": "case_02",
+      "quantity": "at_target_wavelength",
+      "predicted_pm_per_V": 2340.0,
+      "published_pm_per_V": 2340.0,
+      "relative_error": 0.0,
+      "tolerance_percent": 5.0,
+      "within_tolerance": true,
+      "is_anchor_not_evidence": true,
+      "source": "Section 3.1, ideal abrupt interfaces"
+    },
+    {
+      "label": "Fig. 2d peak height",
+      "case_id": "case_02",
+      "quantity": "at_peak",
+      "predicted_pm_per_V": 4027.4708362118,
+      "published_pm_per_V": 4000.0,
+      "relative_error": 0.0068677090529499765,
+      "tolerance_percent": 15.0,
+      "within_tolerance": true,
+      "is_anchor_not_evidence": false,
+      "source": "Fig. 2d, digitised, +-15 %"
+    },
+    {
+      "label": "EDS-profile graded @1550 (1.00 nm grade)",
+      "case_id": "case_09",
+      "quantity": "at_target_wavelength",
+      "predicted_pm_per_V": 1247.8486805048087,
+      "published_pm_per_V": [
+        1200.0,
+        1363.0
+      ],
+      "relative_error": 0.0,
+      "tolerance_percent": 10.0,
+      "within_tolerance": true,
+      "is_anchor_not_evidence": false,
+      "source": "Section 3.1: 1200 pm/V (EDS Al profile), 1363 pm/V (EDS Ga profile)"
+    },
+    {
+      "label": "native/imported twin of the graded case",
+      "case_id": "case_10",
+      "quantity": "at_target_wavelength",
+      "predicted_pm_per_V": 1247.848680504574,
+      "published_pm_per_V": [
+        1200.0,
+        1363.0
+      ],
+      "relative_error": 0.0,
+      "tolerance_percent": 10.0,
+      "within_tolerance": true,
+      "is_anchor_not_evidence": false,
+      "source": "same structure as case_09, written as an imported table"
+    }
+  ],
+  "enhancement": {
+    "definition": "chi2_calibrated(lambda) / chi2_bulk_GaAs, bulk = 377.0 pm/V",
+    "independent_of_calibration_factor": true,
+    "note": "K cancels from this ratio, so the enhancement is not a calibrated quantity -- it is what the raw evaluator already said, expressed against the bulk reference.",
+    "bulk_gaas_pm_per_V": 377.0,
+    "bulk_algaas_pm_per_V": 290.0,
+    "published_points_as_enhancement": {
+      "ideal_abrupt_simulated": 6.206896551724138,
+      "four_period_measured": 7.294429708222812,
+      "eighty_period_measured": 4.588859416445623,
+      "eds_al_profile": 3.183023872679045,
+      "eds_ga_profile": 3.6153846153846154
+    },
+    "expected_band": [
+      6.0,
+      8.0
+    ],
+    "cases_in_expected_band_at_peak": [
+      "case_01",
+      "case_09",
+      "case_10"
+    ],
+    "per_case": [
+      {
+        "case": "case_01",
+        "enhancement_peak": 7.774036385335108,
+        "enhancement_at_1550": 3.9444490005269146
+      },
+      {
+        "case": "case_02",
+        "enhancement_peak": 10.682946515150663,
+        "enhancement_at_1550": 6.206896551724138
+      },
+      {
+        "case": "case_03",
+        "enhancement_peak": 17.00847091397015,
+        "enhancement_at_1550": 10.535383961542758
+      },
+      {
+        "case": "case_04",
+        "enhancement_peak": 2.4264462180766104,
+        "enhancement_at_1550": 1.2047542418595913
+      },
+      {
+        "case": "case_05",
+        "enhancement_peak": 1.1518858901657134,
+        "enhancement_at_1550": 0.9983613291788102
+      },
+      {
+        "case": "case_06",
+        "enhancement_peak": 10.85801618958525,
+        "enhancement_at_1550": 4.991529636256135
+      },
+      {
+        "case": "case_07",
+        "enhancement_peak": 2.4718945724866312,
+        "enhancement_at_1550": 1.1469805766223207
+      },
+      {
+        "case": "case_08",
+        "enhancement_peak": 16.001173261447505,
+        "enhancement_at_1550": 7.460035512610622
+      },
+      {
+        "case": "case_09",
+        "enhancement_peak": 7.046705994694979,
+        "enhancement_at_1550": 3.3099434496148774
+      },
+      {
+        "case": "case_10",
+        "enhancement_peak": 7.046705994693636,
+        "enhancement_at_1550": 3.309943449614255
+      }
+    ]
+  },
+  "spectra_available": 0,
+  "cases_reported": 10,
+  "warning": "One global scale factor was fitted to a single published value. The anchor case reproduces that value by construction and is NOT evidence. Every other number here is a prediction at the same scale, and the absolute magnitudes are a calibrated reproduction rather than an independent prediction."
+}

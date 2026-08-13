@@ -120,4 +120,12 @@ def resolved_snapshot(cfg: Mapping[str, Any], machine: Any | None) -> dict[str, 
         ),
         "r_e_hh": "HSE06/VASP method stated; numerical value not published",
     }
+    result["physical_constants_si"] = {
+        "elementary_charge_C": 1.602176634e-19,
+        "vacuum_permittivity_F_per_m": 8.8541878128e-12,
+        "reduced_planck_J_s": 1.054571817e-34,
+        "electron_mass_kg": 9.1093837015e-31,
+        "speed_of_light_m_per_s": 299792458.0,
+        "hc_eV_nm": 1239.841984,
+    }
     return result

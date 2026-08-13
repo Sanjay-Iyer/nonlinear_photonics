@@ -1,0 +1,156 @@
+# Demo 17c -- bulk control calibration and enhancement analysis.
+#
+# Demos 17 and 17b settled everything except one global scalar: the lineshape,
+# the resonance position (3 nm from the paper's 1520), the graded/abrupt ratio
+# (1.2 %), the renderer equivalence (1e-13), the k-space normalisation, the
+# dimensional ledger, r_e_hh and the spin weight. What remains is a constant
+# 27.6x offset that is the SAME on all ten structures -- which is exactly what a
+# calibration removes.
+#
+# ONE scalar is fitted, to ONE published number. Everything else is a prediction.
+#
+# NO SOLVER RUNS by default. Demo 17c reads Demo 17's saved artifacts.
+
+experiment:
+  name: demo17c_bulk_calibration_and_enhancement
+  demo_id: 17c_bulk_calibration_and_enhancement
+  description: >-
+    Anchors the converged but unscaled Eq. 2 evaluator to a single published
+    absolute value, then reports every other case as a calibrated prediction and
+    measures the enhancement over bulk GaAs.
+
+source:
+  demo_id: 17_paper_chi2_reproduction_corrected
+  # null -> auto-resolve demo_results/demo_17 or demo_results/demo17.
+  results_dir: null
+  target_wavelength_nm: 1550.0
+
+# --- the bulk control -------------------------------------------------------
+bulk_reference:
+  gaas_pm_per_V: 377.0
+  algaas_pm_per_V: 290.0
+  source: "arXiv:2602.23246v1 Section 2.1, quoting refs 17/33/34/39"
+
+  # WHY THERE IS NO chi2_calc_bulk HERE, and why anchor_mode is not 'bulk_gaas'.
+  #
+  # The natural design is K = 377 / chi2_calc_bulk_GaAs, with chi2_calc_bulk
+  # produced by the same Eq. 2 evaluator. That cannot be done, for a physical
+  # reason rather than a practical one.
+  #
+  # Eq. 2 sums ENVELOPE asymmetry -- every factor is a confined-subband integral
+  # -- and its two terms cancel EXACTLY for any symmetric structure. The paper
+  # states this itself and paper_targets.yaml already carries it as
+  # `chi2_zero_at_symmetric_limits: 0.0`. Bulk GaAs has no confined envelopes, so
+  # the same evaluator returns ZERO and K = 377/0 is undefined.
+  #
+  # Bulk GaAs's 377 pm/V comes from the zincblende unit-cell bond asymmetry
+  # (d14) -- the unit-cell physics r_e_hh parameterises, not the envelope physics
+  # Eq. 2 computes. Two different mechanisms, which is exactly why the paper
+  # reports the well as an enhancement OVER bulk rather than bulk plus a term.
+  #
+  # So 377 and 290 are used for the two things they legitimately support: the
+  # denominator of the enhancement ratio, and the reference lines on the plot.
+  #
+  # If a raw bulk chi(2) is ever produced by a theory that CAN produce one, put
+  # it here and set anchor_mode: bulk_gaas. The plumbing is written and tested;
+  # only the number is missing, and Demo 17c will not invent it.
+  chi2_calc_bulk_gaas_raw: null
+
+# --- the single fitted scalar ----------------------------------------------
+calibration:
+  # 'paper_ideal_abrupt' anchors on a number computed by the SAME equation for
+  # the SAME class of structure, which is the defensible choice.
+  # 'bulk_gaas' requires bulk_reference.chi2_calc_bulk_gaas_raw and refuses
+  # without it.
+  anchor_mode: paper_ideal_abrupt
+  anchor_case_id: case_02          # the abrupt structure
+  anchor_quantity: at_target_wavelength    # or: at_peak
+  anchor_target_pm_per_V: 2340.0
+  anchor_source: >-
+    arXiv:2602.23246v1 Section 3.1: simulation prediction of 2340 pm/V for
+    abrupt interfaces, stated in words at 1550 nm.
+
+# --- what the calibration did NOT fit ---------------------------------------
+# The anchor row is marked `is_anchor_not_evidence` in every artifact:
+# reproducing it is arithmetic, not a result. These are the real tests.
+predictions:
+  # Under the default anchor this row IS the anchor and is reported as "fitted"
+  # rather than checked. Under --anchor-peak it becomes a genuine prediction, so
+  # its tolerance has to be a real one rather than the zero-width band an anchor
+  # would trivially satisfy. That the two anchors give K within 0.7 % of each
+  # other is itself a consistency check on the lineshape: the paper's Fig. 2d
+  # peak and its stated 1550 nm value agree with our spectral shape.
+  - label: "ideal abrupt @1550"
+    case_id: case_02
+    quantity: at_target_wavelength
+    published_pm_per_V: 2340.0
+    tolerance_percent: 5.0
+    source: "Section 3.1, ideal abrupt interfaces"
+
+  - label: "Fig. 2d peak height"
+    case_id: case_02
+    quantity: at_peak
+    published_pm_per_V: 4000.0
+    # Read off a figure; the repository's digitisation carries +-15 %, and 16F
+    # deliberately declined to make this a target for that reason. It is a
+    # genuine independent prediction here precisely because nothing was fitted
+    # to it.
+    tolerance_percent: 15.0
+    source: "Fig. 2d, digitised, +-15 %"
+
+  - label: "EDS-profile graded @1550 (1.00 nm grade)"
+    case_id: case_09
+    quantity: at_target_wavelength
+    # The paper quotes two graded values, from the Al and the Ga EDS profiles.
+    # A prediction landing between them is the strongest available outcome, so
+    # the pair is given as a band rather than a single number.
+    published_pm_per_V: [1200.0, 1363.0]
+    tolerance_percent: 10.0
+    source: "Section 3.1: 1200 pm/V (EDS Al profile), 1363 pm/V (EDS Ga profile)"
+
+  - label: "native/imported twin of the graded case"
+    case_id: case_10
+    quantity: at_target_wavelength
+    published_pm_per_V: [1200.0, 1363.0]
+    tolerance_percent: 10.0
+    source: "same structure as case_09, written as an imported table"
+
+# --- the enhancement over bulk ---------------------------------------------
+enhancement:
+  # chi2_calibrated(lambda) / 377. K cancels from this ratio, so the enhancement
+  # is NOT a calibrated quantity -- it is what the raw evaluator already said,
+  # expressed against the bulk reference. That makes it the most robust number
+  # this demo produces.
+  expected_band: [6.0, 8.0]
+  published_points_pm_per_V:
+    ideal_abrupt_simulated: 2340.0
+    four_period_measured: 2750.0     # /377 = 7.29x -- the paper's ">7x" claim
+    eighty_period_measured: 1730.0
+    eds_al_profile: 1200.0
+    eds_ga_profile: 1363.0
+  note: >-
+    The paper's ">7x over bulk GaAs" corresponds to the MEASURED 4-period sample
+    at 2750 pm/V (2750/377 = 7.29x), not to the 2340 pm/V ideal-abrupt
+    simulation, which is 6.21x. Both are reported so the claim is checked
+    against the number it actually describes.
+
+# --- optional licensed bulk solve ------------------------------------------
+# Present because it was asked for, and disabled because of what it can and
+# cannot deliver. A nextnano++ bulk GaAs run returns band edges, effective
+# masses and a gap -- all useful, none of them a chi(2). The zincblende d14 that
+# makes bulk GaAs 377 pm/V is not something the envelope solver computes, so a
+# bulk solve cannot supply chi2_calc_bulk_gaas_raw either. Enabling this runs the
+# solve and records the band structure as context; it does NOT unlock the bulk
+# anchor.
+bulk_solve:
+  enabled: false
+  records_band_structure_only: true
+  cannot_supply_chi2_calc_bulk: true
+
+# --- reporting --------------------------------------------------------------
+reporting:
+  output_subdir: demo_results/demo_17c
+  csv_filename: calibrated_summary.csv
+  plot_filename: chi2_calibrated_spectrum.png
+  json_filename: calibrated_report.json
+  decimal_places: 2
