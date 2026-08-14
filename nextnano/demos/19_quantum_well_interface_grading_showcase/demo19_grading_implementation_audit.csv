@@ -1,0 +1,6 @@
+profile,implementation_type,native_nextnano_keyword,renderer,validated,notes
+abrupt,NATIVE_NEXTNANO_SYNTAX,binary / ternary_constant regions,Demo 19 abrupt region renderer,True,No grading keyword; sharp GaAs well edges.
+linear,NATIVE_NEXTNANO_SYNTAX,ternary_linear,Demo 19 per-interface native renderer,True,One ternary_linear region per nonzero I1-I4 width; ternary_pyramid is never used.
+fermi,PYTHON_GENERATED_PROFILE_RENDERED_TO_NEXTNANO,ternary_import,grading12.profile_fraction(sigmoid) + grading14 DAT importer,True,Python-generated Fermi-like endpoint-normalized logistic profile; not a native Fermi keyword.
+erf,PYTHON_GENERATED_PROFILE_RENDERED_TO_NEXTNANO,ternary_import,grading12.profile_fraction(erf) + grading14 DAT importer,True,Sampled x_Al(z); Nextnano++ linearly interpolates the imported DAT table.
+cosine,PYTHON_GENERATED_PROFILE_RENDERED_TO_NEXTNANO,ternary_import,grading12.profile_fraction(cosine) + grading14 DAT importer,True,Sampled x_Al(z); Nextnano++ linearly interpolates the imported DAT table.
