@@ -105,3 +105,11 @@ def test_runner_never_launches_a_licensed_solver() -> None:
     assert "subprocess.run(" in source  # git provenance only
     assert "new_licensed_solves_required\": 0" in source
 
+
+def test_wavefunction_plot_keeps_quantum_and_band_grids_separate() -> None:
+    runner = (DEMO / "run_demo18e.py").read_text(encoding="utf-8")
+    plots = (DEMO / "plots18e.py").read_text(encoding="utf-8")
+    assert '"z_nm": data.heavy_hole.z_nm' in runner
+    assert '"band_z_nm": data.band_position_nm' in runner
+    assert 'raw_state_data["band_z_nm"]' in plots
+    assert "ax.plot(band_z, edge_values" in plots

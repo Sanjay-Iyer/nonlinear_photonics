@@ -222,12 +222,17 @@ def _load_raw_18d(cfg: Mapping[str, Any], source: Path) -> dict[str, Any]:
     hh_edge = data.band_edges.get("heavy_hole_eV")
     raw_state_data = {
         "z_nm": data.heavy_hole.z_nm,
+        "band_z_nm": data.band_position_nm,
         "heavy_hole_edge_eV": hh_edge,
         "hh23": [
             ("HH2", data.heavy_hole.energies_eV[1], data.heavy_hole.envelopes[:, 1]),
             ("HH3", data.heavy_hole.energies_eV[2], data.heavy_hole.envelopes[:, 2]),
         ],
     }
+    if hh_edge is not None and np.asarray(hh_edge).size != np.asarray(data.band_position_nm).size:
+        raise Runner18EError(
+            "Case_19 heavy-hole band edge does not match the full band-profile grid"
+        )
     return {"model": model, "state_rows": solved["state_audit"],
             "localization": solved["localization"], "raw_state_data": raw_state_data,
             "source_kind": "licensed_archived_raw_output", "source_root": source}

@@ -57,7 +57,14 @@ def generate_all(
         z = np.asarray(raw_state_data["z_nm"], float)
         edges = raw_state_data.get("heavy_hole_edge_eV")
         if edges is not None:
-            ax.plot(z, edges, color="black", lw=1.1, label="HH band edge")
+            band_z = np.asarray(raw_state_data["band_z_nm"], float)
+            edge_values = np.asarray(edges, float)
+            if band_z.shape != edge_values.shape:
+                raise ValueError(
+                    "HH band-profile position and energy arrays must have the same shape; "
+                    f"got {band_z.shape} and {edge_values.shape}"
+                )
+            ax.plot(band_z, edge_values, color="black", lw=1.1, label="HH band edge")
         for label, energy, envelope in raw_state_data["hh23"]:
             env = np.asarray(envelope, float)
             scale = .08 / max(np.max(np.abs(env)), 1e-30)
@@ -119,4 +126,3 @@ def _groups(rows: Sequence[Mapping[str, Any]], key: str) -> dict[str, list[Mappi
     for row in rows:
         result.setdefault(str(row[key]), []).append(row)
     return result
-
