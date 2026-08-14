@@ -1,0 +1,13 @@
+parameter,category,baseline,lower_bound,upper_bound,units,sampling_type,reason_for_range,source,affects_nextnano_solve,notes
+electrostatic_field_kV_per_cm,DIAGNOSTIC_PROXY,0.0,0.0,20.0,kV/cm,local_latin_hypercube,"Tests moderate positive band tilting while avoiding the unhelpful broad negative-field half of Demo 18C.","Demo 18C unweighted reanalysis and requested Demo 18D range",true,"Imposed potential tilt; not a claimed paper input."
+tunneling_barrier_nm,UNCERTAIN,1.8,1.70,1.85,nm,local_latin_hypercube,"Directly changes interwell coupling around the nominal structure.","Ramesh 2026 nominal dimension and Demo 18C reanalysis",true,"Four exact 18C anchors may sit at the boundary of this local search."
+well1_nm,UNCERTAIN,7.1,7.05,7.20,nm,local_latin_hypercube,"Narrow printed-dimension rounding sensitivity around the thick well.","Ramesh 2026 nominal dimension and requested Demo 18D range",true,"Combo 07 is retained as an informative anchor at 7.034685 nm; new LHS points obey this range."
+well2_nm,UNCERTAIN,2.9,2.85,3.00,nm,local_latin_hypercube,"Narrow printed-dimension rounding sensitivity around the thin well.","Ramesh 2026 nominal dimension and requested Demo 18D range",true,"New LHS points obey this range."
+r_e_hh_nm,UNCERTAIN,0.751,0.65,1.00,nm,three_point_postprocessing,"Absolute-scale uncertainty only; cannot move a spectral peak.","Ramesh 2026 omits numerical HSE06/VASP result; repository 2023 value is 0.751 nm",false,"Primary ranking always uses 0.751 nm."
+hh_relative_weight,FIXED_DIAGNOSTIC_DISABLED,1.0,1.0,1.0,dimensionless,fixed,"Demo 18C showed that artificial reweighting changes the dominant peak identity.","Demo 18C",false,"Any value other than exactly 1.0 aborts before physics."
+spin_degeneracy,FIXED_CONVENTION,2,2,2,dimensionless,fixed,"Remove bookkeeping as a fitting parameter.","Demo 18B convention ledger",false,"Fixed."
+wells_per_period_for_Nz,FIXED_CONVENTION,2,2,2,wells_per_30_nm,fixed,"Use the literal two coupled wells per 30 nm period.","Ramesh 2026 structure; Demo 18B",false,"Fixed."
+broadening_meV,PUBLISHED,5.0,5.0,5.0,meV,fixed,"Published Eq. 2 broadening.","Ramesh 2026 Methods 5.1",false,"Fixed."
+states_per_band,PUBLISHED,2,2,2,states,fixed,"Published two electron and two HH bound-state model.","Ramesh 2026 Methods 5.1",false,"Fixed."
+interface_profile,PUBLISHED,abrupt,abrupt,abrupt,text,fixed,"The 2340 pm/V target is the ideal abrupt calculation.","Ramesh 2026 Discussion",true,"Fixed."
+

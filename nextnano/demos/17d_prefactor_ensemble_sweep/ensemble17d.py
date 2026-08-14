@@ -1196,7 +1196,6 @@ def write_summary_csv(
 
     primary = next((s for s in spectra if s.role == "primary"), spectra[0])
     secondary = next((s for s in spectra if s.case_id != primary.case_id), None)
-    headline_target = next(t for t in targets if t.key == headline)
     per_target_columns = [f"Error_vs_{t.key}_Percent" for t in targets]
 
     path = Path(path)
@@ -1224,7 +1223,6 @@ def write_summary_csv(
             ]
             row.extend(round(outcome.residuals[t.key], decimals) for t in targets)
             writer.writerow(row)
-    del headline_target
     return path
 
 
@@ -1244,23 +1242,19 @@ def _draw_styles(outcomes: Sequence[ComboOutcome]) -> list[dict[str, Any]]:
     the rest, so a coincidence is visible AS a coincidence.
     """
 
+    totals = [round(outcome.combo.multiplier, 9) for outcome in outcomes]
     seen: dict[float, int] = {}
     styles: list[dict[str, Any]] = []
-    for index, outcome in enumerate(outcomes):
-        multiplier = round(outcome.combo.multiplier, 9)
+    for multiplier in totals:
         rank = seen.get(multiplier, 0)
         seen[multiplier] = rank + 1
-        duplicated = sum(
-            1 for o in outcomes if round(o.combo.multiplier, 9) == multiplier
-        ) > 1
-        if not duplicated:
+        if totals.count(multiplier) == 1:
             styles.append({"lw": 1.9, "linestyle": "-", "alpha": 0.95, "zorder": 3})
         elif rank == 0:
             styles.append({"lw": 5.0, "linestyle": "-", "alpha": 0.32, "zorder": 3})
         else:
             styles.append({"lw": 1.7, "linestyle": (0, (5, 3)), "alpha": 0.95,
                            "zorder": 4})
-        del index
     return styles
 
 
