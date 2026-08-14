@@ -1,0 +1,533 @@
+# Demo 17E -- statistical interface roughness and grading sweep, production solve.
+#
+# WHAT THIS IS
+# ============
+# Demo 17 solved TEN structures that differ in several things at once (barrier
+# thickness, asymmetry, grading width, deck representation), so no single column
+# of its table isolates grading. Demo 17E holds every one of those fixed at the
+# paper geometry -- 7.10 / 1.80 / 2.90 nm, s = 0.42, Al0.55, linear family,
+# native ternary_linear rendering -- and varies ONLY the interface transition
+# widths, across 20 seed-locked random realizations plus the ideal abrupt
+# reference. That turns "grading costs chi(2)" from an anecdote into a
+# distribution with a slope and a spread.
+#
+# THE THREE CORRECTIONS ARE INHERITED, NOT RE-DERIVED
+# ===================================================
+# Demo 17's corrections A, B and C are carried here verbatim and are re-verified
+# at load time by `demo17.verify_nz_convention`, `verify_k_space_convention` and
+# `verify_domain_convention` -- the same functions, not copies. Demo 17E adds no
+# correction of its own to the raw scale.
+#
+#   A. N_z counts INDIVIDUAL WELLS            -> chi2.nz_mode = well_density
+#      2 / 30 nm = 6.666667e7 m^-1
+#   B. Brillouin-zone edge is zincblende 2*pi/a -> k_parallel.*
+#      k_max = 0.10 * 2*pi/a = 1.111429 nm^-1
+#   C. The Dirichlet box is 30 nm clear of the wells -> geometry.*
+#      cladding 35.0 nm, quantum-region padding 30.0 nm
+#
+# WHAT IS NEW HERE
+# ================
+#   * `sampling`  -- the seed-locked interface-width distribution (Section 2).
+#   * `prefactor` -- the DUAL reporting scale (Section 4). Every optical number
+#                    is written twice: once raw, once times a DECLARED
+#                    multiplier carried over from Demo 17D. Read the warning in
+#                    that section before quoting a calibrated number.
+#
+# NOTHING IN THE RAW COLUMN IS FITTED. r_e_hh_nm, Gamma, the 0.10 zone fraction
+# and the two-states-per-band truncation are published values and all stay put.
+
+experiment:
+  name: demo17e_statistical_grading_sweep
+  demo_id: 17e_statistical_grading_sweep
+  description: >-
+    One fixed GaAs/Al0.55Ga0.45As asymmetric coupled quantum well (7.10 / 1.80 /
+    2.90 nm, s = 0.42) solved 21 times with the production nextnano++ binary:
+    once with ideal abrupt interfaces and twenty times with seed-locked random
+    interface grading widths drawn around 0.7 nm, to measure how STEM/EDS-scale
+    interface roughness moves the absolute second-order susceptibility.
+
+# --- materials -------------------------------------------------------------
+# Unchanged from Demo 14/16E/17.
+materials:
+  well: GaAs
+  barrier: Al(x)Ga(1-x)As
+  substrate: GaAs
+  barrier_al_fraction: 0.55
+  temperature_K: 300.0
+
+# --- geometry --------------------------------------------------------------
+geometry:
+  total_well_thickness_nm: 10.0
+
+  # The PHYSICAL 30 nm period barrier (18.2 + 7.1 + 1.8 + 2.9 = 30.0). This is
+  # what correction A counts wells inside, so it is held at the paper value.
+  period_barrier_nm: 18.2
+
+  # --- CORRECTION C, inherited from Demo 17 -------------------------------
+  # 35.0 nm of Al0.55Ga0.45As cladding either side, with the quantum{} box --
+  # and therefore the Dirichlet wall psi = 0 -- placed 30.0 nm beyond the active
+  # region, leaving 5.0 nm of barrier outside the box. Demo 16E's 20.0 / 2.0
+  # put the hard wall 2 nm from the wells and returned physical_qc_valid = False
+  # on every case; chi(2) rides on <psi|z|psi>, which converges with domain size
+  # more slowly than the eigenvalues do.
+  #
+  # Active region here is 7.10 + 1.80 + 2.90 = 11.80 nm, so:
+  #   quantum box  = 11.80 + 2 * 30.0 = 71.80 nm   (the "72 nm box")
+  #   total domain = 11.80 + 2 * 35.0 = 81.80 nm
+  domain_padding_nm: 35.0
+  quantum_region_padding_nm: 30.0
+
+# --- grading ---------------------------------------------------------------
+# Unchanged from Demo 14/16E/17. Demo 17E varies the WIDTHS handed to this
+# builder, never the builder.
+grading:
+  width_definition: 10_90_percent_of_transition
+  realized_width_reference: peak
+  nominal_reference_low_fraction: 0.10
+  nominal_reference_high_fraction: 0.90
+  continuous_oversample: 20
+  render:
+    linear: ternary_linear      # native nextnano++
+    fermi: ternary_import
+    erf: ternary_import
+    cosine: ternary_import
+  growth_coordinate: x
+  import_name: al_profile
+
+# --- statistical interface roughness ---------------------------------------
+# THE NEW PHYSICS INPUT. Twenty realizations of one growth process, not twenty
+# different designs.
+#
+# WHY A DISTRIBUTION AT ALL. A real MBE/MOCVD interface is not a number: it is a
+# compositional transition whose 10-90 width varies interface to interface and
+# run to run. STEM/EDS line scans on this material system put that width at a
+# few atomic layers to a couple of nanometres, and the reference paper's own EDS
+# profiles are what motivated Demo 16E's 0.70 nm reference case. Sampling around
+# that value says what the measured spread in roughness implies for chi(2).
+#
+# WHY THREE INTERFACE FAMILIES. The two chemistries are not equivalent: an
+# AlGaAs-on-GaAs growth front and a GaAs-on-AlGaAs one segregate differently, so
+# they are sampled independently rather than shared. The two GaAs -> AlGaAs
+# interfaces (the tunnelling barrier at z2 and the period cladding at z4) are
+# the SAME chemistry, so they are sampled independently and then rendered with
+# their mean -- see `tie_rule` below, and README.md "the rise tie".
+sampling:
+  seed: 17005
+  realizations: 20              # cases 01..20; case_00 is the abrupt reference
+
+  # HIERARCHICAL, because that is what a growth run is: one run-level width per
+  # realization, then a small independent offset per interface.
+  #
+  #     sigma_run ~ TruncNormal(mean_nm, standard_deviation_nm) on [min, max]
+  #     sigma_i   =  sigma_run + delta_i,
+  #                  delta_i ~ Normal(0, interface_standard_deviation_nm)
+  #
+  # A flat i.i.d. draw per interface would be the wrong model twice over. The
+  # interfaces of one wafer share a substrate temperature, a V/III ratio and a
+  # growth rate, so their widths are strongly correlated and the large variation
+  # is run to run -- which is what STEM/EDS across wafers shows. And averaging
+  # three independent draws shrinks the ensemble's spread by root-3, so a flat
+  # model would give twenty realizations that all look the same and a severity
+  # grouping with one member in each tail.
+  #
+  # 'truncated_normal' or 'uniform' selects the RUN-LEVEL distribution; the
+  # per-interface offset is normal either way. Every draw is one uniform from a
+  # `random.Random(seed)` Mersenne Twister stream mapped through an exact
+  # inverse CDF (`statistics.NormalDist`), so a realization depends on the seed
+  # and on nothing else -- not on the numpy version, not on the platform, and
+  # not on how many other draws happened first.
+  distribution: truncated_normal
+  mean_nm: 0.70                 # the reference paper's EDS-derived grading width
+  standard_deviation_nm: 0.30   # run to run; this sets the ensemble's spread
+  interface_standard_deviation_nm: 0.08   # interface to interface within a run
+  minimum_nm: 0.20              # ~ one unit cell; below this the 0.05 nm mesh
+  maximum_nm: 1.40              #   cannot carry the ramp -- see preflight17e
+  round_to_decimals: 4          # so the frozen YAML round-trips bit-exactly
+
+  # The three interfaces sampled independently, in draw order. Renaming or
+  # reordering these changes every realization, which is why preflight17e pins
+  # the frozen list against a fresh generation on every run.
+  interfaces:
+    - key: gaas_to_algaas_barrier
+      label: GaAs -> AlGaAs tunnelling barrier
+      position: z2
+      chemistry: gaas_to_algaas
+    - key: algaas_to_gaas_well
+      label: AlGaAs -> GaAs well
+      position: z1_and_z3
+      chemistry: algaas_to_gaas
+    - key: gaas_to_algaas_cladding
+      label: GaAs -> AlGaAs period cladding
+      position: z4
+      chemistry: gaas_to_algaas
+
+  # HOW THE THREE SAMPLES REACH A TWO-KNOB BUILDER. `grading14.build_structure_
+  # profile` takes one width per growth DIRECTION -- one for interfaces where Al
+  # rises with z, one for where it falls -- because that is what one growth
+  # process produces. Demo 17E samples the two rising interfaces separately
+  # anyway (they are separately reported and separately frozen) and renders
+  # their mean, recording the residual per case. Changing the builder instead
+  # would fork the composition path Demo 16E's realized-composition gate and
+  # Demo 17's whole comparison rest on, which is a much larger claim than this
+  # demo is making.
+  tie_rule: mean_of_same_chemistry
+  maximum_rise_tie_residual_nm: 0.60   # half the sampled span; checked, not fitted
+
+# --- severity bands --------------------------------------------------------
+# Used only to GROUP the 20 realizations for the grouped spectral figure and the
+# summary statistics. Nothing is selected, ranked or excluded by these bounds.
+severity_bands:
+  - key: sharp
+    label: Sharp (< 0.5 nm)
+    upper_nm: 0.5
+  - key: moderate
+    label: Moderate (0.5 - 0.9 nm)
+    lower_nm: 0.5
+    upper_nm: 0.9
+  - key: severe
+    label: Severe (> 0.9 nm)
+    lower_nm: 0.9
+
+# --- nextnano++ ------------------------------------------------------------
+nextnano:
+  # DEMO 17's TEMPLATE, BY REFERENCE. Not a copy: the path points at the file
+  # Demo 17 solved with, so the two demos cannot drift apart, and preflight17e
+  # asserts the resolved path is Demo 17's own and that the file still declares
+  # correction C's Dirichlet box.
+  template: ../17_paper_chi2_reproduction_corrected/graded_acqw17.in.j2
+  parser_profile: nextnano_pp_3_0_0
+  quantum_region_name: acqw
+  dipole_polarization_name: growth_z
+  bandedge_columns:
+    position_nm: 0
+    conduction_eV: 1
+    heavy_hole_eV: 2
+    light_hole_eV: 3
+    split_off_eV: 4
+  # An 81.8 nm domain with a 71.8 nm quantum box, 21 times. Demo 17's per-case
+  # budget is kept; an hour on one case means something has hung.
+  solver_timeout_seconds: 3600
+  threads: 1
+
+# --- mesh ------------------------------------------------------------------
+# The active-region spacing is what resolves the sampled grades and it does NOT
+# move: the narrowest width the sampler can draw is 0.20 nm, whose linear ramp
+# spans 1.25 * 0.20 = 0.25 nm, i.e. five 0.05 nm cells. preflight17e asserts
+# that ratio for every frozen case rather than trusting this comment.
+mesh:
+  active_region_grid_spacing_nm: 0.05
+  outer_grid_spacing_nm: 0.5
+
+# --- states ----------------------------------------------------------------
+states:
+  number_of_electron_states: 6
+  number_of_hole_states: 6
+  output_state_count: 6
+  # Eq. 2 uses the first two bound states of each band; the paper says so.
+  max_states_per_band: 2
+
+# --- absolute chi(2) -------------------------------------------------------
+chi2:
+  mode: absolute
+  target_wavelength_nm: 1550.0
+  # Lineshape broadening. Published value, unchanged, and the same one Demo 17
+  # reported with -- a demo that varied Gamma and the interface width together
+  # could not attribute either.
+  broadening_meV: 5.0
+  max_states_per_band: 2
+
+  # Bloch interband POSITION matrix element <u_e|r|u_hh>, 7.51 Angstrom.
+  # Ramesh et al., Appl. Phys. Lett. 123, 251111 (2023), VASP/HSE06.
+  # Eq. (3) already carries e^3 -- this is never multiplied by the charge.
+  r_e_hh_nm: 0.751
+
+  # --- CORRECTION A (inherited) -------------------------------------------
+  # Two GaAs wells per 30 nm period, so N_z = 2 / 30 nm = 6.666667e7 m^-1.
+  # Left null so it is DERIVED rather than typed twice; demo17.verify_nz_
+  # convention raises if a hand-typed value ever disagrees.
+  nz_mode: well_density
+  reference_period_nm: 30.0
+  wells_per_period: 2
+  n_wells_per_metre: null
+
+  broad_wavelength_nm: [400.0, 1800.0]
+  broad_wavelength_points: 701
+  # 1400-1800 nm at exactly 1 nm: (1800 - 1400) / (401 - 1) = 1.0. The spectral
+  # CSV and every figure share this grid, so curves can be differenced directly.
+  focused_wavelength_nm: [1400.0, 1800.0]
+  focused_wavelength_points: 401
+
+# --- in-plane integration --------------------------------------------------
+k_parallel:
+  # --- CORRECTION B (inherited) -------------------------------------------
+  # GaAs is zincblende (FCC): X = (1,0,0) in units of 2*pi/a, so the Gamma->X
+  # zone edge is 2*pi/a and the paper's "one tenth of the Brillouin zone" is
+  # k_max = 0.10 * 2*pi/a = 1.111429 nm^-1 at a = 0.565325 nm.
+  #
+  # `chi2.Chi2Settings.k_max_per_nm` hardcodes the simple-cubic pi/a edge and is
+  # shared with Demos 11, 13, 14 and 16B-16E, so the physical radius is requested
+  # through the only knob that reaches it:
+  #     fraction_of_bz * (pi/a) == fraction_of_brillouin_zone_physical * (2*pi/a)
+  #     0.20           * (pi/a) == 0.10                                * (2*pi/a)
+  # `demo17.verify_k_space_convention` recomputes that identity on every load.
+  fraction_of_bz: 0.20                                  # of the legacy pi/a edge
+  zone_edge_convention: crystallographic_two_pi_over_a
+  fraction_of_brillouin_zone_physical: 0.10
+  target_k_max_per_nm: 1.111429                         # checked, not used
+
+  points: 192
+  lattice_constant_nm: 0.565325
+  electron_mass_m0: 0.067
+  heavy_hole_inplane_mass_m0: 0.112
+  spin_degeneracy: 2
+  convergence:
+    enabled: true
+    point_counts: [96, 192, 384, 768]
+    relative_tolerance: 1.0e-3
+
+# --- prefactor scaling: the DUAL reporting scale ---------------------------
+# Demo 17E reports every optical quantity twice.
+#
+#   RAW        the defensible baseline. 1.0x, no multiplier, no fitted constant.
+#              This is the column an internal solver verification uses and the
+#              only one that follows from the physics in this repository.
+#
+#   CALIBRATED the raw value times ONE DECLARED multiplier, carried over from
+#              Demo 17D's ensemble so that the pm/V figures sit on the same axis
+#              as the paper's numbers.
+#
+# READ THIS BEFORE QUOTING A CALIBRATED NUMBER. Demo 17D's own finding is that
+# these multipliers are DECLARED, not derived: the sweep resolves the product of
+# four hypothesised factors and can never attribute it, combos 07 and 08 reach
+# the same total by different routes, and combo 10 was CONSTRUCTED from the
+# known 27.63x residual, so its landing on 2340 pm/V is arithmetic rather than
+# evidence. Combo 09 rests on a factor Demo 17b classed 'speculative'. The
+# calibrated column therefore aligns the axes; it does not validate the scale.
+# `demo17e.calibration_record` stamps this status beside every calibrated number
+# it writes, and no calibrated value is ever used in a gate or a check.
+prefactor:
+  # Which scale the calibrated column uses. Overridable per run with
+  # `--calibration {raw,combo_09,combo_10}`.
+  active: combo_09
+  raw:
+    id: raw
+    multiplier: 1.0
+    label: Raw Baseline
+    status: established
+    source: >-
+      Demo 17's corrected Eq. 2 evaluation with no multiplier of any kind. The
+      only scale in this demo that follows from cited physics end to end.
+  scales:
+    combo_09:
+      label: Combined Standard
+      multiplier: 16.80
+      factors: {n_z: 3.0, permutation: 2.0, tensor: 2.8, dipole: 1.0}
+      status: speculative
+      source: >-
+        Demo 17D combination 09. Closest of the ten to the published set at
+        31.3 % RMS, on a 2.8x tensor-inversion factor no source in this
+        repository establishes.
+    combo_10:
+      label: Full Reconciliation Budget
+      multiplier: 27.72
+      factors: {n_z: 3.0, permutation: 3.0, tensor: 2.8, dipole: 1.1}
+      status: contradicted
+      source: >-
+        Demo 17D combination 10. Constructed to close Demo 17's measured 27.63x
+        residual, so reproducing the 2340 pm/V anchor is arithmetic. Includes a
+        dipole factor a measurement in this repository points against.
+  # Every declared multiplier is checked against the product of its own factors
+  # at load time; a row whose arithmetic does not close is refused rather than
+  # silently applied.
+  verify_factor_products: true
+  factor_product_tolerance: 1.0e-9
+
+# --- the three inherited corrections, and the baseline they were measured on -
+corrections:
+  baseline_demo_id: 16E_acqw_structure_physics_optical_comparison
+  baseline_config: ../14_absolute_chi2_graded_acqw_bo/demo.yaml
+  inherited_from: 17_paper_chi2_reproduction_corrected
+  applied:
+    - id: A_well_density_Nz
+      changed: chi2.nz_mode
+      from: period_density
+      to: well_density
+      from_value_per_m: 3.3333333333333336e7
+      to_value_per_m: 6.666666666666667e7
+      expected_factor: 2.0
+      exact: true
+      source: >-
+        Ramesh et al., APL 123, 251111 (2023) Eq. 1: "N_z is the number of
+        quantum wells per unit length". arXiv:2602.23246v1 Fig. 1a shows two
+        GaAs wells (7.1 nm, 2.9 nm) per 30 nm period.
+    - id: B_zincblende_zone_edge
+      changed: k_parallel.zone_edge_convention
+      from: legacy_pi_over_a
+      to: crystallographic_two_pi_over_a
+      from_k_max_per_nm: 0.5557143
+      to_k_max_per_nm: 1.1114287
+      expected_factor: null
+      exact: false
+      source: >-
+        GaAs is zincblende (FCC). X = (1,0,0) in units of 2*pi/a, so the
+        Gamma->X zone edge is 2*pi/a. pi/a is the simple-cubic edge.
+    - id: C_cladding_and_dirichlet_box
+      changed: geometry.domain_padding_nm, geometry.quantum_region_padding_nm
+      from: [20.0, 2.0]
+      to: [35.0, 30.0]
+      expected_factor: null
+      exact: false
+      source: >-
+        Demo 16E recorded boundary probabilities up to 3.1e-3 against a 1.0e-3
+        constraint. Absolute chi(2) depends on <psi|z|psi>, which converges with
+        domain size more slowly than the eigenvalues do.
+  # Demo 17E does not run the A/B ablation -- Demo 17 measured it once on these
+  # conventions and re-measuring it on 21 realizations of the same conventions
+  # would add nothing. The block stays enabled because `demo17.corrections_
+  # record`, which stamps the manifest beside every run, rebuilds the legacy
+  # settings from it in order to print the correction ratios.
+  ablation:
+    enabled: true
+    legacy_nz_mode: period_density
+    legacy_k_parallel_fraction_of_bz: 0.10
+    legacy_k_parallel_points: 96
+  known_open_factors:
+    eq1_over_eq2_prefactor: 3.0
+    heavy_hole_mj_multiplicity: 2.0
+
+# --- optimization ----------------------------------------------------------
+# PRESENT BUT NEVER RUN. Demo 17E solves 21 frozen structures and ranks nothing:
+# there is no optimizer, no surrogate and no acquisition function anywhere in
+# this demo, and the 20 realizations are drawn from a declared distribution
+# rather than proposed by anything. The section is retained verbatim only
+# because `demo14.validate_config` -- reused so this config is held to the same
+# schema as Demo 14's and Demo 17's -- requires it. `run_demo17e.py` has no code
+# path that reads it.
+optimization:
+  library: ax
+  required_ax_version: "1.3.1"
+  minimum_ax_version: "1.0.0"
+
+  objective: chi2_xzx_abs_at_1550_pm_per_V
+  direction: maximize
+
+  target_completed_trials: 30
+  initialization_trials: 10
+  bo_trials: 20
+  batch_size: 1
+  random_seed: 1414
+
+  stratify_initialization_by_profile: true
+  minimum_initial_per_profile: 2
+
+  search_space:
+    asymmetry_s:
+      type: range
+      lower: 0.30
+      upper: 0.55
+    nominal_central_barrier_thickness_nm:
+      type: range
+      lower: 0.85
+      upper: 2.50
+    gaas_to_algaas_grading_width_10_90_nm:
+      type: range
+      lower: 0.20
+      upper: 1.40
+    algaas_to_gaas_grading_width_10_90_nm:
+      type: range
+      lower: 0.20
+      upper: 1.40
+    grading_profile:
+      type: choice
+      values: [linear, fermi, erf, cosine]
+
+  max_candidate_regeneration_attempts: 20
+
+# --- constraints -----------------------------------------------------------
+constraints:
+  maximum_detuning_nm: 40.0
+  maximum_boundary_probability: 1.0e-3
+  minimum_state_tracking_confidence: 0.80
+  maximum_orthonormality_error: 1.0e-3
+  require_origin_independence: true
+  require_expected_states: true
+  require_physical_qc: true
+  require_absolute_units_valid: true
+  require_k_parallel_converged: false   # reported; not a feasibility gate
+
+# --- state selection -------------------------------------------------------
+# Must be called `validation`: `adapter14` reads the policy from
+# cfg["validation"]["quasi_bound_state_policy"] and defaults it to "warn" when
+# absent, so the same key under any other section is dead config that looks
+# live. preflight17e asserts the value actually arrives in the derived Demo 11
+# config.
+#
+# 'warn' is deliberate and is Demo 17's choice for the same reason: Demo 11
+# raises on 'fail_case' BEFORE envelopes.csv is written, which would deny this
+# demo the per-state verdict and the per-case envelopes it exists to produce.
+# `demo17.bound_state_verdict` then applies the strict verdict itself, per
+# state, over the states inside Eq. 2's window. A failing state never silently
+# becomes a passing case, and "could not tell" is reported as NOT CERTIFIED
+# rather than as a pass.
+validation:
+  quasi_bound_state_policy: warn
+
+# --- failure policy --------------------------------------------------------
+failure_policy:
+  stop_on_technical_failure: true
+  subresolution_grade_is_a_bug: true
+  fabricate_objective_for_failed_trials: false
+
+# --- logging ---------------------------------------------------------------
+logging:
+  console_level: INFO
+  file_level: DEBUG
+  events_jsonl: true
+  timing_jsonl: true
+  intermediate_plot_every_n_trials: 5
+
+# --- checkpointing ---------------------------------------------------------
+checkpointing:
+  after_every_trial: true
+  atomic_writes: true
+  keep_per_trial_snapshots: true
+
+# --- plotting --------------------------------------------------------------
+plotting:
+  enabled: true
+  failure_is_fatal: false
+  # 300 DPI for the Demo 17E diagnostic suite. The shared `plots.save_figure`
+  # helper is fixed at 180 and is shared with every other demo, so run_demo17e
+  # saves through its own writer at this DPI while still recording skips in the
+  # shared ledger.
+  dpi: 300
+  formats: [png]
+
+# --- paper reference -------------------------------------------------------
+paper_reference:
+  enabled: true
+  targets_file: ../11_paper_validation_interband_chi2_acqw/paper_targets.yaml
+  structure:
+    thick_well_nm: 7.1
+    tunnel_barrier_nm: 1.8
+    thin_well_nm: 2.9
+    period_barrier_nm: 18.2
+    al_fraction: 0.55
+    asymmetry_s: 0.42
+  expectations:
+    chi2_ideal_abrupt_pm_per_V: 2340.0
+    chi2_eds_al_profile_pm_per_V: 1200.0
+    chi2_eds_ga_profile_pm_per_V: 1363.0
+    simulated_resonance_nm: 1520.0
+  # The case the 2340 pm/V ideal-abrupt number describes.
+  ideal_abrupt_case_id: case_00
+  plausibility_band_pm_per_V: [50.0, 50000.0]
+
+# --- workflow / paths ------------------------------------------------------
+workflow:
+  mode: fixed_case_study
+  run_solver: true
+  mock_solver: false
+
+paths:
+  results_subdir: 17e_statistical_grading_sweep

@@ -1,0 +1,52 @@
+{
+  "demo_id": "18E_electron_hh_cancellation_state_truncation_audit",
+  "version": "demo18e-1.0.0",
+  "sources": {
+    "demo18d_run": "C:/nn_results/18D_solver_physics_dual_objective_reproduction/demo18d_20260814T010423Z_66dca051_ce7cd6",
+    "demo18d_case": "Case_19",
+    "demo18b_run": "C:/nn_results/18B_absolute_chi2_reproduction_audit/demo18b_20260813T214542Z_280685a3_012c1f",
+    "demo18b_case": "M2_0p025nm",
+    "local_demo18d_handoff": "demo_results/demo18d",
+    "local_demo18b_handoff": "demo_results/demo18b"
+  },
+  "fixed_physics": {
+    "broadening_meV": 5.0,
+    "spin_degeneracy": 2,
+    "wells_per_period_for_Nz": 2,
+    "nominal_period_nm": 30.0,
+    "r_e_hh_nm": 0.751,
+    "hh_relative_weight": 1.0,
+    "electron_inplane_mass_m0": 0.067,
+    "heavy_hole_inplane_mass_m0": 0.112,
+    "lattice_constant_nm": 0.565325,
+    "kmax_fraction_2pi_over_a": 0.10,
+    "k_points": 768
+  },
+  "spectrum": {
+    "wavelength_start_nm": 1400.0,
+    "wavelength_stop_nm": 1800.0,
+    "wavelength_points": 401,
+    "target_wavelength_nm": 1550.0,
+    "desired_peak_window_nm": [1520.0, 1560.0],
+    "paper_target_pm_per_V": 2340.0
+  },
+  "rotation": {
+    "angles_deg": [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90],
+    "protocol": "exact_degenerate_subspace_control",
+    "states": [2, 3],
+    "explanation": "HH2 and HH3 are replaced by their mean energy for the rotation-control only. This is the mathematically valid degenerate-limit test. Actual nondegenerate eigenstates are used unchanged for substitution and state-count results."
+  },
+  "controls": {
+    "phase_seed": 1805,
+    "phase_trials": 16,
+    "invariance_relative_tolerance": 1.0e-11,
+    "permutation_relative_tolerance": 1.0e-11,
+    "strong_state_truncation_threshold_percent": 20.0
+  },
+  "case19_geometry": {
+    "electrostatic_field_kV_per_cm": 3.0,
+    "tunneling_barrier_nm": 1.75,
+    "well1_nm": 7.1,
+    "well2_nm": 2.92
+  }
+}

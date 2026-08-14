@@ -1,0 +1,856 @@
+
+==============================================================================
+DEMO 18C UNWEIGHTED REANALYSIS
+==============================================================================
+[
+  {
+    "cancellation_factor": 143.60308838535568,
+    "chi_e_abs": 7558.351482494047,
+    "chi_e_imag": -4925.99457299571,
+    "chi_e_real": 5732.648131512762,
+    "chi_hh_abs": 7482.118803194886,
+    "chi_hh_imag": 4930.286122059095,
+    "chi_hh_real": -5627.99969258652,
+    "desired_peak_ratio": 3.390553579980958,
+    "field_kV_per_cm": 3.777444,
+    "forced_hh_relative_weight": 1.0,
+    "normalized_chi2_1550_at_r_0p751": 104.73639846329884,
+    "normalized_r_e_hh_nm": 0.751,
+    "original_combo_id": "Combo_14",
+    "original_hh_relative_weight": 1.295469,
+    "original_peak_wavelength_nm": 1663.0,
+    "original_r_e_hh_nm": 0.909992,
+    "original_reported_chi2_1550": 1725.3211526870148,
+    "raw_chi2_1550_at_hh_weight_1": 85.28000910401536,
+    "recomputed_unweighted_peak_chi2_pm_per_V": 182.51298259968144,
+    "recomputed_unweighted_peak_wavelength_nm": 1519.0,
+    "solver_case_id": "Solve_14",
+    "source_combinations_sha256": "0f321c7dfe08d51061ad2300080823236533f337e9586227e250956f69229ae5",
+    "source_solver_gate_passed": true,
+    "spectral_window_pass": false,
+    "tunneling_barrier_nm": 1.726138,
+    "unweighted_amplitude_rank": 1,
+    "well1_nm": 7.049757,
+    "well2_nm": 2.905859
+  },
+  {
+    "cancellation_factor": 109.97295964980415,
+    "chi_e_abs": 5772.0407406165305,
+    "chi_e_imag": -4778.15903363224,
+    "chi_e_real": 3238.1554256483187,
+    "chi_hh_abs": 5714.485857886072,
+    "chi_hh_imag": 4778.62155993747,
+    "chi_hh_real": -3133.7078049621505,
+    "desired_peak_ratio": 3.212581996683781,
+    "field_kV_per_cm": 0.582619,
+    "forced_hh_relative_weight": 1.0,
+    "normalized_chi2_1550_at_r_0p751": 104.44864478577355,
+    "normalized_r_e_hh_nm": 0.751,
+    "original_combo_id": "Combo_07",
+    "original_hh_relative_weight": 0.68318,
+    "original_peak_wavelength_nm": 1662.0,
+    "original_r_e_hh_nm": 0.767897,
+    "original_reported_chi2_1550": 1954.4741280010403,
+    "raw_chi2_1550_at_hh_weight_1": 109.20156871889537,
+    "recomputed_unweighted_peak_chi2_pm_per_V": 183.39192234460654,
+    "recomputed_unweighted_peak_wavelength_nm": 1518.0,
+    "solver_case_id": "Solve_07",
+    "source_combinations_sha256": "0f321c7dfe08d51061ad2300080823236533f337e9586227e250956f69229ae5",
+    "source_solver_gate_passed": true,
+    "spectral_window_pass": false,
+    "tunneling_barrier_nm": 1.740274,
+    "unweighted_amplitude_rank": 2,
+    "well1_nm": 7.034685,
+    "well2_nm": 2.88371
+  },
+  {
+    "cancellation_factor": 131.25023997112393,
+    "chi_e_abs": 5594.043851176905,
+    "chi_e_imag": -4772.367365883146,
+    "chi_e_real": 2918.533250443399,
+    "chi_hh_abs": 5550.484674840328,
+    "chi_hh_imag": 4772.678411757451,
+    "chi_hh_real": -2833.6232818745902,
+    "desired_peak_ratio": 3.2440401391555835,
+    "field_kV_per_cm": 0.0,
+    "forced_hh_relative_weight": 1.0,
+    "normalized_chi2_1550_at_r_0p751": 84.91053828525659,
+    "normalized_r_e_hh_nm": 0.751,
+    "original_combo_id": "Combo_00",
+    "original_hh_relative_weight": 1.0,
+    "original_peak_wavelength_nm": 1520.0,
+    "original_r_e_hh_nm": 0.751,
+    "original_reported_chi2_1550": 84.91053828525659,
+    "raw_chi2_1550_at_hh_weight_1": 84.91053828525659,
+    "recomputed_unweighted_peak_chi2_pm_per_V": 146.0814424756297,
+    "recomputed_unweighted_peak_wavelength_nm": 1520.0,
+    "solver_case_id": "Solve_00",
+    "source_combinations_sha256": "0f321c7dfe08d51061ad2300080823236533f337e9586227e250956f69229ae5",
+    "source_solver_gate_passed": true,
+    "spectral_window_pass": true,
+    "tunneling_barrier_nm": 1.8,
+    "unweighted_amplitude_rank": 3,
+    "well1_nm": 7.1,
+    "well2_nm": 2.9
+  },
+  {
+    "cancellation_factor": 221.67936755672946,
+    "chi_e_abs": 7965.468763581387,
+    "chi_e_imag": -4989.557685502085,
+    "chi_e_real": 6209.106757548776,
+    "chi_hh_abs": 7914.175091715853,
+    "chi_hh_imag": 4996.180700705915,
+    "chi_hh_real": -6137.780200384287,
+    "desired_peak_ratio": 3.580719900205219,
+    "field_kV_per_cm": 4.57899,
+    "forced_hh_relative_weight": 1.0,
+    "normalized_chi2_1550_at_r_0p751": 71.63338668057827,
+    "normalized_r_e_hh_nm": 0.751,
+    "original_combo_id": "Combo_01",
+    "original_hh_relative_weight": 1.158009,
+    "original_peak_wavelength_nm": 1520.0,
+    "original_r_e_hh_nm": 0.852516,
+    "original_reported_chi2_1550": 1624.1285009265855,
+    "raw_chi2_1550_at_hh_weight_1": 96.8029485519825,
+    "recomputed_unweighted_peak_chi2_pm_per_V": 119.82869116122315,
+    "recomputed_unweighted_peak_wavelength_nm": 1522.0,
+    "solver_case_id": "Solve_01",
+    "source_combinations_sha256": "0f321c7dfe08d51061ad2300080823236533f337e9586227e250956f69229ae5",
+    "source_solver_gate_passed": true,
+    "spectral_window_pass": true,
+    "tunneling_barrier_nm": 1.705461,
+    "unweighted_amplitude_rank": 4,
+    "well1_nm": 7.167789,
+    "well2_nm": 2.952
+  },
+  {
+    "cancellation_factor": 229.64116835258025,
+    "chi_e_abs": 8003.174573485235,
+    "chi_e_imag": -4973.946079584749,
+    "chi_e_real": 6269.821660227991,
+    "chi_hh_abs": 8070.890178108861,
+    "chi_hh_imag": 5002.07593249721,
+    "chi_hh_real": -6333.9170055050645,
+    "desired_peak_ratio": 1.543795650407168,
+    "field_kV_per_cm": 20.0,
+    "forced_hh_relative_weight": 1.0,
+    "normalized_chi2_1550_at_r_0p751": 69.99644213146804,
+    "normalized_r_e_hh_nm": 0.751,
+    "original_combo_id": "Combo_18",
+    "original_hh_relative_weight": 0.75,
+    "original_peak_wavelength_nm": 1524.0,
+    "original_r_e_hh_nm": 1.0,
+    "original_reported_chi2_1550": 3863.335023515954,
+    "raw_chi2_1550_at_hh_weight_1": 140.0958752950545,
+    "recomputed_unweighted_peak_chi2_pm_per_V": 102.95545848651551,
+    "recomputed_unweighted_peak_wavelength_nm": 1525.0,
+    "solver_case_id": "Solve_16",
+    "source_combinations_sha256": "0f321c7dfe08d51061ad2300080823236533f337e9586227e250956f69229ae5",
+    "source_solver_gate_passed": true,
+    "spectral_window_pass": true,
+    "tunneling_barrier_nm": 1.7,
+    "unweighted_amplitude_rank": 5,
+    "well1_nm": 7.2,
+    "well2_nm": 3.0
+  },
+  {
+    "cancellation_factor": 256.8596373790343,
+    "chi_e_abs": 7498.570517781448,
+    "chi_e_imag": -4871.772517113624,
+    "chi_e_real": 5700.385280982113,
+    "chi_hh_abs": 7554.1990679865385,
+    "chi_hh_imag": 4893.8344965942815,
+    "chi_hh_real": -5754.677009069447,
+    "desired_peak_ratio": 1.444986277357261,
+    "field_kV_per_cm": 16.317429,
+    "forced_hh_relative_weight": 1.0,
+    "normalized_chi2_1550_at_r_0p751": 58.60309443462852,
+    "normalized_r_e_hh_nm": 0.751,
+    "original_combo_id": "Combo_06",
+    "original_hh_relative_weight": 0.664592,
+    "original_peak_wavelength_nm": 1511.0,
+    "original_r_e_hh_nm": 0.832779,
+    "original_reported_chi2_1550": 3208.235854373299,
+    "raw_chi2_1550_at_hh_weight_1": 76.57414814517472,
+    "recomputed_unweighted_peak_chi2_pm_per_V": 97.59232873109359,
+    "recomputed_unweighted_peak_wavelength_nm": 1512.0,
+    "solver_case_id": "Solve_06",
+    "source_combinations_sha256": "0f321c7dfe08d51061ad2300080823236533f337e9586227e250956f69229ae5",
+    "source_solver_gate_passed": true,
+    "spectral_window_pass": false,
+    "tunneling_barrier_nm": 1.820115,
+    "unweighted_amplitude_rank": 6,
+    "well1_nm": 7.121634,
+    "well2_nm": 2.82338
+  },
+  {
+    "cancellation_factor": 267.8494942805362,
+    "chi_e_abs": 7612.3750088145325,
+    "chi_e_imag": -4875.003004796383,
+    "chi_e_real": 5846.5886616086045,
+    "chi_hh_abs": 7667.677388747081,
+    "chi_hh_imag": 4899.618485866811,
+    "chi_hh_real": -5898.051816562437,
+    "desired_peak_ratio": 1.4228363637819663,
+    "field_kV_per_cm": 19.653938,
+    "forced_hh_relative_weight": 1.0,
+    "normalized_chi2_1550_at_r_0p751": 57.04715791457802,
+    "normalized_r_e_hh_nm": 0.751,
+    "original_combo_id": "Combo_05",
+    "original_hh_relative_weight": 1.06746,
+    "original_peak_wavelength_nm": 1515.0,
+    "original_r_e_hh_nm": 0.796366,
+    "original_reported_chi2_1550": 350.11987687362307,
+    "raw_chi2_1550_at_hh_weight_1": 35.20807628660261,
+    "recomputed_unweighted_peak_chi2_pm_per_V": 90.61643087144095,
+    "recomputed_unweighted_peak_wavelength_nm": 1515.0,
+    "solver_case_id": "Solve_05",
+    "source_combinations_sha256": "0f321c7dfe08d51061ad2300080823236533f337e9586227e250956f69229ae5",
+    "source_solver_gate_passed": true,
+    "spectral_window_pass": false,
+    "tunneling_barrier_nm": 1.870783,
+    "unweighted_amplitude_rank": 7,
+    "well1_nm": 7.021582,
+    "well2_nm": 2.867634
+  },
+  {
+    "cancellation_factor": 189.37055401943098,
+    "chi_e_abs": 5411.080335375452,
+    "chi_e_imag": -4748.719137587269,
+    "chi_e_real": 2594.119686560229,
+    "chi_hh_abs": 5384.917460981847,
+    "chi_hh_imag": 4749.774777188162,
+    "chi_hh_real": -2537.119553267904,
+    "desired_peak_ratio": 3.238971807981075,
+    "field_kV_per_cm": -2.03342,
+    "forced_hh_relative_weight": 1.0,
+    "normalized_chi2_1550_at_r_0p751": 57.00990765042353,
+    "normalized_r_e_hh_nm": 0.751,
+    "original_combo_id": "Combo_09",
+    "original_hh_relative_weight": 1.383247,
+    "original_peak_wavelength_nm": 1664.0,
+    "original_r_e_hh_nm": 0.962101,
+    "original_reported_chi2_1550": 1719.5284874957204,
+    "raw_chi2_1550_at_hh_weight_1": 49.43359428414519,
+    "recomputed_unweighted_peak_chi2_pm_per_V": 103.26718542033566,
+    "recomputed_unweighted_peak_wavelength_nm": 1517.0,
+    "solver_case_id": "Solve_09",
+    "source_combinations_sha256": "0f321c7dfe08d51061ad2300080823236533f337e9586227e250956f69229ae5",
+    "source_solver_gate_passed": true,
+    "spectral_window_pass": false,
+    "tunneling_barrier_nm": 1.781699,
+    "unweighted_amplitude_rank": 8,
+    "well1_nm": 7.136079,
+    "well2_nm": 2.801561
+  },
+  {
+    "cancellation_factor": 285.55940638426523,
+    "chi_e_abs": 7799.795371726518,
+    "chi_e_imag": -4933.847000754595,
+    "chi_e_real": 6041.023225741754,
+    "chi_hh_abs": 7851.914303942763,
+    "chi_hh_imag": 4953.61993543505,
+    "chi_hh_real": -6092.143118125296,
+    "desired_peak_ratio": 1.6664390883861722,
+    "field_kV_per_cm": 12.932406,
+    "forced_hh_relative_weight": 1.0,
+    "normalized_chi2_1550_at_r_0p751": 54.810695518141806,
+    "normalized_r_e_hh_nm": 0.751,
+    "original_combo_id": "Combo_02",
+    "original_hh_relative_weight": 0.559829,
+    "original_peak_wavelength_nm": 1517.0,
+    "original_r_e_hh_nm": 0.714726,
+    "original_reported_chi2_1550": 3458.797949904566,
+    "raw_chi2_1550_at_hh_weight_1": 56.45490086721415,
+    "recomputed_unweighted_peak_chi2_pm_per_V": 86.45801157782655,
+    "recomputed_unweighted_peak_wavelength_nm": 1518.0,
+    "solver_case_id": "Solve_02",
+    "source_combinations_sha256": "0f321c7dfe08d51061ad2300080823236533f337e9586227e250956f69229ae5",
+    "source_solver_gate_passed": true,
+    "spectral_window_pass": false,
+    "tunneling_barrier_nm": 1.774727,
+    "unweighted_amplitude_rank": 9,
+    "well1_nm": 7.189786,
+    "well2_nm": 2.908121
+  },
+  {
+    "cancellation_factor": 218.8277600653389,
+    "chi_e_abs": 5374.761182440589,
+    "chi_e_imag": -4749.480759328497,
+    "chi_e_real": 2516.046558599139,
+    "chi_hh_abs": 5352.5070531161255,
+    "chi_hh_imag": 4750.06337880092,
+    "chi_hh_real": -2467.0285063274514,
+    "desired_peak_ratio": 3.329485641705986,
+    "field_kV_per_cm": -6.334734,
+    "forced_hh_relative_weight": 1.0,
+    "normalized_chi2_1550_at_r_0p751": 49.0215146028717,
+    "normalized_r_e_hh_nm": 0.751,
+    "original_combo_id": "Combo_11",
+    "original_hh_relative_weight": 0.908619,
+    "original_peak_wavelength_nm": 1663.0,
+    "original_r_e_hh_nm": 0.749842,
+    "original_reported_chi2_1550": 552.484190507176,
+    "raw_chi2_1550_at_hh_weight_1": 55.21718726529429,
+    "recomputed_unweighted_peak_chi2_pm_per_V": 86.36960817382447,
+    "recomputed_unweighted_peak_wavelength_nm": 1519.0,
+    "solver_case_id": "Solve_11",
+    "source_combinations_sha256": "0f321c7dfe08d51061ad2300080823236533f337e9586227e250956f69229ae5",
+    "source_solver_gate_passed": true,
+    "spectral_window_pass": false,
+    "tunneling_barrier_nm": 1.729391,
+    "unweighted_amplitude_rank": 10,
+    "well1_nm": 7.056995,
+    "well2_nm": 2.83542
+  },
+  {
+    "cancellation_factor": 330.33936967758433,
+    "chi_e_abs": 7912.280387488738,
+    "chi_e_imag": -4948.620808769118,
+    "chi_e_real": 6173.76165892855,
+    "chi_hh_abs": 7958.161005899125,
+    "chi_hh_imag": 4966.156459416596,
+    "chi_hh_real": -6218.4898983923895,
+    "desired_peak_ratio": 1.6648975213383963,
+    "field_kV_per_cm": 11.496125,
+    "forced_hh_relative_weight": 1.0,
+    "normalized_chi2_1550_at_r_0p751": 48.04283972836065,
+    "normalized_r_e_hh_nm": 0.751,
+    "original_combo_id": "Combo_03",
+    "original_hh_relative_weight": 1.249622,
+    "original_peak_wavelength_nm": 1518.0,
+    "original_r_e_hh_nm": 0.670296,
+    "original_reported_chi2_1550": 1817.2524254868433,
+    "raw_chi2_1550_at_hh_weight_1": 43.405951877330196,
+    "recomputed_unweighted_peak_chi2_pm_per_V": 74.02367108342193,
+    "recomputed_unweighted_peak_wavelength_nm": 1519.0,
+    "solver_case_id": "Solve_03",
+    "source_combinations_sha256": "0f321c7dfe08d51061ad2300080823236533f337e9586227e250956f69229ae5",
+    "source_solver_gate_passed": true,
+    "spectral_window_pass": false,
+    "tunneling_barrier_nm": 1.757685,
+    "unweighted_amplitude_rank": 11,
+    "well1_nm": 7.086018,
+    "well2_nm": 2.921867
+  },
+  {
+    "cancellation_factor": 253.9775411569465,
+    "chi_e_abs": 5330.149629349821,
+    "chi_e_imag": -4760.881838124012,
+    "chi_e_real": 2396.7684900046083,
+    "chi_hh_abs": 5310.501509127007,
+    "chi_hh_imag": 4759.825549378708,
+    "chi_hh_real": -2354.8857759819043,
+    "desired_peak_ratio": 2.942787992055897,
+    "field_kV_per_cm": -9.518561,
+    "forced_hh_relative_weight": 1.0,
+    "normalized_chi2_1550_at_r_0p751": 41.89603179086371,
+    "normalized_r_e_hh_nm": 0.751,
+    "original_combo_id": "Combo_12",
+    "original_hh_relative_weight": 1.443178,
+    "original_peak_wavelength_nm": 1662.0,
+    "original_r_e_hh_nm": 0.873306,
+    "original_reported_chi2_1550": 3291.082660473733,
+    "raw_chi2_1550_at_hh_weight_1": 61.319920845582224,
+    "recomputed_unweighted_peak_chi2_pm_per_V": 65.60709839667786,
+    "recomputed_unweighted_peak_wavelength_nm": 1528.0,
+    "solver_case_id": "Solve_12",
+    "source_combinations_sha256": "0f321c7dfe08d51061ad2300080823236533f337e9586227e250956f69229ae5",
+    "source_solver_gate_passed": true,
+    "spectral_window_pass": true,
+    "tunneling_barrier_nm": 1.840218,
+    "unweighted_amplitude_rank": 12,
+    "well1_nm": 7.00962,
+    "well2_nm": 2.965709
+  },
+  {
+    "cancellation_factor": 435.42055098015345,
+    "chi_e_abs": 8209.379311151499,
+    "chi_e_imag": -5014.139553633412,
+    "chi_e_real": 6500.177936876127,
+    "chi_hh_abs": 8245.914366917463,
+    "chi_hh_imag": 5028.781611576883,
+    "chi_hh_real": -6535.017922668769,
+    "desired_peak_ratio": 1.6234283999793548,
+    "field_kV_per_cm": 8.563815,
+    "forced_hh_relative_weight": 1.0,
+    "normalized_chi2_1550_at_r_0p751": 37.79172489912861,
+    "normalized_r_e_hh_nm": 0.751,
+    "original_combo_id": "Combo_04",
+    "original_hh_relative_weight": 1.115485,
+    "original_peak_wavelength_nm": 1522.0,
+    "original_r_e_hh_nm": 0.902864,
+    "original_reported_chi2_1550": 790.5111503756204,
+    "raw_chi2_1550_at_hh_weight_1": 30.371853759134694,
+    "recomputed_unweighted_peak_chi2_pm_per_V": 55.445058639431146,
+    "recomputed_unweighted_peak_wavelength_nm": 1523.0,
+    "solver_case_id": "Solve_04",
+    "source_combinations_sha256": "0f321c7dfe08d51061ad2300080823236533f337e9586227e250956f69229ae5",
+    "source_solver_gate_passed": true,
+    "spectral_window_pass": true,
+    "tunneling_barrier_nm": 1.885031,
+    "unweighted_amplitude_rank": 13,
+    "well1_nm": 7.116798,
+    "well2_nm": 2.991329
+  },
+  {
+    "cancellation_factor": 280.5689664192192,
+    "chi_e_abs": 5301.852895011328,
+    "chi_e_imag": -4758.850624001157,
+    "chi_e_real": 2337.3029026602,
+    "chi_hh_abs": 5284.560589817021,
+    "chi_hh_imag": 4757.994256878714,
+    "chi_hh_real": -2299.58067459187,
+    "desired_peak_ratio": 2.9121023183205805,
+    "field_kV_per_cm": -9.160953,
+    "forced_hh_relative_weight": 1.0,
+    "normalized_chi2_1550_at_r_0p751": 37.73194740650822,
+    "normalized_r_e_hh_nm": 0.751,
+    "original_combo_id": "Combo_13",
+    "original_hh_relative_weight": 0.92931,
+    "original_peak_wavelength_nm": 1663.0,
+    "original_r_e_hh_nm": 0.696202,
+    "original_reported_chi2_1550": 337.0467132301508,
+    "raw_chi2_1550_at_hh_weight_1": 32.42648540407728,
+    "recomputed_unweighted_peak_chi2_pm_per_V": 59.87043966386939,
+    "recomputed_unweighted_peak_wavelength_nm": 1527.0,
+    "solver_case_id": "Solve_13",
+    "source_combinations_sha256": "0f321c7dfe08d51061ad2300080823236533f337e9586227e250956f69229ae5",
+    "source_solver_gate_passed": true,
+    "spectral_window_pass": true,
+    "tunneling_barrier_nm": 1.8921,
+    "unweighted_amplitude_rank": 14,
+    "well1_nm": 7.068565,
+    "well2_nm": 2.939511
+  },
+  {
+    "cancellation_factor": 292.5046764812732,
+    "chi_e_abs": 5308.433410797746,
+    "chi_e_imag": -4774.859867128793,
+    "chi_e_real": 2319.5211846751035,
+    "chi_hh_abs": 5290.916007802966,
+    "chi_hh_imag": 4772.8555369156065,
+    "chi_hh_real": -2283.340146662278,
+    "desired_peak_ratio": 2.3814002999130355,
+    "field_kV_per_cm": -16.996749,
+    "forced_hh_relative_weight": 1.0,
+    "normalized_chi2_1550_at_r_0p751": 36.23651268112052,
+    "normalized_r_e_hh_nm": 0.751,
+    "original_combo_id": "Combo_15",
+    "original_hh_relative_weight": 0.983167,
+    "original_peak_wavelength_nm": 1665.0,
+    "original_r_e_hh_nm": 0.735996,
+    "original_reported_chi2_1550": 57.15219895728697,
+    "raw_chi2_1550_at_hh_weight_1": 18.894846718447923,
+    "recomputed_unweighted_peak_chi2_pm_per_V": 57.173703427582055,
+    "recomputed_unweighted_peak_wavelength_nm": 1528.0,
+    "solver_case_id": "Solve_15",
+    "source_combinations_sha256": "0f321c7dfe08d51061ad2300080823236533f337e9586227e250956f69229ae5",
+    "source_solver_gate_passed": true,
+    "spectral_window_pass": true,
+    "tunneling_barrier_nm": 1.807262,
+    "unweighted_amplitude_rank": 15,
+    "well1_nm": 7.147311,
+    "well2_nm": 2.841983
+  },
+  {
+    "cancellation_factor": 297.6276287530221,
+    "chi_e_abs": 5294.073860070187,
+    "chi_e_imag": -4776.142282695918,
+    "chi_e_real": 2283.78697152836,
+    "chi_hh_abs": 5276.87154439827,
+    "chi_hh_imag": 4773.923445428087,
+    "chi_hh_real": -2248.3389942960594,
+    "desired_peak_ratio": 2.448621568846169,
+    "field_kV_per_cm": -13.48485,
+    "forced_hh_relative_weight": 1.0,
+    "normalized_chi2_1550_at_r_0p751": 35.51735250103564,
+    "normalized_r_e_hh_nm": 0.751,
+    "original_combo_id": "Combo_10",
+    "original_hh_relative_weight": 0.796893,
+    "original_peak_wavelength_nm": 1665.0,
+    "original_r_e_hh_nm": 0.989704,
+    "original_reported_chi2_1550": 999.8690030916541,
+    "raw_chi2_1550_at_hh_weight_1": 33.90177458204733,
+    "recomputed_unweighted_peak_chi2_pm_per_V": 52.061744805658556,
+    "recomputed_unweighted_peak_wavelength_nm": 1532.0,
+    "solver_case_id": "Solve_10",
+    "source_combinations_sha256": "0f321c7dfe08d51061ad2300080823236533f337e9586227e250956f69229ae5",
+    "source_solver_gate_passed": true,
+    "spectral_window_pass": true,
+    "tunneling_barrier_nm": 1.850312,
+    "unweighted_amplitude_rank": 16,
+    "well1_nm": 7.175821,
+    "well2_nm": 2.976328
+  },
+  {
+    "cancellation_factor": 309.8785388349587,
+    "chi_e_abs": 5299.235520977372,
+    "chi_e_imag": -4772.148717189131,
+    "chi_e_real": 2304.016867954411,
+    "chi_hh_abs": 5282.490650935784,
+    "chi_hh_imag": 4769.913007130443,
+    "chi_hh_real": -2269.942153807401,
+    "desired_peak_ratio": 2.2527690358186963,
+    "field_kV_per_cm": -18.418271,
+    "forced_hh_relative_weight": 1.0,
+    "normalized_chi2_1550_at_r_0p751": 34.14798008179903,
+    "normalized_r_e_hh_nm": 0.751,
+    "original_combo_id": "Combo_08",
+    "original_hh_relative_weight": 0.765384,
+    "original_peak_wavelength_nm": 1664.0,
+    "original_r_e_hh_nm": 0.941406,
+    "original_reported_chi2_1550": 1974.2044615122948,
+    "raw_chi2_1550_at_hh_weight_1": 53.65856687847029,
+    "recomputed_unweighted_peak_chi2_pm_per_V": 53.58599515457679,
+    "recomputed_unweighted_peak_wavelength_nm": 1528.0,
+    "solver_case_id": "Solve_08",
+    "source_combinations_sha256": "0f321c7dfe08d51061ad2300080823236533f337e9586227e250956f69229ae5",
+    "source_solver_gate_passed": true,
+    "spectral_window_pass": true,
+    "tunneling_barrier_nm": 1.805476,
+    "unweighted_amplitude_rank": 17,
+    "well1_nm": 7.096001,
+    "well2_nm": 2.858181
+  }
+]
+
+==============================================================================
+LICENSED SOLVE 1/20: Case_00
+==============================================================================
+{
+  "failure_reason": null,
+  "field_gate": {
+    "measured_kV_per_cm": 0.0,
+    "passed": true,
+    "requested_kV_per_cm": 0.0,
+    "source": "C:\\nn_results\\18D_solver_physics_dual_objective_reproduction\\demo18d_20260814T010423Z_66dca051_ce7cd6\\solver\\Case_00\\case\\bias_00000\\electric_field.dat",
+    "tolerance_kV_per_cm": 0.05
+  },
+  "passed": true,
+  "quantum_output_completion_gate": true,
+  "solver_return_code_zero": true
+}
+
+==============================================================================
+LICENSED SOLVE 2/20: Case_01
+==============================================================================
+{
+  "failure_reason": null,
+  "field_gate": {
+    "measured_kV_per_cm": 0.58261899999999,
+    "passed": true,
+    "requested_kV_per_cm": 0.582619,
+    "source": "C:\\nn_results\\18D_solver_physics_dual_objective_reproduction\\demo18d_20260814T010423Z_66dca051_ce7cd6\\solver\\Case_01\\case\\bias_00000\\electric_field.dat",
+    "tolerance_kV_per_cm": 0.05
+  },
+  "passed": true,
+  "quantum_output_completion_gate": true,
+  "solver_return_code_zero": true
+}
+
+==============================================================================
+LICENSED SOLVE 3/20: Case_02
+==============================================================================
+{
+  "failure_reason": null,
+  "field_gate": {
+    "measured_kV_per_cm": 20.0,
+    "passed": true,
+    "requested_kV_per_cm": 20.0,
+    "source": "C:\\nn_results\\18D_solver_physics_dual_objective_reproduction\\demo18d_20260814T010423Z_66dca051_ce7cd6\\solver\\Case_02\\case\\bias_00000\\electric_field.dat",
+    "tolerance_kV_per_cm": 0.2
+  },
+  "passed": true,
+  "quantum_output_completion_gate": true,
+  "solver_return_code_zero": true
+}
+
+==============================================================================
+LICENSED SOLVE 4/20: Case_03
+==============================================================================
+{
+  "failure_reason": null,
+  "field_gate": {
+    "measured_kV_per_cm": 4.57899,
+    "passed": true,
+    "requested_kV_per_cm": 4.57899,
+    "source": "C:\\nn_results\\18D_solver_physics_dual_objective_reproduction\\demo18d_20260814T010423Z_66dca051_ce7cd6\\solver\\Case_03\\case\\bias_00000\\electric_field.dat",
+    "tolerance_kV_per_cm": 0.05
+  },
+  "passed": true,
+  "quantum_output_completion_gate": true,
+  "solver_return_code_zero": true
+}
+
+==============================================================================
+LICENSED SOLVE 5/20: Case_04
+==============================================================================
+{
+  "failure_reason": null,
+  "field_gate": {
+    "measured_kV_per_cm": 12.932406,
+    "passed": true,
+    "requested_kV_per_cm": 12.932406,
+    "source": "C:\\nn_results\\18D_solver_physics_dual_objective_reproduction\\demo18d_20260814T010423Z_66dca051_ce7cd6\\solver\\Case_04\\case\\bias_00000\\electric_field.dat",
+    "tolerance_kV_per_cm": 0.12932406000000002
+  },
+  "passed": true,
+  "quantum_output_completion_gate": true,
+  "solver_return_code_zero": true
+}
+
+==============================================================================
+LICENSED SOLVE 6/20: Case_05
+==============================================================================
+{
+  "failure_reason": null,
+  "field_gate": {
+    "measured_kV_per_cm": 7.994842,
+    "passed": true,
+    "requested_kV_per_cm": 7.994842,
+    "source": "C:\\nn_results\\18D_solver_physics_dual_objective_reproduction\\demo18d_20260814T010423Z_66dca051_ce7cd6\\solver\\Case_05\\case\\bias_00000\\electric_field.dat",
+    "tolerance_kV_per_cm": 0.07994842
+  },
+  "passed": true,
+  "quantum_output_completion_gate": true,
+  "solver_return_code_zero": true
+}
+
+==============================================================================
+LICENSED SOLVE 7/20: Case_06
+==============================================================================
+{
+  "failure_reason": null,
+  "field_gate": {
+    "measured_kV_per_cm": 8.8580729999998,
+    "passed": true,
+    "requested_kV_per_cm": 8.858073,
+    "source": "C:\\nn_results\\18D_solver_physics_dual_objective_reproduction\\demo18d_20260814T010423Z_66dca051_ce7cd6\\solver\\Case_06\\case\\bias_00000\\electric_field.dat",
+    "tolerance_kV_per_cm": 0.08858073
+  },
+  "passed": true,
+  "quantum_output_completion_gate": true,
+  "solver_return_code_zero": true
+}
+
+==============================================================================
+LICENSED SOLVE 8/20: Case_07
+==============================================================================
+{
+  "failure_reason": null,
+  "field_gate": {
+    "measured_kV_per_cm": 1.250601,
+    "passed": true,
+    "requested_kV_per_cm": 1.250601,
+    "source": "C:\\nn_results\\18D_solver_physics_dual_objective_reproduction\\demo18d_20260814T010423Z_66dca051_ce7cd6\\solver\\Case_07\\case\\bias_00000\\electric_field.dat",
+    "tolerance_kV_per_cm": 0.05
+  },
+  "passed": true,
+  "quantum_output_completion_gate": true,
+  "solver_return_code_zero": true
+}
+
+==============================================================================
+LICENSED SOLVE 9/20: Case_08
+==============================================================================
+{
+  "failure_reason": null,
+  "field_gate": {
+    "measured_kV_per_cm": 15.036214,
+    "passed": true,
+    "requested_kV_per_cm": 15.036214,
+    "source": "C:\\nn_results\\18D_solver_physics_dual_objective_reproduction\\demo18d_20260814T010423Z_66dca051_ce7cd6\\solver\\Case_08\\case\\bias_00000\\electric_field.dat",
+    "tolerance_kV_per_cm": 0.15036214
+  },
+  "passed": true,
+  "quantum_output_completion_gate": true,
+  "solver_return_code_zero": true
+}
+
+==============================================================================
+LICENSED SOLVE 10/20: Case_09
+==============================================================================
+{
+  "failure_reason": null,
+  "field_gate": {
+    "measured_kV_per_cm": 3.758934,
+    "passed": true,
+    "requested_kV_per_cm": 3.758934,
+    "source": "C:\\nn_results\\18D_solver_physics_dual_objective_reproduction\\demo18d_20260814T010423Z_66dca051_ce7cd6\\solver\\Case_09\\case\\bias_00000\\electric_field.dat",
+    "tolerance_kV_per_cm": 0.05
+  },
+  "passed": true,
+  "quantum_output_completion_gate": true,
+  "solver_return_code_zero": true
+}
+
+==============================================================================
+LICENSED SOLVE 11/20: Case_10
+==============================================================================
+{
+  "failure_reason": null,
+  "field_gate": {
+    "measured_kV_per_cm": 12.890795,
+    "passed": true,
+    "requested_kV_per_cm": 12.890795,
+    "source": "C:\\nn_results\\18D_solver_physics_dual_objective_reproduction\\demo18d_20260814T010423Z_66dca051_ce7cd6\\solver\\Case_10\\case\\bias_00000\\electric_field.dat",
+    "tolerance_kV_per_cm": 0.12890795000000002
+  },
+  "passed": true,
+  "quantum_output_completion_gate": true,
+  "solver_return_code_zero": true
+}
+
+==============================================================================
+LICENSED SOLVE 12/20: Case_11
+==============================================================================
+{
+  "failure_reason": null,
+  "field_gate": {
+    "measured_kV_per_cm": 11.245915,
+    "passed": true,
+    "requested_kV_per_cm": 11.245915,
+    "source": "C:\\nn_results\\18D_solver_physics_dual_objective_reproduction\\demo18d_20260814T010423Z_66dca051_ce7cd6\\solver\\Case_11\\case\\bias_00000\\electric_field.dat",
+    "tolerance_kV_per_cm": 0.11245915000000001
+  },
+  "passed": true,
+  "quantum_output_completion_gate": true,
+  "solver_return_code_zero": true
+}
+
+==============================================================================
+LICENSED SOLVE 13/20: Case_12
+==============================================================================
+{
+  "failure_reason": null,
+  "field_gate": {
+    "measured_kV_per_cm": 5.9797180000001,
+    "passed": true,
+    "requested_kV_per_cm": 5.979718,
+    "source": "C:\\nn_results\\18D_solver_physics_dual_objective_reproduction\\demo18d_20260814T010423Z_66dca051_ce7cd6\\solver\\Case_12\\case\\bias_00000\\electric_field.dat",
+    "tolerance_kV_per_cm": 0.059797180000000005
+  },
+  "passed": true,
+  "quantum_output_completion_gate": true,
+  "solver_return_code_zero": true
+}
+
+==============================================================================
+LICENSED SOLVE 14/20: Case_13
+==============================================================================
+{
+  "failure_reason": null,
+  "field_gate": {
+    "measured_kV_per_cm": 1.964978,
+    "passed": true,
+    "requested_kV_per_cm": 1.964978,
+    "source": "C:\\nn_results\\18D_solver_physics_dual_objective_reproduction\\demo18d_20260814T010423Z_66dca051_ce7cd6\\solver\\Case_13\\case\\bias_00000\\electric_field.dat",
+    "tolerance_kV_per_cm": 0.05
+  },
+  "passed": true,
+  "quantum_output_completion_gate": true,
+  "solver_return_code_zero": true
+}
+
+==============================================================================
+LICENSED SOLVE 15/20: Case_14
+==============================================================================
+{
+  "failure_reason": null,
+  "field_gate": {
+    "measured_kV_per_cm": 19.765848,
+    "passed": true,
+    "requested_kV_per_cm": 19.765848,
+    "source": "C:\\nn_results\\18D_solver_physics_dual_objective_reproduction\\demo18d_20260814T010423Z_66dca051_ce7cd6\\solver\\Case_14\\case\\bias_00000\\electric_field.dat",
+    "tolerance_kV_per_cm": 0.19765848
+  },
+  "passed": true,
+  "quantum_output_completion_gate": true,
+  "solver_return_code_zero": true
+}
+
+==============================================================================
+LICENSED SOLVE 16/20: Case_15
+==============================================================================
+{
+  "failure_reason": null,
+  "field_gate": {
+    "measured_kV_per_cm": 17.464645,
+    "passed": true,
+    "requested_kV_per_cm": 17.464645,
+    "source": "C:\\nn_results\\18D_solver_physics_dual_objective_reproduction\\demo18d_20260814T010423Z_66dca051_ce7cd6\\solver\\Case_15\\case\\bias_00000\\electric_field.dat",
+    "tolerance_kV_per_cm": 0.17464645
+  },
+  "passed": true,
+  "quantum_output_completion_gate": true,
+  "solver_return_code_zero": true
+}
+
+==============================================================================
+LICENSED SOLVE 17/20: Case_16
+==============================================================================
+{
+  "failure_reason": null,
+  "field_gate": {
+    "measured_kV_per_cm": 14.707163,
+    "passed": true,
+    "requested_kV_per_cm": 14.707163,
+    "source": "C:\\nn_results\\18D_solver_physics_dual_objective_reproduction\\demo18d_20260814T010423Z_66dca051_ce7cd6\\solver\\Case_16\\case\\bias_00000\\electric_field.dat",
+    "tolerance_kV_per_cm": 0.14707163
+  },
+  "passed": true,
+  "quantum_output_completion_gate": true,
+  "solver_return_code_zero": true
+}
+
+==============================================================================
+LICENSED SOLVE 18/20: Case_17
+==============================================================================
+{
+  "failure_reason": null,
+  "field_gate": {
+    "measured_kV_per_cm": 0.49999999999999,
+    "passed": true,
+    "requested_kV_per_cm": 0.5,
+    "source": "C:\\nn_results\\18D_solver_physics_dual_objective_reproduction\\demo18d_20260814T010423Z_66dca051_ce7cd6\\solver\\Case_17\\case\\bias_00000\\electric_field.dat",
+    "tolerance_kV_per_cm": 0.05
+  },
+  "passed": true,
+  "quantum_output_completion_gate": true,
+  "solver_return_code_zero": true
+}
+
+==============================================================================
+LICENSED SOLVE 19/20: Case_18
+==============================================================================
+{
+  "failure_reason": null,
+  "field_gate": {
+    "measured_kV_per_cm": 1.5,
+    "passed": true,
+    "requested_kV_per_cm": 1.5,
+    "source": "C:\\nn_results\\18D_solver_physics_dual_objective_reproduction\\demo18d_20260814T010423Z_66dca051_ce7cd6\\solver\\Case_18\\case\\bias_00000\\electric_field.dat",
+    "tolerance_kV_per_cm": 0.05
+  },
+  "passed": true,
+  "quantum_output_completion_gate": true,
+  "solver_return_code_zero": true
+}
+
+==============================================================================
+LICENSED SOLVE 20/20: Case_19
+==============================================================================
+{
+  "failure_reason": null,
+  "field_gate": {
+    "measured_kV_per_cm": 3.0,
+    "passed": true,
+    "requested_kV_per_cm": 3.0,
+    "source": "C:\\nn_results\\18D_solver_physics_dual_objective_reproduction\\demo18d_20260814T010423Z_66dca051_ce7cd6\\solver\\Case_19\\case\\bias_00000\\electric_field.dat",
+    "tolerance_kV_per_cm": 0.05
+  },
+  "passed": true,
+  "quantum_output_completion_gate": true,
+  "solver_return_code_zero": true
+}

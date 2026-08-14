@@ -1,0 +1,841 @@
+demo: 17e_statistical_grading_sweep
+purpose: One fixed paper-geometry ACQW solved 21 times -- once with ideal abrupt interfaces
+  and twenty times with seed-locked random interface grading widths -- to measure
+  how STEM/EDS-scale interface roughness moves the absolute second-order susceptibility.
+reference_structure_identical_to: 17_paper_chi2_reproduction_corrected case_02
+total_cases: 21
+deterministic: true
+optimization_performed: false
+sampling:
+  seed: 17005
+  realizations: 20
+  distribution: truncated_normal
+  mean_nm: 0.7
+  standard_deviation_nm: 0.3
+  minimum_nm: 0.2
+  maximum_nm: 1.4
+  interface_standard_deviation_nm: 0.08
+  round_to_decimals: 4
+  tie_rule: mean_of_same_chemistry
+  maximum_rise_tie_residual_nm: 0.6
+  model: 'hierarchical: one truncated-normal run-level width per realization, plus
+    an independent normal offset per interface'
+  interfaces_in_draw_order:
+  - gaas_to_algaas_barrier
+  - algaas_to_gaas_well
+  - gaas_to_algaas_cladding
+  rise_interfaces:
+  - gaas_to_algaas_barrier
+  - gaas_to_algaas_cladding
+  fall_interfaces:
+  - algaas_to_gaas_well
+  uniform_source: random.Random(seed) -- Mersenne Twister, stdlib
+  inverse_cdf_source: statistics.NormalDist -- exact, stdlib
+  draws_per_realization: 4
+grading_profile: linear
+grading_families_supported:
+- linear
+reference_case: case_00
+paper_target_case: case_00
+paper_target_pm_per_V: 2340.0
+fixed_structure:
+  well: GaAs
+  barrier: AlGaAs
+  aluminium_fraction: 0.55
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 1.8
+  total_gaas_well_nm: 10.0
+  mesh_nm: 0.05
+  target_wavelength_nm: 1550.0
+abrupt_sentinel_width_nm: 0.001
+severity_bands:
+- key: sharp
+  label: Sharp (< 0.5 nm)
+  upper_nm: 0.5
+- key: moderate
+  label: Moderate (0.5 - 0.9 nm)
+  lower_nm: 0.5
+  upper_nm: 0.9
+- key: severe
+  label: Severe (> 0.9 nm)
+  lower_nm: 0.9
+realized_statistics:
+  mean_interface_grading_width:
+    count: 20
+    min_nm: 0.290675
+    mean_nm: 0.8049424999999999
+    median_nm: 0.8201999999999999
+    max_nm: 1.1405750000000001
+    stdev_nm: 0.25335601876296737
+  run_level_width:
+    count: 20
+    min_nm: 0.2674
+    mean_nm: 0.8214750000000001
+    median_nm: 0.8530500000000001
+    max_nm: 1.1926
+    stdev_nm: 0.26615819964232196
+  per_sampled_interface:
+    gaas_to_algaas_barrier:
+      count: 20
+      min_nm: 0.4329
+      mean_nm: 0.8207150000000001
+      median_nm: 0.8513
+      max_nm: 1.2385
+      stdev_nm: 0.24934253817210025
+    algaas_to_gaas_well:
+      count: 20
+      min_nm: 0.2
+      mean_nm: 0.79168
+      median_nm: 0.8586
+      max_nm: 1.1564
+      stdev_nm: 0.2669760714686657
+    gaas_to_algaas_cladding:
+      count: 20
+      min_nm: 0.2997
+      mean_nm: 0.8156950000000001
+      median_nm: 0.82595
+      max_nm: 1.2632
+      stdev_nm: 0.2642259011069685
+  severity_counts:
+    sharp: 3
+    moderate: 10
+    severe: 7
+  rise_tie_residual_nm:
+    max: 0.15105000000000002
+    mean: 0.043870000000000006
+  narrowest_ramp_mesh_cells: 5.0
+cases:
+- case_id: case_00
+  name: reference_abrupt
+  description: Ideal abrupt interfaces on the paper geometry (7.10 / 1.80 / 2.90 nm,
+    s = 0.42). Structurally identical to Demo 17 case_02, which is the one structure
+    the paper quotes an absolute value for (2340 pm/V), so every graded realization
+    below is measured against a solved anchor rather than against an assumption.
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 1.8
+  left_grading_width_nm: 0.0
+  right_grading_width_nm: 0.0
+  interface_mode: abrupt
+  render_request: auto
+  overlap: false
+  grading_profile: linear
+  sampled_widths_nm: {}
+  run_width_nm: null
+  realization_index: null
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  expected_representation: abrupt
+  build_left_grading_width_nm: 0.001
+  build_right_grading_width_nm: 0.001
+  mean_interface_grading_width_nm: 0.0
+  rise_tie_residual_nm: 0.0
+  severity: abrupt
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 0.00125
+  narrowest_ramp_span_nm: 0.00125
+  narrowest_ramp_mesh_cells: null
+  overlap_width_nm: 0.0
+  is_reference_case: true
+  is_paper_target_case: true
+- case_id: case_01
+  name: realization_01
+  description: 'Randomized interface grading realization 01/20: GaAs->AlGaAs barrier
+    1.1506 nm, AlGaAs->GaAs well 1.1277 nm, GaAs->AlGaAs cladding 1.0920 nm.'
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 1.8
+  left_grading_width_nm: 1.1213000000000002
+  right_grading_width_nm: 1.1277
+  interface_mode: graded
+  render_request: auto
+  overlap: false
+  grading_profile: linear
+  sampled_widths_nm:
+    gaas_to_algaas_barrier: 1.1506
+    algaas_to_gaas_well: 1.1277
+    gaas_to_algaas_cladding: 1.092
+  run_width_nm: 1.1702
+  realization_index: 1
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  expected_representation: native_linear
+  build_left_grading_width_nm: 1.1213000000000002
+  build_right_grading_width_nm: 1.1277
+  mean_interface_grading_width_nm: 1.1245
+  rise_tie_residual_nm: 0.029299999999999993
+  severity: severe
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 1.4056250000000001
+  narrowest_ramp_span_nm: 1.4016250000000001
+  narrowest_ramp_mesh_cells: 28.032500000000002
+  overlap_width_nm: 0.0
+  is_reference_case: false
+  is_paper_target_case: false
+- case_id: case_02
+  name: realization_02
+  description: 'Randomized interface grading realization 02/20: GaAs->AlGaAs barrier
+    0.4630 nm, AlGaAs->GaAs well 0.2000 nm, GaAs->AlGaAs cladding 0.2997 nm.'
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 1.8
+  left_grading_width_nm: 0.38135
+  right_grading_width_nm: 0.2
+  interface_mode: graded
+  render_request: auto
+  overlap: false
+  grading_profile: linear
+  sampled_widths_nm:
+    gaas_to_algaas_barrier: 0.463
+    algaas_to_gaas_well: 0.2
+    gaas_to_algaas_cladding: 0.2997
+  run_width_nm: 0.2674
+  realization_index: 2
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  expected_representation: native_linear
+  build_left_grading_width_nm: 0.38135
+  build_right_grading_width_nm: 0.2
+  mean_interface_grading_width_nm: 0.290675
+  rise_tie_residual_nm: 0.08165
+  severity: sharp
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 0.36334375
+  narrowest_ramp_span_nm: 0.25
+  narrowest_ramp_mesh_cells: 5.0
+  overlap_width_nm: 0.0
+  is_reference_case: false
+  is_paper_target_case: false
+- case_id: case_03
+  name: realization_03
+  description: 'Randomized interface grading realization 03/20: GaAs->AlGaAs barrier
+    0.5477 nm, AlGaAs->GaAs well 0.6539 nm, GaAs->AlGaAs cladding 0.5535 nm.'
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 1.8
+  left_grading_width_nm: 0.5506
+  right_grading_width_nm: 0.6539
+  interface_mode: graded
+  render_request: auto
+  overlap: false
+  grading_profile: linear
+  sampled_widths_nm:
+    gaas_to_algaas_barrier: 0.5477
+    algaas_to_gaas_well: 0.6539
+    gaas_to_algaas_cladding: 0.5535
+  run_width_nm: 0.6545
+  realization_index: 3
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  expected_representation: native_linear
+  build_left_grading_width_nm: 0.5506
+  build_right_grading_width_nm: 0.6539
+  mean_interface_grading_width_nm: 0.60225
+  rise_tie_residual_nm: 0.0029000000000000137
+  severity: moderate
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 0.7528124999999999
+  narrowest_ramp_span_nm: 0.68825
+  narrowest_ramp_mesh_cells: 13.765
+  overlap_width_nm: 0.0
+  is_reference_case: false
+  is_paper_target_case: false
+- case_id: case_04
+  name: realization_04
+  description: 'Randomized interface grading realization 04/20: GaAs->AlGaAs barrier
+    0.9082 nm, AlGaAs->GaAs well 0.7162 nm, GaAs->AlGaAs cladding 0.8470 nm.'
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 1.8
+  left_grading_width_nm: 0.8775999999999999
+  right_grading_width_nm: 0.7162
+  interface_mode: graded
+  render_request: auto
+  overlap: false
+  grading_profile: linear
+  sampled_widths_nm:
+    gaas_to_algaas_barrier: 0.9082
+    algaas_to_gaas_well: 0.7162
+    gaas_to_algaas_cladding: 0.847
+  run_width_nm: 0.7956
+  realization_index: 4
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  expected_representation: native_linear
+  build_left_grading_width_nm: 0.8775999999999999
+  build_right_grading_width_nm: 0.7162
+  mean_interface_grading_width_nm: 0.7968999999999999
+  rise_tie_residual_nm: 0.030600000000000016
+  severity: moderate
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 0.9961249999999999
+  narrowest_ramp_span_nm: 0.8952499999999999
+  narrowest_ramp_mesh_cells: 17.904999999999998
+  overlap_width_nm: 0.0
+  is_reference_case: false
+  is_paper_target_case: false
+- case_id: case_05
+  name: realization_05
+  description: 'Randomized interface grading realization 05/20: GaAs->AlGaAs barrier
+    0.8578 nm, AlGaAs->GaAs well 0.9030 nm, GaAs->AlGaAs cladding 0.8705 nm.'
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 1.8
+  left_grading_width_nm: 0.86415
+  right_grading_width_nm: 0.903
+  interface_mode: graded
+  render_request: auto
+  overlap: false
+  grading_profile: linear
+  sampled_widths_nm:
+    gaas_to_algaas_barrier: 0.8578
+    algaas_to_gaas_well: 0.903
+    gaas_to_algaas_cladding: 0.8705
+  run_width_nm: 0.8655
+  realization_index: 5
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  expected_representation: native_linear
+  build_left_grading_width_nm: 0.86415
+  build_right_grading_width_nm: 0.903
+  mean_interface_grading_width_nm: 0.883575
+  rise_tie_residual_nm: 0.006350000000000022
+  severity: moderate
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 1.10446875
+  narrowest_ramp_span_nm: 1.0801875
+  narrowest_ramp_mesh_cells: 21.60375
+  overlap_width_nm: 0.0
+  is_reference_case: false
+  is_paper_target_case: false
+- case_id: case_06
+  name: realization_06
+  description: 'Randomized interface grading realization 06/20: GaAs->AlGaAs barrier
+    1.0658 nm, AlGaAs->GaAs well 1.0851 nm, GaAs->AlGaAs cladding 1.2632 nm.'
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 1.8
+  left_grading_width_nm: 1.1645
+  right_grading_width_nm: 1.0851
+  interface_mode: graded
+  render_request: auto
+  overlap: false
+  grading_profile: linear
+  sampled_widths_nm:
+    gaas_to_algaas_barrier: 1.0658
+    algaas_to_gaas_well: 1.0851
+    gaas_to_algaas_cladding: 1.2632
+  run_width_nm: 1.1654
+  realization_index: 6
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  expected_representation: native_linear
+  build_left_grading_width_nm: 1.1645
+  build_right_grading_width_nm: 1.0851
+  mean_interface_grading_width_nm: 1.1248
+  rise_tie_residual_nm: 0.09870000000000001
+  severity: severe
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 1.4060000000000001
+  narrowest_ramp_span_nm: 1.3563749999999999
+  narrowest_ramp_mesh_cells: 27.127499999999998
+  overlap_width_nm: 0.0
+  is_reference_case: false
+  is_paper_target_case: false
+- case_id: case_07
+  name: realization_07
+  description: 'Randomized interface grading realization 07/20: GaAs->AlGaAs barrier
+    1.0011 nm, AlGaAs->GaAs well 1.1564 nm, GaAs->AlGaAs cladding 1.1827 nm.'
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 1.8
+  left_grading_width_nm: 1.0919
+  right_grading_width_nm: 1.1564
+  interface_mode: graded
+  render_request: auto
+  overlap: false
+  grading_profile: linear
+  sampled_widths_nm:
+    gaas_to_algaas_barrier: 1.0011
+    algaas_to_gaas_well: 1.1564
+    gaas_to_algaas_cladding: 1.1827
+  run_width_nm: 1.1088
+  realization_index: 7
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  expected_representation: native_linear
+  build_left_grading_width_nm: 1.0919
+  build_right_grading_width_nm: 1.1564
+  mean_interface_grading_width_nm: 1.1241500000000002
+  rise_tie_residual_nm: 0.09079999999999999
+  severity: severe
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 1.4051875000000003
+  narrowest_ramp_span_nm: 1.364875
+  narrowest_ramp_mesh_cells: 27.2975
+  overlap_width_nm: 0.0
+  is_reference_case: false
+  is_paper_target_case: false
+- case_id: case_08
+  name: realization_08
+  description: 'Randomized interface grading realization 08/20: GaAs->AlGaAs barrier
+    0.9522 nm, AlGaAs->GaAs well 0.8549 nm, GaAs->AlGaAs cladding 0.9621 nm.'
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 1.8
+  left_grading_width_nm: 0.95715
+  right_grading_width_nm: 0.8549
+  interface_mode: graded
+  render_request: auto
+  overlap: false
+  grading_profile: linear
+  sampled_widths_nm:
+    gaas_to_algaas_barrier: 0.9522
+    algaas_to_gaas_well: 0.8549
+    gaas_to_algaas_cladding: 0.9621
+  run_width_nm: 0.9937
+  realization_index: 8
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  expected_representation: native_linear
+  build_left_grading_width_nm: 0.95715
+  build_right_grading_width_nm: 0.8549
+  mean_interface_grading_width_nm: 0.906025
+  rise_tie_residual_nm: 0.0049499999999999544
+  severity: severe
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 1.13253125
+  narrowest_ramp_span_nm: 1.068625
+  narrowest_ramp_mesh_cells: 21.3725
+  overlap_width_nm: 0.0
+  is_reference_case: false
+  is_paper_target_case: false
+- case_id: case_09
+  name: realization_09
+  description: 'Randomized interface grading realization 09/20: GaAs->AlGaAs barrier
+    0.4329 nm, AlGaAs->GaAs well 0.3225 nm, GaAs->AlGaAs cladding 0.3393 nm.'
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 1.8
+  left_grading_width_nm: 0.3861
+  right_grading_width_nm: 0.3225
+  interface_mode: graded
+  render_request: auto
+  overlap: false
+  grading_profile: linear
+  sampled_widths_nm:
+    gaas_to_algaas_barrier: 0.4329
+    algaas_to_gaas_well: 0.3225
+    gaas_to_algaas_cladding: 0.3393
+  run_width_nm: 0.391
+  realization_index: 9
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  expected_representation: native_linear
+  build_left_grading_width_nm: 0.3861
+  build_right_grading_width_nm: 0.3225
+  mean_interface_grading_width_nm: 0.3543
+  rise_tie_residual_nm: 0.04680000000000001
+  severity: sharp
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 0.442875
+  narrowest_ramp_span_nm: 0.403125
+  narrowest_ramp_mesh_cells: 8.0625
+  overlap_width_nm: 0.0
+  is_reference_case: false
+  is_paper_target_case: false
+- case_id: case_10
+  name: realization_10
+  description: 'Randomized interface grading realization 10/20: GaAs->AlGaAs barrier
+    0.7467 nm, AlGaAs->GaAs well 0.8623 nm, GaAs->AlGaAs cladding 0.7080 nm.'
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 1.8
+  left_grading_width_nm: 0.7273499999999999
+  right_grading_width_nm: 0.8623
+  interface_mode: graded
+  render_request: auto
+  overlap: false
+  grading_profile: linear
+  sampled_widths_nm:
+    gaas_to_algaas_barrier: 0.7467
+    algaas_to_gaas_well: 0.8623
+    gaas_to_algaas_cladding: 0.708
+  run_width_nm: 0.7513
+  realization_index: 10
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  expected_representation: native_linear
+  build_left_grading_width_nm: 0.7273499999999999
+  build_right_grading_width_nm: 0.8623
+  mean_interface_grading_width_nm: 0.7948249999999999
+  rise_tie_residual_nm: 0.019350000000000034
+  severity: moderate
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 0.9935312499999999
+  narrowest_ramp_span_nm: 0.9091874999999999
+  narrowest_ramp_mesh_cells: 18.183749999999996
+  overlap_width_nm: 0.0
+  is_reference_case: false
+  is_paper_target_case: false
+- case_id: case_11
+  name: realization_11
+  description: 'Randomized interface grading realization 11/20: GaAs->AlGaAs barrier
+    1.2385 nm, AlGaAs->GaAs well 1.1040 nm, GaAs->AlGaAs cladding 1.1158 nm.'
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 1.8
+  left_grading_width_nm: 1.17715
+  right_grading_width_nm: 1.104
+  interface_mode: graded
+  render_request: auto
+  overlap: false
+  grading_profile: linear
+  sampled_widths_nm:
+    gaas_to_algaas_barrier: 1.2385
+    algaas_to_gaas_well: 1.104
+    gaas_to_algaas_cladding: 1.1158
+  run_width_nm: 1.1926
+  realization_index: 11
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  expected_representation: native_linear
+  build_left_grading_width_nm: 1.17715
+  build_right_grading_width_nm: 1.104
+  mean_interface_grading_width_nm: 1.1405750000000001
+  rise_tie_residual_nm: 0.061350000000000016
+  severity: severe
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 1.4257187500000001
+  narrowest_ramp_span_nm: 1.3800000000000001
+  narrowest_ramp_mesh_cells: 27.6
+  overlap_width_nm: 0.0
+  is_reference_case: false
+  is_paper_target_case: false
+- case_id: case_12
+  name: realization_12
+  description: 'Randomized interface grading realization 12/20: GaAs->AlGaAs barrier
+    0.8448 nm, AlGaAs->GaAs well 0.8839 nm, GaAs->AlGaAs cladding 0.8617 nm.'
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 1.8
+  left_grading_width_nm: 0.8532500000000001
+  right_grading_width_nm: 0.8839
+  interface_mode: graded
+  render_request: auto
+  overlap: false
+  grading_profile: linear
+  sampled_widths_nm:
+    gaas_to_algaas_barrier: 0.8448
+    algaas_to_gaas_well: 0.8839
+    gaas_to_algaas_cladding: 0.8617
+  run_width_nm: 0.878
+  realization_index: 12
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  expected_representation: native_linear
+  build_left_grading_width_nm: 0.8532500000000001
+  build_right_grading_width_nm: 0.8839
+  mean_interface_grading_width_nm: 0.8685750000000001
+  rise_tie_residual_nm: 0.008450000000000013
+  severity: moderate
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 1.08571875
+  narrowest_ramp_span_nm: 1.0665625
+  narrowest_ramp_mesh_cells: 21.33125
+  overlap_width_nm: 0.0
+  is_reference_case: false
+  is_paper_target_case: false
+- case_id: case_13
+  name: realization_13
+  description: 'Randomized interface grading realization 13/20: GaAs->AlGaAs barrier
+    0.6162 nm, AlGaAs->GaAs well 0.5988 nm, GaAs->AlGaAs cladding 0.7026 nm.'
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 1.8
+  left_grading_width_nm: 0.6594
+  right_grading_width_nm: 0.5988
+  interface_mode: graded
+  render_request: auto
+  overlap: false
+  grading_profile: linear
+  sampled_widths_nm:
+    gaas_to_algaas_barrier: 0.6162
+    algaas_to_gaas_well: 0.5988
+    gaas_to_algaas_cladding: 0.7026
+  run_width_nm: 0.5881
+  realization_index: 13
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  expected_representation: native_linear
+  build_left_grading_width_nm: 0.6594
+  build_right_grading_width_nm: 0.5988
+  mean_interface_grading_width_nm: 0.6291
+  rise_tie_residual_nm: 0.043200000000000016
+  severity: moderate
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 0.786375
+  narrowest_ramp_span_nm: 0.7484999999999999
+  narrowest_ramp_mesh_cells: 14.969999999999999
+  overlap_width_nm: 0.0
+  is_reference_case: false
+  is_paper_target_case: false
+- case_id: case_14
+  name: realization_14
+  description: 'Randomized interface grading realization 14/20: GaAs->AlGaAs barrier
+    0.6063 nm, AlGaAs->GaAs well 0.7989 nm, GaAs->AlGaAs cladding 0.7450 nm.'
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 1.8
+  left_grading_width_nm: 0.67565
+  right_grading_width_nm: 0.7989
+  interface_mode: graded
+  render_request: auto
+  overlap: false
+  grading_profile: linear
+  sampled_widths_nm:
+    gaas_to_algaas_barrier: 0.6063
+    algaas_to_gaas_well: 0.7989
+    gaas_to_algaas_cladding: 0.745
+  run_width_nm: 0.681
+  realization_index: 14
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  expected_representation: native_linear
+  build_left_grading_width_nm: 0.67565
+  build_right_grading_width_nm: 0.7989
+  mean_interface_grading_width_nm: 0.737275
+  rise_tie_residual_nm: 0.06935000000000002
+  severity: moderate
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 0.92159375
+  narrowest_ramp_span_nm: 0.8445625
+  narrowest_ramp_mesh_cells: 16.89125
+  overlap_width_nm: 0.0
+  is_reference_case: false
+  is_paper_target_case: false
+- case_id: case_15
+  name: realization_15
+  description: 'Randomized interface grading realization 15/20: GaAs->AlGaAs barrier
+    0.6407 nm, AlGaAs->GaAs well 0.7518 nm, GaAs->AlGaAs cladding 0.7519 nm.'
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 1.8
+  left_grading_width_nm: 0.6963
+  right_grading_width_nm: 0.7518
+  interface_mode: graded
+  render_request: auto
+  overlap: false
+  grading_profile: linear
+  sampled_widths_nm:
+    gaas_to_algaas_barrier: 0.6407
+    algaas_to_gaas_well: 0.7518
+    gaas_to_algaas_cladding: 0.7519
+  run_width_nm: 0.709
+  realization_index: 15
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  expected_representation: native_linear
+  build_left_grading_width_nm: 0.6963
+  build_right_grading_width_nm: 0.7518
+  mean_interface_grading_width_nm: 0.7240500000000001
+  rise_tie_residual_nm: 0.05559999999999998
+  severity: moderate
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 0.9050625000000001
+  narrowest_ramp_span_nm: 0.870375
+  narrowest_ramp_mesh_cells: 17.4075
+  overlap_width_nm: 0.0
+  is_reference_case: false
+  is_paper_target_case: false
+- case_id: case_16
+  name: realization_16
+  description: 'Randomized interface grading realization 16/20: GaAs->AlGaAs barrier
+    0.8811 nm, AlGaAs->GaAs well 0.7591 nm, GaAs->AlGaAs cladding 0.7937 nm.'
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 1.8
+  left_grading_width_nm: 0.8373999999999999
+  right_grading_width_nm: 0.7591
+  interface_mode: graded
+  render_request: auto
+  overlap: false
+  grading_profile: linear
+  sampled_widths_nm:
+    gaas_to_algaas_barrier: 0.8811
+    algaas_to_gaas_well: 0.7591
+    gaas_to_algaas_cladding: 0.7937
+  run_width_nm: 0.8406
+  realization_index: 16
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  expected_representation: native_linear
+  build_left_grading_width_nm: 0.8373999999999999
+  build_right_grading_width_nm: 0.7591
+  mean_interface_grading_width_nm: 0.7982499999999999
+  rise_tie_residual_nm: 0.04370000000000002
+  severity: moderate
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 0.9978124999999999
+  narrowest_ramp_span_nm: 0.948875
+  narrowest_ramp_mesh_cells: 18.9775
+  overlap_width_nm: 0.0
+  is_reference_case: false
+  is_paper_target_case: false
+- case_id: case_17
+  name: realization_17
+  description: 'Randomized interface grading realization 17/20: GaAs->AlGaAs barrier
+    0.4520 nm, AlGaAs->GaAs well 0.3323 nm, GaAs->AlGaAs cladding 0.4707 nm.'
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 1.8
+  left_grading_width_nm: 0.46135000000000004
+  right_grading_width_nm: 0.3323
+  interface_mode: graded
+  render_request: auto
+  overlap: false
+  grading_profile: linear
+  sampled_widths_nm:
+    gaas_to_algaas_barrier: 0.452
+    algaas_to_gaas_well: 0.3323
+    gaas_to_algaas_cladding: 0.4707
+  run_width_nm: 0.4414
+  realization_index: 17
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  expected_representation: native_linear
+  build_left_grading_width_nm: 0.46135000000000004
+  build_right_grading_width_nm: 0.3323
+  mean_interface_grading_width_nm: 0.396825
+  rise_tie_residual_nm: 0.009349999999999997
+  severity: sharp
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 0.49603125
+  narrowest_ramp_span_nm: 0.415375
+  narrowest_ramp_mesh_cells: 8.3075
+  overlap_width_nm: 0.0
+  is_reference_case: false
+  is_paper_target_case: false
+- case_id: case_18
+  name: realization_18
+  description: 'Randomized interface grading realization 18/20: GaAs->AlGaAs barrier
+    1.0869 nm, AlGaAs->GaAs well 0.8739 nm, GaAs->AlGaAs cladding 1.1026 nm.'
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 1.8
+  left_grading_width_nm: 1.09475
+  right_grading_width_nm: 0.8739
+  interface_mode: graded
+  render_request: auto
+  overlap: false
+  grading_profile: linear
+  sampled_widths_nm:
+    gaas_to_algaas_barrier: 1.0869
+    algaas_to_gaas_well: 0.8739
+    gaas_to_algaas_cladding: 1.1026
+  run_width_nm: 1.0657
+  realization_index: 18
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  expected_representation: native_linear
+  build_left_grading_width_nm: 1.09475
+  build_right_grading_width_nm: 0.8739
+  mean_interface_grading_width_nm: 0.9843249999999999
+  rise_tie_residual_nm: 0.007850000000000024
+  severity: severe
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 1.23040625
+  narrowest_ramp_span_nm: 1.092375
+  narrowest_ramp_mesh_cells: 21.8475
+  overlap_width_nm: 0.0
+  is_reference_case: false
+  is_paper_target_case: false
+- case_id: case_19
+  name: realization_19
+  description: 'Randomized interface grading realization 19/20: GaAs->AlGaAs barrier
+    0.8027 nm, AlGaAs->GaAs well 0.8655 nm, GaAs->AlGaAs cladding 0.8349 nm.'
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 1.8
+  left_grading_width_nm: 0.8188
+  right_grading_width_nm: 0.8655
+  interface_mode: graded
+  render_request: auto
+  overlap: false
+  grading_profile: linear
+  sampled_widths_nm:
+    gaas_to_algaas_barrier: 0.8027
+    algaas_to_gaas_well: 0.8655
+    gaas_to_algaas_cladding: 0.8349
+  run_width_nm: 0.8709
+  realization_index: 19
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  expected_representation: native_linear
+  build_left_grading_width_nm: 0.8188
+  build_right_grading_width_nm: 0.8655
+  mean_interface_grading_width_nm: 0.84215
+  rise_tie_residual_nm: 0.016100000000000003
+  severity: moderate
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 1.0526875
+  narrowest_ramp_span_nm: 1.0234999999999999
+  narrowest_ramp_mesh_cells: 20.469999999999995
+  overlap_width_nm: 0.0
+  is_reference_case: false
+  is_paper_target_case: false
+- case_id: case_20
+  name: realization_20
+  description: 'Randomized interface grading realization 20/20: GaAs->AlGaAs barrier
+    1.1191 nm, AlGaAs->GaAs well 0.9834 nm, GaAs->AlGaAs cladding 0.8170 nm.'
+  asymmetry_s: 0.41999999999999993
+  central_barrier_nm: 1.8
+  left_grading_width_nm: 0.96805
+  right_grading_width_nm: 0.9834
+  interface_mode: graded
+  render_request: auto
+  overlap: false
+  grading_profile: linear
+  sampled_widths_nm:
+    gaas_to_algaas_barrier: 1.1191
+    algaas_to_gaas_well: 0.9834
+    gaas_to_algaas_cladding: 0.817
+  run_width_nm: 0.9988
+  realization_index: 20
+  well_1_nm: 7.1
+  well_2_nm: 2.9000000000000004
+  total_gaas_well_nm: 10.0
+  expected_representation: native_linear
+  build_left_grading_width_nm: 0.96805
+  build_right_grading_width_nm: 0.9834
+  mean_interface_grading_width_nm: 0.975725
+  rise_tie_residual_nm: 0.15105000000000002
+  severity: severe
+  aluminium_fraction: 0.55
+  mesh_nm: 0.05
+  linear_ramp_span_nm: 1.2196562499999999
+  narrowest_ramp_span_nm: 1.2100625
+  narrowest_ramp_mesh_cells: 24.201249999999998
+  overlap_width_nm: 0.0
+  is_reference_case: false
+  is_paper_target_case: false
