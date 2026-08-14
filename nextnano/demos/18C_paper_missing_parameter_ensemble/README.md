@@ -115,6 +115,12 @@ python -c "import pyexpat; import matplotlib.pyplot as plt; print('plotting OK')
 Repair or switch the active Python environment until that command succeeds; do not
 start the 17-solve campaign with a broken plotting runtime.
 
+The runner deliberately preloads Python's `pyexpat` extension before NumPy, YAML,
+and the Nextnano support modules. On Windows this prevents a later scientific
+dependency from selecting an incompatible expat DLL before Matplotlib imports
+`plistlib`. If the direct command succeeds but an older runner still fails, update
+the runner to the version containing this preload before starting physics.
+
 The expected result family is:
 
 ```text

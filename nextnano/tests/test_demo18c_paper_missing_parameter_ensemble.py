@@ -114,6 +114,7 @@ def test_cli_rejects_any_non_frozen_ensemble() -> None:
 def test_plotting_is_lazy_and_reports_environment_failure(monkeypatch: pytest.MonkeyPatch) -> None:
     source = (DEMO / "run_demo18c.py").read_text(encoding="utf-8")
     assert "\nimport plots18c\n" not in source
+    assert source.index("import pyexpat") < source.index("import numpy as np")
 
     def broken_import(name: str):
         assert name == "plots18c"

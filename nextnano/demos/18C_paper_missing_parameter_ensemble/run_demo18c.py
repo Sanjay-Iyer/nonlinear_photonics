@@ -16,6 +16,14 @@ import traceback
 import uuid
 from typing import Any, Mapping, Sequence
 
+# On the licensed Windows workstation, another compiled dependency can load an
+# incompatible expat DLL before Matplotlib eventually imports plistlib.  Loading
+# Python's own pyexpat extension first fixes the DLL selection deterministically.
+# Keep this above NumPy, YAML, and all repository scientific imports.  A direct
+# ``python -c "import pyexpat; import matplotlib.pyplot"`` check succeeding while
+# a late Matplotlib import fails is the characteristic load-order signature.
+import pyexpat  # noqa: F401
+
 
 DEMO_DIR = Path(__file__).resolve().parent
 DEMOS = DEMO_DIR.parent
