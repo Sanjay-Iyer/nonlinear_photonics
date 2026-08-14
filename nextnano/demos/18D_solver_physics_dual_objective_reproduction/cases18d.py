@@ -129,5 +129,7 @@ def validate_cases(rows: Iterable[PhysicsCase], *, seed: int = SEED) -> None:
 
 
 def combinations_sha256(path: Path) -> str:
-    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+    """Hash canonical UTF-8/LF CSV content, independent of Git autocrlf."""
 
+    text = Path(path).read_text(encoding="utf-8-sig").replace("\r\n", "\n").replace("\r", "\n")
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()

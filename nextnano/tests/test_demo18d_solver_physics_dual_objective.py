@@ -103,3 +103,21 @@ def test_cli_and_pyexpat_preload() -> None:
         run_demo18d._validate_cli(19, 1804)
     source = (DEMO / "run_demo18d.py").read_text(encoding="utf-8")
     assert source.index("import pyexpat") < source.index("import numpy as np")
+
+
+def test_archived_18c_config_is_bridged_to_demo18b_audit_schema() -> None:
+    old_cfg = {
+        "bound_state_criteria": {"minimum_binding_energy_meV": 7.0},
+        "chi2": {"k_points": 768},
+    }
+    bridged = run_demo18d._audit_config_for_18c(old_cfg)
+    assert bridged["chi2"]["primary_k_points"] == 384
+    assert bridged["bound_state_criteria"]["minimum_binding_energy_meV"] == 7.0
+
+
+def test_combinations_hash_is_independent_of_windows_line_endings(tmp_path: Path) -> None:
+    lf = tmp_path / "lf.csv"
+    crlf = tmp_path / "crlf.csv"
+    lf.write_bytes(b"a,b\n1,2\n")
+    crlf.write_bytes(b"a,b\r\n1,2\r\n")
+    assert cases18d.combinations_sha256(lf) == cases18d.combinations_sha256(crlf)

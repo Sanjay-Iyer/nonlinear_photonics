@@ -43,6 +43,10 @@ unsupported cross-run provenance assumption. The completed 18C solver tree is re
 first only to create `demo18d_reanalysis_of_18c.csv` with common unweighted
 postprocessing.
 
+The printed combinations SHA256 is calculated from canonical UTF-8 text with LF
+line endings, so the value is identical on Windows `core.autocrlf` checkouts and
+LF-based development machines.
+
 ## Dual objective
 
 For every case:
@@ -108,4 +112,3 @@ Outcome A means no valid in-window case exceeds 500 pm/V. Outcomes B-E require a
 in-window dominant peak and increasingly strong amplitude agreement; Outcome D is
 within 20%, and Outcome E within 10%. An amplitude-only match at 1663 nm is never a
 reproduction.
-

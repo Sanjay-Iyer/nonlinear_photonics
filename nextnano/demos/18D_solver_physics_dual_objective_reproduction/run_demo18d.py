@@ -217,6 +217,22 @@ def _audit_config(cfg: Mapping[str, Any]) -> dict[str, Any]:
     return audit_cfg
 
 
+def _audit_config_for_18c(old_cfg: Mapping[str, Any]) -> dict[str, Any]:
+    """Bridge an archived 18C config into audit18b's required schema.
+
+    Demo 18C stores its k grid under ``chi2.k_points``.  The reusable Demo 18B
+    state/matrix audit also computes a baseline optical summary and therefore
+    requires Demo 18B's ``chi2.primary_k_points`` schema.  Only the strict
+    bound-state criteria need to be projected from the archived 18C run; the
+    final spectrum is independently recomputed by analysis18d with fixed 18D
+    settings immediately afterward.
+    """
+
+    audit_cfg = config18b.load_config()
+    audit_cfg["bound_state_criteria"] = dict(old_cfg["bound_state_criteria"])
+    return audit_cfg
+
+
 def _read_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
 
@@ -247,6 +263,7 @@ def _reanalyse_18c(source: Path, destination: Path, log: DebugLog) -> list[dict[
     ) as stream:
         original_results = list(csv.DictReader(stream))
     original_by_combo = {row["combo_id"]: row for row in original_results}
+    old_audit_cfg = _audit_config_for_18c(old_cfg)
     rows: list[dict[str, Any]] = []
     for original in (row for row in old_combos if row.requires_new_nextnano_solve):
         raw = source / "solver" / original.solver_case_id
@@ -261,7 +278,7 @@ def _reanalyse_18c(source: Path, destination: Path, log: DebugLog) -> list[dict[
         solver_cfg, _case, geometry, _profile, _blocks, _deck = run_demo18c.build_case(old_cfg, original)
         data = audit18b.load_solved_data(solver_cfg, raw)
         solved = audit18b.analyze_case(
-            old_cfg, original.solver_case_id, data, geometry,
+            old_audit_cfg, original.solver_case_id, data, geometry,
             float(old_cfg["solver"].get("quantum_region_padding_nm", 42.0)),
         )
         normalized_case = cases18d.PhysicsCase(
