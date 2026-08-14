@@ -199,8 +199,7 @@ def analyze_case(
 
 def rank(rows: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
     valid = [dict(row) for row in rows if bool(row.get("physical_valid"))]
-    # Prefer an in-window physical peak; then use the requested combined score.
-    valid.sort(key=lambda row: (not bool(row["spectral_window_pass"]), float(row["combined_score"])))
+    valid.sort(key=lambda row: float(row["combined_score"]))
     for index, row in enumerate(valid, 1):
         row["dual_objective_rank"] = index
     return valid
@@ -225,4 +224,3 @@ def outcome(ranked: Sequence[Mapping[str, Any]]) -> dict[str, str]:
     if any(float(row["chi2_1550_pm_per_V"]) > 500.0 for row in spectral):
         return {"outcome": "B", "label": "meaningful solver-physics increase"}
     return {"outcome": "A", "label": "solver physics still far too small"}
-

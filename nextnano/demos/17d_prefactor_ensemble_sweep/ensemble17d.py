@@ -1258,6 +1258,40 @@ def _draw_styles(outcomes: Sequence[ComboOutcome]) -> list[dict[str, Any]]:
     return styles
 
 
+def _plain_number_yaxis(axis: Any, log_scale: bool) -> None:
+    """Label the susceptibility axis 100 / 200 / 500 / 1000, not 10^2 and 10^3.
+
+    A log axis is the right choice here -- the ensemble spans 84 to 4041 pm/V,
+    nearly two decades, and a linear axis would flatten the low combinations
+    into the baseline. But matplotlib's default log labels are powers of ten,
+    which puts the reader one mental step away from a number they can compare to
+    "2340 pm/V". Decade ticks alone are also too sparse to read a value off: the
+    whole spectrum lives between two of them.
+
+    So the ticks go at 1, 2 and 5 per decade and are written out in full.
+    """
+
+    from matplotlib.ticker import (  # noqa: PLC0415
+        FuncFormatter, LogLocator, NullFormatter, ScalarFormatter,
+    )
+
+    if not log_scale:
+        formatter = ScalarFormatter(useOffset=False)
+        formatter.set_scientific(False)
+        axis.yaxis.set_major_formatter(formatter)
+        return
+
+    axis.yaxis.set_major_locator(
+        LogLocator(base=10.0, subs=(1.0, 2.0, 5.0), numticks=32)
+    )
+    axis.yaxis.set_minor_locator(
+        LogLocator(base=10.0, subs=tuple(x / 10.0 for x in range(1, 10)),
+                   numticks=128)
+    )
+    axis.yaxis.set_major_formatter(FuncFormatter(lambda value, _: f"{value:g}"))
+    axis.yaxis.set_minor_formatter(NullFormatter())
+
+
 def write_ensemble_figure(
     path: Path, outcomes: Sequence[ComboOutcome], spectra: Sequence[CaseSpectrum],
     targets: Sequence[PaperTarget], cfg: Mapping[str, Any],
@@ -1340,6 +1374,7 @@ def write_ensemble_figure(
                       textcoords="offset points", fontsize=9.5, color="#222222")
         if log_scale:
             axis.set_yscale("log")
+        _plain_number_yaxis(axis, log_scale)
         axis.set_ylabel(r"$|\chi^{(2)}_{xzx}|$ (pm/V)")
         axis.grid(alpha=0.2, which="both")
         title = (f"{spectrum.case_id} -- {spectrum.label} "
