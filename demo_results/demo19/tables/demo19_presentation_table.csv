@@ -1,0 +1,14 @@
+Case,Profile,I1,I2,I3,I4,chi2_1550,Relative_to_abrupt,Peak_nm
+Abrupt reference,abrupt,0.0,0.0,0.0,0.0,31.036041396587407,,1517.0
+Linear 0.2 nm,linear,0.2,0.2,0.2,0.2,29.373821276653924,,1515.0
+Linear 0.4 nm,linear,0.4,0.4,0.4,0.4,26.442974692208633,,1513.0
+Linear 0.7 nm,linear,0.7,0.7,0.7,0.7,21.681632420366405,,1508.0
+Linear 1.0 nm,linear,1.0,1.0,1.0,1.0,18.047520507860785,,1502.0
+Linear 1.4 nm,linear,1.4,1.4,1.4,1.4,15.232022782516708,,1493.0
+Asymmetric inner grading A,linear,0.0,0.4,0.8,0.0,22.746444471321382,,1512.0
+Asymmetric inner grading B,linear,0.0,0.8,0.4,0.0,31.03331049550273,,1514.0
+Inner interfaces graded only,linear,0.0,0.7,0.7,0.0,24.64599847559191,,1512.0
+Outer interfaces graded only,linear,0.7,0.0,0.0,0.7,26.14986173795292,,1513.0
+Fermi-like 0.7 nm,fermi,0.7,0.7,0.7,0.7,26.25415335507906,,1513.0
+erf 0.7 nm,erf,0.7,0.7,0.7,0.7,24.492140650394717,,1511.0
+Cosine 0.7 nm,cosine,0.7,0.7,0.7,0.7,24.282017923492297,,1511.0

@@ -1,0 +1,135 @@
+{
+  "case": {
+    "case_id": "08",
+    "case_name": "Inner interfaces graded only",
+    "profile": "linear",
+    "nominal_grade_width_nm": 0.7,
+    "I1_profile": "abrupt",
+    "I1_width_nm": 0.0,
+    "I2_profile": "linear",
+    "I2_width_nm": 0.7,
+    "I3_profile": "linear",
+    "I3_width_nm": 0.7,
+    "I4_profile": "abrupt",
+    "I4_width_nm": 0.0,
+    "well1_nm": 7.1,
+    "tunnel_barrier_nm": 1.8,
+    "well2_nm": 2.9,
+    "barrier_Al_fraction": 0.55,
+    "well_Al_fraction": 0.0,
+    "grading_geometry_convention": "Full 0-to-0.55 transition width centered on the nominal abrupt interface; equal lengths of the adjacent materials are replaced, while nominal interface positions and total device length remain fixed.",
+    "implementation_type": "NATIVE_NEXTNANO_SYNTAX",
+    "requires_solver": true,
+    "notes": "Isolates changes to inter-well coupling."
+  },
+  "geometry": {
+    "thick_well_nm": 7.1,
+    "tunnel_barrier_nm": 1.8,
+    "thin_well_nm": 2.9,
+    "period_barrier_nm": 18.2,
+    "outer_barrier_nm": 9.1,
+    "total_well_nm": 10.0,
+    "active_start_nm": 9.1,
+    "active_end_nm": 20.9,
+    "barrier_centre_nm": 17.099999999999998,
+    "domain_nm": [
+      0.0,
+      30.0
+    ],
+    "quantum_region_nm": [
+      7.1,
+      22.9
+    ]
+  },
+  "profile_request": {
+    "profile": "linear",
+    "render_method": "ternary_linear",
+    "width_definition": "full start-to-end transition width",
+    "max_al_fraction": 0.55,
+    "domain_nm": [
+      0.0,
+      30.0
+    ],
+    "interfaces_nm": {
+      "outer_left_algaas_to_gaas": 9.1,
+      "central_gaas_to_algaas": 16.2,
+      "central_algaas_to_gaas": 18.0,
+      "outer_right_gaas_to_algaas": 20.9
+    },
+    "interface_ids": {
+      "I1": 9.1,
+      "I2": 16.2,
+      "I3": 18.0,
+      "I4": 20.9
+    },
+    "requested_widths_nm": {
+      "I1": 0.0,
+      "I2": 0.7,
+      "I3": 0.7,
+      "I4": 0.0
+    },
+    "grading_geometry_convention": "Full 0-to-0.55 transition width centered on the nominal abrupt interface; equal lengths of the adjacent materials are replaced, while nominal interface positions and total device length remain fixed."
+  },
+  "profile_diagnostics": {
+    "realized_peak_al_fraction": 0.55,
+    "realized_min_al_fraction": 0.0,
+    "grading_profile_realization_max_error": 0.0,
+    "grading_profile_realization_rms_error": 0.0,
+    "profile_within_bounds": true,
+    "profile_monotone_coordinates": true,
+    "profile_points": 601
+  },
+  "plateau_lengths_nm": {
+    "left_outer_barrier_pure_nm": 9.1,
+    "thick_well_pure_nm": 6.75,
+    "tunnel_barrier_pure_nm": 1.1,
+    "thin_well_pure_nm": 2.55,
+    "right_outer_barrier_pure_nm": 9.1
+  },
+  "grade_intervals_nm": {
+    "I1": null,
+    "I2": [
+      15.85,
+      16.55
+    ],
+    "I3": [
+      17.65,
+      18.35
+    ],
+    "I4": null
+  },
+  "validation": {
+    "case_id": "08",
+    "case_name": "Inner interfaces graded only",
+    "profile": "linear",
+    "requested_grade_width_nm": 0.7,
+    "realized_grade_width_nm": 0.7,
+    "maximum_composition_error": 0.0,
+    "gaas_reaches_zero": true,
+    "algaas_reaches_max": true,
+    "nominal_geometry_preserved": true,
+    "unintended_overlap": false,
+    "smooth_profile_continuous_in_rendering": true,
+    "notes": "",
+    "I1_requested_width_nm": 0.0,
+    "I1_realized_width_nm": 0.0,
+    "I1_width_error_nm": 0.0,
+    "I1_direction_pass": true,
+    "I2_requested_width_nm": 0.7,
+    "I2_realized_width_nm": 0.7,
+    "I2_width_error_nm": 0.0,
+    "I2_direction_pass": true,
+    "I3_requested_width_nm": 0.7,
+    "I3_realized_width_nm": 0.7,
+    "I3_width_error_nm": 0.0,
+    "I3_direction_pass": true,
+    "I4_requested_width_nm": 0.0,
+    "I4_realized_width_nm": 0.0,
+    "I4_width_error_nm": 0.0,
+    "I4_direction_pass": true,
+    "grading_direction_correct": true,
+    "validation_pass": true
+  },
+  "deck_complete": true,
+  "datafile_rows": 0
+}

@@ -1,0 +1,200 @@
+# =============================================================================
+# Demo 20 - Quantum-Well Interface Grading, with a configurable (2*pi)^2
+#           k-space normalization experiment.
+#
+# Every option Demo 20 depends on is visible in this one file. Values marked
+# "FROZEN FROM DEMO 19" reproduce Demo 19 exactly and must not be edited to
+# make a result look better; changing one stops Demo 20 being a controlled
+# reorganization of Demo 19 and makes it a different study.
+# =============================================================================
+
+demo:
+  id: 20
+  name: quantum_well_interface_grading_scaled
+  parent_demo: 19_quantum_well_interface_grading_showcase
+  description: >-
+    Demo 19's controlled interface-grading study, reorganized into numbered
+    pipeline stages, with the in-plane k-space normalization exposed as an
+    explicit switchable convention.
+
+# --- Layer 1: geometry -------------------------------------------------------
+# FROZEN FROM DEMO 19 (nextnano/demos/19_.../cases19.py).
+# Interface positions are derived, never typed in: see s02_grading.py.
+#   I1 = period_barrier/2                                  = 9.1 nm
+#   I2 = I1 + thick_well                                   = 16.2 nm
+#   I3 = I2 + tunnel_barrier                               = 18.0 nm
+#   I4 = I3 + thin_well                                    = 20.9 nm
+#   domain = period_barrier + thick + tunnel + thin        = 30.0 nm
+geometry:
+  thick_well_nm: 7.1
+  tunnel_barrier_nm: 1.8
+  thin_well_nm: 2.9
+  period_barrier_nm: 18.2
+  quantum_region_padding_nm: 2.0
+
+materials:
+  barrier_al_fraction: 0.55
+  well_al_fraction: 0.0
+  temperature_K: 300.0
+
+mesh:
+  active_region_grid_spacing_nm: 0.05
+  outer_grid_spacing_nm: 0.5
+  # The solver-free audit grid is this many times finer than the mesh. It is a
+  # validation grid only and is never handed to nextnano++.
+  continuous_oversample: 20
+
+# --- Layer 2: grading profile mathematics ------------------------------------
+# FROZEN FROM DEMO 19 (grading12.profile_fraction defaults, as called by
+# demo19._profile_shape). Both smooth shapes are endpoint-normalized so the
+# realized profile reaches exactly 0 and exactly barrier_al_fraction.
+grading:
+  width_definition: full_0_to_0p55_transition_width
+  sigmoid_steepness: 10.0
+  erf_span_sigma: 3.0
+  profile_tolerance: 0.005
+  width_tolerance_nm: 1.0e-9
+  render:
+    abrupt: abrupt_regions
+    linear: ternary_linear
+    fermi: ternary_import
+    erf: ternary_import
+    cosine: ternary_import
+
+# --- Layer 3: solver ---------------------------------------------------------
+# enabled: false is the home-laptop setting. Demo 20 never fabricates solver
+# output; with the solver disabled it runs the analysis stages against real
+# tabulated licensed results instead (see analysis.source below).
+solver:
+  enabled: false
+  threads: 1
+  solver_timeout_seconds: 3600
+  quantum_region_name: acqw
+  dipole_polarization_name: growth_z
+  parser_profile: nextnano_pp_3_0_0
+  template: graded_acqw20.in.j2
+  bandedge_columns:
+    position_nm: 0
+    conduction_eV: 1
+    heavy_hole_eV: 2
+    light_hole_eV: 3
+    split_off_eV: 4
+
+states:
+  number_of_electron_states: 6
+  number_of_hole_states: 6
+  output_state_count: 6
+  # How many states of each band enter the m, n, l sums. FROZEN AT 2.
+  max_states_per_band: 2
+
+# --- Layer 5: chi2 physics ---------------------------------------------------
+# FROZEN FROM DEMO 19 (demos/14/demo.yaml chi2 block + Chi2Settings defaults
+# reached through physics14.settings_from_config).
+chi2:
+  mode: absolute
+  target_wavelength_nm: 1550.0
+  broadening_meV: 5.0
+  r_e_hh_nm: 0.751
+  nz_mode: period_density        # 1 coupled-well period per reference_period_nm
+  reference_period_nm: 30.0
+  wells_per_period: 2            # only used by nz_mode: well_density
+  focused_wavelength_nm: [1400.0, 1800.0]
+  focused_wavelength_points: 401
+  broad_wavelength_nm: [400.0, 1800.0]
+  broad_wavelength_points: 701
+
+  # ---------------------------------------------------------------------------
+  # THE DEMO 20 EXPERIMENT.
+  #
+  # Demo 19 evaluates the in-plane sum as
+  #
+  #     (1/A) sum_k  ->  integral d^2k / (2*pi)^2
+  #                   =  (1 / (2*pi)) integral_0^kmax k dk      (isotropic)
+  #
+  # so the factor 1/(2*pi)^2 IS ALREADY PRESENT in Demo 19. See the audit in
+  # README.md and the machine-checked evidence in s06_chi2.py.
+  #
+  # Setting apply_kspace_2pi_squared_scaling: true therefore does NOT add a
+  # missing factor. It CANCELS the existing denominator, switching the measure
+  # to the bare
+  #
+  #     sum_k  ->  g_s * integral d^2k
+  #
+  # convention. That is an alternative normalization convention, and until the
+  # source paper's own k-space measure is confirmed it is a numerical
+  # sensitivity experiment - not a correction. Both values are always computed
+  # and both are always written to the output tables; this switch only chooses
+  # which one is labelled "reported".
+  # ---------------------------------------------------------------------------
+  apply_kspace_2pi_squared_scaling: false
+  kspace_scaling_factor: 39.47841760435743   # (2*pi)^2, verified in tests
+  kspace_scaling_definition: "(2*pi)^2"
+
+k_parallel:
+  fraction_of_bz: 0.10
+  lattice_constant_nm: 0.565325
+  bz_edge_convention: legacy_pi_over_a   # k_max = fraction * pi / a
+  points: 96
+  convergence_probe_points: [48, 96, 192, 384]
+  convergence_tolerance: 1.0e-3
+  electron_mass_m0: 0.067
+  heavy_hole_inplane_mass_m0: 0.112
+  spin_degeneracy: 2
+
+# --- Layer 6: QC -------------------------------------------------------------
+# solver_pass and physical_valid stay separate concepts. A zero return code is
+# never sufficient to call the physics validated.
+qc:
+  orthonormality_tolerance: 1.0e-3
+  maximum_boundary_probability: 1.0e-3
+  minimum_confined_probability: 0.5
+  origin_shift_nm: 100.0
+  origin_relative_tolerance: 1.0e-6
+  # Invariance gates for the scaling experiment: a k-independent constant must
+  # not move a peak, reorder the cases, or change a normalized lineshape.
+  peak_wavelength_tolerance_nm: 0.0
+  spectral_shape_tolerance: 1.0e-9
+  ranking_must_be_identical: true
+
+# --- Layer 7/8: analysis inputs, plots, reporting ----------------------------
+analysis:
+  # Where the electron/hole energies and the O / z matrices come from.
+  #   master_table    - read them from a Demo 19 (or Demo 20) master results
+  #                     CSV. These are real licensed solver numbers; only the
+  #                     chi2 postprocessing is re-run. Works with no solver.
+  #   nextnano_output - parse a raw licensed run directory (work laptop).
+  source: master_table
+  master_table: demo_results/demo19/tables/demo19_master_results.csv
+  reference_case_id: "00"
+  # Demo 19 fills chi2_1550_relative_to_abrupt only when the abrupt reference is
+  # physical_valid. Demo 19's own copied run is physical_valid=False for all 13
+  # cases, so that column came out empty. Demo 20 preserves that column and its
+  # gate verbatim, and adds *_relative_to_reference columns that are computed
+  # whenever the reference case has a finite chi2, so the comparison plots have
+  # data without relabelling unvalidated physics as validated.
+  strict_relative_requires_physical_valid: true
+
+paper:
+  # Published order-of-magnitude target this investigation is chasing.
+  target_chi2_pm_per_V: 2500.0
+  target_wavelength_nm: 1550.0
+  source: >-
+    Published interband chi2 for a graded asymmetric coupled quantum well,
+    approximately 2500 pm/V. Recorded as a comparison target only; Demo 20
+    never fits to it.
+
+plots:
+  enabled: true
+  dpi: 220
+
+paths:
+  # Repository-relative. Resolved against the repo root by config20.py, so no
+  # absolute paths and no usernames appear anywhere.
+  results_root: demo_results/demo20
+  subdirs:
+    tables: tables
+    plots: plots
+    data: data
+    qc: qc
+    logs: logs
+    inputs: inputs

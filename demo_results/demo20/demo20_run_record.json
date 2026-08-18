@@ -1,0 +1,203 @@
+{
+  "generated_utc": "2026-08-17T21:33:15Z",
+  "configuration": {
+    "config_path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\20_quantum_well_interface_grading_scaled\\demo20_config.yaml",
+    "command_line_overrides": {
+      "chi2.apply_kspace_2pi_squared_scaling": false
+    },
+    "demo": {
+      "id": 20,
+      "name": "quantum_well_interface_grading_scaled",
+      "parent_demo": "19_quantum_well_interface_grading_showcase",
+      "description": "Demo 19's controlled interface-grading study, reorganized into numbered pipeline stages, with the in-plane k-space normalization exposed as an explicit switchable convention."
+    },
+    "geometry": {
+      "thick_well_nm": 7.1,
+      "tunnel_barrier_nm": 1.8,
+      "thin_well_nm": 2.9,
+      "period_barrier_nm": 18.2,
+      "quantum_region_padding_nm": 2.0
+    },
+    "materials": {
+      "barrier_al_fraction": 0.55,
+      "well_al_fraction": 0.0,
+      "temperature_K": 300.0
+    },
+    "mesh": {
+      "active_region_grid_spacing_nm": 0.05,
+      "outer_grid_spacing_nm": 0.5,
+      "continuous_oversample": 20
+    },
+    "grading": {
+      "width_definition": "full_0_to_0p55_transition_width",
+      "sigmoid_steepness": 10.0,
+      "erf_span_sigma": 3.0,
+      "profile_tolerance": 0.005,
+      "width_tolerance_nm": 1e-09,
+      "render": {
+        "abrupt": "abrupt_regions",
+        "linear": "ternary_linear",
+        "fermi": "ternary_import",
+        "erf": "ternary_import",
+        "cosine": "ternary_import"
+      }
+    },
+    "states": {
+      "number_of_electron_states": 6,
+      "number_of_hole_states": 6,
+      "output_state_count": 6,
+      "max_states_per_band": 2
+    },
+    "chi2": {
+      "mode": "absolute",
+      "target_wavelength_nm": 1550.0,
+      "broadening_meV": 5.0,
+      "r_e_hh_nm": 0.751,
+      "nz_mode": "period_density",
+      "reference_period_nm": 30.0,
+      "wells_per_period": 2,
+      "focused_wavelength_nm": [
+        1400.0,
+        1800.0
+      ],
+      "focused_wavelength_points": 401,
+      "broad_wavelength_nm": [
+        400.0,
+        1800.0
+      ],
+      "broad_wavelength_points": 701,
+      "apply_kspace_2pi_squared_scaling": false,
+      "kspace_scaling_factor": 39.47841760435743,
+      "kspace_scaling_definition": "(2*pi)^2"
+    },
+    "k_parallel": {
+      "fraction_of_bz": 0.1,
+      "lattice_constant_nm": 0.565325,
+      "bz_edge_convention": "legacy_pi_over_a",
+      "points": 96,
+      "convergence_probe_points": [
+        48,
+        96,
+        192,
+        384
+      ],
+      "convergence_tolerance": 0.001,
+      "electron_mass_m0": 0.067,
+      "heavy_hole_inplane_mass_m0": 0.112,
+      "spin_degeneracy": 2
+    },
+    "qc": {
+      "orthonormality_tolerance": 0.001,
+      "maximum_boundary_probability": 0.001,
+      "minimum_confined_probability": 0.5,
+      "origin_shift_nm": 100.0,
+      "origin_relative_tolerance": 1e-06,
+      "peak_wavelength_tolerance_nm": 0.0,
+      "spectral_shape_tolerance": 1e-09,
+      "ranking_must_be_identical": true
+    },
+    "analysis": {
+      "source": "master_table",
+      "master_table": "demo_results/demo19/tables/demo19_master_results.csv",
+      "reference_case_id": "00",
+      "strict_relative_requires_physical_valid": true
+    },
+    "paper": {
+      "target_chi2_pm_per_V": 2500.0,
+      "target_wavelength_nm": 1550.0,
+      "source": "Published interband chi2 for a graded asymmetric coupled quantum well, approximately 2500 pm/V. Recorded as a comparison target only; Demo 20 never fits to it."
+    },
+    "solver_enabled": false
+  },
+  "source": {
+    "analysis_source": "master_table",
+    "analysis_source_path": "C:\\code\\nonlinear_photonics\\demo_results\\demo19\\tables\\demo19_master_results.csv",
+    "solver_run_in_this_execution": false,
+    "note": "Energies and matrix elements were read from a licensed solver run's results table; only the chi2 postprocessing was re-evaluated here."
+  },
+  "solver_ran_in_this_execution": false,
+  "figures": {
+    "enabled": true,
+    "made": [
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\plots\\01_grading_composition_profiles.png",
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\plots\\02_grading_profile_shapes.png",
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\plots\\04_chi2_spectra_linear_grading.png",
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\plots\\05_grade_width_vs_chi2_1550.png",
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\plots\\06_grade_width_relative_to_abrupt.png",
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\plots\\07_grade_width_vs_peak_wavelength.png",
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\plots\\08_grading_location_comparison.png",
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\plots\\09_profile_shape_chi2_comparison.png",
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\plots\\10_grading_summary_heatmap.png",
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\plots\\11_raw_vs_scaled_chi2_1550.png",
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\plots\\12_scaling_ratio_by_case.png",
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\plots\\13_reference_raw_vs_scaled_spectrum.png"
+    ],
+    "skipped": [
+      "03_abrupt_vs_graded_wavefunctions.png"
+    ],
+    "skip_reasons": {
+      "03_abrupt_vs_graded_wavefunctions.png": "needs per-state envelope data from a raw licensed run"
+    }
+  },
+  "validation_status": {
+    "code_validated": {
+      "status": true,
+      "evidence": "tests/test_demo20.py executed locally; includes exact reproduction of Demo 19's chi2 from its own tabulated matrix elements."
+    },
+    "numerics_validated": {
+      "status": true,
+      "evidence": "k-measure agrees with its closed form, the k grid is converged at the production point count, and the two conventions differ by exactly (2*pi)^2 pointwise."
+    },
+    "solver_validated": {
+      "status": false,
+      "evidence": "NO licensed solve ran in this execution; the quantum data was read from a previous licensed run's table."
+    },
+    "physical_model_validated": {
+      "status": false,
+      "evidence": "physical_valid is False; the inherited Demo 11/14 physical QC did not pass. The specific failed sub-check needs the raw licensed run and the proprietary material database, neither of which is present in this checkout."
+    },
+    "paper_reproduction_validated": {
+      "status": false,
+      "evidence": "no convention reproduces the published target; closest ratio to target is 0.4901. Agreement would in any case require the paper's own k-space measure to be confirmed, which this checkout cannot do."
+    }
+  },
+  "paper_comparison": {
+    "paper_target_pm_per_V": 2500.0,
+    "paper_target_wavelength_nm": 1550.0,
+    "paper_source": "Published interband chi2 for a graded asymmetric coupled quantum well, approximately 2500 pm/V. Recorded as a comparison target only; Demo 20 never fits to it.",
+    "evaluated": true,
+    "reference_case_id": "00",
+    "reference_case_name": "Abrupt reference",
+    "demo19_recorded_pm_per_V": 31.036041396587407,
+    "demo20_reproduces_demo19": true,
+    "demo20_vs_demo19_relative_difference": 2.289411612391484e-16,
+    "demo20_raw_pm_per_V": 31.036041396587414,
+    "demo20_scaled_pm_per_V": 1225.2538030406026,
+    "raw_ratio_to_paper": 0.012414416558634966,
+    "scaled_ratio_to_paper": 0.49010152121624107,
+    "raw_error_percent": 98.7585583441365,
+    "scaled_error_percent": 50.98984787837589,
+    "remaining_factor_after_scaling": 2.04039358522779,
+    "largest_raw_case": {
+      "case_id": "00",
+      "case_name": "Abrupt reference",
+      "chi2_pm_per_V": 31.036041396587414
+    },
+    "largest_scaled_case": {
+      "case_id": "00",
+      "case_name": "Abrupt reference",
+      "chi2_pm_per_V": 1225.2538030406026,
+      "ratio_to_paper": 0.49010152121624107
+    },
+    "residual_analysis": {
+      "evaluated": true,
+      "remaining_factor": 2.04039358522779,
+      "nz_alternative_convention": "well_density",
+      "nz_alternative_multiplier": 2.0,
+      "chi2_if_scaled_and_well_density_pm_per_V": 2450.5076060812053,
+      "ratio_to_paper_if_both": 0.9802030424324821,
+      "note": "The residual is close to the N_z counting ambiguity, which is a factor of exactly 2. This is recorded as a lead only: two independent convention changes that happen to multiply to roughly the published number is not evidence that either is the paper's choice. Confirming it requires the paper's own k-space measure and its own N_z definition, neither of which this checkout can establish."
+    },
+    "interpretation": "Neither convention reproduces the published target. The (2*pi)^2 convention closes most of the gap but is not a fit and is not evidence that the scaled convention is the paper's. The residual factor is recorded as remaining_factor_after_scaling."
+  }
+}

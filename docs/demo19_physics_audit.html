@@ -1,0 +1,1384 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Demo 19 Physics Audit</title>
+
+<style>
+:root{
+  --ground:#F1F4F7;
+  --surface:#FFFFFF;
+  --surface-2:#E7ECF2;
+  --ink:#121922;
+  --ink-2:#4A5769;
+  --ink-3:#6D7B8D;
+  --rule:#D2DAE4;
+  --rule-soft:#E3E9F0;
+  --cb:#26488C;
+  --cb-soft:#E3EAF7;
+  --vb:#A34E28;
+  --vb-soft:#F7EAE3;
+  --ok:#1A6549;
+  --ok-soft:#E1F0EA;
+  --flag:#8A5606;
+  --flag-soft:#F7EDDC;
+  --py:#5B3E86;
+  --py-soft:#EDE7F5;
+
+  --display:"Charter","Bitstream Charter","Iowan Old Style","Source Serif 4",Georgia,"Times New Roman",serif;
+  --body:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"SFMono-Regular","Cascadia Mono","Consolas","Liberation Mono",Menlo,monospace;
+
+  --w:74ch;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0C1117;
+    --surface:#141B24;
+    --surface-2:#1B2531;
+    --ink:#E0E7EF;
+    --ink-2:#95A3B5;
+    --ink-3:#758395;
+    --rule:#26313E;
+    --rule-soft:#1E2833;
+    --cb:#82A9EA;
+    --cb-soft:#18243A;
+    --vb:#E29669;
+    --vb-soft:#2E211A;
+    --ok:#54C296;
+    --ok-soft:#132A23;
+    --flag:#DCA847;
+    --flag-soft:#2C2413;
+    --py:#B49AE0;
+    --py-soft:#231C33;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0C1117;
+  --surface:#141B24;
+  --surface-2:#1B2531;
+  --ink:#E0E7EF;
+  --ink-2:#95A3B5;
+  --ink-3:#758395;
+  --rule:#26313E;
+  --rule-soft:#1E2833;
+  --cb:#82A9EA;
+  --cb-soft:#18243A;
+  --vb:#E29669;
+  --vb-soft:#2E211A;
+  --ok:#54C296;
+  --ok-soft:#132A23;
+  --flag:#DCA847;
+  --flag-soft:#2C2413;
+  --py:#B49AE0;
+  --py-soft:#231C33;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--body);
+  font-size:16px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- shell ---------- */
+.shell{
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  max-width:1240px;
+  margin:0 auto;
+  padding:0 24px 96px;
+}
+@media (min-width:1080px){
+  .shell{grid-template-columns:236px minmax(0,1fr);gap:56px;padding:0 32px 120px}
+}
+
+/* ---------- masthead ---------- */
+.masthead{
+  grid-column:1/-1;
+  border-bottom:2px solid var(--ink);
+  padding:56px 0 22px;
+  margin-bottom:40px;
+}
+.eyebrow{
+  font-family:var(--mono);
+  font-size:11px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--ink-3);
+  margin:0 0 14px;
+}
+.masthead h1{
+  font-family:var(--display);
+  font-weight:600;
+  font-size:clamp(34px,5vw,52px);
+  line-height:1.05;
+  letter-spacing:-.015em;
+  margin:0 0 14px;
+  text-wrap:balance;
+}
+.standfirst{
+  font-size:17px;
+  color:var(--ink-2);
+  max-width:62ch;
+  margin:0 0 24px;
+}
+.runstrip{
+  display:flex;
+  flex-wrap:wrap;
+  gap:0 28px;
+  font-family:var(--mono);
+  font-size:12px;
+  color:var(--ink-2);
+  border-top:1px solid var(--rule-soft);
+  padding-top:14px;
+}
+.runstrip b{color:var(--ink-3);font-weight:400;letter-spacing:.06em;text-transform:uppercase;font-size:10.5px;display:block}
+
+/* ---------- nav ---------- */
+.rail{display:none}
+@media (min-width:1080px){
+  .rail{
+    display:block;
+    position:sticky;
+    top:0;
+    align-self:start;
+    max-height:100vh;
+    overflow-y:auto;
+    padding:8px 0 40px;
+  }
+}
+.rail p{
+  font-family:var(--mono);
+  font-size:10.5px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--ink-3);
+  margin:0 0 12px;
+}
+.rail ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.rail a{
+  display:grid;
+  grid-template-columns:26px 1fr;
+  gap:6px;
+  text-decoration:none;
+  color:var(--ink-2);
+  font-size:13.5px;
+  line-height:1.35;
+  padding:5px 6px 5px 0;
+  border-left:2px solid transparent;
+  padding-left:10px;
+}
+.rail a:hover{color:var(--cb);border-left-color:var(--cb)}
+.rail a:focus-visible{outline:2px solid var(--cb);outline-offset:2px}
+.rail a span{font-family:var(--mono);font-size:11px;color:var(--ink-3);padding-top:1px}
+
+/* ---------- sections ---------- */
+main{min-width:0}
+section{
+  scroll-margin-top:20px;
+  padding-top:8px;
+  margin-bottom:52px;
+}
+section > h2{
+  font-family:var(--display);
+  font-size:27px;
+  font-weight:600;
+  letter-spacing:-.01em;
+  line-height:1.2;
+  margin:0 0 6px;
+  display:grid;
+  grid-template-columns:auto 1fr;
+  gap:14px;
+  align-items:baseline;
+  text-wrap:balance;
+}
+section > h2 em{
+  font-family:var(--mono);
+  font-style:normal;
+  font-size:12px;
+  font-weight:400;
+  color:var(--cb);
+  letter-spacing:.1em;
+  border:1px solid var(--rule);
+  border-radius:2px;
+  padding:3px 7px;
+  background:var(--surface);
+}
+.lede{color:var(--ink-2);max-width:var(--w);margin:0 0 22px;font-size:15.5px}
+h3{
+  font-family:var(--body);
+  font-size:12px;
+  font-weight:650;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--ink-3);
+  margin:30px 0 12px;
+  padding-bottom:6px;
+  border-bottom:1px solid var(--rule-soft);
+}
+p{max-width:var(--w)}
+ul,ol.plain{max-width:var(--w)}
+li{margin-bottom:6px}
+code{
+  font-family:var(--mono);
+  font-size:.88em;
+  background:var(--surface-2);
+  padding:1px 5px;
+  border-radius:3px;
+}
+strong{font-weight:650}
+
+/* ---------- provenance chips ---------- */
+.chip{
+  display:inline-block;
+  font-family:var(--mono);
+  font-size:9.5px;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+  padding:2px 6px;
+  border-radius:2px;
+  vertical-align:2px;
+  white-space:nowrap;
+  font-weight:600;
+}
+.c-deck{background:var(--cb-soft);color:var(--cb)}
+.c-db{background:var(--vb-soft);color:var(--vb)}
+.c-meas{background:var(--ok-soft);color:var(--ok)}
+.c-py{background:var(--py-soft);color:var(--py)}
+.c-unk{background:var(--flag-soft);color:var(--flag)}
+
+.legend{
+  display:flex;flex-wrap:wrap;gap:8px 16px;
+  background:var(--surface);
+  border:1px solid var(--rule);
+  padding:14px 16px;
+  margin:0 0 34px;
+}
+.legend div{font-size:12.5px;color:var(--ink-2);display:flex;gap:8px;align-items:baseline}
+
+/* ---------- spec tables ---------- */
+.tw{overflow-x:auto;margin:0 0 18px;border:1px solid var(--rule);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:8px 14px;border-bottom:1px solid var(--rule-soft);vertical-align:top}
+thead th{
+  font-family:var(--mono);
+  font-size:10.5px;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+  color:var(--ink-3);
+  font-weight:500;
+  background:var(--surface-2);
+  border-bottom:1px solid var(--rule);
+  white-space:nowrap;
+}
+tbody tr:last-child td{border-bottom:none}
+td.num,th.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+td.k{font-family:var(--mono);font-size:12.5px;color:var(--ink-2);white-space:nowrap}
+
+/* ---------- equations ---------- */
+.eq{
+  font-family:var(--mono);
+  font-size:13px;
+  line-height:1.75;
+  background:var(--surface);
+  border:1px solid var(--rule);
+  border-left:3px solid var(--cb);
+  padding:16px 18px;
+  margin:0 0 16px;
+  overflow-x:auto;
+  white-space:pre;
+  color:var(--ink);
+}
+.eq.vb{border-left-color:var(--vb)}
+.eq .cm{color:var(--ink-3)}
+.deck{
+  font-family:var(--mono);
+  font-size:12.5px;
+  line-height:1.65;
+  background:var(--surface);
+  border:1px solid var(--rule);
+  padding:14px 16px;
+  margin:0 0 16px;
+  overflow-x:auto;
+  white-space:pre;
+}
+figcaption{
+  font-family:var(--mono);
+  font-size:11px;
+  color:var(--ink-3);
+  letter-spacing:.04em;
+  margin:-8px 0 22px;
+}
+figure{margin:0}
+
+/* ---------- callouts ---------- */
+.note{
+  background:var(--surface);
+  border:1px solid var(--rule);
+  border-left:3px solid var(--flag);
+  padding:14px 18px;
+  margin:0 0 20px;
+  max-width:var(--w);
+  font-size:14.5px;
+}
+.note b{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--flag);margin-bottom:6px;font-family:var(--mono);font-weight:600}
+.note.good{border-left-color:var(--ok)}
+.note.good b{color:var(--ok)}
+.note p{margin:0 0 8px;max-width:none}
+.note p:last-child{margin:0}
+
+/* ---------- profile cards ---------- */
+.profiles{display:grid;gap:14px;margin:0 0 20px}
+@media(min-width:760px){.profiles{grid-template-columns:1fr 1fr}}
+.pcard{background:var(--surface);border:1px solid var(--rule);padding:16px 18px}
+.pcard h4{
+  margin:0 0 4px;font-family:var(--display);font-size:19px;font-weight:600;
+}
+.pcard .sub{font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:.05em;margin:0 0 12px;text-transform:uppercase}
+.pcard .eq{margin:0 0 12px;font-size:12.5px;padding:12px 14px}
+.pcard dl{margin:0;font-size:13.5px;display:grid;grid-template-columns:auto 1fr;gap:3px 12px}
+.pcard dt{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);white-space:nowrap;padding-top:2px}
+.pcard dd{margin:0;color:var(--ink-2)}
+
+/* ---------- causal chain ---------- */
+.chain{list-style:none;margin:0;padding:0;counter-reset:step}
+.chain li{
+  position:relative;
+  padding:0 0 26px 44px;
+  border-left:1px solid var(--rule);
+  margin:0;
+}
+.chain li:last-child{border-left-color:transparent;padding-bottom:0}
+.chain li::before{
+  counter-increment:step;
+  content:counter(step);
+  position:absolute;left:-13px;top:0;
+  width:26px;height:26px;border-radius:50%;
+  background:var(--cb);color:var(--surface);
+  font-family:var(--mono);font-size:12px;
+  display:flex;align-items:center;justify-content:center;
+}
+.chain h4{
+  margin:2px 0 6px;font-family:var(--mono);font-size:12.5px;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--cb);font-weight:600;
+}
+.chain p{margin:0;font-size:15px;color:var(--ink-2);max-width:66ch}
+
+/* ---------- Q&A ---------- */
+.qa{display:grid;gap:0;border-top:1px solid var(--rule)}
+.qa article{
+  border-bottom:1px solid var(--rule-soft);
+  padding:16px 0;
+  display:grid;
+  grid-template-columns:32px 1fr;
+  gap:0 14px;
+}
+.qa .n{font-family:var(--mono);font-size:12px;color:var(--ink-3);padding-top:3px;font-variant-numeric:tabular-nums}
+.qa h4{
+  margin:0 0 6px;
+  font-family:var(--display);
+  font-size:18px;
+  font-weight:600;
+  line-height:1.3;
+  text-wrap:balance;
+}
+.qa p{margin:0;color:var(--ink-2);font-size:14.5px;max-width:68ch}
+.qa p + p{margin-top:8px}
+
+/* ---------- cheat sheet ---------- */
+.sheet{
+  background:var(--surface);
+  border:2px solid var(--ink);
+  padding:26px;
+}
+.sheet-grid{display:grid;gap:0}
+@media(min-width:720px){.sheet-grid{grid-template-columns:1fr 1fr;column-gap:36px}}
+.blk{border-top:1px solid var(--rule);padding:14px 0 16px}
+.blk:first-child{border-top:none;padding-top:0}
+@media(min-width:720px){.blk:nth-child(2){border-top:none;padding-top:0}}
+.blk h4{
+  margin:0 0 8px;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--cb);font-weight:600;
+}
+.blk dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:3px 14px;font-size:13px}
+.blk dt{color:var(--ink-3);white-space:nowrap}
+.blk dd{margin:0;font-family:var(--mono);font-size:12.5px;font-variant-numeric:tabular-nums;color:var(--ink)}
+.blk dd.t{font-family:var(--body);font-size:13px}
+
+footer{
+  grid-column:1/-1;
+  border-top:1px solid var(--rule);
+  margin-top:56px;padding-top:20px;
+  font-family:var(--mono);font-size:11.5px;color:var(--ink-3);
+  display:flex;flex-wrap:wrap;gap:6px 24px;
+}
+a{color:var(--cb)}
+:focus-visible{outline:2px solid var(--cb);outline-offset:2px}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<header class="masthead">
+  <p class="eyebrow">Physics &amp; model audit · nextnano++ 3.0.0</p>
+  <h1>Demo 19 — what the solver is actually being asked</h1>
+  <p class="standfirst">Thirteen interface-grading definitions on one frozen GaAs/Al<sub>0.55</sub>Ga<sub>0.45</sub>As asymmetric coupled quantum well. This traces every number from the input deck to the χ² spectrum, with the origin of each fact marked.</p>
+  <div class="runstrip">
+    <div><b>Structure</b>7.1 / 1.8 / 2.9 nm, 30.0 nm period</div>
+    <div><b>Cases</b>13, all solved</div>
+    <div><b>Run</b>demo19_20260814T150258Z_38f64513</div>
+    <div><b>Model</b>1-band effective mass, Schrödinger only</div>
+  </div>
+</header>
+
+<nav class="rail" aria-label="Sections">
+  <p>Contents</p>
+  <ol>
+    <li><a href="#s1"><span>01</span>Structure</a></li>
+    <li><a href="#s2"><span>02</span>Grading geometry</a></li>
+    <li><a href="#s3"><span>03</span>Grading math</a></li>
+    <li><a href="#s4"><span>04</span>nextnano representation</a></li>
+    <li><a href="#s5"><span>05</span>Material model</a></li>
+    <li><a href="#s6"><span>06</span>Quantum model</a></li>
+    <li><a href="#s7"><span>07</span>Numerics</a></li>
+    <li><a href="#s8"><span>08</span>Solver outputs</a></li>
+    <li><a href="#s9"><span>09</span>Optical postprocessing</a></li>
+    <li><a href="#s10"><span>10</span>Causal chain</a></li>
+    <li><a href="#s11"><span>11</span>Twenty questions</a></li>
+    <li><a href="#s12"><span>12</span>Cheat sheet</a></li>
+    <li><a href="#flags"><span>!!</span>Open flags</a></li>
+  </ol>
+</nav>
+
+<main>
+
+<div class="legend">
+  <div><span class="chip c-deck">deck</span> written in the Demo 19 input</div>
+  <div><span class="chip c-db">database</span> nextnano++ material database</div>
+  <div><span class="chip c-meas">verified</span> reproduced by running the solver</div>
+  <div><span class="chip c-py">python</span> computed after the solve</div>
+  <div><span class="chip c-unk">unknown</span> not establishable from this checkout</div>
+</div>
+
+<!-- ============ 1 ============ -->
+<section id="s1">
+  <h2><em>01</em>Structure</h2>
+  <p class="lede">One layer stack, frozen across all thirteen cases. The growth coordinate is <code>x</code> in nextnano++ and is called <code>z</code> in every plot and equation below.</p>
+
+  <div class="tw"><table>
+    <thead><tr><th>#</th><th>Layer</th><th class="num">Thickness</th><th class="num">x<sub>Al</sub></th><th class="num">Span (nm)</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td>Al<sub>0.55</sub>Ga<sub>0.45</sub>As outer barrier (left)</td><td class="num">9.100</td><td class="num">0.55</td><td class="num">0.000 – 9.100</td></tr>
+      <tr><td class="num">2</td><td>GaAs thick well</td><td class="num">7.100</td><td class="num">0.00</td><td class="num">9.100 – 16.200</td></tr>
+      <tr><td class="num">3</td><td>Al<sub>0.55</sub>Ga<sub>0.45</sub>As tunnel barrier</td><td class="num">1.800</td><td class="num">0.55</td><td class="num">16.200 – 18.000</td></tr>
+      <tr><td class="num">4</td><td>GaAs thin well</td><td class="num">2.900</td><td class="num">0.00</td><td class="num">18.000 – 20.900</td></tr>
+      <tr><td class="num">5</td><td>Al<sub>0.55</sub>Ga<sub>0.45</sub>As outer barrier (right)</td><td class="num">9.100</td><td class="num">0.55</td><td class="num">20.900 – 30.000</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Interfaces</h3>
+  <div class="tw"><table>
+    <thead><tr><th>ID</th><th>Name</th><th class="num">Position</th><th>Direction with increasing z</th></tr></thead>
+    <tbody>
+      <tr><td class="k">I1</td><td>outer barrier → thick well</td><td class="num">9.100 nm</td><td>x<sub>Al</sub> falls 0.55 → 0</td></tr>
+      <tr><td class="k">I2</td><td>thick well → tunnel barrier</td><td class="num">16.200 nm</td><td>x<sub>Al</sub> rises 0 → 0.55</td></tr>
+      <tr><td class="k">I3</td><td>tunnel barrier → thin well</td><td class="num">18.000 nm</td><td>x<sub>Al</sub> falls 0.55 → 0</td></tr>
+      <tr><td class="k">I4</td><td>thin well → outer barrier</td><td class="num">20.900 nm</td><td>x<sub>Al</sub> rises 0 → 0.55</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Fixed quantities</h3>
+  <div class="tw"><table>
+    <tbody>
+      <tr><td>Total simulation length</td><td class="num">30.000 nm</td><td>= 9.1 + 7.1 + 1.8 + 2.9 + 9.1; equals the reference period <span class="chip c-deck">deck</span></td></tr>
+      <tr><td>Outer barrier each side</td><td class="num">9.100 nm</td><td>= half the 18.2 nm period barrier <span class="chip c-deck">deck</span></td></tr>
+      <tr><td>Total GaAs</td><td class="num">10.000 nm</td><td>asymmetry s = (7.1−2.9)/10 = <b>0.42</b></td></tr>
+      <tr><td>Quantum region</td><td class="num">7.100 – 22.900 nm</td><td>active region ± 2.0 nm padding <span class="chip c-deck">deck</span></td></tr>
+      <tr><td>Barrier Al fraction</td><td class="num">0.550</td><td>well Al fraction 0.000</td></tr>
+      <tr><td>Temperature</td><td class="num">300.0 K</td><td>identical in all 13 decks <span class="chip c-meas">verified</span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ============ 2 ============ -->
+<section id="s2">
+  <h2><em>02</em>Grading geometry</h2>
+  <p class="lede">The single most important definition to get right in the meeting, because it is not the convention used in Demos 13 or 14.</p>
+
+  <div class="note good">
+    <b>The definition</b>
+    <p><strong>Grading width = the full, start-to-end width of the complete 0 ↔ 0.55 composition transition</strong>, centred on the nominal abrupt interface. It is <em>not</em> a half width, <em>not</em> a 10–90 % width, and <em>not</em> a Gaussian σ.</p>
+    <p>So a 0.7 nm grade means: at 0.35 nm before the interface x<sub>Al</sub> is exactly 0.55, at 0.35 nm after it is exactly 0.00, and at the interface itself it is exactly 0.275.</p>
+  </div>
+
+  <p>Formally, a grade of width <em>w</em> at interface position <em>z<sub>i</sub></em> occupies the closed interval <code>[z_i − w/2, z_i + w/2]</code>. Demo 14 by contrast used a 10–90 % width so that different profile families would describe comparable interfaces; Demo 19 deliberately uses the full width so that <em>the region of modified material is identical</em> across families and only the shape inside it differs.</p>
+
+  <h3>Worked example — I1 at 0.7 nm</h3>
+  <div class="tw"><table>
+    <thead><tr><th class="num">z (nm)</th><th class="num">x<sub>Al</sub> (linear)</th><th>meaning</th></tr></thead>
+    <tbody>
+      <tr><td class="num">8.750</td><td class="num">0.550000</td><td>grade starts — last point of pure Al<sub>0.55</sub>Ga<sub>0.45</sub>As</td></tr>
+      <tr><td class="num">9.100</td><td class="num">0.275000</td><td>nominal interface I1, exactly half composition</td></tr>
+      <tr><td class="num">9.450</td><td class="num">0.000000</td><td>grade ends — first point of pure GaAs</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>What stays fixed, what is consumed</h3>
+  <p>Nominal interface positions I1–I4 and the 30.0 nm total length <strong>never move</strong>. The grade eats <code>w/2</code> out of each of the two adjacent materials, so the <em>pure</em> plateau of every layer shrinks:</p>
+
+  <div class="tw"><table>
+    <thead><tr><th>Pure-material plateau</th><th class="num">w = 0</th><th class="num">0.2</th><th class="num">0.4</th><th class="num">0.7</th><th class="num">1.0</th><th class="num">1.4</th></tr></thead>
+    <tbody>
+      <tr><td>Thick GaAs well (7.1 − w)</td><td class="num">7.10</td><td class="num">6.90</td><td class="num">6.70</td><td class="num">6.40</td><td class="num">6.10</td><td class="num">5.70</td></tr>
+      <tr><td>Tunnel barrier (1.8 − w)</td><td class="num">1.80</td><td class="num">1.60</td><td class="num">1.40</td><td class="num">1.10</td><td class="num">0.80</td><td class="num">0.40</td></tr>
+      <tr><td>Thin GaAs well (2.9 − w)</td><td class="num">2.90</td><td class="num">2.70</td><td class="num">2.50</td><td class="num">2.20</td><td class="num">1.90</td><td class="num">1.50</td></tr>
+      <tr><td>Outer barriers (9.1 − w/2)</td><td class="num">9.10</td><td class="num">9.00</td><td class="num">8.90</td><td class="num">8.75</td><td class="num">8.60</td><td class="num">8.40</td></tr>
+    </tbody>
+  </table></div>
+
+  <p>The binding constraint is the 1.8 nm tunnel barrier: at <em>w</em> &gt; 1.8 nm the I2 and I3 grades would overlap and the barrier would never reach 0.55. The widest case in the study is 1.4 nm, which still leaves a 0.4 nm plateau at full composition. An explicit overlap check runs over all four intervals before any deck is written, and <strong>no case in the study overlaps</strong>. <span class="chip c-py">python</span></p>
+
+  <h3>The thirteen cases</h3>
+  <div class="tw"><table>
+    <thead><tr><th class="num">#</th><th>Case</th><th>Profile</th><th class="num">I1</th><th class="num">I2</th><th class="num">I3</th><th class="num">I4</th><th>Isolates</th></tr></thead>
+    <tbody>
+      <tr><td class="num">00</td><td>Abrupt reference</td><td>abrupt</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td>baseline for every ratio</td></tr>
+      <tr><td class="num">01</td><td>Linear 0.2 nm</td><td>linear</td><td class="num">0.2</td><td class="num">0.2</td><td class="num">0.2</td><td class="num">0.2</td><td rowspan="5" style="vertical-align:middle">width series, all four interfaces</td></tr>
+      <tr><td class="num">02</td><td>Linear 0.4 nm</td><td>linear</td><td class="num">0.4</td><td class="num">0.4</td><td class="num">0.4</td><td class="num">0.4</td></tr>
+      <tr><td class="num">03</td><td>Linear 0.7 nm</td><td>linear</td><td class="num">0.7</td><td class="num">0.7</td><td class="num">0.7</td><td class="num">0.7</td></tr>
+      <tr><td class="num">04</td><td>Linear 1.0 nm</td><td>linear</td><td class="num">1.0</td><td class="num">1.0</td><td class="num">1.0</td><td class="num">1.0</td></tr>
+      <tr><td class="num">05</td><td>Linear 1.4 nm</td><td>linear</td><td class="num">1.4</td><td class="num">1.4</td><td class="num">1.4</td><td class="num">1.4</td></tr>
+      <tr><td class="num">06</td><td>Asymmetric inner A</td><td>linear</td><td class="num">0</td><td class="num">0.4</td><td class="num">0.8</td><td class="num">0</td><td>orientation of inner grading</td></tr>
+      <tr><td class="num">07</td><td>Asymmetric inner B</td><td>linear</td><td class="num">0</td><td class="num">0.8</td><td class="num">0.4</td><td class="num">0</td><td>reverse of 06</td></tr>
+      <tr><td class="num">08</td><td>Inner only</td><td>linear</td><td class="num">0</td><td class="num">0.7</td><td class="num">0.7</td><td class="num">0</td><td>inter-well coupling</td></tr>
+      <tr><td class="num">09</td><td>Outer only</td><td>linear</td><td class="num">0.7</td><td class="num">0</td><td class="num">0</td><td class="num">0.7</td><td>outer confinement</td></tr>
+      <tr><td class="num">10</td><td>Fermi-like 0.7 nm</td><td>fermi</td><td class="num">0.7</td><td class="num">0.7</td><td class="num">0.7</td><td class="num">0.7</td><td rowspan="3" style="vertical-align:middle">profile shape at fixed width</td></tr>
+      <tr><td class="num">11</td><td>erf 0.7 nm</td><td>erf</td><td class="num">0.7</td><td class="num">0.7</td><td class="num">0.7</td><td class="num">0.7</td></tr>
+      <tr><td class="num">12</td><td>Cosine 0.7 nm</td><td>cosine</td><td class="num">0.7</td><td class="num">0.7</td><td class="num">0.7</td><td class="num">0.7</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ============ 3 ============ -->
+<section id="s3">
+  <h2><em>03</em>Grading math</h2>
+  <p class="lede">Every profile is one shape function applied identically at each graded interface. Nothing else varies.</p>
+
+  <h3>The common construction</h3>
+  <div class="eq">Baseline (no grading):
+    x_Al(z) = 0.55   in the three barriers
+    x_Al(z) = 0.00   in [I1, I2] and [I3, I4]
+
+For each interface i with width w &gt; 0, on [z_i − w/2, z_i + w/2]:
+
+    u    = clip( ( z − (z_i − w/2) ) / w ,  0 , 1 )      <span class="cm">← this is the ONLY place w enters</span>
+    f(u) = shape function,  f(0) = 0 exactly,  f(1) = 1 exactly
+    x_Al(z) = x_start + ( x_end − x_start ) · f(u)
+
+with  (x_start, x_end) = (0.55, 0.00)  at I1 and I3
+      (x_start, x_end) = (0.00, 0.55)  at I2 and I4</div>
+  <figcaption>The width enters only as the divisor of u — every family is the same shape stretched over the requested interval.</figcaption>
+
+  <p><strong>How x<sub>Al</sub> is normalised to span exactly 0 → 0.55:</strong> the shape function is normalised first, to run from 0 to 1 over <em>u</em>, and the composition endpoints are then applied as a plain affine map. Because <code>f(0)=0</code> and <code>f(1)=1</code> hold <em>exactly</em> (not asymptotically), the alloy fraction hits 0.000000 and 0.550000 exactly at the interval edges. No clipping is needed and none is applied to the composition itself; the only clip in the chain is on <em>u</em> outside the interval.</p>
+
+  <div class="profiles">
+    <div class="pcard">
+      <h4>Abrupt</h4>
+      <p class="sub">Case 00 · native regions</p>
+      <div class="eq">w = 0 at all four interfaces.
+No shape function is evaluated —
+the composition is a pure step at
+z_i, carried by material regions.</div>
+      <dl>
+        <dt>params</dt><dd>none</dd>
+        <dt>support</dt><dd>zero width</dd>
+        <dt>truncation</dt><dd>n/a</dd>
+      </dl>
+    </div>
+
+    <div class="pcard">
+      <h4>Linear</h4>
+      <p class="sub">Cases 01–09 · native <code>ternary_linear</code></p>
+      <div class="eq">f(u) = u</div>
+      <dl>
+        <dt>params</dt><dd>none</dd>
+        <dt>support</dt><dd>compact — exact on [0,1]</dd>
+        <dt>truncation</dt><dd>none needed</dd>
+        <dt>10–90 %</dt><dd>0.8 w = 0.560 nm at w = 0.7</dd>
+      </dl>
+    </div>
+
+    <div class="pcard">
+      <h4>Fermi-like (logistic)</h4>
+      <p class="sub">Case 10 · imported table</p>
+      <div class="eq">k    = 10.0                 <span class="cm">steepness</span>
+raw  = 1 / (1 + exp(−k(u−½)))
+lo   = 1 / (1 + exp(+k/2))  = 0.00669285
+hi   = 1 / (1 + exp(−k/2))  = 0.99330715
+f(u) = (raw − lo) / (hi − lo)</div>
+      <dl>
+        <dt>params</dt><dd>steepness k = 10.0 (fixed)</dd>
+        <dt>support</dt><dd>infinite — <b>truncated</b> at u ∈ [0,1]</dd>
+        <dt>truncation</dt><dd>the truncated function is then endpoint-normalised by (raw−lo)/(hi−lo), so it reaches 0 and 1 exactly rather than asymptotically; the cost is a slope discontinuity at the two edges</dd>
+        <dt>10–90 %</dt><dd>2ln9·w/k = 0.308 nm at w = 0.7</dd>
+      </dl>
+    </div>
+
+    <div class="pcard">
+      <h4>erf (error function)</h4>
+      <p class="sub">Case 11 · imported table</p>
+      <div class="eq">σ_span = 3.0                <span class="cm">half-widths of sigma</span>
+raw    = erf( σ_span·(u − ½) )
+lo     = erf(−1.5) = −0.96610515
+hi     = erf(+1.5) = +0.96610515
+f(u)   = (raw − lo) / (hi − lo)</div>
+      <dl>
+        <dt>params</dt><dd>erf_span_sigma = 3.0 (fixed)</dd>
+        <dt>support</dt><dd>infinite — <b>truncated</b> at u ∈ [0,1]</dd>
+        <dt>truncation</dt><dd>the interval spans ±1.5σ, i.e. 96.6 % of the transition; the remaining 3.4 % is removed by the same endpoint normalisation. Equivalent Gaussian width σ<sub>z</sub> = w/3 = 0.233 nm at w = 0.7</dd>
+        <dt>10–90 %</dt><dd>0.598 nm at w = 0.7</dd>
+      </dl>
+    </div>
+
+    <div class="pcard">
+      <h4>Cosine (raised cosine)</h4>
+      <p class="sub">Case 12 · imported table</p>
+      <div class="eq">f(u) = ½ − ½·cos(π u)</div>
+      <dl>
+        <dt>params</dt><dd>none</dd>
+        <dt>support</dt><dd>compact — exact on [0,1]</dd>
+        <dt>truncation</dt><dd>none; f(0)=0 and f(1)=1 identically, so no normalisation is applied. Slope is zero at both edges, so this is the only C¹-smooth family</dd>
+        <dt>10–90 %</dt><dd>0.512 nm at w = 0.7</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>Say this precisely</b>
+    <p>“Fermi-like” and “erf” are <strong>endpoint-normalised truncated</strong> functions, not the bare logistic or error function. At a fixed 0.7 nm full width the three smooth families have quite different <em>internal</em> sharpness — the 10–90 % widths are 0.31 nm (fermi), 0.60 nm (erf) and 0.51 nm (cosine) against 0.56 nm for linear. Cases 10–12 therefore compare <em>shape at fixed envelope</em>, not sharpness at fixed sharpness.</p>
+  </div>
+
+  <h3>Sampling of the imported profiles</h3>
+  <p>For fermi/erf/cosine the analytic x<sub>Al</sub>(z) is sampled onto a table before nextnano sees it: <strong>uniform 0.05 nm spacing over the whole 0 – 30 nm domain, 601 rows</strong> — exactly the active-region mesh spacing. The sampler additionally forces a point at each z<sub>i</sub> and each z<sub>i</sub> ± w/2; because every width in the study is a multiple of 0.1 nm, those points already sit on the 0.05 nm lattice and the table stays uniform. <span class="chip c-meas">verified</span></p>
+
+  <p>The resulting sampling error, measured against the analytic function on a 20× finer grid:</p>
+  <div class="tw"><table>
+    <thead><tr><th>Profile</th><th class="num">max |Δx<sub>Al</sub>|</th><th class="num">gate</th><th>Exactness</th></tr></thead>
+    <tbody>
+      <tr><td>abrupt, linear</td><td class="num">0.0</td><td class="num">5.0 × 10⁻³</td><td>exact — native nextnano syntax, no sampling</td></tr>
+      <tr><td>fermi</td><td class="num">3.26 × 10⁻³</td><td class="num">5.0 × 10⁻³</td><td>piecewise-linear reconstruction of the table</td></tr>
+      <tr><td>erf</td><td class="num">1.57 × 10⁻³</td><td class="num">5.0 × 10⁻³</td><td>piecewise-linear reconstruction of the table</td></tr>
+      <tr><td>cosine</td><td class="num">1.72 × 10⁻³</td><td class="num">5.0 × 10⁻³</td><td>piecewise-linear reconstruction of the table</td></tr>
+    </tbody>
+  </table></div>
+  <p>Fermi is worst because its truncation leaves the steepest kink at the interval edges. All three pass by a factor of 1.5–3. After each licensed solve the profile is checked a <em>second</em> time against nextnano's own realised <code>alloy_composition.dat</code>, with the same 5 × 10⁻³ tolerance. <span class="chip c-py">python</span></p>
+</section>
+
+<!-- ============ 4 ============ -->
+<section id="s4">
+  <h2><em>04</em>nextnano representation</h2>
+  <p class="lede">Two rendering paths. Only <code>ternary_linear</code> is native; nextnano++ 3.0.0 has no Fermi, erf or cosine grading keyword, so those go in as a data table. <code>ternary_pyramid</code> is never emitted and the preflight refuses any deck containing it.</p>
+
+  <h3>Path A — abrupt and linear (native)</h3>
+  <p>The whole domain is Al<sub>0.55</sub>Ga<sub>0.45</sub>As; the wells are carved out of it; the ramps are then written <em>on top</em>. nextnano++ applies later regions over earlier ones, so a ramp that overhangs a well region wins in the overlap — that ordering is deliberate and load-bearing.</p>
+
+  <figure>
+  <div class="deck">structure{
+    region{
+        everywhere{}
+        ternary_constant{ name = "Al(x)Ga(1-x)As"  alloy_x = 0.550000 }
+    }
+    region{
+        line{ x = [0.000000, 30.000000] }
+        contact{ name = qw_contact }
+    }
+    region{
+        line{ x = [9.100000, 16.200000] }
+        binary{ name = "GaAs" }
+    }
+    region{
+        line{ x = [18.000000, 20.900000] }
+        binary{ name = "GaAs" }
+    }
+    region{
+        line{ x = [8.750000, 9.450000] }
+        ternary_linear{ name = "Al(x)Ga(1-x)As"  alloy_x = [0.550000, 0.000000]  x = [8.750000, 9.450000] }
+    }
+    region{
+        line{ x = [15.850000, 16.550000] }
+        ternary_linear{ name = "Al(x)Ga(1-x)As"  alloy_x = [0.000000, 0.550000]  x = [15.850000, 16.550000] }
+    }
+    region{
+        line{ x = [17.650000, 18.350000] }
+        ternary_linear{ name = "Al(x)Ga(1-x)As"  alloy_x = [0.550000, 0.000000]  x = [17.650000, 18.350000] }
+    }
+    region{
+        line{ x = [20.550000, 21.250000] }
+        ternary_linear{ name = "Al(x)Ga(1-x)As"  alloy_x = [0.000000, 0.550000]  x = [20.550000, 21.250000] }
+    }
+}</div>
+  <figcaption>Case 03, Linear 0.7 nm — the actual generated structure block. Case 00 is the same with the last four regions absent.</figcaption>
+  </figure>
+
+  <p><strong><code>ternary_linear</code> semantics.</strong> <code>alloy_x = [a, b]</code> gives the Al mole fraction at the first and second spatial coordinate; <code>x = [z0, z1]</code> gives those coordinates in nm. Between them nextnano++ interpolates the alloy fraction linearly:</p>
+  <div class="eq">x_Al(z) = a + (b − a)·(z − z0)/(z1 − z0)     for z0 ≤ z ≤ z1</div>
+  <p>The two <code>x</code> entries are <em>positions</em>, not compositions — a genuine trip hazard, since <code>alloy_x</code> and <code>x</code> sit side by side. I confirmed the semantics by running a probe deck through nextnano++ with a 0.55 → 0.00 ramp over [4.65, 5.35] and reading back <code>alloy_composition.dat</code>: the solver returned 0.373214285714 at z = 4.875 nm, which is 0.55 × (5.35 − 4.875)/0.7 to twelve digits. <span class="chip c-meas">verified</span></p>
+
+  <h3>Path B — fermi, erf, cosine (imported table)</h3>
+  <figure>
+  <div class="deck">import{
+    file{ name = "al_profile"  filename = "al_profile.dat"  format = DAT  number_of_dimensions = 1 }
+    output_imports{}
+}
+
+structure{
+    region{
+        everywhere{}
+        ternary_constant{ name = "Al(x)Ga(1-x)As"  alloy_x = 0.550000 }
+    }
+    region{
+        line{ x = [0.000000, 30.000000] }
+        contact{ name = qw_contact }
+    }
+    region{
+        line{ x = [0.000000, 30.000000] }
+        ternary_import{ name = "Al(x)Ga(1-x)As"  import_from = "al_profile" }
+    }
+}</div>
+  <figcaption>Case 10, Fermi-like 0.7 nm — one region spans the entire domain and the table supplies every layer.</figcaption>
+  </figure>
+
+  <p><strong>The DAT file.</strong> Two whitespace-separated columns, no header, strictly ascending in position:</p>
+  <div class="tw"><table>
+    <thead><tr><th>Column</th><th>Quantity</th><th>Units</th><th>Format</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td>position along growth direction</td><td>nm</td><td><code>%.6f</code></td></tr>
+      <tr><td class="num">2</td><td>Al mole fraction x</td><td>dimensionless, 0 – 0.55</td><td><code>%.8f</code></td></tr>
+    </tbody>
+  </table></div>
+  <div class="deck">0.000000 0.55000000
+0.050000 0.55000000
+   ...
+8.750000 0.55000000
+8.800000 0.54616239
+8.850000 0.53848622
+   ...
+9.100000 0.27500000        ← nominal interface I1, exactly half
+   ...
+9.450000 0.00000000
+   ...
+30.000000 0.55000000</div>
+  <p>601 rows at uniform 0.05 nm. <strong>nextnano++ interpolates the table linearly between rows</strong> onto its own computational grid; the piecewise-linear reconstruction is exactly what the 3.3 × 10⁻³ fidelity figure in §3 measures.</p>
+
+  <div class="note good">
+    <b>Imported and native cases describe the same material</b>
+    <p>In the imported cases the wells are <code>Al(x=0)Ga(1−x)As</code> rather than the literal <code>binary{GaAs}</code> database entry. These are identical: I ran both through nextnano++ and the band edges match to thirteen digits — Γ = 2.8821488095238 eV, HH = 1.4596666666667 eV in both. The ternary interpolation formula at x = 0 simply returns the GaAs parameters. <span class="chip c-meas">verified</span></p>
+  </div>
+</section>
+
+<!-- ============ 5 ============ -->
+<section id="s5">
+  <h2><em>05</em>Material model</h2>
+  <p class="lede">No parameter is overridden anywhere in the Demo 19 input. Everything below comes from the stock nextnano++ material database, and the interpolation rules are confirmed by reproducing the solver's own output.</p>
+
+  <div class="tw"><table>
+    <tbody>
+      <tr><td>Temperature</td><td class="num">300.0 K</td><td><code>global{ temperature }</code>, identical in all 13 decks <span class="chip c-deck">deck</span></td></tr>
+      <tr><td>Database</td><td class="k">database.nnp</td><td>the file shipped with the 2026_07_03 nextnano++ package; no custom database, no in-deck material overrides <span class="chip c-deck">deck</span></td></tr>
+      <tr><td>Crystal</td><td class="k">crystal_zb</td><td>zincblende, growth along [1 0 0], substrate GaAs <span class="chip c-deck">deck</span></td></tr>
+      <tr><td>GaAs model</td><td class="k">binary_zb</td><td>stock GaAs binary entry</td></tr>
+      <tr><td>AlGaAs model</td><td class="k">ternary2_zb</td><td>Al(x)Ga(1-x)As built from the AlAs and GaAs binaries with two bowing sets</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Binary parameters that matter</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Parameter</th><th class="num">GaAs</th><th class="num">AlAs</th><th>Enters</th></tr></thead>
+    <tbody>
+      <tr><td>Γ gap at 0 K (eV)</td><td class="num">1.519</td><td class="num">3.099</td><td>V(z) for electrons</td></tr>
+      <tr><td>Varshni α (eV/K)</td><td class="num">0.5405e−3</td><td class="num">0.885e−3</td><td>300 K gap</td></tr>
+      <tr><td>Varshni β (K)</td><td class="num">204</td><td class="num">530</td><td>300 K gap</td></tr>
+      <tr><td>Γ electron mass (m₀)</td><td class="num">0.067</td><td class="num">0.15</td><td>kinetic operator, electrons</td></tr>
+      <tr><td>HH mass (m₀)</td><td class="num">0.51</td><td class="num">0.5</td><td>kinetic operator, holes (growth direction)</td></tr>
+      <tr><td>LH mass (m₀)</td><td class="num">0.082</td><td class="num">0.26</td><td>band edge output only — no LH quantum states</td></tr>
+      <tr><td>Valence band offset (eV)</td><td class="num">1.346</td><td class="num">0.857</td><td>absolute valence reference; sets the offsets</td></tr>
+      <tr><td>Δ<sub>SO</sub> (eV)</td><td class="num">0.341</td><td class="num">0.28</td><td>HH edge = VBO + Δ<sub>SO</sub>/3</td></tr>
+      <tr><td>Lattice constant (Å)</td><td class="num">5.65325</td><td class="num">5.6611</td><td>unused — no strain calculation</td></tr>
+      <tr><td>ε static / optical</td><td class="num">12.93 / 10.89</td><td class="num">10.064 / 8.162</td><td>unused — no Poisson solve</td></tr>
+    </tbody>
+  </table></div>
+  <p><span class="chip c-db">database</span> All values read from the co-versioned 2026_07_03 database file.</p>
+
+  <h3>The alloy interpolation rule — confirmed, not assumed</h3>
+  <div class="eq">Bowing (Vurgaftman, composition-dependent):
+
+    C_Γ(x) = −0.127 + 1.310·x            <span class="cm">Γ gap bowing</span>
+    C_X    = 0.055 ,  C_L = 0 ,  C_ΔSO = 0
+    <span class="cm">no bowing on effective mass and none on the valence band offset</span>
+
+Interpolation, verified against the solver:
+
+    1.  evaluate each BINARY parameter at T = 300 K first
+    2.  P(x) = x·P_AlAs + (1−x)·P_GaAs − x(1−x)·C(x)</div>
+
+  <p>The ordering in step 1 is not cosmetic and I checked it. Applying Varshni to each binary first and then interpolating gives 2.1448956 eV for the Al<sub>0.55</sub> gap, which is <em>exactly</em> what nextnano++ printed. Interpolating the 0 K gaps first and then applying Varshni with interpolated α, β gives 2.1449522 eV — off by 0.057 meV. <span class="chip c-meas">verified</span></p>
+
+  <h3>Band lineup at 300 K</h3>
+  <div class="eq">E_v(HH) = bandoffset + Δ_SO/3
+E_c(Γ)  = E_v(HH) + Eg_Γ(T)
+E_v(SO) = bandoffset − 2·Δ_SO/3</div>
+
+  <div class="tw"><table>
+    <thead><tr><th>Quantity</th><th class="num">GaAs</th><th class="num">Al<sub>0.55</sub>Ga<sub>0.45</sub>As</th><th class="num">Difference</th></tr></thead>
+    <tbody>
+      <tr><td>Γ conduction edge (eV)</td><td class="num">2.8821488</td><td class="num">3.3244289</td><td class="num">ΔE<sub>c</sub> = 442.28 meV</td></tr>
+      <tr><td>HH valence edge (eV)</td><td class="num">1.4596667</td><td class="num">1.1795333</td><td class="num">ΔE<sub>v</sub> = 280.13 meV</td></tr>
+      <tr><td>LH valence edge (eV)</td><td class="num">1.4596667</td><td class="num">1.1795333</td><td class="num">degenerate with HH</td></tr>
+      <tr><td>Γ band gap (eV)</td><td class="num">1.4224821</td><td class="num">2.1448956</td><td class="num">ΔE<sub>g</sub> = 722.41 meV</td></tr>
+      <tr><td>Offset partition</td><td class="num">—</td><td class="num">—</td><td class="num">Q<sub>c</sub> = 61.2 % / Q<sub>v</sub> = 38.8 %</td></tr>
+    </tbody>
+  </table></div>
+  <p><span class="chip c-meas">verified</span> These are the solver's own printed band edges from a probe run of this exact structure, not a hand calculation. Note the 61/39 split is an <em>output</em> of the absolute valence-band-offset parameters, not an imposed rule — no Q<sub>c</sub> appears anywhere in the configuration.</p>
+
+  <h3>Effective masses — linear in m, not in 1/m</h3>
+  <div class="eq">m_Γ(x)  = 0.067 + (0.15 − 0.067)·x    →  0.11265 m₀ at x = 0.55
+m_HH(x) = 0.51  + (0.50 − 0.51 )·x    →  0.50450 m₀ at x = 0.55</div>
+  <p>The database carries no mass bowing for AlGaAs, so the mass is a straight linear interpolation of the mass parameter itself. To be certain it is not a harmonic (inverse-mass) average, I rebuilt the abrupt case in an independent BenDaniel–Duke solver: linear mass interpolation reproduces the solver's E1 and E2 to 0.06 and 0.07 meV, while inverse-mass interpolation is off by 2.1 and 7.7 meV. <span class="chip c-meas">verified</span></p>
+
+  <div class="note">
+    <b>Everything above is a local function of position</b>
+    <p>Because x<sub>Al</sub> varies with z through a graded interface, so do E<sub>c</sub>(z), E<sub>v</sub>(z) and m*(z) — continuously, on the same mesh. That is the entire physical content of this study: grading is not a boundary condition, it is a smooth spatial variation of the Hamiltonian's coefficients.</p>
+  </div>
+
+  <h3>What is deliberately absent</h3>
+  <div class="tw"><table>
+    <tbody>
+      <tr><td><strong>Strain</strong></td><td>Not included. No <code>strain{}</code> block, no <code>run{strain{}}</code>. Confirmed in the output: the LH and HH edges are exactly degenerate in both materials, which cannot happen under biaxial strain. GaAs/AlAs mismatch is 0.14 %.</td></tr>
+      <tr><td><strong>Nonparabolicity</strong></td><td>Not included, and not available — nextnano++ 3.0.0's keyword grammar has no nonparabolicity option for the one-band Γ model. The dispersion is strictly parabolic.</td></tr>
+      <tr><td><strong>Dielectric response</strong></td><td>The static and optical permittivities exist in the database but never enter: no Poisson equation is solved, and the χ² model uses ε₀ alone — no background refractive index, no local-field correction.</td></tr>
+      <tr><td><strong>Piezo / pyroelectric</strong></td><td>Not included; irrelevant for unstrained [100] zincblende.</td></tr>
+      <tr><td><strong>Excitons</strong></td><td>Not modelled at any stage.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ============ 6 ============ -->
+<section id="s6">
+  <h2><em>06</em>Quantum model</h2>
+  <p class="lede">nextnano++ solves two independent single-band effective-mass eigenvalue problems, once, with no self-consistency and no space charge.</p>
+
+  <h3>The equations actually solved</h3>
+  <div class="eq">ELECTRONS (Γ):
+
+  [ − ħ²/2 · d/dz ( 1/m*_Γ(z) · d/dz ) + E_c(z) ] ψ_n^e(z) = E_n^e · ψ_n^e(z)</div>
+  <div class="eq vb">HEAVY HOLES (HH):
+
+  [ + ħ²/2 · d/dz ( 1/m*_HH(z) · d/dz ) + E_v(z) ] ψ_m^hh(z) = E_m^hh · ψ_m^hh(z)</div>
+
+  <p>Both are written on nextnano's <strong>single electron-energy scale</strong>, which is why the hole operator carries the opposite sign: confinement pushes hole levels <em>down</em> in this convention, and nextnano lists HH states in order of decreasing energy — index order is confinement order, so HH1 is the most confined hole. An interband transition is then a plain subtraction, E<sup>e</sup><sub>n</sub> − E<sup>hh</sup><sub>m</sub>.</p>
+
+  <p>The mass sits <em>inside</em> the derivative — the BenDaniel–Duke form. At an abrupt interface this makes ψ and (1/m)dψ/dz the continuous quantities. Inside a graded interface there is no interface condition at all: m*(z) varies smoothly and the operator is simply a smooth second-order operator. <span class="chip c-meas">verified</span> by reproducing the solver's eigenvalues to &lt; 0.1 meV with an independent BenDaniel–Duke discretisation.</p>
+
+  <div class="tw"><table>
+    <tbody>
+      <tr><td>Band model</td><td><strong>One-band, decoupled.</strong> <code>Gamma{ num_ev = 6 }</code> and <code>HH{ num_ev = 6 }</code>. No <code>kp_6band</code>, no <code>kp_8band</code>. No HH/LH mixing, no valence band warping, no conduction–valence coupling. <span class="chip c-deck">deck</span></td></tr>
+      <tr><td>Electron model</td><td>Single parabolic Γ band, m*(z) from the local alloy composition.</td></tr>
+      <tr><td>Heavy-hole model</td><td>Single parabolic HH band, m*(z) from the local alloy composition. LH and SO appear only in <code>classical{}</code> for band-edge output — <strong>no LH or SO quantum states are computed</strong>.</td></tr>
+      <tr><td>Schrödinger vs S–P</td><td><strong>Schrödinger only.</strong> <code>run{ quantum{} }</code> — no Poisson, no current, no <code>quantum_poisson</code> loop. Nothing is iterated.</td></tr>
+      <tr><td>Charge density</td><td><strong>None.</strong> <code>no_density = yes</code> on the quantum region; no quantum density is accumulated and nothing is fed back into a potential.</td></tr>
+      <tr><td>Doping</td><td><strong>None.</strong> There is no <code>impurities{}</code> block and no <code>doping{}</code> in any region. The structure is nominally undoped.</td></tr>
+      <tr><td>Electric field</td><td><strong>Zero.</strong> A single <code>fermi{ name = qw_contact  bias = 0.0 }</code> contact covers the whole domain purely because nextnano++'s parser requires a contact. No Poisson equation is solved, so φ(z) ≡ 0 and V(z) is exactly the material band-edge profile. <span class="chip c-meas">verified</span> — a flat-band reproduction matches E1 and E2 to &lt; 0.1 meV, which it could not if any field were present.</td></tr>
+      <tr><td>Electrostatic BCs</td><td>Not applicable — no electrostatic problem is posed.</td></tr>
+      <tr><td>Quantum BCs</td><td><strong>Dirichlet</strong>, ψ = 0, at both ends of the quantum region: z = 7.100 nm and z = 22.900 nm. That leaves 7.1 nm of outer barrier <em>outside</em> the quantum box on each side. <span class="chip c-deck">deck</span></td></tr>
+      <tr><td>States requested</td><td>6 electron + 6 heavy hole; <code>output_states{ max_num = 6  envelopes = yes  probabilities = yes }</code>. Only the first 2 of each band enter the optical sum.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ============ 7 ============ -->
+<section id="s7">
+  <h2><em>07</em>Numerics</h2>
+
+  <figure>
+  <div class="deck">grid{
+    xgrid{
+        line{ pos = 0.000000   spacing = 0.500000 }
+        line{ pos = 9.100000   spacing = 0.050000 }
+        line{ pos = 20.900000  spacing = 0.050000 }
+        line{ pos = 30.000000  spacing = 0.500000 }
+    }
+}</div>
+  <figcaption>Byte-identical in all thirteen decks.</figcaption>
+  </figure>
+
+  <div class="tw"><table>
+    <tbody>
+      <tr><td>Active-region mesh</td><td class="num">0.050 nm</td><td>uniform across the entire active region, 9.100 – 20.900 nm</td></tr>
+      <tr><td>Outer-domain mesh</td><td class="num">0.500 nm</td><td>at the two domain edges; nextnano++ grades the spacing smoothly between control lines</td></tr>
+      <tr><td>Domain</td><td class="num">0 – 30.000 nm</td><td>the full period</td></tr>
+      <tr><td>Quantum region</td><td class="num">7.100 – 22.900 nm</td><td>spans both the uniform 0.05 nm zone and part of the graded zone</td></tr>
+      <tr><td>Total grid points</td><td class="num">—</td><td><span class="chip c-unk">unknown</span> the graded-spacing count is chosen internally by nextnano++ and is not recorded in the artifacts copied off the licensed machine</td></tr>
+      <tr><td>Mesh intervals per grade</td><td class="num">4 – 28</td><td>4 at w = 0.2 nm, 14 at w = 0.7 nm, 28 at w = 1.4 nm</td></tr>
+      <tr><td>Convergence settings</td><td class="num">none</td><td>nothing is iterated — one diagonalisation per band, no self-consistency loop to converge</td></tr>
+      <tr><td>Eigenvalue solver</td><td class="num">default</td><td><span class="chip c-unk">unknown</span> no <code>solver{}</code>, <code>accuracy</code> or <code>iterations</code> is set, so nextnano++'s default applies; the deck does not record which of lapack / arpack / davidson that is</td></tr>
+      <tr><td>Threads</td><td class="num">1</td><td>timeout 3600 s per case</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note good">
+    <b>All thirteen cases use identical numerical settings</b>
+    <p>I regenerated all thirteen decks and compared them. The <code>global{}</code>, <code>grid{}</code>, <code>classical{}</code> and <code>quantum{}</code> blocks are <strong>byte-identical across all 13</strong>. The only differences anywhere in the input are the <code>structure{}</code> region list and, for cases 10–12, the added <code>import{}</code> block. Temperature, mesh, domain, quantum region, boundary condition and state count never vary. <span class="chip c-meas">verified</span></p>
+  </div>
+</section>
+
+<!-- ============ 8 ============ -->
+<section id="s8">
+  <h2><em>08</em>What comes out of the solver</h2>
+  <p class="lede">The distinction that matters most in a review: which numbers nextnano++ produced, and which the post-processing computed from them.</p>
+
+  <div class="tw"><table>
+    <thead><tr><th>Quantity</th><th>Origin</th><th>Where it comes from / how it is formed</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Conduction band edge E<sub>c</sub>(z)</strong></td><td><span class="chip c-deck">direct</span></td><td><code>bias_00000/bandedges.dat</code>, column 1</td></tr>
+      <tr><td><strong>HH band edge E<sub>v</sub>(z)</strong></td><td><span class="chip c-deck">direct</span></td><td>same file, column 2 (LH col 3, SO col 4)</td></tr>
+      <tr><td><strong>Band gap E<sub>g</sub>(z)</strong></td><td><span class="chip c-deck">direct</span></td><td><code>bandgap.dat</code></td></tr>
+      <tr><td><strong>Realised x<sub>Al</sub>(z)</strong></td><td><span class="chip c-deck">direct</span></td><td><code>Structure/alloy_composition.dat</code> — used for the post-solve composition gate</td></tr>
+      <tr><td><strong>E1 … E6</strong></td><td><span class="chip c-deck">direct</span></td><td><code>Quantum/acqw/Gamma/energy_spectrum_k*.dat</code>, ascending energy</td></tr>
+      <tr><td><strong>HH1 … HH6</strong></td><td><span class="chip c-deck">direct</span></td><td><code>Quantum/acqw/HH/energy_spectrum_k*.dat</code>, descending energy = confinement order</td></tr>
+      <tr><td><strong>Wavefunctions ψ(z)</strong></td><td><span class="chip c-deck">direct</span></td><td><code>envelopes_k00000.dat</code> — signed real amplitudes, nm<sup>−1/2</sup>, both bands</td></tr>
+      <tr><td><strong>Probability densities |ψ|²(z)</strong></td><td><span class="chip c-deck">direct</span></td><td><code>probabilities_k00000.dat</code>, nm<sup>−1</sup></td></tr>
+      <tr><td>Transition energies E1−HH1 etc.</td><td><span class="chip c-py">python</span></td><td>subtraction of two solver energies</td></tr>
+      <tr><td><strong>Overlaps O<sub>nm</sub></strong></td><td><span class="chip c-py">python</span></td><td>trapezoidal ∫ψ<sup>e</sup><sub>n</sub>ψ<sup>hh</sup><sub>m</sub> dz on the envelope grid, after renormalising each envelope to ∫ψ²dz = 1</td></tr>
+      <tr><td><strong>z matrix elements</strong></td><td><span class="chip c-py">python</span></td><td>trapezoidal ⟨ψ<sub>i</sub>|z|ψ<sub>j</sub>⟩ in nm, intra-band only</td></tr>
+      <tr><td>Δz<sub>e</sub>, Δz<sub>hh</sub></td><td><span class="chip c-py">python</span></td><td>z<sub>22</sub> − z<sub>11</sub> within each band</td></tr>
+      <tr><td><strong>Centroids</strong></td><td><span class="chip c-py">python</span></td><td>∫z|ψ|²dz / ∫|ψ|²dz, using the solver's own probability output</td></tr>
+      <tr><td>χ² spectrum, |χ²|(1550), peak λ, ratios</td><td><span class="chip c-py">python</span></td><td>see §9</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note">
+    <b>nextnano's native optical outputs are requested but not used</b>
+    <p>The deck asks for <code>transition_energies{ Gamma_HH{} }</code>, <code>overlap_integrals{ Gamma_HH{} }</code> and <code>dipole_moment_matrix_elements{ polarization{ name = "growth_z" } }</code>, so nextnano++ does compute and write native overlaps and dipoles. <strong>Nothing in Demo 19's analysis path reads them.</strong> Every overlap and every z matrix element in the results table is recomputed in Python from the envelope amplitudes. The repository does contain a native-vs-computed dipole comparison routine, but it is used only by Demo 9 — so a cross-check between the two is available and has not been run for Demo 19. <span class="chip c-meas">verified</span></p>
+  </div>
+
+  <p>One presentational note on the tables: the sign of any single eigenvector is arbitrary, so entries like O<sub>12</sub> and z<sub>hh,12</sub> flip sign between cases. Each χ² numerator is a product in which the sign of any one state cancels, so |χ²| is unaffected — and the origin-independence check (translate z by 100 nm, re-evaluate, compare) is the end-to-end guard on this whole class of issue.</p>
+</section>
+
+<!-- ============ 9 ============ -->
+<section id="s9">
+  <h2><em>09</em>Optical postprocessing</h2>
+  <p class="lede">One fixed convention, inherited unchanged from Demo 14, applied identically to all thirteen cases. The implementation is the interband χ² of the coupled-quantum-well paper (arXiv:2602.23246, Eq. 2), evaluated for second-harmonic generation.</p>
+
+  <h3>The equation as implemented</h3>
+  <div class="eq">χ²_xzx(ω) =  N_z e³ r_e,hh²
+             ─────────────  ·  Σ_k w(k) · Σ_m Σ_n  [ T_cond(n,m,k)  −  T_val(n,m,k) ]
+                6 ε₀
+
+  T_cond(n,m,k) = Σ_l   O_nm · z^e_nl · O_lm
+                        ──────────────────────
+                          D₂(n,m,k) · D₁(l,m,k)
+
+  T_val (n,m,k) = Σ_l   O_nm · z^hh_ml · O_nl
+                        ──────────────────────
+                          D₂(n,m,k) · D₁(n,l,k)
+
+  D₂(n,m,k) = E_nm(k) − 2ħω + iΓ        <span class="cm">two-photon denominator</span>
+  D₁(l,m,k) = E_lm(k) −  ħω + iΓ        <span class="cm">one-photon denominator</span>
+
+  E_nm(k)   = ( E^e_n − E^hh_m ) + ħ²k²/(2 m_r)
+  w(k)      = g_s · [ k / (2π) ] · trapezoid weight</div>
+
+  <div class="tw"><table>
+    <thead><tr><th>Symbol</th><th>Meaning</th><th>Value / source</th></tr></thead>
+    <tbody>
+      <tr><td class="k">n, l</td><td>electron state indices</td><td>run over E1, E2</td></tr>
+      <tr><td class="k">m</td><td>heavy-hole state index</td><td>runs over HH1, HH2</td></tr>
+      <tr><td class="k">O_nm</td><td>⟨ψ<sup>e</sup><sub>n</sub>|ψ<sup>hh</sup><sub>m</sub>⟩ interband envelope overlap</td><td>dimensionless, Python from envelopes</td></tr>
+      <tr><td class="k">z^e_nl</td><td>⟨ψ<sup>e</sup><sub>n</sub>|z|ψ<sup>e</sup><sub>l</sub>⟩ intra-conduction position element</td><td>nm, Python from envelopes</td></tr>
+      <tr><td class="k">z^hh_ml</td><td>⟨ψ<sup>hh</sup><sub>m</sub>|z|ψ<sup>hh</sup><sub>l</sub>⟩ intra-valence position element</td><td>nm, Python from envelopes</td></tr>
+      <tr><td class="k">r_e,hh</td><td>Bloch <em>interband position</em> matrix element of the unit-cell functions</td><td class="num">0.751 nm</td></tr>
+      <tr><td class="k">N_z</td><td>quantum wells per unit length</td><td class="num">3.3333 × 10⁷ m⁻¹</td></tr>
+      <tr><td class="k">Γ</td><td>phenomenological line broadening</td><td class="num">5.0 meV</td></tr>
+      <tr><td class="k">g_s</td><td>spin degeneracy</td><td class="num">2</td></tr>
+      <tr><td class="k">m_r</td><td>in-plane reduced mass</td><td class="num">0.041922 m₀</td></tr>
+      <tr><td class="k">ħω</td><td>fundamental photon energy</td><td>hc/λ, hc = 1239.841984 eV·nm</td></tr>
+    </tbody>
+  </table></div>
+
+  <p><strong>Why there is no ħ² in the prefactor.</strong> The published equation carries <code>1/(6ε₀ħ²)</code> and writes both denominators as angular frequencies. Here the denominators are written in <em>energy</em>, which cancels the ħ² exactly. Demo 14 also carries an independent re-derivation in rad/s with the ħ² kept explicit, as a check that the rewriting did not lose a factor.</p>
+
+  <h3>Every fixed parameter</h3>
+  <div class="tw"><table>
+    <tbody>
+      <tr><td><strong>State count</strong></td><td class="num">2 per band</td><td><code>max_states_per_band = 2</code> — E1, E2, HH1, HH2. Six states are requested from the solver and four are used. The triple sum is 8 conduction + 8 valence = <strong>16 terms</strong>. Raising this changes what is being computed and is treated as a separate experiment, never inferred from how many states the solver returned.</td></tr>
+      <tr><td><strong>Transition energies</strong></td><td>—</td><td>E<sup>e</sup><sub>n</sub> − E<sup>hh</sup><sub>m</sub> on nextnano's single electron scale, plus the in-plane kinetic term. For the abrupt case: E1−HH1 = 1.48943 eV, E1−HH2 = 1.52248, E2−HH1 = 1.59929, E2−HH2 = 1.63235 eV.</td></tr>
+      <tr><td><strong>Overlap definition</strong></td><td>—</td><td>∫ψ<sup>e</sup><sub>n</sub>(z)ψ<sup>hh</sup><sub>m</sub>(z)dz by trapezoid on the solver's grid, each envelope first renormalised so ∫ψ²dz = 1. Real-valued.</td></tr>
+      <tr><td><strong>z element definition</strong></td><td>—</td><td>∫ψ<sub>i</sub>(z)·z·ψ<sub>j</sub>(z)dz in nm, within one band only. Diagonal elements are individually origin-dependent; the dependence cancels between the two terms of the equation <em>provided</em> each band's envelopes are orthonormal, which is enforced at 10⁻³ and separately tested by shifting z by 100 nm.</td></tr>
+      <tr><td><strong>r_e,hh</strong></td><td class="num">0.751 nm</td><td>7.51 Å from Ramesh et al., Appl. Phys. Lett. <b>123</b>, 251111 (2023), VASP/HSE06. It is a <em>position</em> matrix element and is never multiplied by e — the e³ is already in the prefactor. This is one of the two constants the source paper does not publish jointly.</td></tr>
+      <tr><td><strong>Γ</strong></td><td class="num">5.0 meV</td><td>Added as +iΓ to <em>both</em> denominators. Purely phenomenological — no temperature, carrier density or interface-roughness dependence, and identical in all 13 cases so it cannot masquerade as a grading effect.</td></tr>
+      <tr><td><strong>N<sub>z</sub></strong></td><td class="num">3.3333 × 10⁷ m⁻¹</td><td>= 1/(30 nm), <code>nz_mode = period_density</code> — one coupled <em>pair</em> per 30 nm period. The alternative reading (two wells per period, 6.667 × 10⁷ m⁻¹) is reported as a sensitivity and never fitted. This is the second unpublished constant, and it is a direct linear multiplier on the answer.</td></tr>
+      <tr><td><strong>Spin factor</strong></td><td class="num">2</td><td>Applied as an explicit multiplier inside the k weights, deliberately kept separate from N<sub>z</sub>.</td></tr>
+      <tr><td><strong>k<sub>∥</sub> grid</strong></td><td class="num">96 points</td><td>Uniform in |k| from 0 to k<sub>max</sub>, trapezoidal weights, times the radial measure k/(2π), times g<sub>s</sub>. This encodes (1/A)Σ<sub>k</sub> → ∫d²k/(2π)², which dimensional analysis fixes uniquely if the result is to come out in m/V.</td></tr>
+      <tr><td><strong>k cutoff</strong></td><td class="num">0.555714 nm⁻¹</td><td>= 0.10 × π/a with a = 0.565325 nm — one tenth of the zone under the <code>legacy_pi_over_a</code> convention. The 2π/a convention is reported as a sensitivity. At the cutoff the in-plane kinetic energy is 0.281 eV.</td></tr>
+      <tr><td><strong>In-plane masses</strong></td><td class="num">0.067 / 0.112 m₀</td><td>Electron and <em>in-plane</em> heavy hole. Note the in-plane HH mass 0.112 is not the 0.51 growth-direction mass nextnano used for confinement — different directions, both stated explicitly.</td></tr>
+      <tr><td><strong>k dependence of envelopes</strong></td><td>none</td><td>Envelopes and all matrix elements are taken k-independent; only the transition energies disperse. This follows the source paper, which pulls the unit-cell element out of the k sum.</td></tr>
+      <tr><td><strong>Temperature / Fermi</strong></td><td>none</td><td><strong>The Fermi factor is unity.</strong> Valence band full, conduction band empty, no thermal occupation and no Fermi level anywhere in the optical step. The only place 300 K enters the whole chain is the Varshni band gaps inside nextnano.</td></tr>
+      <tr><td><strong>Wavelength grid</strong></td><td class="num">1400 – 1800 nm</td><td>401 points, exactly 1.0 nm spacing; 1550 nm lands on a grid point. A 400–1800 nm / 701-point broad grid is configured but Demo 19 reads its numbers from the focused spectrum.</td></tr>
+      <tr><td><strong>Units</strong></td><td class="num">pm/V</td><td>Absolute mode. Overall scale is 56.698 pm/V per unit of the dimensionless sum. No scale factor is fitted at any point.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Reading the abrupt spectrum</h3>
+  <p>Four two-photon resonances fall inside the 1400–1800 nm window for the abrupt case — 1519.0 nm (E2→HH2), 1550.7 nm (E2→HH1), 1629.0 nm (E1→HH2) and 1664.9 nm (E1→HH1). The reported peak at 1517 nm is the E2→HH2 two-photon resonance, displaced slightly by the 5 meV broadening and by interference between the conduction and valence terms. The 1550 nm operating point sits essentially on the E2→HH1 two-photon resonance. All one-photon resonances lie near 760–830 nm, outside the window.</p>
+</section>
+
+<!-- ============ 10 ============ -->
+<section id="s10">
+  <h2><em>10</em>The causal chain</h2>
+  <p class="lede">This is the version to say out loud.</p>
+
+  <ol class="chain">
+    <li>
+      <h4>Grading input → x<sub>Al</sub>(z)</h4>
+      <p>We pick one interface width and one shape family. The width defines a symmetric interval around each nominal interface, and the shape function maps position inside that interval onto a normalised 0-to-1 ramp. Multiplying by 0.55 gives a single-valued aluminium mole fraction at every point in the 30 nm device.</p>
+    </li>
+    <li>
+      <h4>x<sub>Al</sub>(z) → local material parameters and band edges</h4>
+      <p>nextnano++ evaluates the AlGaAs alloy formula pointwise: each parameter is interpolated between GaAs and AlAs at 300 K, with a composition-dependent bowing on the Γ gap. That turns the composition profile into three continuous spatial functions — the conduction band edge, the heavy-hole band edge, and the effective mass of each band. A graded interface is a smooth ramp in all three, not a step.</p>
+    </li>
+    <li>
+      <h4>Band edges and masses → quantum Hamiltonian</h4>
+      <p>Those functions are exactly the coefficients of the one-band effective-mass Hamiltonian: the band edge is the potential and the local mass sits inside the kinetic operator. There is no doping, no field and no space charge, so the potential the electrons see <em>is</em> the conduction band edge and nothing else. Grading is therefore a change to the Hamiltonian itself, not a boundary condition on it.</p>
+    </li>
+    <li>
+      <h4>Hamiltonian → electron and heavy-hole eigenstates</h4>
+      <p>The solver diagonalises the electron and hole problems independently on a 0.05 nm mesh with hard walls 2 nm outside the active region, returning six energies and six envelope functions per band. Softening an interface lowers the effective barrier the states see near that interface, so the levels shift and — more importantly for this study — the wavefunctions redistribute between the two wells.</p>
+    </li>
+    <li>
+      <h4>Eigenstates → energies, overlaps and dipoles</h4>
+      <p>From the first two states of each band we form the interband transition energies by subtraction, the electron–hole overlaps as envelope integrals, and the intra-band position matrix elements. The overlaps set how strongly each transition couples; the position elements set the asymmetry, which is the quantity that must be non-zero for any second-order response to exist at all.</p>
+    </li>
+    <li>
+      <h4>Matrix elements → χ² spectrum</h4>
+      <p>Those four numbers per state pair go into the interband second-order susceptibility as a sixteen-term sum of products, each divided by a one-photon and a two-photon complex denominator, integrated over in-plane momentum to a tenth of the Brillouin zone and scaled by two external constants — the unit-cell interband dipole and the well density. The output is a complex χ² in pm/V across 1400–1800 nm.</p>
+    </li>
+    <li>
+      <h4>Spectrum → the comparison we actually claim</h4>
+      <p>Every optical convention is frozen across the thirteen cases, and so is every numerical setting, so the only thing that differs between two spectra is the shape of x<sub>Al</sub>(z) at four named interfaces. The defensible claim is the ratio to the abrupt reference. Absolute agreement with an experiment is outside what this comparison is designed to establish.</p>
+    </li>
+  </ol>
+</section>
+
+<!-- ============ 11 ============ -->
+<section id="s11">
+  <h2><em>11</em>Twenty questions</h2>
+  <p class="lede">The ones a semiconductor or quantum-well specialist is most likely to put to you, answered from the actual configuration.</p>
+
+  <div class="qa">
+    <article><div class="n">01</div><div>
+      <h4>Why one-band effective mass rather than 6- or 8-band k·p?</h4>
+      <p>The deck requests <code>Gamma{num_ev=6}</code> and <code>HH{num_ev=6}</code>, which is nextnano++'s decoupled single-band model — no k·p block appears anywhere. The consequences are specific: no HH/LH mixing, no valence band warping, and no in-plane hole dispersion from the band structure at all, so the optical step imposes its own parabolic in-plane HH mass. This is the largest structural approximation in the model and it should be named before someone else names it. It is defensible for a Γ-point interband SHG estimate at a fixed structure, and it is applied identically to all thirteen cases.</p>
+    </div></article>
+
+    <article><div class="n">02</div><div>
+      <h4>What conduction/valence band offset ratio did you assume?</h4>
+      <p>None — it is an output, not an input. The database carries absolute valence band offsets (GaAs 1.346 eV, AlAs 0.857 eV) plus the spin–orbit splittings, and the lineup follows from E<sub>v</sub>(HH) = offset + Δ<sub>SO</sub>/3 and E<sub>c</sub> = E<sub>v</sub> + E<sub>g</sub><sup>Γ</sup>. At x = 0.55 that gives ΔE<sub>c</sub> = 442.3 meV and ΔE<sub>v</sub> = 280.1 meV, i.e. 61.2 / 38.8. No Q<sub>c</sub> parameter appears in any configuration file.</p>
+    </div></article>
+
+    <article><div class="n">03</div><div>
+      <h4>Which bowing parameters, and is the temperature applied before or after alloying?</h4>
+      <p>Composition-dependent Vurgaftman Γ bowing, C(x) = −0.127 + 1.310x, giving 0.5935 eV at x = 0.55 and a bowing correction of 0.147 eV. X bowing is 0.055 eV; L and Δ<sub>SO</sub> bowing are zero; there is no bowing on mass or band offset. Varshni is applied to each <em>binary first</em>, and the 300 K values are then interpolated. I verified that ordering: it reproduces the solver's Al<sub>0.55</sub> gap of 2.1448956 eV exactly, while the other ordering differs by 0.06 meV.</p>
+    </div></article>
+
+    <article><div class="n">04</div><div>
+      <h4>Is the barrier effective mass interpolated in m or in 1/m?</h4>
+      <p>Linearly in m, giving 0.11265 m₀ for the Γ electron and 0.50450 m₀ for the heavy hole at x = 0.55. The database has no mass bowing for AlGaAs. I confirmed this rather than assuming it: an independent BenDaniel–Duke reconstruction of the abrupt case reproduces nextnano's E1 and E2 to 0.06 and 0.07 meV with linear mass interpolation, and misses by 2.1 and 7.7 meV with harmonic (inverse-mass) interpolation.</p>
+    </div></article>
+
+    <article><div class="n">05</div><div>
+      <h4>Is strain included?</h4>
+      <p>No. There is no <code>strain{}</code> block and no <code>run{strain{}}</code>, and the output confirms it — the light-hole and heavy-hole band edges come out exactly degenerate in both materials, which cannot happen under biaxial strain. The GaAs/AlAs lattice mismatch is 0.14 %, so a pseudomorphic calculation would shift HH and LH apart by a few meV and would not change the picture qualitatively, but this is a real omission and worth stating plainly.</p>
+    </div></article>
+
+    <article><div class="n">06</div><div>
+      <h4>Is conduction-band nonparabolicity included?</h4>
+      <p>No, and it is not available: nextnano++ 3.0.0's keyword grammar has no nonparabolicity option for the one-band Γ model. The dispersion is strictly parabolic. E1 sits 55.8 meV above the GaAs Γ edge in the abrupt case, so a nonparabolic correction would be modest but not zero — and again, identical across all thirteen cases.</p>
+    </div></article>
+
+    <article><div class="n">07</div><div>
+      <h4>Is this Schrödinger–Poisson, and why is there a contact if there is no field?</h4>
+      <p>Schrödinger only. The run statement is <code>run{ quantum{} }</code>, the quantum region carries <code>no_density = yes</code>, there is no doping and no bias. The zero-bias Fermi contact exists purely because nextnano++'s parser requires at least one; no Poisson equation is solved with it, so φ(z) ≡ 0 and the potential is exactly the material band edge. I verified this by reproducing E1 and E2 with a flat-band solver to under 0.1 meV, which would be impossible if any electrostatic potential were present.</p>
+    </div></article>
+
+    <article><div class="n">08</div><div>
+      <h4>Where are the quantum boundaries, and can the Dirichlet walls contaminate the states?</h4>
+      <p>The walls sit at 7.1 and 22.9 nm — 2.0 nm outside the active region, leaving 7.1 nm of outer barrier beyond each wall. Every state's boundary probability is computed against a 10⁻³ threshold and recorded per state on the licensed machine. Because the box is identical in all thirteen cases, any residual wall effect is common-mode and largely divides out of the ratios to the abrupt reference.</p>
+    </div></article>
+
+    <article><div class="n">09</div><div>
+      <h4>Is a 0.05 nm mesh enough to resolve a 0.2 nm grade?</h4>
+      <p>It gives four mesh intervals across the narrowest grade, fourteen at 0.7 nm and twenty-eight at 1.4 nm. The imported tables are sampled at exactly the same 0.05 nm, so the mesh and the table never disagree. What we have <em>not</em> run is a mesh-refinement study — the spacing is a fixed inherited value, identical across all cases, so it is controlled but not converged. That distinction is worth conceding directly if asked.</p>
+    </div></article>
+
+    <article><div class="n">10</div><div>
+      <h4>Does grading change the well widths or the period?</h4>
+      <p>No. The nominal interface positions and the 30.0 nm total length are frozen; the grade replaces w/2 of material on each side of an interface. What does change is the amount of <em>pure</em> material: at 0.7 nm the thick well retains 6.4 nm of pure GaAs and the tunnel barrier 1.1 nm of full-composition AlGaAs. The composition at each nominal interface is always exactly half, 0.275.</p>
+    </div></article>
+
+    <article><div class="n">11</div><div>
+      <h4>Is "Fermi grading" a nextnano feature?</h4>
+      <p>No — and the distinction is deliberate in the code. nextnano++ 3.0.0 has no <code>ternary_fermi</code>, <code>ternary_erf</code> or <code>ternary_cosine</code> keyword. Only linear grading is native, via <code>ternary_linear</code>. The three smooth families are Python-generated x<sub>Al</sub>(z) tables handed to the solver through <code>import{}</code> plus <code>ternary_import{}</code>, and every artifact labels them as such. <code>ternary_pyramid</code> is never emitted and the preflight rejects any deck containing it.</p>
+    </div></article>
+
+    <article><div class="n">12</div><div>
+      <h4>Are the imported cases really comparable to the native ones, given they use a different material keyword?</h4>
+      <p>Yes. In the imported cases the wells are Al(x = 0)Ga(1−x)As rather than the literal binary GaAs entry, but the ternary formula at x = 0 returns the GaAs parameters exactly. I ran both through the solver: band edges 2.8821488095238 and 1.4596666666667 eV in both, identical to thirteen digits. The comparison between case 03 and case 10 is a comparison of profile shape, not of rendering path.</p>
+    </div></article>
+
+    <article><div class="n">13</div><div>
+      <h4>How much error does the imported table introduce?</h4>
+      <p>Maximum deviation in Al fraction from the analytic profile is 3.3 × 10⁻³ for fermi, 1.6 × 10⁻³ for erf and 1.7 × 10⁻³ for cosine, against a 5 × 10⁻³ gate; linear and abrupt are exact because they are native syntax. Fermi is worst because its truncation leaves the steepest kink at the interval edges. There is a second, independent check after each solve: nextnano's own realised <code>alloy_composition.dat</code> is compared to the intended profile under the same tolerance, so a rendering failure would stop the case rather than propagate.</p>
+    </div></article>
+
+    <article><div class="n">14</div><div>
+      <h4>Only two states per band — is the sum converged?</h4>
+      <p>It is a reproduction choice, not a convergence result, and the code is explicit about the difference. Six states are requested from the solver and exactly two per band enter the sum, fixing it at sixteen terms. Widening the sum changes what is being computed and would be a separate, deliberate experiment; the state counts at every layer — requested, returned, supplied, used, discarded — are recorded per case so this can never be quietly assumed.</p>
+    </div></article>
+
+    <article><div class="n">15</div><div>
+      <h4>Why is the heavy-hole mass 0.51 in one place and 0.112 in another?</h4>
+      <p>Different directions. 0.51 m₀ is the growth-direction HH mass from the database and sets confinement in the Schrödinger equation. 0.112 m₀ is the <em>in-plane</em> HH mass and appears only in the parabolic k<sub>∥</sub> dispersion of the transition energy in the optical step. Heavy holes really are light in-plane, so both numbers are physically right — but they come from two different models bolted together, and the in-plane value is a stated assumption rather than an output of the band-structure calculation.</p>
+    </div></article>
+
+    <article><div class="n">16</div><div>
+      <h4>What sets the absolute pm/V scale, and is anything fitted?</h4>
+      <p>Nothing is fitted — there is no scale factor anywhere in the absolute path. Two external constants set the magnitude: r<sub>e,hh</sub> = 0.751 nm from an HSE06 calculation in Ramesh et al. (2023), and N<sub>z</sub> = 1/30 nm. The source paper does not publish both jointly, and the N<sub>z</sub> counting convention is genuinely ambiguous, so both the alternative well-counting convention and the alternative Brillouin-zone-edge convention are computed and reported as sensitivities rather than chosen to match a published number.</p>
+    </div></article>
+
+    <article><div class="n">17</div><div>
+      <h4>Where does temperature enter the optical calculation?</h4>
+      <p>It does not. The Fermi factor is unity throughout — valence band full, conduction band empty — with no thermal occupation and no Fermi level in the susceptibility step. The only place 300 K enters the entire chain is the Varshni band gaps inside nextnano. Broadening is a fixed phenomenological 5 meV added to both denominators, with no temperature, density or roughness dependence; it is identical across all thirteen cases, so it cannot masquerade as a grading effect.</p>
+    </div></article>
+
+    <article><div class="n">18</div><div>
+      <h4>Is there a refractive index or local-field correction in the χ²?</h4>
+      <p>No. The prefactor carries ε₀ alone — no background dielectric constant, no Lorentz local-field factor, no cavity or metasurface enhancement. The database permittivities are never used because no Poisson equation is solved. What comes out is a bare material susceptibility for the multiple-quantum-well stack, and any device-level enhancement would sit on top of it.</p>
+    </div></article>
+
+    <article><div class="n">19</div><div>
+      <h4>Why does the abrupt spectrum peak at 1517 nm, and why report 1550?</h4>
+      <p>The peak is the two-photon resonance of the E2→HH2 transition: 1.63235 eV gives 2hc/E = 1519.0 nm, displaced by the 5 meV broadening and by interference between the conduction and valence terms. 1550 nm is the inherited telecom operating point, and it happens to sit essentially on the E2→HH1 two-photon resonance at 1550.7 nm. Both the on-resonance peak and the fixed 1550 nm value are reported, which is why they move differently as grading widens.</p>
+    </div></article>
+
+    <article><div class="n">20</div><div>
+      <h4>Why does every row of the results table say physical_valid = False?</h4>
+      <p>Because of a reporting-key defect, not a physics failure. All thirteen solves completed with return code 0 and produced complete output. The aggregate flag is read from a dictionary key named <code>passed</code> that the analysis routine never writes, so the flag evaluates false unconditionally for every case in this path. The individual physics checks — envelope orthonormality, origin independence, energy ordering, boundary probability, state-window consistency — are all computed and stored per case; they are simply never rolled up into that one field. Two knock-on effects to expect: the ratio-to-abrupt columns are blank in the master table, and the summary document rendered its pre-physics "pending" text even though the physics ran. See the flags below.</p>
+    </div></article>
+  </div>
+</section>
+
+<!-- ============ 12 ============ -->
+<section id="s12">
+  <h2><em>12</em>Cheat sheet</h2>
+  <p class="lede">One page, everything load-bearing.</p>
+
+  <div class="sheet">
+    <div class="sheet-grid">
+
+      <div class="blk">
+        <h4>Fixed structure</h4>
+        <dl>
+          <dt>Stack</dt><dd class="t">AlGaAs 9.1 / GaAs 7.1 / AlGaAs 1.8 / GaAs 2.9 / AlGaAs 9.1 nm</dd>
+          <dt>Total</dt><dd>30.000 nm</dd>
+          <dt>Wells</dt><dd>7.1 thick, 2.9 thin (s = 0.42)</dd>
+          <dt>Tunnel barrier</dt><dd>1.800 nm</dd>
+          <dt>Outer barriers</dt><dd>9.100 nm each</dd>
+          <dt>I1 / I2 / I3 / I4</dt><dd>9.1 / 16.2 / 18.0 / 20.9 nm</dd>
+          <dt>x<sub>Al</sub></dt><dd>0.55 barrier, 0.00 well</dd>
+          <dt>Temperature</dt><dd>300.0 K</dd>
+        </dl>
+      </div>
+
+      <div class="blk">
+        <h4>Grading definition</h4>
+        <dl>
+          <dt>Width</dt><dd class="t">FULL 0 ↔ 0.55 transition width</dd>
+          <dt>Centring</dt><dd class="t">symmetric on the nominal interface</dd>
+          <dt>Interval</dt><dd>[z<sub>i</sub> − w/2, z<sub>i</sub> + w/2]</dd>
+          <dt>At z<sub>i</sub></dt><dd>x<sub>Al</sub> = 0.275 exactly</dd>
+          <dt>Example</dt><dd>w = 0.7 at I1 → [8.75, 9.45]</dd>
+          <dt>Fixed</dt><dd class="t">I1–I4 positions, 30 nm length, mesh, quantum box</dd>
+          <dt>Consumed</dt><dd class="t">w/2 of each neighbour; plateau = layer − w</dd>
+          <dt>Cases</dt><dd>13 (1 abrupt, 9 linear, 3 smooth)</dd>
+        </dl>
+      </div>
+
+      <div class="blk">
+        <h4>Grading equations</h4>
+        <dl>
+          <dt>Common</dt><dd>u = clip((z − z<sub>i</sub> + w/2)/w, 0, 1)</dd>
+          <dt></dt><dd>x = x<sub>0</sub> + (x<sub>1</sub> − x<sub>0</sub>)·f(u)</dd>
+          <dt>abrupt</dt><dd>w = 0, step</dd>
+          <dt>linear</dt><dd>f = u</dd>
+          <dt>fermi</dt><dd>f = (σ(k(u−½)) − lo)/(hi − lo), k = 10</dd>
+          <dt>erf</dt><dd>f = (erf(3(u−½)) + 0.96611)/1.93221</dd>
+          <dt>cosine</dt><dd>f = ½ − ½cos(πu)</dd>
+          <dt>Normalisation</dt><dd class="t">f(0) = 0, f(1) = 1 exactly (endpoint-normalised after truncation for fermi and erf)</dd>
+        </dl>
+      </div>
+
+      <div class="blk">
+        <h4>Rendering into nextnano</h4>
+        <dl>
+          <dt>abrupt</dt><dd class="t">binary GaAs + ternary_constant</dd>
+          <dt>linear</dt><dd class="t">native ternary_linear, one region per interface</dd>
+          <dt>fermi/erf/cosine</dt><dd class="t">import{} + ternary_import over the whole domain</dd>
+          <dt>DAT columns</dt><dd class="t">position [nm] · Al fraction</dd>
+          <dt>DAT sampling</dt><dd>0.05 nm, 601 rows, 0–30 nm</dd>
+          <dt>Interpolation</dt><dd class="t">linear between table rows</dd>
+          <dt>Fidelity</dt><dd>≤ 3.3e−3 vs 5.0e−3 gate</dd>
+          <dt>Forbidden</dt><dd class="t">ternary_pyramid (preflight rejects)</dd>
+        </dl>
+      </div>
+
+      <div class="blk">
+        <h4>Material model</h4>
+        <dl>
+          <dt>Database</dt><dd class="t">stock nextnano++ 2026_07_03</dd>
+          <dt>Alloy</dt><dd class="t">ternary2_zb, Varshni per binary then interpolate</dd>
+          <dt>Γ bowing</dt><dd>C(x) = −0.127 + 1.310x</dd>
+          <dt>E<sub>c</sub> GaAs / Al<sub>0.55</sub></dt><dd>2.8821 / 3.3244 eV</dd>
+          <dt>E<sub>v</sub> GaAs / Al<sub>0.55</sub></dt><dd>1.4597 / 1.1795 eV</dd>
+          <dt>ΔE<sub>c</sub> / ΔE<sub>v</sub></dt><dd>442.3 / 280.1 meV (61/39)</dd>
+          <dt>m<sub>e</sub></dt><dd>0.067 → 0.11265 m₀ (linear in m)</dd>
+          <dt>m<sub>HH</sub></dt><dd>0.51 → 0.50450 m₀</dd>
+          <dt>Strain</dt><dd class="t">none · Nonparabolicity none · ε unused</dd>
+        </dl>
+      </div>
+
+      <div class="blk">
+        <h4>Quantum model</h4>
+        <dl>
+          <dt>Type</dt><dd class="t">1-band effective mass, BenDaniel–Duke</dd>
+          <dt>Bands</dt><dd class="t">Γ and HH, decoupled; no k·p, no LH/SO states</dd>
+          <dt>Equation</dt><dd>[−ħ²/2 d/dz(1/m*(z) d/dz) + V(z)]ψ = Eψ</dd>
+          <dt>Solve</dt><dd class="t">Schrödinger only, run{quantum{}}</dd>
+          <dt>Density</dt><dd class="t">none (no_density = yes)</dd>
+          <dt>Doping / field</dt><dd class="t">none / zero</dd>
+          <dt>Quantum BC</dt><dd class="t">Dirichlet at 7.1 and 22.9 nm</dd>
+          <dt>States</dt><dd>6 electron + 6 HH requested</dd>
+        </dl>
+      </div>
+
+      <div class="blk">
+        <h4>Mesh &amp; numerics</h4>
+        <dl>
+          <dt>Active</dt><dd>0.050 nm, 9.1 – 20.9 nm</dd>
+          <dt>Outer</dt><dd>0.500 nm at 0 and 30 nm</dd>
+          <dt>Domain</dt><dd>0 – 30.000 nm</dd>
+          <dt>Points per grade</dt><dd>4 (0.2 nm) … 28 (1.4 nm)</dd>
+          <dt>Convergence</dt><dd class="t">nothing iterated</dd>
+          <dt>Eigensolver</dt><dd class="t">nextnano default (unspecified)</dd>
+          <dt>Threads</dt><dd>1, timeout 3600 s</dd>
+          <dt>Across cases</dt><dd class="t">grid/quantum/classical byte-identical</dd>
+        </dl>
+      </div>
+
+      <div class="blk">
+        <h4>Optical parameters</h4>
+        <dl>
+          <dt>States in sum</dt><dd>2 per band → 16 terms</dd>
+          <dt>r<sub>e,hh</sub></dt><dd>0.751 nm (HSE06)</dd>
+          <dt>N<sub>z</sub></dt><dd>3.3333e7 m⁻¹ (1 pair / 30 nm)</dd>
+          <dt>Γ</dt><dd>5.0 meV, both denominators</dd>
+          <dt>Spin</dt><dd>2, inside the k weights</dd>
+          <dt>k grid</dt><dd>96 pts, 0 → 0.555714 nm⁻¹</dd>
+          <dt>k cutoff</dt><dd>0.10 × π/a, a = 0.565325 nm</dd>
+          <dt>In-plane m</dt><dd>0.067 / 0.112 → m<sub>r</sub> 0.041922</dd>
+          <dt>Fermi factor</dt><dd class="t">unity, no temperature</dd>
+          <dt>λ grid</dt><dd>1400–1800 nm, 401 pts, 1 nm</dd>
+          <dt>Units</dt><dd class="t">pm/V, nothing fitted</dd>
+        </dl>
+      </div>
+
+      <div class="blk">
+        <h4>Direct solver outputs</h4>
+        <dl>
+          <dt></dt><dd class="t">Conduction and HH/LH/SO band edges</dd>
+          <dt></dt><dd class="t">Band gap profile</dd>
+          <dt></dt><dd class="t">Realised alloy composition</dd>
+          <dt></dt><dd class="t">E1…E6 and HH1…HH6 energies</dd>
+          <dt></dt><dd class="t">Envelope amplitudes ψ(z), both bands</dd>
+          <dt></dt><dd class="t">Probability densities |ψ|²(z)</dd>
+          <dt></dt><dd class="t">Native overlaps and dipoles — written, not read</dd>
+        </dl>
+      </div>
+
+      <div class="blk">
+        <h4>Postprocessed in Python</h4>
+        <dl>
+          <dt></dt><dd class="t">Transition energies (subtraction)</dd>
+          <dt></dt><dd class="t">Overlaps O<sub>nm</sub> (envelope integrals)</dd>
+          <dt></dt><dd class="t">z matrix elements (envelope integrals)</dd>
+          <dt></dt><dd class="t">Δz<sub>e</sub>, Δz<sub>hh</sub></dd>
+          <dt></dt><dd class="t">Centroids from |ψ|²</dd>
+          <dt></dt><dd class="t">χ² spectrum 1400–1800 nm</dd>
+          <dt></dt><dd class="t">|χ²| at 1550 nm, peak λ and magnitude</dd>
+          <dt></dt><dd class="t">Ratios to the abrupt reference</dd>
+        </dl>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ flags ============ -->
+<section id="flags">
+  <h2><em>!!</em>Open flags and unknowns</h2>
+  <p class="lede">Things to say before someone finds them.</p>
+
+  <div class="note">
+    <b>1 · physical_valid is false on all thirteen rows</b>
+    <p>All thirteen solves returned code 0 with complete output, and the χ² numbers in the table are real. The aggregate validity flag is read from a dictionary key that the analysis routine never writes, so it is unconditionally false for every case in this path. Two consequences visible in the artifacts: the <code>chi2_1550_relative_to_abrupt</code> and <code>peak_chi2_relative_to_abrupt</code> columns are empty, and the generated summary document rendered its pre-physics "pending" text. The per-case physics checks were all computed and stored; only the roll-up is broken.</p>
+  </div>
+
+  <div class="note">
+    <b>2 · Material parameters read from the co-versioned free database</b>
+    <p>The licensed solves used <code>database.nnp</code> from the 2026_07_03 package on the work laptop, which is not present in this checkout. Every database value quoted here was read from <code>database_free.nnp</code> of the same 2026_07_03 package, and every band edge quoted was produced by running that same free build. The GaAs and AlGaAs entries are expected to be identical between the two files — the Free edition limits problem size, not database content — but that equality has not been checked directly.</p>
+  </div>
+
+  <div class="note">
+    <b>3 · Two genuine unknowns</b>
+    <p><strong>Eigenvalue solver.</strong> The deck sets no <code>solver{}</code>, <code>accuracy</code> or <code>iterations</code>, so nextnano++'s default applies; which algorithm that is cannot be established from the repository.</p>
+    <p><strong>Total grid point count.</strong> The control lines are exact, but nextnano++ chooses the graded-spacing point count internally and that number is not in the artifacts copied off the licensed machine.</p>
+  </div>
+
+  <div class="note">
+    <b>4 · Controlled, not converged</b>
+    <p>The 0.05 nm mesh, the 96-point k grid, the two-state truncation and the 5 meV broadening are all fixed inherited values applied identically to every case. That makes the comparison between cases clean, but none of them has been the subject of a refinement study within Demo 19. If asked whether a result is converged, the honest answer is that it is <em>controlled</em>.</p>
+  </div>
+
+  <div class="note">
+    <b>5 · Native optical outputs go unused</b>
+    <p>nextnano++ computes overlaps, transition energies and growth-direction dipoles natively because the deck asks for them, and Demo 19 reads none of them — every such quantity in the results is recomputed in Python from the envelopes. A comparison routine between the two sources exists in the shared code but has only ever been used by another demo. Running it once for Demo 19 would turn a reasonable assumption into a verified one.</p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <span>Demo 19 — Quantum-Well Interface Grading Showcase</span>
+  <span>nextnano++ 3.0.0, 2026_07_03 package</span>
+  <span>Run demo19_20260814T150258Z_38f64513_ba3c80 · 13 cases</span>
+</footer>
+
+</div>
+</body>
+</html>

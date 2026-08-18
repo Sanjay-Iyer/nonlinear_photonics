@@ -1,0 +1,219 @@
+{
+  "generated_utc": "2026-08-17T21:33:12Z",
+  "status_summary": {
+    "case_count": 13,
+    "solver_pass_count": 13,
+    "physical_valid_count": 0,
+    "all_solver_pass": true,
+    "all_physical_valid": false,
+    "physical_invalid_reasons": [
+      "Demo 11/14 physical QC did not pass"
+    ],
+    "interpretation": "Every reported spectrum comes from a solver run that returned successfully but did NOT pass the inherited Demo 11/14 physical QC. Treat the numbers as a controlled comparison between grading cases, not as validated absolute physics."
+  },
+  "validation_status": {
+    "code_validated": {
+      "status": true,
+      "evidence": "tests/test_demo20.py executed locally; includes exact reproduction of Demo 19's chi2 from its own tabulated matrix elements."
+    },
+    "numerics_validated": {
+      "status": true,
+      "evidence": "k-measure agrees with its closed form, the k grid is converged at the production point count, and the two conventions differ by exactly (2*pi)^2 pointwise."
+    },
+    "solver_validated": {
+      "status": false,
+      "evidence": "NO licensed solve ran in this execution; the quantum data was read from a previous licensed run's table."
+    },
+    "physical_model_validated": {
+      "status": false,
+      "evidence": "physical_valid is False; the inherited Demo 11/14 physical QC did not pass. The specific failed sub-check needs the raw licensed run and the proprietary material database, neither of which is present in this checkout."
+    },
+    "paper_reproduction_validated": {
+      "status": false,
+      "evidence": "no convention reproduces the published target; closest ratio to target is 0.4901. Agreement would in any case require the paper's own k-space measure to be confirmed, which this checkout cannot do."
+    }
+  },
+  "numerics_checks": [
+    {
+      "check": "k_measure_matches_closed_form[d2k_over_2pi_squared]",
+      "passed": true,
+      "detail": "trapezoidal 0.0491499968365 vs closed form 0.0491499968365 nm^-2, relative 1.412e-16",
+      "value": {
+        "measured": 0.049149996836533275,
+        "analytic": 0.04914999683653328,
+        "relative": 1.411779115059787e-16
+      }
+    },
+    {
+      "check": "k_measure_matches_closed_form[bare_d2k]",
+      "passed": true,
+      "detail": "trapezoidal 1.94036410037 vs closed form 1.94036410037 nm^-2, relative 0.000e+00",
+      "value": {
+        "measured": 1.9403641003655074,
+        "analytic": 1.9403641003655074,
+        "relative": 0.0
+      }
+    },
+    {
+      "check": "k_grid_converged",
+      "passed": true,
+      "detail": "|chi2| at 96 points is within 9.014e-05 of the 384-point value (tolerance 0.001)",
+      "value": {
+        "48": 31.020169111519536,
+        "96": 31.03604139658741,
+        "192": 31.038350461288235,
+        "384": 31.03883908500989
+      }
+    }
+  ],
+  "scaling_invariance_checks": [
+    {
+      "check": "scaling_ratio_equals_two_pi_squared",
+      "passed": true,
+      "detail": "max |ratio - (2pi)^2| = 2.132e-14 over 5213 wavelength points in 13 cases",
+      "value": {
+        "expected": 39.47841760435743,
+        "max_deviation": 2.1316282072803006e-14,
+        "ratio_min": 39.47841760435741,
+        "ratio_max": 39.47841760435745
+      }
+    },
+    {
+      "check": "peak_wavelength_unchanged",
+      "passed": true,
+      "detail": "largest peak shift 0 nm (tolerance 0 nm)",
+      "value": {
+        "00": 0.0,
+        "01": 0.0,
+        "02": 0.0,
+        "03": 0.0,
+        "04": 0.0,
+        "05": 0.0,
+        "06": 0.0,
+        "07": 0.0,
+        "08": 0.0,
+        "09": 0.0,
+        "10": 0.0,
+        "11": 0.0,
+        "12": 0.0
+      }
+    },
+    {
+      "check": "spectral_shape_unchanged",
+      "passed": true,
+      "detail": "largest normalized-lineshape difference 5.551e-16 (tolerance 1e-09)",
+      "value": {
+        "00": 4.440892098500626e-16,
+        "01": 3.3306690738754696e-16,
+        "02": 4.440892098500626e-16,
+        "03": 3.3306690738754696e-16,
+        "04": 3.3306690738754696e-16,
+        "05": 2.220446049250313e-16,
+        "06": 3.3306690738754696e-16,
+        "07": 5.551115123125783e-16,
+        "08": 3.3306690738754696e-16,
+        "09": 5.551115123125783e-16,
+        "10": 5.551115123125783e-16,
+        "11": 5.551115123125783e-16,
+        "12": 4.440892098500626e-16
+      }
+    },
+    {
+      "check": "case_ranking_unchanged",
+      "passed": true,
+      "detail": "ranking by |chi2| at the target wavelength is identical",
+      "value": {
+        "raw_order": [
+          "00",
+          "07",
+          "01",
+          "02",
+          "10",
+          "09",
+          "08",
+          "11",
+          "12",
+          "06",
+          "03",
+          "04",
+          "05"
+        ],
+        "scaled_order": [
+          "00",
+          "07",
+          "01",
+          "02",
+          "10",
+          "09",
+          "08",
+          "11",
+          "12",
+          "06",
+          "03",
+          "04",
+          "05"
+        ]
+      }
+    },
+    {
+      "check": "grading_trend_unchanged",
+      "passed": true,
+      "detail": "largest change in relative-to-reference ratio 3.331e-16",
+      "value": {
+        "00": 0.0,
+        "01": 1.1102230246251565e-16,
+        "02": 2.220446049250313e-16,
+        "03": 1.1102230246251565e-16,
+        "04": 0.0,
+        "05": 5.551115123125783e-17,
+        "06": 0.0,
+        "07": 2.220446049250313e-16,
+        "08": 0.0,
+        "09": 3.3306690738754696e-16,
+        "10": 2.220446049250313e-16,
+        "11": 0.0,
+        "12": 0.0
+      }
+    }
+  ],
+  "k_convergence": {
+    "case_id": "00",
+    "kspace_convention": "d2k_over_2pi_squared",
+    "k_parallel_points_production": 96,
+    "k_parallel_points_tested": [
+      48,
+      96,
+      192,
+      384
+    ],
+    "chi2_abs_by_point_count": {
+      "48": 31.020169111519536,
+      "96": 31.03604139658741,
+      "192": 31.038350461288235,
+      "384": 31.03883908500989
+    },
+    "k_parallel_relative_error": 9.01358908036328e-05,
+    "k_parallel_integration_converged": true,
+    "k_parallel_tolerance": 0.001,
+    "k_measure_total_per_nm2": 0.049149996836533275
+  },
+  "chi2_settings": {
+    "broadening_meV": 5.0,
+    "r_e_hh_nm": 0.751,
+    "n_wells_per_metre": 33333333.33333333,
+    "nz_mode": "period_density",
+    "reference_period_nm": 30.0,
+    "max_states_per_band": 2,
+    "k_parallel_fraction_of_bz": 0.1,
+    "lattice_constant_nm": 0.565325,
+    "bz_edge_convention": "legacy_pi_over_a",
+    "k_max_per_nm": 0.5557144392322635,
+    "k_parallel_points": 96,
+    "electron_mass_m0": 0.067,
+    "heavy_hole_inplane_mass_m0": 0.112,
+    "reduced_mass_m0": 0.04192178770949721,
+    "spin_degeneracy": 2,
+    "kspace_convention": "d2k_over_2pi_squared",
+    "kspace_convention_description": "(1/A) sum_k -> integral d^2k/(2*pi)^2 = (1/(2*pi)) integral k dk  [Demo 19 original]"
+  }
+}

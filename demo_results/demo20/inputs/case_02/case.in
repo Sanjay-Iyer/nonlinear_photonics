@@ -1,0 +1,94 @@
+# Demo 20: controlled interface-grading comparison in one fixed GaAs/AlGaAs ACQW.
+# Identical to the Demo 19 deck: only the comment header differs. Byte-identity of
+# the rendered decks is asserted by tests/test_demo20.py::test_decks_match_demo19.
+# Growth coordinate is x in nextnano++; plots label the same coordinate z.
+# Linear grades use native ternary_linear. Smooth profiles use a Python-generated
+# composition table through import{} + ternary_import{}.
+
+global{
+    simulate1D{}
+    temperature = 300.0
+    substrate{ name = "GaAs" }
+    crystal_zb{ x_hkl = [1, 0, 0]  y_hkl = [0, 1, 0] }
+}
+
+
+
+contacts{ fermi{ name = qw_contact  bias = 0.0 } }
+
+grid{
+    xgrid{
+        line{ pos = 0.000000  spacing = 0.500000 }
+        line{ pos = 9.100000  spacing = 0.050000 }
+        line{ pos = 20.900000  spacing = 0.050000 }
+        line{ pos = 30.000000  spacing = 0.500000 }
+    }
+}
+
+structure{
+    output_region_index{ boxes = no }
+    output_material_index{ boxes = no }
+    output_alloy_composition{ boxes = no }
+    region{
+        everywhere{}
+        ternary_constant{ name = "Al(x)Ga(1-x)As"  alloy_x = 0.550000 }
+    }
+    region{
+        line{ x = [0.000000, 30.000000] }
+        contact{ name = qw_contact }
+    }
+    region{
+        line{ x = [9.100000, 16.200000] }
+        binary{ name = "GaAs" }
+    }
+    region{
+        line{ x = [18.000000, 20.900000] }
+        binary{ name = "GaAs" }
+    }
+    region{
+        line{ x = [8.900000, 9.300000] }
+        ternary_linear{ name = "Al(x)Ga(1-x)As"  alloy_x = [0.550000, 0.000000]  x = [8.900000, 9.300000] }
+    }
+    region{
+        line{ x = [16.000000, 16.400000] }
+        ternary_linear{ name = "Al(x)Ga(1-x)As"  alloy_x = [0.000000, 0.550000]  x = [16.000000, 16.400000] }
+    }
+    region{
+        line{ x = [17.800000, 18.200000] }
+        ternary_linear{ name = "Al(x)Ga(1-x)As"  alloy_x = [0.550000, 0.000000]  x = [17.800000, 18.200000] }
+    }
+    region{
+        line{ x = [20.700000, 21.100000] }
+        ternary_linear{ name = "Al(x)Ga(1-x)As"  alloy_x = [0.000000, 0.550000]  x = [20.700000, 21.100000] }
+    }
+}
+
+classical{
+    Gamma{}
+    HH{}
+    LH{}
+    SO{}
+    output_bandedges{ averaged = no }
+    output_bandgap{}
+}
+
+quantum{
+    region{
+        name = "acqw"
+        x = [7.100000, 22.900000]
+        no_density = yes
+        boundary{ x = dirichlet }
+        Gamma{ num_ev = 6 }
+        HH{ num_ev = 6 }
+        output_states{ max_num = 6 envelopes = yes probabilities = yes }
+        transition_energies{ Gamma_HH{} }
+        overlap_integrals{ Gamma_HH{} }
+        dipole_moment_matrix_elements{
+            polarization{ name = "growth_z" re = [1, 0, 0] }
+            Gamma{}
+            HH{}
+        }
+    }
+}
+
+run{ quantum{} }

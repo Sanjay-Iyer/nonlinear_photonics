@@ -1,0 +1,32 @@
+{
+  "original_convention": "(1/A) sum_k -> integral d^2k/(2*pi)^2 = (1/(2*pi)) integral k dk  [Demo 19 original]",
+  "integration_method": "uniform radial grid, trapezoidal weights, 96 points from k=0 to k_max inclusive; the angular integral is done analytically using isotropy",
+  "explicit_one_over_2pi_squared_present": true,
+  "one_over_2pi_squared_location": "s06_chi2.k_grid: 1/(2*pi)^2 * (2*pi from the angular integral) = radial_measure = k/(2*pi)",
+  "explicit_2pi_radial_factor_present": true,
+  "explicit_2pi_radial_factor_detail": "the 2*pi of the angular integral is already cancelled against 1/(2*pi)^2; it is not a separate multiplication",
+  "cartesian_or_radial": "radial (isotropic reduction of d^2k)",
+  "quadrature": "trapezoidal in k, with k dk as the radial measure",
+  "spin_degeneracy": 2,
+  "spin_degeneracy_location": "folded into the k weights",
+  "nz_convention": "period_density = 3.3333333e+07 m^-1 (1 period per 30 nm)",
+  "nz_is_not_a_kspace_factor": "N_z is a well-density prefactor in units of m^-1 and is unrelated to the k-space measure; it cannot absorb a factor of (2*pi)^2",
+  "k_max_per_nm": 0.5557144392322635,
+  "bz_edge_convention": "legacy_pi_over_a",
+  "k_measure_total_per_nm2_demo19": 0.049149996836533275,
+  "k_measure_analytic_per_nm2_demo19": 0.04914999683653328,
+  "k_measure_matches_closed_form": true,
+  "k_measure_total_per_nm2_scaled": 1.9403641003655074,
+  "experimental_scaling_enabled": false,
+  "scaling_factor": 39.47841760435743,
+  "scaling_definition": "(2*pi)^2",
+  "scaling_is_exact_constant": {
+    "expected_factor": 39.47841760435743,
+    "pointwise_ratio_min": 39.478417604357425,
+    "pointwise_ratio_max": 39.47841760435744,
+    "max_absolute_deviation": 7.105427357601002e-15,
+    "total_measure_ratio": 39.47841760435743,
+    "is_exact_constant": true
+  },
+  "finding": "The 1/(2*pi)^2 normalization is ALREADY PRESENT in the original Demo 19 calculation, in its reduced isotropic form 1/(2*pi) with the compensating 2*pi already cancelled by the angular integral. Multiplying by (2*pi)^2 therefore REMOVES an existing denominator rather than restoring a missing factor: it switches the measure from (1/A) sum_k -> int d^2k/(2*pi)^2 to sum_k -> g_s * int d^2k. That is an ALTERNATIVE CONVENTION under test, not a correction."
+}

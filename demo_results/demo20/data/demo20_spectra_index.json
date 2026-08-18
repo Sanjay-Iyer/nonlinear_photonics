@@ -1,0 +1,70 @@
+{
+  "note": "Full spectra are written per case beside this index.",
+  "cases": [
+    {
+      "case_id": "00",
+      "path": "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\data\\case_00_chi2_spectrum.csv",
+      "points": 401
+    },
+    {
+      "case_id": "01",
+      "path": "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\data\\case_01_chi2_spectrum.csv",
+      "points": 401
+    },
+    {
+      "case_id": "02",
+      "path": "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\data\\case_02_chi2_spectrum.csv",
+      "points": 401
+    },
+    {
+      "case_id": "03",
+      "path": "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\data\\case_03_chi2_spectrum.csv",
+      "points": 401
+    },
+    {
+      "case_id": "04",
+      "path": "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\data\\case_04_chi2_spectrum.csv",
+      "points": 401
+    },
+    {
+      "case_id": "05",
+      "path": "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\data\\case_05_chi2_spectrum.csv",
+      "points": 401
+    },
+    {
+      "case_id": "06",
+      "path": "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\data\\case_06_chi2_spectrum.csv",
+      "points": 401
+    },
+    {
+      "case_id": "07",
+      "path": "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\data\\case_07_chi2_spectrum.csv",
+      "points": 401
+    },
+    {
+      "case_id": "08",
+      "path": "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\data\\case_08_chi2_spectrum.csv",
+      "points": 401
+    },
+    {
+      "case_id": "09",
+      "path": "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\data\\case_09_chi2_spectrum.csv",
+      "points": 401
+    },
+    {
+      "case_id": "10",
+      "path": "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\data\\case_10_chi2_spectrum.csv",
+      "points": 401
+    },
+    {
+      "case_id": "11",
+      "path": "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\data\\case_11_chi2_spectrum.csv",
+      "points": 401
+    },
+    {
+      "case_id": "12",
+      "path": "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\data\\case_12_chi2_spectrum.csv",
+      "points": 401
+    }
+  ]
+}

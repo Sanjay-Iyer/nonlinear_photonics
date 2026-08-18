@@ -1,0 +1,30 @@
+==========================================================================
+DEMO 20 - k-SPACE NORMALIZATION AUDIT
+==========================================================================
+Original Demo 19 convention  : (1/A) sum_k -> integral d^2k/(2*pi)^2 = (1/(2*pi)) integral k dk  [Demo 19 original]
+k-space integration method   : uniform radial grid, trapezoidal weights, 96 points from k=0 to k_max inclusive; the angular integral is done analytically using isotropy
+Cartesian or radial          : radial (isotropic reduction of d^2k)
+Quadrature                   : trapezoidal in k, with k dk as the radial measure
+Explicit 1/(2pi)^2 present   : YES   <- s06_chi2.k_grid: 1/(2*pi)^2 * (2*pi from the angular integral) = radial_measure = k/(2*pi)
+Explicit 2pi radial factor   : YES   (the 2*pi of the angular integral is already cancelled against 1/(2*pi)^2; it is not a separate multiplication)
+Spin degeneracy              : 2 (folded into the k weights)
+Nz convention                : period_density = 3.3333333e+07 m^-1 (1 period per 30 nm)
+k_max                        : 0.55571444 nm^-1 (legacy_pi_over_a)
+k measure, Demo 19 convention: 0.0491499968365 nm^-2
+  closed form                : 0.0491499968365 nm^-2  [match: YES]
+k measure, scaled convention : 1.94036410037 nm^-2
+--------------------------------------------------------------------------
+Experimental scaling enabled : NO
+Scaling factor               : 39.4784176044
+Scaling definition           : (2*pi)^2
+Pointwise ratio range        : [39.478417604357, 39.478417604357]  [exact constant: YES]
+--------------------------------------------------------------------------
+FINDING:
+  The 1/(2*pi)^2 normalization is ALREADY PRESENT in the original Demo 19
+  calculation, in its reduced isotropic form 1/(2*pi) with the
+  compensating 2*pi already cancelled by the angular integral. Multiplying
+  by (2*pi)^2 therefore REMOVES an existing denominator rather than
+  restoring a missing factor: it switches the measure from (1/A) sum_k ->
+  int d^2k/(2*pi)^2 to sum_k -> g_s * int d^2k. That is an ALTERNATIVE
+  CONVENTION under test, not a correction.
+==========================================================================
