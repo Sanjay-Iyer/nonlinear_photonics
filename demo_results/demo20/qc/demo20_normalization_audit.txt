@@ -14,7 +14,7 @@ k measure, Demo 19 convention: 0.0491499968365 nm^-2
   closed form                : 0.0491499968365 nm^-2  [match: YES]
 k measure, scaled convention : 1.94036410037 nm^-2
 --------------------------------------------------------------------------
-Experimental scaling enabled : NO
+Experimental scaling enabled : YES
 Scaling factor               : 39.4784176044
 Scaling definition           : (2*pi)^2
 Pointwise ratio range        : [39.478417604357, 39.478417604357]  [exact constant: YES]

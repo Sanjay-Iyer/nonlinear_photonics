@@ -191,9 +191,7 @@ def physics_plots(
                 ax.plot(*spectra[case_id], label=label, lw=1.8)
         target = float(cfg["chi2"]["target_wavelength_nm"])
         ax.axvline(target, color="black", ls="--", lw=1)
-        ax.set(xlabel="Wavelength (nm)", ylabel="$|\\chi^{(2)}|$ (pm/V)",
-               title=f"Grading Dependence of $\\chi^{{(2)}}$ "
-                     f"({_convention_label(cfg)})")
+        ax.set(xlabel="Wavelength (nm)", ylabel="$|\\chi^{(2)}|$ (pm/V)")
         ax.legend(frameon=False)
         ax.grid(alpha=0.18)
         made.append(_finish(fig, destination / DEMO19_FIGURES[3], dpi))

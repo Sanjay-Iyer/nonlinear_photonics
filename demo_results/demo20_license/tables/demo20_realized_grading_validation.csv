@@ -1,0 +1,14 @@
+case_id,case_name,profile,requested_grade_width_nm,realized_grade_width_nm,maximum_composition_error,gaas_reaches_zero,algaas_reaches_max,nominal_geometry_preserved,unintended_overlap,smooth_profile_continuous_in_rendering,notes,I1_requested_width_nm,I1_realized_width_nm,I1_width_error_nm,I1_direction_pass,I2_requested_width_nm,I2_realized_width_nm,I2_width_error_nm,I2_direction_pass,I3_requested_width_nm,I3_realized_width_nm,I3_width_error_nm,I3_direction_pass,I4_requested_width_nm,I4_realized_width_nm,I4_width_error_nm,I4_direction_pass,grading_direction_correct,validation_pass
+00,Abrupt reference,abrupt,0.0,0.0,0.0,True,True,True,False,True,,0.0,0.0,0.0,True,0.0,0.0,0.0,True,0.0,0.0,0.0,True,0.0,0.0,0.0,True,True,True
+01,Linear 0.2 nm,linear,0.2,0.2,0.0,True,True,True,False,True,,0.2,0.2,0.0,True,0.2,0.2,0.0,True,0.2,0.2,0.0,True,0.2,0.2,0.0,True,True,True
+02,Linear 0.4 nm,linear,0.4,0.4,0.0,True,True,True,False,True,,0.4,0.4,0.0,True,0.4,0.4,0.0,True,0.4,0.4,0.0,True,0.4,0.4,0.0,True,True,True
+03,Linear 0.7 nm,linear,0.7,0.7,0.0,True,True,True,False,True,,0.7,0.7,0.0,True,0.7,0.7,0.0,True,0.7,0.7,0.0,True,0.7,0.7,0.0,True,True,True
+04,Linear 1.0 nm,linear,1.0,1.0,0.0,True,True,True,False,True,,1.0,1.0,0.0,True,1.0,1.0,0.0,True,1.0,1.0,0.0,True,1.0,1.0,0.0,True,True,True
+05,Linear 1.4 nm,linear,1.4,1.4,0.0,True,True,True,False,True,,1.4,1.4,0.0,True,1.4,1.4,0.0,True,1.4,1.4,0.0,True,1.4,1.4,0.0,True,True,True
+06,Asymmetric inner grading A,linear,,,0.0,True,True,True,False,True,,0.0,0.0,0.0,True,0.4,0.4,0.0,True,0.8,0.8,0.0,True,0.0,0.0,0.0,True,True,True
+07,Asymmetric inner grading B,linear,,,0.0,True,True,True,False,True,,0.0,0.0,0.0,True,0.8,0.8,0.0,True,0.4,0.4,0.0,True,0.0,0.0,0.0,True,True,True
+08,Inner interfaces graded only,linear,0.7,0.7,0.0,True,True,True,False,True,,0.0,0.0,0.0,True,0.7,0.7,0.0,True,0.7,0.7,0.0,True,0.0,0.0,0.0,True,True,True
+09,Outer interfaces graded only,linear,0.7,0.7,0.0,True,True,True,False,True,,0.7,0.7,0.0,True,0.0,0.0,0.0,True,0.0,0.0,0.0,True,0.7,0.7,0.0,True,True,True
+10,Fermi-like 0.7 nm,fermi,0.7,0.7,0.0032641931215615094,True,True,True,False,True,,0.7,0.7,0.0,True,0.7,0.7,0.0,True,0.7,0.7,0.0,True,0.7,0.7,0.0,True,True,True
+11,erf 0.7 nm,erf,0.7,0.7,0.0015700115310522955,True,True,True,False,True,,0.7,0.7,0.0,True,0.7,0.7,0.0,True,0.7,0.7,0.0,True,0.7,0.7,0.0,True,True,True
+12,Cosine 0.7 nm,cosine,0.7,0.7,0.0017182697956410705,True,True,True,False,True,,0.7,0.7,0.0,True,0.7,0.7,0.0,True,0.7,0.7,0.0,True,0.7,0.7,0.0,True,True,True

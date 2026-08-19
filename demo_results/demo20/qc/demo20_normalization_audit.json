@@ -17,7 +17,7 @@
   "k_measure_analytic_per_nm2_demo19": 0.04914999683653328,
   "k_measure_matches_closed_form": true,
   "k_measure_total_per_nm2_scaled": 1.9403641003655074,
-  "experimental_scaling_enabled": false,
+  "experimental_scaling_enabled": true,
   "scaling_factor": 39.47841760435743,
   "scaling_definition": "(2*pi)^2",
   "scaling_is_exact_constant": {

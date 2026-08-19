@@ -1,7 +1,7 @@
 {
-  "generated_utc": "2026-08-18T15:20:56Z",
+  "generated_utc": "2026-08-18T00:26:50Z",
   "configuration": {
-    "config_path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\20_quantum_well_interface_grading_scaled\\demo20_config.yaml",
+    "config_path": "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\nextnano\\demos\\20_quantum_well_interface_grading_scaled\\demo20_config.yaml",
     "command_line_overrides": {
       "chi2.apply_kspace_2pi_squared_scaling": true
     },
@@ -111,7 +111,7 @@
   },
   "source": {
     "analysis_source": "master_table",
-    "analysis_source_path": "C:\\code\\nonlinear_photonics\\demo_results\\demo19\\tables\\demo19_master_results.csv",
+    "analysis_source_path": "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\demo_results\\demo19\\tables\\demo19_master_results.csv",
     "solver_run_in_this_execution": false,
     "note": "Energies and matrix elements were read from a licensed solver run's results table; only the chi2 postprocessing was re-evaluated here."
   },
@@ -119,18 +119,18 @@
   "figures": {
     "enabled": true,
     "made": [
-      "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\plots\\01_grading_composition_profiles.png",
-      "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\plots\\02_grading_profile_shapes.png",
-      "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\plots\\04_chi2_spectra_linear_grading.png",
-      "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\plots\\05_grade_width_vs_chi2_1550.png",
-      "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\plots\\06_grade_width_relative_to_abrupt.png",
-      "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\plots\\07_grade_width_vs_peak_wavelength.png",
-      "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\plots\\08_grading_location_comparison.png",
-      "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\plots\\09_profile_shape_chi2_comparison.png",
-      "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\plots\\10_grading_summary_heatmap.png",
-      "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\plots\\11_raw_vs_scaled_chi2_1550.png",
-      "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\plots\\12_scaling_ratio_by_case.png",
-      "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\plots\\13_reference_raw_vs_scaled_spectrum.png"
+      "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\demo_results\\demo20\\plots\\01_grading_composition_profiles.png",
+      "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\demo_results\\demo20\\plots\\02_grading_profile_shapes.png",
+      "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\demo_results\\demo20\\plots\\04_chi2_spectra_linear_grading.png",
+      "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\demo_results\\demo20\\plots\\05_grade_width_vs_chi2_1550.png",
+      "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\demo_results\\demo20\\plots\\06_grade_width_relative_to_abrupt.png",
+      "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\demo_results\\demo20\\plots\\07_grade_width_vs_peak_wavelength.png",
+      "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\demo_results\\demo20\\plots\\08_grading_location_comparison.png",
+      "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\demo_results\\demo20\\plots\\09_profile_shape_chi2_comparison.png",
+      "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\demo_results\\demo20\\plots\\10_grading_summary_heatmap.png",
+      "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\demo_results\\demo20\\plots\\11_raw_vs_scaled_chi2_1550.png",
+      "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\demo_results\\demo20\\plots\\12_scaling_ratio_by_case.png",
+      "C:\\Code\\optics\\nextnano\\nonlinear_photonics\\demo_results\\demo20\\plots\\13_reference_raw_vs_scaled_spectrum.png"
     ],
     "skipped": [
       "03_abrupt_vs_graded_wavefunctions.png"

@@ -48,6 +48,9 @@ SHARED_DEPENDENCIES: Mapping[str, str] = {
         "post-solve output presence check and realized alloy-composition "
         "readback, so the solver's own composition is verified against the "
         "requested profile.",
+    "16_acqw_renderer_stress_validation/demo16.py":
+        "not called by Demo 20, but imported at module scope by demo16b.py. "
+        "Its directory has to be importable or 'import demo16b' fails.",
     "14_absolute_chi2_graded_acqw_bo/demo14.py":
         "analyse_real_trial: the Demo 11 parser chain that turns a raw run into "
         "energies, envelopes and matrix elements. Reused so Demo 20's parsing "
@@ -61,6 +64,7 @@ _SHARED_PATHS = (
     config20.DEMOS_DIR / "14_absolute_chi2_graded_acqw_bo",
     config20.DEMOS_DIR / "16B_simple_acqw_grading_validation",
     config20.DEMOS_DIR / "16E_acqw_structure_physics_optical_comparison",
+    config20.DEMOS_DIR / "16_acqw_renderer_stress_validation",
 )
 
 
@@ -226,7 +230,7 @@ def solve_case(
         imported_files=imported,
         logs_dir=logs_dir,
     )
-    demo16b.verify_quantum_outputs(cfg, raw_output_dir)
+    demo16b.verify_quantum_outputs(_demo16b_style_config(cfg), raw_output_dir)
 
     # Compare the composition nextnano++ built against the one requested.
     alloy_path = demo16b.find_alloy_composition(raw_output_dir)
@@ -246,6 +250,23 @@ def solve_case(
         composition_max_error=composition_error,
         message="solver returned successfully and realized the requested profile",
     )
+
+
+def _demo16b_style_config(cfg: Mapping[str, Any]) -> dict[str, Any]:
+    """Demo 20's solver block under the ``nextnano`` key Demo 16B reads.
+
+    ``demo16b.verify_quantum_outputs`` looks up ``cfg["nextnano"]``. Demo 20
+    keeps the same fields under ``solver`` instead, so this is the same
+    translation ``_demo14_style_config`` performs, narrowed to the two keys the
+    output check actually reads.
+    """
+
+    return {
+        "nextnano": {
+            "parser_profile": str(cfg["solver"]["parser_profile"]),
+            "quantum_region_name": str(cfg["solver"]["quantum_region_name"]),
+        }
+    }
 
 
 def parse_case(
