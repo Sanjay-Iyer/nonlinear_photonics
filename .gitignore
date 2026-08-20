@@ -56,6 +56,10 @@ nextnano/demos/**/*.log
 nextnano/demos/**/*.dat
 # ...except the reference decks Demo 16G ships as fixtures, which ARE source.
 !nextnano/demos/**/docs/*.nnp
+# Demo 21's trace writes its numbered checkpoints beside its own source. They are
+# regenerable in ~0.3 s by re-running trace_demo20_linear_1nm.py, so they are
+# scratch, not a curated hand-off, and do not belong in a commit.
+nextnano/demos/21_demo20_mathematical_walkthrough/trace_linear_1nm/
 
 # ─── curated demo results ───────────────────────────────────────────────────
 # `demo_results/` is the split-machine hand-off. The work laptop runs the
