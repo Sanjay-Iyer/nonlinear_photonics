@@ -393,6 +393,190 @@ def test_demo20_production_still_runs_unchanged(cfg):
     assert case04.row["chi2_reproduces_demo19"] is True
 
 
+# --- 4b. STEP 08: the Case 04 envelope path ----------------------------------
+
+
+def test_case04_parsed_path_is_repo_relative():
+    """The brief requires REPO_ROOT resolution, not an absolute Windows path."""
+
+    assert trace.CASE04_PARSED == (
+        trace.REPO_ROOT / "demo_results/demo20/data/case_04/optical/parsed")
+    # Must be inside the repo, and must not have been hardcoded per machine.
+    assert trace.CASE04_PARSED.relative_to(trace.REPO_ROOT) == Path(
+        "demo_results/demo20/data/case_04/optical/parsed")
+    source = (DEMO21_DIR / "trace_demo20_linear_1nm.py").read_text(encoding="utf-8")
+    assert "C:\\\\Code" not in source and "C:/Code" not in source
+    assert 'REPO_ROOT / "demo_results/demo20/data/case_04/optical/parsed"' in source
+
+
+def test_envelope_columns_are_the_four_chi2_uses():
+    assert trace.ENVELOPE_COLUMNS == ("z_nm", "psi_e1", "psi_e2", "psi_hh1", "psi_hh2")
+
+
+def _write_thirteen_column_fixture(directory: Path) -> dict[str, np.ndarray]:
+    """A 13-column envelopes.csv + 6x6 matrix_elements.json, for the LOADER only.
+
+    THIS IS NOT CASE 04 PHYSICS and is never presented as such. Case 04's own
+    parsed run is not in this checkout, so the numbers here are borrowed from
+    the one real licensed envelope table that is (Demo 11 s1_ref) and padded out
+    to the 13-column / 6-state shape a Demo 20 parsed run has. Its only job is
+    to prove that the STEP 08 reader selects the right columns by name, slices
+    the recorded matrices correctly, and would fail loudly if it did not.
+    """
+
+    source = trace.AUX_ENVELOPES
+    if not (source / "envelopes.csv").is_file():
+        pytest.skip("no real licensed envelope table available to build a fixture")
+    z, psi_e, psi_h, _ = trace._read_envelope_table(source / "envelopes.csv")
+    recorded = json.loads((source / "matrix_elements.json").read_text(encoding="utf-8"))
+
+    # 6 states per band; states 3-6 are filler the reader must IGNORE. They are
+    # deliberately given values that would wreck every matrix element if the
+    # reader sliced by position instead of by name.
+    n = z.size
+    filler = [np.full(n, 7.0 + i) for i in range(4)]
+    columns = [z, psi_e[:, 0], psi_e[:, 1], *filler,
+               psi_h[:, 0], psi_h[:, 1], *filler]
+    header = ("z_nm,psi_e1,psi_e2,psi_e3,psi_e4,psi_e5,psi_e6,"
+              "psi_hh1,psi_hh2,psi_hh3,psi_hh4,psi_hh5,psi_hh6")
+    directory.mkdir(parents=True, exist_ok=True)
+    np.savetxt(directory / "envelopes.csv", np.column_stack(columns),
+               delimiter=",", header=header, comments="")
+
+    # 6x6 recorded matrices whose LEADING 2x2 blocks are the real ones.
+    def expand(block):
+        big = np.full((6, 6), -999.0)
+        big[:2, :2] = np.asarray(block, dtype=float)[:2, :2]
+        return big.tolist()
+
+    (directory / "matrix_elements.json").write_text(json.dumps({
+        "overlap_electron_hole": expand(recorded["overlap_electron_hole"]),
+        "position_matrix_electron_nm": expand(recorded["position_matrix_electron_nm"]),
+        "position_matrix_heavy_hole_nm": expand(
+            recorded["position_matrix_heavy_hole_nm"]),
+        "units": "nm",
+    }, indent=2), encoding="utf-8")
+    return {"z": z, "psi_e": psi_e, "psi_h": psi_h}
+
+
+def test_step08_reads_thirteen_columns_by_name_and_verifies_all_12_elements(
+    tmp_path, monkeypatch
+):
+    """The full STEP 08 contract, on a 13-column / 6-state table."""
+
+    fixture = tmp_path / "parsed"
+    truth = _write_thirteen_column_fixture(fixture)
+    monkeypatch.setattr(trace, "CASE04_PARSED", fixture)
+
+    out_csv = tmp_path / "06_case04_envelopes.csv"
+    result = trace.case04_envelope_demo(out_csv)
+    assert result is not None, "the Case 04 path did not engage"
+    assert result["is_case04"] is True
+    assert result["source"] == "Demo 20 Case 04 licensed envelopes"
+
+    # (1) loaded, (2) raw arrays recorded, ignoring the 8 filler columns
+    assert len(result["columns_present"]) == 13
+    assert result["grid_points"] == truth["z"].size
+
+    # (5) norms before and after, for all four states
+    assert set(result["norm_before"]) == {"psi_e1", "psi_e2", "psi_hh1", "psi_hh2"}
+    assert set(result["norm_after"]) == {"psi_e1", "psi_e2", "psi_hh1", "psi_hh2"}
+    for value in result["norm_after"].values():
+        assert value == pytest.approx(1.0, abs=1e-12)
+
+    # (6) orthonormality of both bands
+    for value in result["orthonormality_error"].values():
+        assert value < 1e-9
+
+    # (11) every element compared, (12) every one asserted
+    assert len(result["element_comparisons"]) == 12
+    assert {row["symbol"] for row in result["element_comparisons"]} == {"O", "z_e", "z_hh"}
+    assert result["max_absolute_difference"] < 1e-12
+    for row in result["element_comparisons"]:
+        assert row["absolute_difference"] <= row["allowed"]
+
+    # the checkpoint CSV, with exactly the columns the brief specifies
+    assert out_csv.is_file()
+    with out_csv.open(encoding="utf-8", newline="") as stream:
+        reader = csv.DictReader(stream)
+        assert reader.fieldnames == [
+            "z_nm", "psi_e1_raw", "psi_e2_raw", "psi_hh1_raw", "psi_hh2_raw",
+            "psi_e1_normalized", "psi_e2_normalized",
+            "psi_hh1_normalized", "psi_hh2_normalized",
+            "psi_e1_times_psi_hh1", "psi_e1_z_psi_e1"]
+        rows = list(reader)
+    assert len(rows) == truth["z"].size
+    # the two integrand columns must be the products they claim to be
+    first = rows[1]
+    assert float(first["psi_e1_times_psi_hh1"]) == pytest.approx(
+        float(first["psi_e1_normalized"]) * float(first["psi_hh1_normalized"]), rel=1e-15)
+    assert float(first["psi_e1_z_psi_e1"]) == pytest.approx(
+        float(first["psi_e1_normalized"]) ** 2 * float(first["z_nm"]), rel=1e-15)
+
+
+def test_step08_reader_is_not_fooled_by_column_order(tmp_path, monkeypatch):
+    """Shuffle the header; name-based selection must still pick the right four."""
+
+    fixture = tmp_path / "parsed"
+    _write_thirteen_column_fixture(fixture)
+    straight = trace._read_envelope_table(fixture / "envelopes.csv")
+
+    text = (fixture / "envelopes.csv").read_text(encoding="utf-8").splitlines()
+    names = text[0].split(",")
+    order = [names.index(n) for n in
+             ["psi_hh2", "z_nm", "psi_e5", "psi_e1", "psi_hh1", "psi_e2"]]
+    order += [i for i in range(len(names)) if i not in order]
+    shuffled = [",".join(names[i] for i in order)]
+    for line in text[1:]:
+        cells = line.split(",")
+        shuffled.append(",".join(cells[i] for i in order))
+    (fixture / "envelopes.csv").write_text("\n".join(shuffled) + "\n", encoding="utf-8")
+
+    reshuffled = trace._read_envelope_table(fixture / "envelopes.csv")
+    for a, b in zip(straight[:3], reshuffled[:3]):
+        assert np.array_equal(a, b), "column selection depends on order"
+
+
+def test_step08_rejects_a_table_missing_a_required_column(tmp_path):
+    path = tmp_path / "envelopes.csv"
+    path.write_text("z_nm,psi_e1,psi_e2,psi_hh1\n0,1,1,1\n1,1,1,1\n2,1,1,1\n",
+                    encoding="utf-8")
+    with pytest.raises(trace.Extract20EnvelopeError, match="psi_hh2"):
+        trace._read_envelope_table(path)
+
+
+def test_step08_assertion_fires_when_stored_and_recomputed_disagree(
+    tmp_path, monkeypatch
+):
+    """The guard must actually guard - corrupt one element and expect a failure."""
+
+    fixture = tmp_path / "parsed"
+    _write_thirteen_column_fixture(fixture)
+    payload = json.loads((fixture / "matrix_elements.json").read_text(encoding="utf-8"))
+    payload["overlap_electron_hole"][0][0] += 1.0e-6      # far above the tolerance
+    (fixture / "matrix_elements.json").write_text(json.dumps(payload), encoding="utf-8")
+    monkeypatch.setattr(trace, "CASE04_PARSED", fixture)
+    with pytest.raises(AssertionError, match=r"O\[e1,hh1\]"):
+        trace.case04_envelope_demo(None)
+
+
+def test_step08_falls_back_only_when_case04_is_absent(tmp_path, monkeypatch):
+    monkeypatch.setattr(trace, "CASE04_PARSED", tmp_path / "nothing_here")
+    assert trace.case04_envelope_demo(None) is None
+    fallback = trace.demo11_fallback_demo(None)
+    if fallback is not None:
+        assert fallback["is_case04"] is False
+        assert "fallback" in fallback["source"].lower()
+
+
+def test_leading_block_slices_a_six_by_six_correctly():
+    big = np.arange(36, dtype=float).reshape(6, 6)
+    assert np.array_equal(trace._leading_block(big),
+                          np.array([[0.0, 1.0], [6.0, 7.0]]))
+    small = [[1.0, 2.0], [3.0, 4.0]]
+    assert np.array_equal(trace._leading_block(small), np.asarray(small))
+
+
 # --- 5. the scripts run end to end -------------------------------------------
 
 

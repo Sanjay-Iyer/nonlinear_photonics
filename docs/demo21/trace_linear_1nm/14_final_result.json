@@ -1,0 +1,272 @@
+{
+  "demo": "21 (walkthrough of demo 20)",
+  "case_id": "04",
+  "case_name": "Linear 1.0 nm",
+  "profile": "linear",
+  "grading_width_nm": 1.0,
+  "target_wavelength_nm": 1550.0,
+  "chi2_1550_raw_pm_per_V": 18.04752050786078,
+  "chi2_1550_scaled_pm_per_V": 712.4875513325329,
+  "chi2_1550_reconstructed_raw_pm_per_V": 18.04752050786077,
+  "peak_raw": {
+    "wavelength_nm": 1502.0,
+    "magnitude_pm_per_V": 45.106579094356526,
+    "photon_energy_eV": 0.8254607083888148
+  },
+  "peak_scaled": {
+    "wavelength_nm": 1502.0,
+    "magnitude_pm_per_V": 1780.7363661909856,
+    "photon_energy_eV": 0.8254607083888148
+  },
+  "kspace_convention_raw": "d2k_over_2pi_squared",
+  "kspace_convention_scaled": "bare_d2k",
+  "prefactor_pm_per_V": 56.69816882497043,
+  "envelope_demonstration": {
+    "source": "Demo 11 s1_ref (fallback, different structure)",
+    "envelopes_csv": "C:\\code\\nonlinear_photonics\\nextnano\\results\\demo_runs\\11_paper_validation_interband_chi2_acqw\\20260731T002541Z_62efb35c\\runs\\s1_ref\\extracted\\envelopes.csv",
+    "matrix_elements_json": "C:\\code\\nonlinear_photonics\\nextnano\\results\\demo_runs\\11_paper_validation_interband_chi2_acqw\\20260731T002541Z_62efb35c\\runs\\s1_ref\\extracted\\matrix_elements.json",
+    "is_case04": false,
+    "grid_points": 55,
+    "columns_present": [
+      "z_nm",
+      "psi_e1",
+      "psi_e2",
+      "psi_hh1",
+      "psi_hh2"
+    ],
+    "norm_before": {
+      "psi_e1": 1.0000000000000002,
+      "psi_e2": 1.0000000000000002,
+      "psi_hh1": 1.0000000000000002,
+      "psi_hh2": 0.9999999999999999
+    },
+    "norm_after": {
+      "psi_e1": 1.0000000000000002,
+      "psi_e2": 1.0000000000000002,
+      "psi_hh1": 1.0000000000000002,
+      "psi_hh2": 1.0000000000000002
+    },
+    "orthonormality_error": {
+      "electron": 3.917642425330733e-15,
+      "heavy_hole": 1.2553408949552401e-14
+    },
+    "element_comparisons": [
+      {
+        "symbol": "O",
+        "element": "O[e1,hh1]",
+        "recomputed": 0.9808489136883206,
+        "stored": 0.9808489136883206,
+        "absolute_difference": 0.0,
+        "allowed": 1e-12
+      },
+      {
+        "symbol": "O",
+        "element": "O[e1,hh2]",
+        "recomputed": -0.01753483861592903,
+        "stored": -0.017534838615929048,
+        "absolute_difference": 1.734723475976807e-17,
+        "allowed": 1e-12
+      },
+      {
+        "symbol": "O",
+        "element": "O[e2,hh1]",
+        "recomputed": -0.08571658398768506,
+        "stored": -0.08571658398768506,
+        "absolute_difference": 0.0,
+        "allowed": 1e-12
+      },
+      {
+        "symbol": "O",
+        "element": "O[e2,hh2]",
+        "recomputed": -0.4216940569188113,
+        "stored": -0.4216940569188113,
+        "absolute_difference": 0.0,
+        "allowed": 1e-12
+      },
+      {
+        "symbol": "z_e",
+        "element": "z_e[e1,e1]",
+        "recomputed": 12.7135835400687,
+        "stored": 12.7135835400687,
+        "absolute_difference": 0.0,
+        "allowed": 1.2713583540068701e-11
+      },
+      {
+        "symbol": "z_e",
+        "element": "z_e[e1,e2]",
+        "recomputed": 1.040446171671351,
+        "stored": 1.040446171671351,
+        "absolute_difference": 0.0,
+        "allowed": 1.0404461716713508e-12
+      },
+      {
+        "symbol": "z_e",
+        "element": "z_e[e2,e1]",
+        "recomputed": 1.040446171671351,
+        "stored": 1.040446171671351,
+        "absolute_difference": 0.0,
+        "allowed": 1.0404461716713508e-12
+      },
+      {
+        "symbol": "z_e",
+        "element": "z_e[e2,e2]",
+        "recomputed": 18.807537994063697,
+        "stored": 18.807537994063697,
+        "absolute_difference": 0.0,
+        "allowed": 1.8807537994063698e-11
+      },
+      {
+        "symbol": "z_hh",
+        "element": "z_hh[hh1,hh1]",
+        "recomputed": 12.653883646536041,
+        "stored": 12.653883646536041,
+        "absolute_difference": 0.0,
+        "allowed": 1.2653883646536041e-11
+      },
+      {
+        "symbol": "z_hh",
+        "element": "z_hh[hh1,hh2]",
+        "recomputed": -1.4492447518369918,
+        "stored": -1.4492447518369915,
+        "absolute_difference": 2.220446049250313e-16,
+        "allowed": 1.4492447518369915e-12
+      },
+      {
+        "symbol": "z_hh",
+        "element": "z_hh[hh2,hh1]",
+        "recomputed": -1.4492447518369915,
+        "stored": -1.4492447518369918,
+        "absolute_difference": 2.220446049250313e-16,
+        "allowed": 1.4492447518369917e-12
+      },
+      {
+        "symbol": "z_hh",
+        "element": "z_hh[hh2,hh2]",
+        "recomputed": 12.867574136817556,
+        "stored": 12.867574136817552,
+        "absolute_difference": 3.552713678800501e-15,
+        "allowed": 1.2867574136817552e-11
+      }
+    ],
+    "max_absolute_difference": 3.552713678800501e-15
+  },
+  "states_provenance": "master_table:demo19_master_results.csv",
+  "solver_pass": true,
+  "physical_valid": false,
+  "failure_reason": "Demo 11/14 physical QC did not pass",
+  "stored_demo20": {
+    "case_id": "04",
+    "case_name": "Linear 1.0 nm",
+    "profile": "linear",
+    "I1_width_nm": "1.0",
+    "I2_width_nm": "1.0",
+    "I3_width_nm": "1.0",
+    "I4_width_nm": "1.0",
+    "nominal_grade_width_nm": "1.0",
+    "E1_HH1_eV": "1.4933526957039998",
+    "E1_HH2_eV": "1.5283667159019998",
+    "E2_HH1_eV": "1.613217415774",
+    "E2_HH2_eV": "1.648231435972",
+    "z_e12_nm": "1.0251735847808658",
+    "z_hh12_nm": "1.4323684065114455",
+    "delta_z_e_nm": "5.936663003241108",
+    "delta_z_hh_nm": "0.07875320177365097",
+    "O11": "0.9822755287674644",
+    "O12": "0.01540332812208936",
+    "O21": "-0.08353004083929513",
+    "O22": "0.3831404861807044",
+    "chi2_1550_pm_per_V": "712.4875513325329",
+    "chi2_1550_relative_to_abrupt": "",
+    "peak_chi2_pm_per_V": "1780.7363661909856",
+    "peak_chi2_relative_to_abrupt": "",
+    "peak_wavelength_nm": "1502.0",
+    "grading_validation_pass": "True",
+    "solver_pass": "True",
+    "physical_valid": "False",
+    "E1_eV": "2.941158138088",
+    "E2_eV": "3.061022858158",
+    "HH1_eV": "1.447805442384",
+    "HH2_eV": "1.412791422186",
+    "z_e11_nm": "12.72452731946466",
+    "z_e21_nm": "1.0251735847808656",
+    "z_e22_nm": "18.661190322705767",
+    "z_hh11_nm": "12.65139233424412",
+    "z_hh21_nm": "1.4323684065114457",
+    "z_hh22_nm": "12.73014553601777",
+    "electron_E1_centroid_nm": "12.724527319464652",
+    "electron_E2_centroid_nm": "18.661190322705764",
+    "HH1_centroid_nm": "12.651392334244115",
+    "HH2_centroid_nm": "12.730145536017774",
+    "solver_return_code": "0",
+    "failure_stage": "physical_validation",
+    "failure_reason": "Demo 11/14 physical QC did not pass",
+    "spectrum_path": "C:\\nn_results\\19_quantum_well_interface_grading_showcase\\demo19_20260814T150258Z_38f64513_ba3c80\\cases\\case_04\\optical\\parsed\\chi2_focused.csv",
+    "kspace_scaling_enabled": "True",
+    "kspace_scaling_factor": "39.47841760435743",
+    "kspace_convention_raw": "d2k_over_2pi_squared",
+    "kspace_convention_scaled": "bare_d2k",
+    "chi2_raw_1550_pm_per_V": "18.04752050786078",
+    "chi2_scaled_1550_pm_per_V": "712.4875513325329",
+    "chi2_reported_1550_pm_per_V": "712.4875513325329",
+    "raw_peak_chi2_pm_per_V": "45.106579094356526",
+    "scaled_peak_chi2_pm_per_V": "1780.7363661909856",
+    "reported_peak_chi2_pm_per_V": "1780.7363661909856",
+    "raw_peak_wavelength_nm": "1502.0",
+    "scaled_peak_wavelength_nm": "1502.0",
+    "peak_wavelength_shift_nm": "0.0",
+    "spectral_shape_max_difference": "3.3306690738754696e-16",
+    "chi2_raw_1550_relative_to_reference": "0.5815020117174224",
+    "chi2_scaled_1550_relative_to_reference": "0.5815020117174224",
+    "raw_peak_relative_to_reference": "0.7088677603826632",
+    "scaled_peak_relative_to_reference": "0.7088677603826631",
+    "paper_target_pm_per_V": "2500.0",
+    "raw_ratio_to_paper": "0.007219008203144313",
+    "scaled_ratio_to_paper": "0.2849950205330132",
+    "raw_error_percent": "99.27809917968555",
+    "scaled_error_percent": "71.50049794669869",
+    "demo19_recorded_chi2_1550_pm_per_V": "18.047520507860785",
+    "chi2_reproduces_demo19": "True",
+    "chi2_demo19_relative_difference": "1.9685328393188858e-16",
+    "states_provenance": "master_table:demo19_master_results.csv",
+    "analysis_source": "master_table"
+  },
+  "demo19_recorded_chi2_1550_pm_per_V": 18.047520507860785,
+  "verification": [
+    {
+      "comparison": "traced raw vs stored Demo 20 chi2_raw_1550_pm_per_V",
+      "traced": 18.04752050786078,
+      "reference": 18.04752050786078,
+      "relative_difference": 0.0,
+      "tolerance_justification": "same production function, same inputs -> bit-identical"
+    },
+    {
+      "comparison": "traced scaled vs stored Demo 20 chi2_scaled_1550_pm_per_V",
+      "traced": 712.4875513325329,
+      "reference": 712.4875513325329,
+      "relative_difference": 0.0,
+      "tolerance_justification": "same production function, same inputs -> bit-identical"
+    },
+    {
+      "comparison": "traced peak vs stored Demo 20 raw_peak_chi2_pm_per_V",
+      "traced": 45.106579094356526,
+      "reference": 45.106579094356526,
+      "relative_difference": 0.0,
+      "tolerance_justification": "argmax over the same array; ULP-level float noise only"
+    },
+    {
+      "comparison": "traced raw vs Demo 19 recorded chi2_1550_pm_per_V",
+      "traced": 18.04752050786078,
+      "reference": 18.047520507860785,
+      "relative_difference": 1.9685328393188858e-16,
+      "tolerance_justification": "Demo 19 computed this from the same matrix elements with the same equation; agreement is limited only by float summation order"
+    },
+    {
+      "comparison": "STEP 16-18 hand reconstruction vs traced raw",
+      "traced": 18.04752050786077,
+      "reference": 18.04752050786078,
+      "relative_difference": 5.905598517956658e-16,
+      "tolerance_justification": "identical arithmetic accumulated in a different order (list-sum per k vs in-place +=); a few ULP"
+    }
+  ],
+  "caveat": "solver_pass and physical_valid are separate. All 13 Demo 19 cases are physical_valid=False; treat these numbers as a controlled comparison between grading cases, not validated absolute physics."
+}

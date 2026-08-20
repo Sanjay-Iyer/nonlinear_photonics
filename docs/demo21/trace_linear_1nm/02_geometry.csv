@@ -1,0 +1,5 @@
+interface,position_nm,x_al_left,x_al_right,role
+I1,9.1,0.55,0.0,outer_left_algaas_to_gaas
+I2,16.2,0.0,0.55,central_gaas_to_algaas
+I3,18.0,0.55,0.0,central_algaas_to_gaas
+I4,20.9,0.0,0.55,outer_right_gaas_to_algaas
