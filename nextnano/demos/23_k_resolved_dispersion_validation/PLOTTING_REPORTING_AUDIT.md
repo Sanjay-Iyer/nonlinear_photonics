@@ -6,7 +6,7 @@ Equation 2 physics was altered.
 
 | Plot / table | Previously implemented? | File / function | Data source | Change made? |
 |---|---|---|---|---|
-| Fig. 1 raw kp8 dispersions | Yes | `plotting.raw_dispersions` | tracked Professional kp8 states | Yes: point markers, k=0/kmax/range, electron and hole zooms |
+| Fig. 1 raw kp8 dispersions | Yes | `plotting.raw_dispersions` | Professional combined E(k) table; k=0-identified Kramers-pair columns | Yes: point markers, k=0/kmax/range, electron and hole zooms |
 | Figs. 2–5 parabolic fits/residuals | Yes | `fit_plot`, `residual_plot` | tracked points + anchored fits | Yes: fit annotations, extrema, optional curvature diagnostic |
 | Figs. 6–7 transition energies | Yes | transition plotters | A–D same-k transitions | Yes: 1550-nm two-photon resonance marker |
 | Fig. 8 full A–D spectrum | Yes | `spectra` | validated 16-pathway Equation 2 | Yes: 1550, peak, FWHM annotations |
@@ -24,3 +24,8 @@ Equation 2 physics was altered.
 
 The paper curve is labeled “Digitized from Ramesh et al. Fig. 2d” and is never
 represented as raw or tabulated author data.
+
+The observed Professional run provides finite-k energies and explicit k
+vectors but only k=0 spinors. Demo 23 therefore records a limited solver-column
+tracking method and fails the finite-k overlap gate instead of manufacturing
+tracking scores.

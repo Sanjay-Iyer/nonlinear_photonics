@@ -44,12 +44,19 @@ def _load_spec(
     spec: deck23.DeckSpec,
     cfg: Mapping[str, Any],
     table_root: Path,
+    frozen: physics23.FrozenK0Inputs,
 ) -> state_tracking.TrackedSubbands:
     raw = run_root / "raw" / spec.name
     if not raw.is_dir():
         raise Demo23Error(f"required real solver output is missing: {raw}")
     inventory = table_root / "inventories" / f"{spec.name}.csv"
-    return state_tracking.load_and_track(raw, inventory, cfg)
+    expected = {
+        "e1": float(frozen.states.electron_energies_eV[0]),
+        "e2": float(frozen.states.electron_energies_eV[1]),
+        "hh1": float(frozen.states.hole_energies_eV[0]),
+        "hh2": float(frozen.states.hole_energies_eV[1]),
+    }
+    return state_tracking.load_and_track(raw, inventory, cfg, expected)
 
 
 def _settings_for_spec(
@@ -200,7 +207,7 @@ def _convergence_rows(
             settings = _settings_for_spec(base_settings, spec)
             results = {mode: result_map[mode] for mode in modes}
         else:
-            tracked = _load_spec(run_root, spec, cfg, output / "tables")
+            tracked = _load_spec(run_root, spec, cfg, output / "tables", frozen)
             settings = _settings_for_spec(base_settings, spec)
             results, _, _ = _evaluate_spec(tracked, frozen, settings, wavelengths, cfg, modes)
         for mode, result in results.items():
@@ -237,7 +244,7 @@ def _isotropy(
     candidates = [spec for spec in deck23.deck_specs(cfg) if spec.role == "isotropy"]
     if not candidates:
         return [], {}, np.asarray([])
-    other = _load_spec(run_root, candidates[0], cfg, output / "tables")
+    other = _load_spec(run_root, candidates[0], cfg, output / "tables", frozen)
     primary_aligned = _aligned_to_demo21(primary, frozen)
     other_aligned = _aligned_to_demo21(other, frozen)
     stop = min(float(primary.k_per_nm[-1]), float(other.k_per_nm[-1]))
@@ -276,7 +283,7 @@ def analyze_run(
     base_settings = physics23.settings_from_config(cfg)
     wavelengths = physics23.wavelength_grid(cfg)
     production = next(spec for spec in deck23.deck_specs(cfg) if spec.role == "production")
-    tracked = _load_spec(run_root, production, cfg, output / "tables")
+    tracked = _load_spec(run_root, production, cfg, output / "tables", frozen)
     modes = ("23A", str(selected_mode).upper()) if selected_mode and str(selected_mode).upper() != "23A" else (
         ("23A",) if selected_mode else MODES
     )
@@ -439,10 +446,25 @@ def analyze_run(
     )
     boss_tolerance = float(cfg["validation"]["boss_hybrid_relative_spectrum_tolerance"])
     summary_by_mode = {str(row["mode"]): row for row in summary_rows}
+    finite_k_overlap_available = all(
+        bool(row.get("finite_k_overlap_available", True)) for row in tracked.rows
+    )
+    finite_scores = [float(row["tracking_score"]) for row in tracked.rows
+                     if np.isfinite(float(row["tracking_score"]))]
+    finite_margins = [float(row["assignment_margin"]) for row in tracked.rows
+                      if np.isfinite(float(row["assignment_margin"]))]
+    min_tracking_score = min(finite_scores) if finite_scores else float("nan")
+    min_tracking_margin = min(finite_margins) if finite_margins else float("nan")
+    state_tracking_validated = (
+        finite_k_overlap_available
+        and min_tracking_score >= float(cfg["state_tracking"]["minimum_overlap_score"])
+        and min_tracking_margin >= float(cfg["state_tracking"]["minimum_assignment_margin"])
+        and all(str(row["confidence"]).lower() != "ambiguous" for row in tracked.rows)
+    )
     boss_validated = (
         "23C" in summary_by_mode and "23D" in summary_by_mode
         and float(summary_by_mode["23C"]["relative_spectrum_RMSE_vs_23D"]) <= boss_tolerance
-        and grid_converged and kmax_converged and radial_validated
+        and grid_converged and kmax_converged and radial_validated and state_tracking_validated
     )
 
     master_rows = []
@@ -454,14 +476,12 @@ def analyze_run(
         master_rows.append({"Mode": row["mode"], "Dispersion": descriptions[str(row["mode"])], **row})
     reporting.write_csv(output / "tables" / "demo23_master_mode_comparison.csv", master_rows)
 
-    min_tracking_score = min(float(row["tracking_score"]) for row in tracked.rows)
-    min_tracking_margin = min(float(row["assignment_margin"]) for row in tracked.rows)
     interpolation_max = max(float(row["max_node_residual_eV"]) for row in interpolation_rows)
     fit_by_state = {str(row["state"]): row for row in fit_rows}
     electron_fit_tol = float(cfg["validation"]["electron_fit_rmse_tolerance_meV"])
     validation_rows = [
         {"Check": "23A regression", "Result": error, "Threshold": f"<= {tolerance:g} pm/V", "PASS/FAIL": "PASS" if error <= tolerance else "FAIL"},
-        {"Check": "state tracking", "Result": f"min score {min_tracking_score:.6g}; min margin {min_tracking_margin:.6g}", "Threshold": f"score >= {cfg['state_tracking']['minimum_overlap_score']}; margin >= {cfg['state_tracking']['minimum_assignment_margin']}; no ambiguous", "PASS/FAIL": "PASS"},
+        {"Check": "state tracking", "Result": (f"min score {min_tracking_score:.6g}; min margin {min_tracking_margin:.6g}" if finite_k_overlap_available else "finite-k spinors absent; solver band columns + Kramers-pair averaging used"), "Threshold": f"finite-k overlap; score >= {cfg['state_tracking']['minimum_overlap_score']}; margin >= {cfg['state_tracking']['minimum_assignment_margin']}; no ambiguous", "PASS/FAIL": "PASS" if state_tracking_validated else "FAIL"},
         {"Check": "e1 fit", "Result": f"RMSE {float(fit_by_state['e1']['RMSE_meV']):.6g} meV", "Threshold": f"<= {electron_fit_tol:g} meV", "PASS/FAIL": "PASS" if float(fit_by_state['e1']['RMSE_meV']) <= electron_fit_tol else "FAIL"},
         {"Check": "e2 fit", "Result": f"RMSE {float(fit_by_state['e2']['RMSE_meV']):.6g} meV", "Threshold": f"<= {electron_fit_tol:g} meV", "PASS/FAIL": "PASS" if float(fit_by_state['e2']['RMSE_meV']) <= electron_fit_tol else "FAIL"},
         {"Check": "23C-vs-23D spectral RMSE", "Result": float(summary_by_mode["23C"]["relative_spectrum_RMSE_vs_23D"]) if "23C" in summary_by_mode and "23D" in summary_by_mode else "not run", "Threshold": f"<= {boss_tolerance:g}", "PASS/FAIL": ("PASS" if float(summary_by_mode["23C"]["relative_spectrum_RMSE_vs_23D"]) <= boss_tolerance else "FAIL") if "23C" in summary_by_mode and "23D" in summary_by_mode else "NOT RUN"},
@@ -548,6 +568,8 @@ def analyze_run(
         "k_grid_converged": grid_converged,
         "kmax_converged": kmax_converged,
         "radial_assumption_validated": radial_validated,
+        "finite_k_overlap_available": finite_k_overlap_available,
+        "state_tracking_validated": state_tracking_validated,
         "boss_hybrid_relative_spectrum_tolerance": boss_tolerance,
         "boss_hybrid_validated": boss_validated,
         "paper_curve_label": paper_curve.label,

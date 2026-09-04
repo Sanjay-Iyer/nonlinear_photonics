@@ -85,6 +85,26 @@ composition is missing; target-state tracking is ambiguous; interpolation
 would extrapolate; or the 23A regression gate fails. No synthetic physics
 spectrum is generated in any of those cases.
 
+## Professional combined-dispersion output
+
+The observed Professional build writes the complete path to
+`QuantumDispersions/.../dispersion_<path>.dat` with explicit vectors in
+`kVectors_<path>.dat`; `Quantum/.../energy_spectrum_k00000.dat` and the spinor
+composition contain only k=0. Demo 23 reads that layout directly, including a
+known formatting defect where the Band 6/7 and Band 13/14 numeric fields touch.
+
+At k=0, the frozen Demo 21 transition ladder and Cb character identify the
+Kramers pairs as e1=`11+12`, e2=`13+14`, hh1=`5+6`, and hh2=`3+4` for the
+observed run. Each scalar subband energy is the pair average, consistent with
+the retained `g_s=2` model. Pair splittings are recorded in
+`tables/state_tracking.csv`.
+
+Because this output contains no finite-k spinors, overlap-based tracking cannot
+be certified. The analysis still produces the energy-only A–D diagnostics but
+marks the state-tracking gate `FAIL`/limited and does not declare the complete
+boss-hybrid validation passed. This limitation is not hidden or replaced with
+synthetic spinors.
+
 ## Output
 
 Real runs are written under `demo_results/demo23/demo23_<UTC stamp>/` and

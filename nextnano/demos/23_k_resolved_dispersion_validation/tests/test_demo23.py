@@ -340,3 +340,60 @@ def test_22_new_paper_plot_and_21_section_report_are_written(tmp_path):
     text = report.read_text(encoding="utf-8")
     for section in range(1, 22):
         assert f"## {section}." in text
+
+
+def test_23_combined_professional_dispersion_layout_is_parsed(tmp_path, cfg):
+    raw = tmp_path / "raw"
+    quantum = raw / "case" / "bias_00000" / "Quantum" / "acqw" / "kp8"
+    dispersion = raw / "case" / "bias_00000" / "QuantumDispersions" / "acqw" / "kp8"
+    quantum.mkdir(parents=True)
+    dispersion.mkdir(parents=True)
+    k = np.linspace(0.0, 0.4, 5)
+    base = np.asarray([1.397, 1.397, 1.416, 1.416, 1.444, 1.444,
+                       2.339, 2.339, 2.340, 2.340, 2.952, 2.952, 3.091, 3.091])
+    bands = np.vstack([base + (np.arange(14) + 1) * 0.001 * value ** 2 for value in k])
+    header = f"{'|k|[1/nm]':<22}" + "".join(f"{'Band_' + str(i) + '[eV]':<22}" for i in range(1, 15))
+    rows = [header] + [f"{value:<22.15g}" + "".join(f"{energy:<22.15g}" for energy in row)
+                              for value, row in zip(k, bands)]
+    (dispersion / "dispersion_Gamma_to_y.dat").write_text("\n".join(rows), encoding="utf-8")
+    vector_rows = ["no. kx ky kz"] + [f"{i} 0 {value:.15g} 0" for i, value in enumerate(k)]
+    (dispersion / "kVectors_Gamma_to_y.dat").write_text("\n".join(vector_rows), encoding="utf-8")
+    energy_rows = ["no. Energy[eV]"] + [f"{i + 1} {value:.15g}" for i, value in enumerate(base)]
+    (quantum / "energy_spectrum_k00000.dat").write_text("\n".join(energy_rows), encoding="utf-8")
+    components = np.zeros((14, 8))
+    components[:6, 2] = 1.0
+    components[6:10, 0:2] = 0.275
+    components[6:10, 3] = 0.45
+    components[10:, 0:2] = 0.475
+    components[10:, 3] = 0.05
+    spin_rows = ["no. cb1 cb2 hh1 lh1 lh2 hh2 so1 so2"] + [
+        f"{i + 1} " + " ".join(f"{value:.9f}" for value in row)
+        for i, row in enumerate(components)
+    ]
+    (quantum / "spinor_composition_k00000_CbHhLhSo.dat").write_text(
+        "\n".join(spin_rows), encoding="utf-8"
+    )
+    expected = {"e1": 2.941, "e2": 3.061, "hh1": 1.448, "hh2": 1.413}
+    tracked = state_tracking.load_combined_dispersion(
+        raw, tmp_path / "inventory.csv", cfg, expected
+    )
+    np.testing.assert_allclose(tracked.k_per_nm, k)
+    assert tracked.rows[0]["finite_k_overlap_available"] is False
+    assert {row["raw_solver_index"] for row in tracked.rows if row["assigned_physical_state"] == "e1"} == {"11+12"}
+    assert {row["raw_solver_index"] for row in tracked.rows if row["assigned_physical_state"] == "e2"} == {"13+14"}
+    assert {row["raw_solver_index"] for row in tracked.rows if row["assigned_physical_state"] == "hh1"} == {"5+6"}
+    assert {row["raw_solver_index"] for row in tracked.rows if row["assigned_physical_state"] == "hh2"} == {"3+4"}
+
+
+def test_24_actual_professional_touching_dispersion_fields_are_repaired(tmp_path):
+    path = tmp_path / "dispersion_Gamma_to_y.dat"
+    header = "|k|[1/nm]            Band_1[eV]           Band_2[eV]           Band_3[eV]           Band_4[eV]           Band_5[eV]           Band_6[eV]Band_7[eV]           Band_8[eV]           Band_9[eV]           Band_10[eV]          Band_11[eV]          Band_12[eV]          Band_13[eV]Band_14[eV]"
+    row = "0                    1.3976942530797      1.3976942530798      1.4167478423565      1.4167478423565      1.4437721218703      1.44377212187032.3390669310193      2.3390669310193      2.3390988947366      2.3390988947366      2.9525116792099      2.9525116792099      3.09114845201543.0911484520155"
+    path.write_text(header + "\n" + row + "\n", encoding="utf-8")
+    k, bands = state_tracking._fixed_width_dispersion(path)
+    assert k[0] == pytest.approx(0.0)
+    assert bands.shape == (1, 14)
+    assert bands[0, 5] == pytest.approx(1.4437721218703)
+    assert bands[0, 6] == pytest.approx(2.3390669310193)
+    assert bands[0, 12] == pytest.approx(3.0911484520154)
+    assert bands[0, 13] == pytest.approx(3.0911484520155)

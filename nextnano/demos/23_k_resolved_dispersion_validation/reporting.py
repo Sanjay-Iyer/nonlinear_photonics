@@ -141,6 +141,13 @@ def write_final_report(
         "raw solver index, overlap score, assignment margin, confidence, and dominant spinor "
         "character. Ambiguous target tracking stops analysis before fitting.",
         "",
+        ("Finite-k spinors were available, so overlap tracking was evaluated."
+         if bool(resolved.get("finite_k_overlap_available")) else
+         "This Professional output contains only k=0 spinors. Target Kramers pairs are identified "
+         "at k=0 and their fixed solver dispersion columns are averaged at finite k. Therefore "
+         "finite-k overlap tracking is unavailable and the state-tracking validation is marked FAIL, "
+         "even though the energy-only A–D diagnostics are still produced."),
+        "",
         "## 6. Electron dispersion fits",
         "",
         "| State | m*/m0 | RMSE meV | Max error meV | k at max nm^-1 | Fit range nm^-1 |",
