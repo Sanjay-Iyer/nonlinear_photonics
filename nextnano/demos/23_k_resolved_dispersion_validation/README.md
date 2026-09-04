@@ -89,5 +89,13 @@ spectrum is generated in any of those cases.
 
 Real runs are written under `demo_results/demo23/demo23_<UTC stamp>/` and
 contain copied input decks, solver logs, raw Professional output, tables,
-spectra, 13 diagnostic figure families, the resolved configuration, and
-`DEMO23_FINAL_REPORT.md`.
+spectra, 16 internal diagnostic figure families, five paper-comparison figure
+families, the resolved configuration, and `DEMO23_FINAL_REPORT.md`.
+
+The paper comparison uses the repository's existing 45-point eye digitization
+of the simulated curve in Ramesh et al. Fig. 2d. It is always labeled
+`Digitized from Ramesh et al. Fig. 2d`, is not treated as raw/tabulated author
+data, and is not an acceptance gate. The measured paper resonance appears only
+as a separately categorized location marker; measured SH intensity is not
+placed on a susceptibility axis. See `PAPER_DATA_PROVENANCE.md` and
+`PLOTTING_REPORTING_AUDIT.md`.

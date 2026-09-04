@@ -13,6 +13,7 @@ import dispersion_models
 import k_integration
 import physics23
 import plotting
+import paper_comparison
 import reporting
 import state_tracking
 from config23 import Demo23Error, k_bz_per_nm, kmax_per_nm
@@ -317,10 +318,50 @@ def analyze_run(
     reporting.write_csv(output / "tables" / "near_zone_center_fit_sensitivity.csv", near_rows)
     reference = results.get("23D")
     summary_rows = [physics23.spectrum_metrics(result, reference) for result in results.values()]
+    paper_path = Path(__file__).resolve().parent / str(cfg["paper_comparison"]["digitized_simulation_csv"])
+    paper_curve = paper_comparison.load_digitized_curve(paper_path)
+    paper_rows = [paper_comparison.comparison_metrics(result, paper_curve) for result in results.values()]
+    paper_by_mode = {str(row["mode"]): row for row in paper_rows}
+    for row in summary_rows:
+        paper_row = paper_by_mode[str(row["mode"])]
+        row["RMSE_vs_digitized_paper_pm_per_V"] = paper_row["RMSE_vs_digitized_paper_pm_per_V"]
+        row["normalized_RMSE_vs_digitized_paper"] = paper_row["normalized_RMSE_vs_digitized_paper"]
     pathway_rows = [physics23.pathway_summary(result, float(cfg["chi2"]["target_wavelength_nm"]))
                     for result in results.values()]
     reporting.write_csv(output / "tables" / "mode_summary.csv", summary_rows)
     reporting.write_csv(output / "tables" / "pathway_summary_1550nm.csv", pathway_rows)
+    reporting.write_csv(output / "tables" / "paper_comparison_metrics.csv", paper_rows)
+    reporting.write_csv(
+        output / "tables" / "paper_reference_values.csv",
+        paper_comparison.reference_rows(cfg, paper_curve),
+    )
+    detailed_pathways = []
+    for result in results.values():
+        detailed_pathways.extend(physics23.pathway_rows(
+            result, float(cfg["chi2"]["target_wavelength_nm"]), "1550_nm"
+        ))
+        peak_nm = float(result.spectrum.wavelength_nm[int(np.argmax(result.magnitude))])
+        detailed_pathways.extend(physics23.pathway_rows(result, peak_nm, "mode_spectral_peak"))
+    reporting.write_csv(output / "tables" / "pathway_contributions_1550_and_peaks.csv", detailed_pathways)
+
+    prefactor = physics23.validated.absolute_prefactor(base_settings)
+    integrand_rows = []
+    for result in results.values():
+        target_nm = float(cfg["chi2"]["target_wavelength_nm"])
+        iw = int(np.argmin(np.abs(result.spectrum.wavelength_nm - target_nm)))
+        per_node = prefactor * result.spectrum.summed_integrand[iw] * result.spectrum.k_weights
+        absolute_cumulative = np.cumsum(np.abs(per_node))
+        fraction = absolute_cumulative / max(float(absolute_cumulative[-1]), 1e-300)
+        integrand_rows.append({
+            "mode": result.mode,
+            "wavelength_nm": float(result.spectrum.wavelength_nm[iw]),
+            "k_at_max_absolute_node_per_nm": float(result.transitions.k_per_nm[int(np.argmax(np.abs(per_node)))]),
+            "k_at_10pct_absolute_weight_per_nm": float(result.transitions.k_per_nm[int(np.searchsorted(fraction, 0.10))]),
+            "k_at_50pct_absolute_weight_per_nm": float(result.transitions.k_per_nm[int(np.searchsorted(fraction, 0.50))]),
+            "k_at_90pct_absolute_weight_per_nm": float(result.transitions.k_per_nm[int(np.searchsorted(fraction, 0.90))]),
+            "coherence_ratio": float(abs(np.sum(per_node)) / max(float(np.sum(np.abs(per_node))), 1e-300)),
+        })
+    reporting.write_csv(output / "tables" / "k_integrand_summary_1550nm.csv", integrand_rows)
 
     grid_rows = _convergence_rows(
         cfg, run_root, output, frozen, base_settings, wavelengths, tuple(results),
@@ -383,32 +424,6 @@ def analyze_run(
         "status": "production unchanged; alternative diagnostic only",
     }])
 
-    if bool(cfg["plots"]["enabled"]):
-        dpi = int(cfg["plots"]["dpi"])
-        plots = output / "plots"
-        plotting.raw_dispersions(plots / "figure01_raw_kp8_dispersions.png", tracked.k_per_nm, aligned, dpi)
-        plotting.fit_plot(plots / "figure02_electron_parabolic_fits.png", tracked.k_per_nm, aligned, fits,
-                          ("e1", "e2"), "Electron parabolic fits", dpi)
-        plotting.residual_plot(plots / "figure03_electron_fit_residuals.png", tracked.k_per_nm, aligned, fits,
-                               ("e1", "e2"), "Electron parabolic-fit residuals", dpi)
-        plotting.fit_plot(plots / "figure04_heavy_hole_parabolic_failure.png", tracked.k_per_nm, aligned, fits,
-                          ("hh1", "hh2"), "Heavy-hole parabolic-fit diagnostic", dpi)
-        plotting.residual_plot(plots / "figure05_heavy_hole_residuals.png", tracked.k_per_nm, aligned, fits,
-                               ("hh1", "hh2"), "Heavy-hole parabolic-fit residuals", dpi)
-        k = results["23A"].transitions.k_per_nm
-        for mode, result in results.items():
-            plotting.transition_mode_detail(plots / f"figure06_{mode}_transition_energies.png", k, result, dpi)
-        plotting.transition_modes(plots / "figure07_transition_model_comparison.png", k, results, dpi)
-        plotting.spectra(plots / "figure08_chi2_comparison.png", results, dpi)
-        plotting.differences(plots / "figure09_difference_from_23D.png", results, dpi)
-        plotting.k_integrand(plots / "figure10_k_integrand_1550nm.png", k, results,
-                             physics23.validated.absolute_prefactor(base_settings), dpi)
-        plotting.convergence(plots / "figure11_k_grid_convergence.png", grid_rows, "N_k",
-                             "k-grid convergence", dpi)
-        plotting.convergence(plots / "figure12_kmax_convergence.png", kmax_rows, "fraction_of_bz",
-                             "kmax convergence", dpi)
-        plotting.isotropy(plots / "figure13_isotropy.png", anisotropy_k, anisotropy, dpi)
-
     grid_counts = sorted({int(row["N_k"]) for row in grid_rows})
     grid_check_count = grid_counts[-2] if len(grid_counts) >= 2 else grid_counts[-1]
     grid_converged = all(
@@ -429,6 +444,87 @@ def analyze_run(
         and float(summary_by_mode["23C"]["relative_spectrum_RMSE_vs_23D"]) <= boss_tolerance
         and grid_converged and kmax_converged and radial_validated
     )
+
+    master_rows = []
+    descriptions = {
+        "23A": "shared parabola", "23B": "4 parabolas",
+        "23C": "e parabola + nonparabolic hh", "23D": "raw kp8 all states",
+    }
+    for row in summary_rows:
+        master_rows.append({"Mode": row["mode"], "Dispersion": descriptions[str(row["mode"])], **row})
+    reporting.write_csv(output / "tables" / "demo23_master_mode_comparison.csv", master_rows)
+
+    min_tracking_score = min(float(row["tracking_score"]) for row in tracked.rows)
+    min_tracking_margin = min(float(row["assignment_margin"]) for row in tracked.rows)
+    interpolation_max = max(float(row["max_node_residual_eV"]) for row in interpolation_rows)
+    fit_by_state = {str(row["state"]): row for row in fit_rows}
+    electron_fit_tol = float(cfg["validation"]["electron_fit_rmse_tolerance_meV"])
+    validation_rows = [
+        {"Check": "23A regression", "Result": error, "Threshold": f"<= {tolerance:g} pm/V", "PASS/FAIL": "PASS" if error <= tolerance else "FAIL"},
+        {"Check": "state tracking", "Result": f"min score {min_tracking_score:.6g}; min margin {min_tracking_margin:.6g}", "Threshold": f"score >= {cfg['state_tracking']['minimum_overlap_score']}; margin >= {cfg['state_tracking']['minimum_assignment_margin']}; no ambiguous", "PASS/FAIL": "PASS"},
+        {"Check": "e1 fit", "Result": f"RMSE {float(fit_by_state['e1']['RMSE_meV']):.6g} meV", "Threshold": f"<= {electron_fit_tol:g} meV", "PASS/FAIL": "PASS" if float(fit_by_state['e1']['RMSE_meV']) <= electron_fit_tol else "FAIL"},
+        {"Check": "e2 fit", "Result": f"RMSE {float(fit_by_state['e2']['RMSE_meV']):.6g} meV", "Threshold": f"<= {electron_fit_tol:g} meV", "PASS/FAIL": "PASS" if float(fit_by_state['e2']['RMSE_meV']) <= electron_fit_tol else "FAIL"},
+        {"Check": "23C-vs-23D spectral RMSE", "Result": float(summary_by_mode["23C"]["relative_spectrum_RMSE_vs_23D"]) if "23C" in summary_by_mode and "23D" in summary_by_mode else "not run", "Threshold": f"<= {boss_tolerance:g}", "PASS/FAIL": ("PASS" if float(summary_by_mode["23C"]["relative_spectrum_RMSE_vs_23D"]) <= boss_tolerance else "FAIL") if "23C" in summary_by_mode and "23D" in summary_by_mode else "NOT RUN"},
+        {"Check": "k-grid convergence", "Result": f"N={grid_check_count} vs {max(grid_counts)}", "Threshold": f"max complex relative change <= {cfg['validation']['convergence_relative_tolerance']}", "PASS/FAIL": "PASS" if grid_converged else "FAIL"},
+        {"Check": "kmax convergence", "Result": f"nominal fraction {nominal_fraction:g}", "Threshold": f"max complex relative change <= {cfg['validation']['convergence_relative_tolerance']}", "PASS/FAIL": "PASS" if kmax_converged else "FAIL"},
+        {"Check": "isotropy", "Result": max((float(row["max_absolute_anisotropy_meV"]) for row in isotropy_rows), default=float("nan")), "Threshold": f"<= {cfg['validation']['isotropy_absolute_tolerance_meV']} meV", "PASS/FAIL": "PASS" if radial_validated else "FAIL"},
+        {"Check": "interpolation bounds", "Result": interpolation_max, "Threshold": f"node residual <= {cfg['validation']['interpolation_node_tolerance_eV']} eV; no extrapolation", "PASS/FAIL": "PASS" if interpolation_max <= float(cfg["validation"]["interpolation_node_tolerance_eV"]) else "FAIL"},
+        {"Check": "normalization consistency", "Result": ratio, "Threshold": f"bare/production = (2pi)^2 = {(2*math.pi)**2:.12g}", "PASS/FAIL": "PASS" if math.isclose(ratio, (2 * math.pi) ** 2, rel_tol=1e-12) else "FAIL"},
+    ]
+    reporting.write_csv(output / "tables" / "demo23_validation_table.csv", validation_rows)
+
+    if bool(cfg["plots"]["enabled"]):
+        dpi = int(cfg["plots"]["dpi"])
+        plots = output / "plots"
+        plotting.raw_dispersions(plots / "figure01_raw_kp8_dispersions.png", tracked.k_per_nm, aligned, dpi)
+        plotting.fit_plot(plots / "figure02_electron_parabolic_fits.png", tracked.k_per_nm, aligned, fits,
+                          ("e1", "e2"), "Electron parabolic fits", dpi)
+        plotting.residual_plot(plots / "figure03_electron_fit_residuals.png", tracked.k_per_nm, aligned, fits,
+                               ("e1", "e2"), "Electron parabolic-fit residuals", dpi)
+        plotting.fit_plot(plots / "figure04_heavy_hole_parabolic_failure.png", tracked.k_per_nm, aligned, fits,
+                          ("hh1", "hh2"), "Heavy-hole parabolic-fit diagnostic", dpi)
+        plotting.residual_plot(plots / "figure05_heavy_hole_residuals.png", tracked.k_per_nm, aligned, fits,
+                               ("hh1", "hh2"), "Heavy-hole parabolic-fit residuals", dpi)
+        plotting.local_curvature(plots / "figure05b_heavy_hole_local_curvature.png", tracked.k_per_nm, aligned, dpi)
+        k = results["23A"].transitions.k_per_nm
+        target_nm = float(cfg["chi2"]["target_wavelength_nm"])
+        for mode, result in results.items():
+            plotting.transition_mode_detail(plots / f"figure06_{mode}_transition_energies.png", k, result,
+                                            target_nm, physics23.validated.HC_EV_NM, dpi)
+        plotting.transition_modes(plots / "figure07_transition_model_comparison.png", k, results,
+                                  target_nm, physics23.validated.HC_EV_NM, dpi)
+        plotting.spectra(plots / "figure08_chi2_comparison.png", results, summary_rows, target_nm, dpi)
+        plotting.differences(plots / "figure09_difference_from_23D.png", results, summary_rows,
+                             boss_tolerance, dpi)
+        plotting.k_integrand(plots / "figure10_k_integrand_1550nm.png", k, results,
+                             prefactor, target_nm, dpi)
+        plotting.cumulative_k(plots / "figure11_cumulative_k_contribution_1550nm.png", k, results,
+                              prefactor, target_nm, dpi)
+        for mode, result in results.items():
+            plotting.pathway_contributions(plots / f"figure12_{mode}_pathways_1550nm.png",
+                                           result, target_nm, "1550 nm", dpi)
+            peak_nm = float(result.spectrum.wavelength_nm[int(np.argmax(result.magnitude))])
+            plotting.pathway_contributions(plots / f"figure12_{mode}_pathways_peak.png",
+                                           result, peak_nm, "mode spectral peak", dpi)
+        plotting.major_pathway_changes(plots / "figure13_major_pathway_changes_1550nm.png",
+                                       results, target_nm, dpi)
+        plotting.convergence(plots / "figure14_k_grid_convergence.png", grid_rows, "N_k",
+                             "Figure 14 — k-grid convergence", float(cfg["validation"]["convergence_relative_tolerance"]),
+                             float(grid_check_count), dpi)
+        plotting.convergence(plots / "figure15_kmax_convergence.png", kmax_rows, "fraction_of_bz",
+                             "Figure 15 — kmax convergence", float(cfg["validation"]["convergence_relative_tolerance"]),
+                             nominal_fraction, dpi)
+        plotting.isotropy(plots / "figure16_isotropy.png", anisotropy_k, anisotropy, isotropy_rows, dpi)
+        paper_plots = output / "paper_comparison_plots"
+        paper_block = cfg["paper_comparison"]
+        plotting.paper_full_overlay(paper_plots / "paper_P1_full_spectrum_overlay.png", results, paper_curve,
+                                    float(paper_block["simulated_peak_nm"]), float(paper_block["measured_peak_nm"]), dpi)
+        plotting.paper_normalized(paper_plots / "paper_P2_normalized_spectral_shape.png", results, paper_curve, dpi)
+        plotting.paper_peaks(paper_plots / "paper_P3_peak_location_comparison.png", summary_rows,
+                             float(paper_block["simulated_peak_nm"]), float(paper_block["measured_peak_nm"]), dpi)
+        plotting.paper_1550(paper_plots / "paper_P4_chi2_1550_comparison.png", summary_rows,
+                            float(paper_block["ideal_abrupt_chi2_1550_pm_per_V"]), dpi)
+        plotting.paper_errors(paper_plots / "paper_P5_error_to_digitized_spectrum.png", paper_rows, dpi)
     resolved = {
         "broadening_meV": base_settings.broadening_meV,
         "r_e_hh_nm": base_settings.r_e_hh_nm,
@@ -454,6 +550,9 @@ def analyze_run(
         "radial_assumption_validated": radial_validated,
         "boss_hybrid_relative_spectrum_tolerance": boss_tolerance,
         "boss_hybrid_validated": boss_validated,
+        "paper_curve_label": paper_curve.label,
+        "paper_curve_source_type": paper_curve.source_type,
+        "paper_curve_points": int(len(paper_curve.wavelength_nm)),
     }
     unresolved = [
         "The residual 1/hbar on the boss derivation slide remains dimensionally unresolved and was not implemented.",
@@ -466,6 +565,9 @@ def analyze_run(
         output / "DEMO23_FINAL_REPORT.md", baseline_error=error, tolerance=tolerance,
         summary_rows=summary_rows, fit_rows=fit_rows, isotropy_rows=isotropy_rows,
         grid_rows=grid_rows, kmax_rows=kmax_rows, resolved=resolved, unresolved=unresolved,
+        validation_rows=validation_rows, pathway_rows=pathway_rows,
+        integrand_rows=integrand_rows, paper_rows=paper_rows,
+        paper_reference_rows=paper_comparison.reference_rows(cfg, paper_curve),
     )
     summary = {
         "status": "COMPLETE",

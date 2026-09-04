@@ -4,6 +4,7 @@ import copy
 import math
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -18,6 +19,9 @@ import deck23
 import dispersion_models
 import k_integration
 import physics23
+import paper_comparison
+import plotting
+import reporting
 import run_demo23
 import state_tracking
 import transition_energies
@@ -255,3 +259,84 @@ def test_18_decks_share_geometry_and_define_all_convergence_roles(cfg):
         assert "line{ x = [18, 20.9] }" in text
         assert f"num_points = {spec.points}" in text
         assert "all_k_points = yes" in text
+
+
+def test_19_fwhm_is_reported_only_with_two_crossings():
+    wavelength = np.asarray([0.0, 1.0, 2.0, 3.0, 4.0])
+    assert physics23.fwhm_nm(wavelength, np.asarray([0.0, 1.0, 2.0, 1.0, 0.0])) == pytest.approx(2.0)
+    assert math.isnan(physics23.fwhm_nm(wavelength, np.asarray([1.0, 2.0, 3.0, 4.0, 5.0])))
+
+
+def test_20_paper_curve_is_traceable_and_explicitly_digitized():
+    curve = paper_comparison.load_digitized_curve(DEMO / "paper_figure2d_digitized_simulation.csv")
+    assert len(curve.wavelength_nm) == 45
+    assert curve.label == "Digitized from Ramesh et al. Fig. 2d"
+    assert "digitized" in curve.source_type
+    assert curve.wavelength_nm[np.argmax(curve.chi2_pm_per_V)] == pytest.approx(1520.0)
+
+
+def test_21_paper_metrics_use_only_common_grid():
+    curve = paper_comparison.load_digitized_curve(DEMO / "paper_figure2d_digitized_simulation.csv")
+    wavelength = np.arange(400.0, 1851.0, 1.0)
+    values = np.interp(wavelength, curve.wavelength_nm, curve.chi2_pm_per_V)
+    fake = SimpleNamespace(
+        mode="23D", magnitude=values,
+        spectrum=SimpleNamespace(wavelength_nm=wavelength),
+    )
+    row = paper_comparison.comparison_metrics(fake, curve)
+    assert row["normalized_RMSE_vs_digitized_paper"] == pytest.approx(0.0)
+    assert row["peak_wavelength_error_nm"] == pytest.approx(0.0)
+    assert row["metric_status"] == "DIAGNOSTIC_ONLY_EYE_DIGITIZATION"
+
+
+def test_22_new_paper_plot_and_21_section_report_are_written(tmp_path):
+    metric = {
+        "mode": "23A", "chi2_1550_pm_per_V": 1.0, "peak_chi2_pm_per_V": 2.0,
+        "peak_wavelength_nm": 1520.0, "FWHM_nm": 20.0,
+        "relative_spectrum_RMSE_vs_23D": 0.0,
+        "normalized_RMSE_vs_digitized_paper": 0.1,
+    }
+    figure = tmp_path / "p3.png"
+    plotting.paper_peaks(figure, [metric], 1520.0, 1560.0, 60)
+    assert figure.is_file() and figure.stat().st_size > 0
+    fits = [{
+        "state": state, "effective_mass_m0": 0.1, "RMSE_meV": 0.2,
+        "max_abs_residual_meV": 0.3, "k_at_max_residual_per_nm": 0.4,
+        "fit_kmin_per_nm": 0.0, "fit_kmax_per_nm": 0.5,
+        "residual_pattern": "not_detected",
+    } for state in dispersion_models.SUBBANDS]
+    resolved = {
+        "boss_hybrid_validated": True, "broadening_meV": 5.0, "r_e_hh_nm": 0.751,
+        "n_periods_per_metre": 1 / 30e-9, "nz_semantics": "period density",
+        "spin_degeneracy": 2, "kspace_convention": "d2k_over_2pi_squared",
+        "kmax_per_nm": 0.5, "bz_definition": "pi/a", "k_grid_converged": True,
+        "kmax_converged": True, "radial_assumption_validated": True,
+        "paper_curve_label": paper_comparison.LABEL,
+        "paper_curve_source_type": "eye-digitized published figure", "paper_curve_points": 45,
+        "boss_hybrid_relative_spectrum_tolerance": 0.01,
+    }
+    pathway = [{
+        "mode": "23A", "electron_side_real_pm_per_V": 1.0,
+        "electron_side_imag_pm_per_V": 0.0, "heavy_hole_side_real_pm_per_V": -0.5,
+        "heavy_hole_side_imag_pm_per_V": 0.0, "largest_pathways": "C_1=1",
+    }]
+    integrand = [{
+        "mode": "23A", "k_at_max_absolute_node_per_nm": 0.2,
+        "k_at_10pct_absolute_weight_per_nm": 0.1, "k_at_90pct_absolute_weight_per_nm": 0.4,
+        "coherence_ratio": 0.8,
+    }]
+    paper = [{
+        "mode": "23A", "normalized_RMSE_vs_digitized_paper": 0.1,
+        "peak_wavelength_error_nm": 0.0, "chi2_1550_error_pm_per_V": -2339.0,
+    }]
+    report = tmp_path / "report.md"
+    reporting.write_final_report(
+        report, baseline_error=0.0, tolerance=1e-9, summary_rows=[metric], fit_rows=fits,
+        isotropy_rows=[], grid_rows=[], kmax_rows=[], resolved=resolved, unresolved=[],
+        validation_rows=[{"Check": "23A regression", "Result": 0, "Threshold": "<=1e-9", "PASS/FAIL": "PASS"}],
+        pathway_rows=pathway, integrand_rows=integrand, paper_rows=paper,
+        paper_reference_rows=[{"reference": "curve", "value": "45 points", "category": "paper simulation", "source_type": "digitized", "use": "shape"}],
+    )
+    text = report.read_text(encoding="utf-8")
+    for section in range(1, 22):
+        assert f"## {section}." in text

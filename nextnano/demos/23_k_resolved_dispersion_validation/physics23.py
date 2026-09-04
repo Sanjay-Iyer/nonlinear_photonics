@@ -186,6 +186,65 @@ def pathway_summary(result: ModeResult, target_nm: float) -> dict[str, Any]:
     }
 
 
+def pathway_rows(result: ModeResult, target_nm: float, context: str) -> list[dict[str, Any]]:
+    """Return all 16 complex pathway values plus the physical subtotals."""
+    index = int(np.argmin(np.abs(result.spectrum.wavelength_nm - float(target_nm))))
+    values = result.spectrum.terms[:, index]
+    rows: list[dict[str, Any]] = []
+    for label, value in zip(result.spectrum.term_labels, values):
+        rows.append({
+            "mode": result.mode,
+            "context": context,
+            "wavelength_nm": float(result.spectrum.wavelength_nm[index]),
+            "entry": label,
+            "group": "electron_side" if label.startswith("C_") else "heavy_hole_side_signed",
+            "real_pm_per_V": float(value.real),
+            "imag_pm_per_V": float(value.imag),
+            "abs_pm_per_V": float(abs(value)),
+        })
+    electron = np.sum(values[[label.startswith("C_") for label in result.spectrum.term_labels]])
+    hole = np.sum(values[[label.startswith("V_") for label in result.spectrum.term_labels]])
+    for label, group, value in (
+        ("electron_side_subtotal", "subtotal", electron),
+        ("heavy_hole_side_subtotal_signed", "subtotal", hole),
+        ("final_electron_minus_heavy_hole", "final", result.spectrum.chi2[index]),
+    ):
+        rows.append({
+            "mode": result.mode,
+            "context": context,
+            "wavelength_nm": float(result.spectrum.wavelength_nm[index]),
+            "entry": label,
+            "group": group,
+            "real_pm_per_V": float(value.real),
+            "imag_pm_per_V": float(value.imag),
+            "abs_pm_per_V": float(abs(value)),
+        })
+    return rows
+
+
+def fwhm_nm(wavelength_nm: np.ndarray, magnitude: np.ndarray) -> float:
+    """FWHM of the global peak, or NaN when both half-height crossings do not exist."""
+    x = np.asarray(wavelength_nm, dtype=float)
+    y = np.asarray(magnitude, dtype=float)
+    if len(x) < 3 or len(x) != len(y) or np.any(np.diff(x) <= 0):
+        return float("nan")
+    peak = int(np.argmax(y))
+    half = 0.5 * float(y[peak])
+    left_candidates = np.where(y[:peak] < half)[0]
+    right_candidates = np.where(y[peak + 1:] < half)[0]
+    if not len(left_candidates) or not len(right_candidates):
+        return float("nan")
+    left = int(left_candidates[-1])
+    right = int(peak + 1 + right_candidates[0])
+
+    def crossing(i0: int, i1: int) -> float:
+        if y[i1] == y[i0]:
+            return float(x[i0])
+        return float(x[i0] + (half - y[i0]) * (x[i1] - x[i0]) / (y[i1] - y[i0]))
+
+    return crossing(right - 1, right) - crossing(left, left + 1)
+
+
 def spectrum_metrics(result: ModeResult, reference: ModeResult | None = None) -> dict[str, Any]:
     wavelength = result.spectrum.wavelength_nm
     magnitude = result.magnitude
@@ -193,15 +252,26 @@ def spectrum_metrics(result: ModeResult, reference: ModeResult | None = None) ->
     peak_index = int(np.argmax(magnitude))
     if reference is None:
         relative = 0.0
+        maximum_relative = 0.0
+        maximum_relative_wavelength = float(wavelength[0])
     else:
         relative = float(
             np.sqrt(np.mean((magnitude - reference.magnitude) ** 2))
             / max(float(np.max(reference.magnitude)), 1e-300)
         )
+        denominator = np.maximum(reference.magnitude, 1e-6 * float(np.max(reference.magnitude)))
+        pointwise = np.abs(magnitude - reference.magnitude) / denominator
+        maximum_index = int(np.argmax(pointwise))
+        maximum_relative = float(pointwise[maximum_index])
+        maximum_relative_wavelength = float(wavelength[maximum_index])
     return {
         "mode": result.mode,
         "chi2_1550_pm_per_V": target,
         "peak_chi2_pm_per_V": float(magnitude[peak_index]),
         "peak_wavelength_nm": float(wavelength[peak_index]),
+        "FWHM_nm": fwhm_nm(wavelength, magnitude),
         "relative_spectrum_RMSE_vs_23D": relative,
+        "max_relative_deviation_vs_23D": maximum_relative,
+        "max_relative_deviation_wavelength_nm": maximum_relative_wavelength,
+        "relative_deviation_denominator_floor": "1e-6 times max(|chi2_23D|)",
     }

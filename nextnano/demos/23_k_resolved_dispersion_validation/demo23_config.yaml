@@ -85,6 +85,16 @@ validation:
   interpolation_node_tolerance_eV: 1.0e-12
   isotropy_absolute_tolerance_meV: 1.0
   convergence_relative_tolerance: 1.0e-3
+  electron_fit_rmse_tolerance_meV: 1.0
+
+paper_comparison:
+  enabled: true
+  digitized_simulation_csv: paper_figure2d_digitized_simulation.csv
+  source: "Ramesh et al. arXiv:2602.23246v1 Figure 2d (eye-digitized; diagnostic only)"
+  simulated_peak_nm: 1520.0
+  measured_peak_nm: 1560.0
+  ideal_abrupt_chi2_1550_pm_per_V: 2340.0
+  claim_policy: "Digitized values are not raw/tabulated author data and are not acceptance gates."
 
 plots:
   enabled: true
