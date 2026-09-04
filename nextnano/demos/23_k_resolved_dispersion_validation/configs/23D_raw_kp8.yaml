@@ -1,0 +1,5 @@
+mode:
+  id: 23D
+  backend: raw_kp8
+  description: PCHIP-interpolated tracked kp8 energies for all four subbands
+

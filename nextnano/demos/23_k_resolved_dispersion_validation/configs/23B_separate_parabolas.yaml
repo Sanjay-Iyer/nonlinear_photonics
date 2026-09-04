@@ -1,0 +1,5 @@
+mode:
+  id: 23B
+  backend: separate_parabolic
+  description: Independent anchored parabolic fits for e1, e2, hh1, and hh2
+

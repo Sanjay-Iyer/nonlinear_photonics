@@ -1,0 +1,65 @@
+================================================================================
+START
+================================================================================
+
+nextnano++ 3.0.0 from 2026-06-16 - LIMITED FREE VERSION (kernel: 2026-06-16a, lib: 2026-06-15)
+
+================================================================================
+COPYRIGHT NOTICE                                                                
+================================================================================
+ANY USE OF THE NEXTNANO++ CODE CONSTITUTES ACCEPTANCE OF THE TERMS OF THE       
+COPYRIGHT NOTICE.                                                               
+                                                                                
+The terms of copyright of the nextnano++ code and of third party source codes   
+and libraries used in the nextnano++ code can be found in the file              
+'documentation/copyright/copyright_notice_nextnano++.pdf' in your               
+installation folder.                                                            
+                                                                                
+In case this file is missing or seems incomplete or corrupted, please contact   
+our support team at https://nextnano.com/goto/support to receive a new copy.    
+================================================================================
+
+
+Checking input files...
+
+Reading environment and checking paths...
+
+================================================================================
+RUNNING..
+================================================================================
+Starting execution as:
+C:\Program Files\nextnano\2026_07_03\nextnano++\bin 32bit\nextnano++_Microsoft_32bit_free.exe --parse -d C:\Program Files\nextnano\2026_07_03\nextnano++\database\database_free.nnp -l C:\Program Files\nextnano\2026_07_03\License\License_free.lic C:\code\nonlinear_photonics\nextnano\demos\23_k_resolved_dispersion_validation\inputs\grid_y_n101_k0100.in 
+
+
+================================================================================
+ PROCESSING INPUT FILE: C:\code\nonlinear_photonics\nextnano\demos\23_k_resolved_dispersion_validation\inputs\grid_y_n101_k0100.in
+================================================================================
+
+Start time: Fri 2026-09-04, 11:07:30 (-0400)
+
+Reading input file (C:\code\nonlinear_photonics\nextnano\demos\23_k_resolved_dispersion_validation\inputs\grid_y_n101_k0100.in)...
+
+
+WARNING: Using database specified in command line.
+
+Reading database file (C:\Program Files\nextnano\2026_07_03\nextnano++\database\database_free.nnp)...
+
+Checking database for errors...
+
+
+Material database initialized.
+
+
+NOTE: This version of nextnano++ does not need a license file. License file ignored.
+      In case you have a paid license, please download the corresponding licensed version of nextnano++.
+
+*** PARSING COMPLETED ********** 
+
+End time: Fri 2026-09-04, 11:07:30 (-0400)
+Total Time: 0.127[s]
+
+================================================================================
+DONE.
+================================================================================
+
+--- STDERR ---

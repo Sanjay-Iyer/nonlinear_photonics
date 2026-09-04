@@ -1,0 +1,5 @@
+mode:
+  id: 23A
+  backend: shared_reduced_mass
+  description: Exact Demo 20/21 shared reduced-mass parabolic baseline
+

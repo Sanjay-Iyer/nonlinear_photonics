@@ -1,0 +1,5 @@
+mode:
+  id: 23C
+  backend: boss_hybrid
+  description: Anchored electron parabolas plus PCHIP-interpolated heavy-hole kp8 energies
+
