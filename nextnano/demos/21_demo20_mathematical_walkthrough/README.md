@@ -199,12 +199,16 @@ the production `BandStates`, reports ∫|ψ|² dz before and after and both
 orthonormality errors, recomputes O / z^e / z^hh, and asserts all twelve
 elements against the recorded `matrix_elements.json`.
 
+On the licensed Case 04 run this reproduces all twelve elements to
+**0.000e+00** over 281 grid points spanning 7.114 – 22.886 nm — see §11 of the
+walkthrough for the verbatim output.
+
 That `case_04/optical/parsed/` subtree only exists where a licensed
-`--physics` run wrote it. When it is absent STEP 08 says so and falls back to
-Demo 11's `s1_ref` — **a different structure**, labelled as a fallback and used
-nowhere else — so the mechanism can still be watched on genuine licensed
-wavefunctions. χ⁽²⁾ is byte-identical either way: §12 and §13 take O, z^e and
-z^hh from the results table, not from STEP 08.
+`--physics` run wrote it and it was carried across. When it is absent STEP 08
+says so and falls back to Demo 11's `s1_ref` — **a different structure**,
+labelled as a fallback and used nowhere else — so the mechanism can still be
+watched on genuine licensed wavefunctions. χ⁽²⁾ is byte-identical either way:
+§12 and §13 take O, z^e and z^hh from the results table, not from STEP 08.
 
 ---
 

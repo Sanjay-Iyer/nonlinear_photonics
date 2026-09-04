@@ -22,133 +22,141 @@
   "kspace_convention_scaled": "bare_d2k",
   "prefactor_pm_per_V": 56.69816882497043,
   "envelope_demonstration": {
-    "source": "Demo 11 s1_ref (fallback, different structure)",
-    "envelopes_csv": "C:\\code\\nonlinear_photonics\\nextnano\\results\\demo_runs\\11_paper_validation_interband_chi2_acqw\\20260731T002541Z_62efb35c\\runs\\s1_ref\\extracted\\envelopes.csv",
-    "matrix_elements_json": "C:\\code\\nonlinear_photonics\\nextnano\\results\\demo_runs\\11_paper_validation_interband_chi2_acqw\\20260731T002541Z_62efb35c\\runs\\s1_ref\\extracted\\matrix_elements.json",
-    "is_case04": false,
-    "grid_points": 55,
+    "source": "Demo 20 Case 04 licensed envelopes",
+    "envelopes_csv": "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\data\\case_04\\optical\\parsed\\envelopes.csv",
+    "matrix_elements_json": "C:\\code\\nonlinear_photonics\\demo_results\\demo20\\data\\case_04\\optical\\parsed\\matrix_elements.json",
+    "is_case04": true,
+    "grid_points": 281,
     "columns_present": [
       "z_nm",
       "psi_e1",
       "psi_e2",
+      "psi_e3",
+      "psi_e4",
+      "psi_e5",
+      "psi_e6",
       "psi_hh1",
-      "psi_hh2"
+      "psi_hh2",
+      "psi_hh3",
+      "psi_hh4",
+      "psi_hh5",
+      "psi_hh6"
     ],
     "norm_before": {
       "psi_e1": 1.0000000000000002,
       "psi_e2": 1.0000000000000002,
       "psi_hh1": 1.0000000000000002,
-      "psi_hh2": 0.9999999999999999
+      "psi_hh2": 1.0
     },
     "norm_after": {
       "psi_e1": 1.0000000000000002,
       "psi_e2": 1.0000000000000002,
       "psi_hh1": 1.0000000000000002,
-      "psi_hh2": 1.0000000000000002
+      "psi_hh2": 1.0
     },
     "orthonormality_error": {
-      "electron": 3.917642425330733e-15,
-      "heavy_hole": 1.2553408949552401e-14
+      "electron": 1.9984014443252818e-15,
+      "heavy_hole": 5.967448757360216e-16
     },
     "element_comparisons": [
       {
         "symbol": "O",
         "element": "O[e1,hh1]",
-        "recomputed": 0.9808489136883206,
-        "stored": 0.9808489136883206,
+        "recomputed": 0.9822755287674644,
+        "stored": 0.9822755287674644,
         "absolute_difference": 0.0,
         "allowed": 1e-12
       },
       {
         "symbol": "O",
         "element": "O[e1,hh2]",
-        "recomputed": -0.01753483861592903,
-        "stored": -0.017534838615929048,
-        "absolute_difference": 1.734723475976807e-17,
+        "recomputed": 0.01540332812208936,
+        "stored": 0.01540332812208936,
+        "absolute_difference": 0.0,
         "allowed": 1e-12
       },
       {
         "symbol": "O",
         "element": "O[e2,hh1]",
-        "recomputed": -0.08571658398768506,
-        "stored": -0.08571658398768506,
+        "recomputed": -0.08353004083929513,
+        "stored": -0.08353004083929513,
         "absolute_difference": 0.0,
         "allowed": 1e-12
       },
       {
         "symbol": "O",
         "element": "O[e2,hh2]",
-        "recomputed": -0.4216940569188113,
-        "stored": -0.4216940569188113,
+        "recomputed": 0.3831404861807044,
+        "stored": 0.3831404861807044,
         "absolute_difference": 0.0,
         "allowed": 1e-12
       },
       {
         "symbol": "z_e",
         "element": "z_e[e1,e1]",
-        "recomputed": 12.7135835400687,
-        "stored": 12.7135835400687,
+        "recomputed": 12.72452731946466,
+        "stored": 12.72452731946466,
         "absolute_difference": 0.0,
-        "allowed": 1.2713583540068701e-11
+        "allowed": 1.2724527319464659e-11
       },
       {
         "symbol": "z_e",
         "element": "z_e[e1,e2]",
-        "recomputed": 1.040446171671351,
-        "stored": 1.040446171671351,
+        "recomputed": 1.0251735847808658,
+        "stored": 1.0251735847808658,
         "absolute_difference": 0.0,
-        "allowed": 1.0404461716713508e-12
+        "allowed": 1.0251735847808659e-12
       },
       {
         "symbol": "z_e",
         "element": "z_e[e2,e1]",
-        "recomputed": 1.040446171671351,
-        "stored": 1.040446171671351,
+        "recomputed": 1.0251735847808656,
+        "stored": 1.0251735847808656,
         "absolute_difference": 0.0,
-        "allowed": 1.0404461716713508e-12
+        "allowed": 1.0251735847808657e-12
       },
       {
         "symbol": "z_e",
         "element": "z_e[e2,e2]",
-        "recomputed": 18.807537994063697,
-        "stored": 18.807537994063697,
+        "recomputed": 18.661190322705767,
+        "stored": 18.661190322705767,
         "absolute_difference": 0.0,
-        "allowed": 1.8807537994063698e-11
+        "allowed": 1.8661190322705767e-11
       },
       {
         "symbol": "z_hh",
         "element": "z_hh[hh1,hh1]",
-        "recomputed": 12.653883646536041,
-        "stored": 12.653883646536041,
+        "recomputed": 12.65139233424412,
+        "stored": 12.65139233424412,
         "absolute_difference": 0.0,
-        "allowed": 1.2653883646536041e-11
+        "allowed": 1.265139233424412e-11
       },
       {
         "symbol": "z_hh",
         "element": "z_hh[hh1,hh2]",
-        "recomputed": -1.4492447518369918,
-        "stored": -1.4492447518369915,
-        "absolute_difference": 2.220446049250313e-16,
-        "allowed": 1.4492447518369915e-12
+        "recomputed": 1.4323684065114455,
+        "stored": 1.4323684065114455,
+        "absolute_difference": 0.0,
+        "allowed": 1.4323684065114454e-12
       },
       {
         "symbol": "z_hh",
         "element": "z_hh[hh2,hh1]",
-        "recomputed": -1.4492447518369915,
-        "stored": -1.4492447518369918,
-        "absolute_difference": 2.220446049250313e-16,
-        "allowed": 1.4492447518369917e-12
+        "recomputed": 1.4323684065114457,
+        "stored": 1.4323684065114457,
+        "absolute_difference": 0.0,
+        "allowed": 1.4323684065114456e-12
       },
       {
         "symbol": "z_hh",
         "element": "z_hh[hh2,hh2]",
-        "recomputed": 12.867574136817556,
-        "stored": 12.867574136817552,
-        "absolute_difference": 3.552713678800501e-15,
-        "allowed": 1.2867574136817552e-11
+        "recomputed": 12.73014553601777,
+        "stored": 12.73014553601777,
+        "absolute_difference": 0.0,
+        "allowed": 1.2730145536017771e-11
       }
     ],
-    "max_absolute_difference": 3.552713678800501e-15
+    "max_absolute_difference": 0.0
   },
   "states_provenance": "master_table:demo19_master_results.csv",
   "solver_pass": true,

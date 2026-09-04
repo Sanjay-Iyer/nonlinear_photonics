@@ -1,0 +1,13 @@
+name,real,imag,magnitude,sign_real,current_code_usage
+"O[e1,h1]",0.9822755287674644,0.0,0.9822755287674644,1,signed numerator; no magnitude or square
+"O[e1,h2]",0.01540332812208936,0.0,0.01540332812208936,1,signed numerator; no magnitude or square
+"O[e2,h1]",-0.08353004083929513,0.0,0.08353004083929513,-1,signed numerator; no magnitude or square
+"O[e2,h2]",0.3831404861807044,0.0,0.3831404861807044,1,signed numerator; no magnitude or square
+"z_e[e1,e1]",12.72452731946466,0.0,12.72452731946466,1,signed numerator; no magnitude or square
+"z_e[e1,e2]",1.0251735847808658,0.0,1.0251735847808658,1,signed numerator; no magnitude or square
+"z_e[e2,e1]",1.0251735847808656,0.0,1.0251735847808656,1,signed numerator; no magnitude or square
+"z_e[e2,e2]",18.661190322705767,0.0,18.661190322705767,1,signed numerator; no magnitude or square
+"z_h[h1,h1]",12.65139233424412,0.0,12.65139233424412,1,signed numerator; no magnitude or square
+"z_h[h1,h2]",1.4323684065114455,0.0,1.4323684065114455,1,signed numerator; no magnitude or square
+"z_h[h2,h1]",1.4323684065114457,0.0,1.4323684065114457,1,signed numerator; no magnitude or square
+"z_h[h2,h2]",12.73014553601777,0.0,12.73014553601777,1,signed numerator; no magnitude or square

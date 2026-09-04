@@ -1,0 +1,7 @@
+kmax_per_nm,nk,dk_per_nm,node1_nm,node1_depth,node2_nm,node2_depth,peak_nm,peak_norm,rmse,scope
+0.2,51,0.004,550.0,0.004843788250892497,1200.0,0.031664880019706396,1497.0,1.0,0.26967487794752143,within the hybrid polynomial's implemented 0-1.2 nm^-1 domain; fit provenance/accuracy not independently validated
+0.4,101,0.004,550.0,0.0144810549787466,1200.0,0.09140076567018077,1501.0,1.0,0.26262739909151633,within the hybrid polynomial's implemented 0-1.2 nm^-1 domain; fit provenance/accuracy not independently validated
+0.556,140,0.004,550.0,0.027003190205747155,1200.0,0.16591597372487754,1357.0,1.0,0.284014670512284,within the hybrid polynomial's implemented 0-1.2 nm^-1 domain; fit provenance/accuracy not independently validated
+0.8,201,0.004,550.0,0.06516166343328414,1200.0,0.4532062247827227,1236.0,1.0,0.2859744997170538,within the hybrid polynomial's implemented 0-1.2 nm^-1 domain; fit provenance/accuracy not independently validated
+1.0,251,0.004,550.0,0.1649636115708414,1312.0,0.5616659769906939,1136.0,1.0,0.25194423130525206,within the hybrid polynomial's implemented 0-1.2 nm^-1 domain; fit provenance/accuracy not independently validated
+1.2,301,0.004,584.0,0.2545556480822405,1268.0,0.5028011461382781,1045.0,1.0,0.20376190135091635,within the hybrid polynomial's implemented 0-1.2 nm^-1 domain; fit provenance/accuracy not independently validated

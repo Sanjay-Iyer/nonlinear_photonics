@@ -1,0 +1,4 @@
+check,value,expected,tolerance,pass_fail,notes
+Professional executable/database/licence,unavailable,complete Professional installation,exact,BLOCKED,"missing configured Professional file(s): executable, database, license"
+actual kp8 solver execution,not run,normal completion,exact,BLOCKED,free --parse is syntax-only
+real finite-k output,absent,"explicit k vectors, energies, spinors",required,BLOCKED,no substitute was generated

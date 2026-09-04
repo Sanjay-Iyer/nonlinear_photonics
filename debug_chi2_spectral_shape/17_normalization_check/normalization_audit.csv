@@ -1,0 +1,8 @@
+variant,multiplicative_factor,chi2_1550_magnitude_pm_per_V,max_normalized_shape_difference,changes
+Eq2 baseline,1.0,38.292585198868125,0.0,amplitude only
+omit 1/6,6.0,229.75551119320878,2.220446049250313e-16,amplitude only
+spin 1,0.5,19.146292599434062,0.0,amplitude only
+bare d2k,39.47841760435743,1511.7306696313526,2.220446049250313e-16,amplitude only
+well density,2.0,76.58517039773625,0.0,amplitude only
+hybrid as-written,37.69911184307752,1443.5964521727044,2.220446049250313e-16,amplitude only
+nm-to-m k error,1e+18,3.829258519886813e+19,3.3306690738754696e-16,amplitude only

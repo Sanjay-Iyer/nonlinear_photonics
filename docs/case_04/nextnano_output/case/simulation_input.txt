@@ -1,0 +1,186 @@
+global{
+    temperature = 300
+    simulate1D{
+    }
+    substrate{
+        name = "GaAs"
+    }
+    crystal_zb{
+        x_hkl = [ 1, 0, 0 ]
+        y_hkl = [ 0, 1, 0 ]
+    }
+}
+
+contacts{
+    fermi{
+        name = "qw_contact"
+        bias = [ 0 ]
+    }
+}
+
+grid{
+    xgrid{
+        line{
+            pos = 0
+            spacing = 0.5
+        }
+        line{
+            pos = 9.1
+            spacing = 0.05
+        }
+        line{
+            pos = 20.9
+            spacing = 0.05
+        }
+        line{
+            pos = 30
+            spacing = 0.5
+        }
+    }
+}
+
+structure{
+    output_region_index{
+        boxes = "no"
+    }
+    output_material_index{
+        boxes = "no"
+    }
+    output_alloy_composition{
+        boxes = "no"
+    }
+    region{
+        everywhere{
+        }
+        ternary_constant{
+            name = "Al(x)Ga(1-x)As"
+            alloy_x = 0.55
+        }
+    }
+    region{
+        line{
+            x = [ 0, 30 ]
+        }
+        contact{
+            name = "qw_contact"
+        }
+    }
+    region{
+        line{
+            x = [ 9.1, 16.2 ]
+        }
+        binary{
+            name = "GaAs"
+        }
+    }
+    region{
+        line{
+            x = [ 18, 20.9 ]
+        }
+        binary{
+            name = "GaAs"
+        }
+    }
+    region{
+        line{
+            x = [ 8.6, 9.6 ]
+        }
+        ternary_linear{
+            name = "Al(x)Ga(1-x)As"
+            alloy_x = [ 0.55, 0 ]
+            x = [ 8.6, 9.6 ]
+        }
+    }
+    region{
+        line{
+            x = [ 15.7, 16.7 ]
+        }
+        ternary_linear{
+            name = "Al(x)Ga(1-x)As"
+            alloy_x = [ 0, 0.55 ]
+            x = [ 15.7, 16.7 ]
+        }
+    }
+    region{
+        line{
+            x = [ 17.5, 18.5 ]
+        }
+        ternary_linear{
+            name = "Al(x)Ga(1-x)As"
+            alloy_x = [ 0.55, 0 ]
+            x = [ 17.5, 18.5 ]
+        }
+    }
+    region{
+        line{
+            x = [ 20.4, 21.4 ]
+        }
+        ternary_linear{
+            name = "Al(x)Ga(1-x)As"
+            alloy_x = [ 0, 0.55 ]
+            x = [ 20.4, 21.4 ]
+        }
+    }
+}
+
+classical{
+    Gamma{
+    }
+    HH{
+    }
+    LH{
+    }
+    SO{
+    }
+    output_bandedges{
+        averaged = "no"
+    }
+    output_bandgap{
+    }
+}
+
+quantum{
+    region{
+        name = "acqw"
+        x = [ 7.1, 22.9 ]
+        no_density = "yes"
+        boundary{
+            x = "dirichlet"
+        }
+        Gamma{
+            num_ev = 6
+        }
+        HH{
+            num_ev = 6
+        }
+        output_states{
+            max_num = 6
+            envelopes = "yes"
+            probabilities = "yes"
+        }
+        transition_energies{
+            Gamma_HH{
+            }
+        }
+        overlap_integrals{
+            Gamma_HH{
+            }
+        }
+        dipole_moment_matrix_elements{
+            polarization{
+                name = "growth_z"
+                re = [ 1, 0, 0 ]
+            }
+            Gamma{
+            }
+            HH{
+            }
+        }
+    }
+}
+
+run{
+    quantum{
+    }
+}
+

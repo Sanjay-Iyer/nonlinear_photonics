@@ -724,6 +724,87 @@ Those last two columns are the point: integrate the first over z and you get
 descriptions of how case 04's matrix elements were produced — they are a
 *re-run* of it, landing on the numbers the licensed run recorded.
 
+### The actual case 04 result
+
+Output of STEP 08 on the licensed parsed run, verbatim:
+
+```text
+Source: Demo 20 Case 04 licensed envelopes
+    demo_results/demo20/data/case_04/optical/parsed/envelopes.csv
+    demo_results/demo20/data/case_04/optical/parsed/matrix_elements.json
+
+Envelope table : 281 grid points, z from 7.114232 to 22.885768 nm
+Columns present: 13  (z_nm, psi_e1, psi_e2, psi_e3, psi_e4, ...)
+Columns used   : z_nm, psi_e1, psi_e2, psi_hh1, psi_hh2
+
+RAW ARRAYS AS STORED
+    psi_e1   shape (281,)  max|psi| = 0.451556015 nm^-1/2
+             first 4 : [0.        0.00726   0.014321  0.021322]
+    psi_e2   shape (281,)  max|psi| = 0.559368437 nm^-1/2
+             first 4 : [0.       -0.004764 -0.009365 -0.013866]
+    psi_hh1  shape (281,)  max|psi| = 0.502783255 nm^-1/2
+             first 4 : [0.        0.001232  0.00249   0.003845]
+    psi_hh2  shape (281,)  max|psi| = 0.495489498 nm^-1/2
+             first 4 : [0.       -0.002993 -0.006021 -0.009233]
+
+NORMALIZATION   int |psi|^2 dz   (trapezoid, z in nm)
+    state                    before                  after
+    psi_e1      1.00000000000000022    1.00000000000000022
+    psi_e2      1.00000000000000022    1.00000000000000022
+    psi_hh1     1.00000000000000022    1.00000000000000022
+    psi_hh2     1.00000000000000000    1.00000000000000000
+
+ORTHONORMALITY   max |<psi_i|psi_j> - delta_ij|
+    electron band   : 1.998e-15
+    heavy-hole band : 5.967e-16
+
+RECOMPUTED vs STORED matrix_elements.json   (all 12 elements)
+    element                      recomputed                   stored      |diff|
+    O[e1,hh1]           0.98227552876746438      0.98227552876746438   0.000e+00
+    O[e1,hh2]           0.01540332812208936      0.01540332812208936   0.000e+00
+    O[e2,hh1]         -0.083530040839295133    -0.083530040839295133   0.000e+00
+    O[e2,hh2]            0.3831404861807044       0.3831404861807044   0.000e+00
+    z_e[e1,e1]           12.724527319464659       12.724527319464659   0.000e+00
+    z_e[e1,e2]           1.0251735847808658       1.0251735847808658   0.000e+00
+    z_e[e2,e1]           1.0251735847808656       1.0251735847808656   0.000e+00
+    z_e[e2,e2]           18.661190322705767       18.661190322705767   0.000e+00
+    z_hh[hh1,hh1]         12.65139233424412        12.65139233424412   0.000e+00
+    z_hh[hh1,hh2]        1.4323684065114455       1.4323684065114455   0.000e+00
+    z_hh[hh2,hh1]        1.4323684065114457       1.4323684065114457   0.000e+00
+    z_hh[hh2,hh2]        12.730145536017771       12.730145536017771   0.000e+00
+
+    worst element : O[e1,hh1]  |diff| = 0.000e+00  (allowed 1.000e-12)
+    ALL 12 ELEMENTS AGREE TO NUMERICAL PRECISION.
+```
+
+Read that table against §12 and §13: the twelve `recomputed` values **are** the
+O, z^e and z^hh those sections tabulate, and the same twelve the master table
+carries into the susceptibility. The chain is continuous with no re-derivation
+and no substitution anywhere:
+
+```text
+1.0 nm grading → x_Al(z) → nextnano++ Case 04 solve
+    → psi_e1, psi_e2, psi_hh1, psi_hh2   (281 points, 7.114 – 22.886 nm)
+    → normalization + orthonormality
+    → O_nm, z^e, z^hh
+    → transition energies → chi^(2)(1550 nm) = 18.047520507860781 pm/V
+```
+
+Two details worth noticing in that output.
+
+**The grid is not uniform.** Spacing runs from 0.050000 nm inside the active
+region to 0.146747 nm outside it. That is exactly why every integral uses
+`np.trapezoid(f, z)` with the real `z` array rather than a constant `dz` — a
+uniform-spacing shortcut would be wrong here by a visible amount.
+
+**The differences are identically zero, not merely small.** All twelve elements
+reproduce bit-for-bit. That is the expected result and it is a meaningful check
+rather than a tautology: `matrix_elements.json` was written by the licensed run
+on the work laptop, `envelopes.csv` is the basis it used, and this machine
+re-derived one from the other months later through the same shared functions. A
+change to the quadrature rule, the normalization convention, or the column
+mapping would move these numbers off zero immediately.
+
 > **Reading the "before" column.** `envelopes.csv` is written from the
 > already-normalized `BandStates` (`demo11.py:791-801`), so ∫|ψ|² dz is already
 > 1 to ~1e-16 before STEP 08 touches it, and re-normalizing is idempotent. That
@@ -731,16 +812,14 @@ descriptions of how case 04's matrix elements were produced — they are a
 > basis the recorded matrix elements were built from, rather than an
 > unnormalized dump.
 
-> **If the parsed run is not in your checkout.** `demo_results/demo20/data/`
-> carries the per-case spectra by default; the `case_04/optical/parsed/` subtree
-> only exists where a licensed `--physics` run wrote it. When it is absent STEP
-> 08 says so explicitly, then falls back to the one other real licensed envelope
-> table in the repository — Demo 11's `s1_ref`, **a different structure**,
-> clearly labelled as a fallback and used nowhere else — so the mechanism can
-> still be watched working on genuine wavefunctions. Nothing downstream is
-> affected either way: §12 and §13 take O, z^e and z^hh from the results table,
-> and the χ⁽²⁾ of §23 is identical in both cases. The trace never invents an
-> envelope.
+> **On a checkout without the parsed run.** The `case_04/optical/parsed/`
+> subtree only exists where a licensed `--physics` run wrote it and it was
+> carried across. When it is absent STEP 08 says so explicitly, then falls back
+> to the one other real licensed envelope table in the repository — Demo 11's
+> `s1_ref`, **a different structure**, clearly labelled as a fallback and used
+> nowhere else. Nothing downstream is affected either way: §12 and §13 take O,
+> z^e and z^hh from the results table, and the χ⁽²⁾ of §23 is identical in both
+> cases. The trace never invents an envelope.
 
 ---
 
@@ -788,8 +867,8 @@ pushed into the thin well while hh2 has not.
 **These four numbers are re-derived, not just quoted.** STEP 08 loads case 04's
 own `psi_e1, psi_e2, psi_hh1, psi_hh2`, normalizes them, runs
 `_shared/chi2.overlap_matrix` on them and checks all four entries against the
-`matrix_elements.json` the licensed run recorded — asserting agreement to
-`1e-12 · max(1, |stored|)`. The integrand of $O_{11}$ is column
+`matrix_elements.json` the licensed run recorded. All four agree to
+**0.000e+00** — see the table in §11. The integrand of $O_{11}$ is column
 `psi_e1_times_psi_hh1` of `trace_linear_1nm/06_case04_envelopes.csv`; integrate
 it over `z_nm` by the trapezoidal rule above and you land on 0.9822755…
 
@@ -837,7 +916,8 @@ $z^{hh}$ (nm):
 
 **Re-derived in STEP 08 as well.** Both matrices come back out of case 04's
 own envelopes through `_shared/chi2.position_matrix`, and all eight entries are
-compared element by element against the recorded `matrix_elements.json`. The
+compared element by element against the recorded `matrix_elements.json`; every
+one agrees to **0.000e+00** (§11). The
 integrand of $z^{e}_{11}$ is column `psi_e1_z_psi_e1` of
 `trace_linear_1nm/06_case04_envelopes.csv`; its trapezoidal integral is the
 12.7245… nm below.

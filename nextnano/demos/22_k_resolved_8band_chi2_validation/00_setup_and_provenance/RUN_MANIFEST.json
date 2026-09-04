@@ -1,0 +1,225 @@
+{
+  "configuration": {
+    "chi2": {
+      "broadening_meV": 5.0,
+      "broadening_sweep_meV": [
+        1.0,
+        2.0,
+        5.0,
+        10.0,
+        20.0
+      ],
+      "max_states_per_band": 2,
+      "n_periods_per_metre": 33333333.333333332,
+      "r_e_hh_nm": 0.751,
+      "spin_degeneracy": 2,
+      "wavelength_max_nm": 1850.0,
+      "wavelength_min_nm": 400.0,
+      "wavelength_step_nm": 1.0
+    },
+    "demo": {
+      "id": 22,
+      "name": "k_resolved_8band_chi2_validation",
+      "title": "k-Resolved 8-Band k.p Validation of the chi2 Spectrum"
+    },
+    "geometry": {
+      "period_barrier_nm": 18.2,
+      "primary_interface_model": "abrupt",
+      "quantum_region_padding_nm": 2.0,
+      "secondary_grade_width_nm": 1.0,
+      "secondary_interface_model": "linear_1nm",
+      "thick_well_nm": 7.1,
+      "thin_well_nm": 2.9,
+      "total_period_nm": 30.0,
+      "tunnel_barrier_nm": 1.8
+    },
+    "kp8": {
+      "all_k_state_output": true,
+      "classification": "classify_by_energy",
+      "dispersion_kmax_per_nm": 1.2,
+      "dispersion_points": 301,
+      "integration_convergence_points": [
+        48,
+        72,
+        96
+      ],
+      "integration_points": 96,
+      "integration_relative_size": 0.1,
+      "integration_symmetry": "none",
+      "number_of_electron_states": 6,
+      "number_of_hole_states": 8,
+      "output_state_count": 14
+    },
+    "materials": {
+      "barrier_al_fraction": 0.55,
+      "growth_direction": "[1, 0, 0]",
+      "inplane_k_direction": "[0, 1, 0]",
+      "substrate": "GaAs",
+      "temperature_K": 300.0,
+      "well_al_fraction": 0.0
+    },
+    "mesh": {
+      "active_spacing_nm": 0.05,
+      "outer_spacing_nm": 0.5
+    },
+    "paper": {
+      "digitization_source": "docs/demo21/compare_demo21_hybrid_spectra.py",
+      "dominant_peak_nm": 1520.0,
+      "node1_nm": 605.0,
+      "node2_nm": 1330.0,
+      "published_observable_label": "|chi(2)|"
+    },
+    "paths": {
+      "raw_subdir": "raw",
+      "results_root": "demo_results/demo22"
+    },
+    "solver": {
+      "run_secondary_control": true,
+      "threads": 1,
+      "timeout_seconds_per_deck": 14400
+    },
+    "state_tracking": {
+      "energy_tie_break_weight": 0.05,
+      "minimum_assignment_margin": 0.15,
+      "minimum_overlap_score": 0.6,
+      "spinor_character_threshold": 0.6
+    },
+    "validation": {
+      "completion_markers": [
+        "simulation completed",
+        "calculation successfully completed"
+      ],
+      "energy_finite_required": true,
+      "fatal_markers": [
+        "terminating program",
+        "fatal error",
+        "license expired",
+        "failed to converge"
+      ],
+      "k0_energy_tolerance_meV": 20.0,
+      "maximum_boundary_probability": 0.001,
+      "normalization_tolerance": 0.001
+    }
+  },
+  "created_utc": "2026-09-04T01:21:42.999259+00:00",
+  "decks": [
+    {
+      "path": "00_setup_and_provenance\\inputs\\abrupt_integration.in",
+      "sha256": "57915f8888bab33c89c5004e13c582786d44484673216ebd7b34e6d4b1df1d82"
+    },
+    {
+      "path": "00_setup_and_provenance\\inputs\\abrupt_dispersion.in",
+      "sha256": "97bedf4e7eaa100b70f1d1aa221e25a7891d1bb684a408065acfb345674c56ce"
+    },
+    {
+      "path": "00_setup_and_provenance\\inputs\\linear_1nm_integration.in",
+      "sha256": "b9898880299136d331ae057b38a2af3017fa1a9f9101f20f89e8a383812de279"
+    },
+    {
+      "path": "00_setup_and_provenance\\inputs\\linear_1nm_dispersion.in",
+      "sha256": "b3514ba3c07eb755fc5a1c4dfe0582d67688d94cd5fc225aa433d384769288d7"
+    },
+    {
+      "path": "00_setup_and_provenance\\inputs\\abrupt_integration_k048.in",
+      "sha256": "7e8bb944339632025a78ff670206994dbc323592bd77428f81372aa45c6d79b9"
+    },
+    {
+      "path": "00_setup_and_provenance\\inputs\\abrupt_integration_k072.in",
+      "sha256": "339221dccb7c559b56d26d6f1d570d866b91c3707341a3d6dbf5d303bfe4f43c"
+    }
+  ],
+  "demo": {
+    "id": 22,
+    "name": "k_resolved_8band_chi2_validation",
+    "title": "k-Resolved 8-Band k.p Validation of the chi2 Spectrum"
+  },
+  "git_commit": "47527996e0c6355718a727d823503121810ef034",
+  "git_dirty": true,
+  "host": "ScienceThing",
+  "installed_free_syntax_parser": {
+    "database": "C:\\Program Files\\nextnano\\2026_07_03\\nextnano++\\database\\database_free.nnp",
+    "executable": "C:\\Program Files\\nextnano\\2026_07_03\\nextnano++\\bin 32bit\\nextnano++_Microsoft_32bit_free.exe"
+  },
+  "platform": "Windows-10-10.0.26200-SP0",
+  "professional_probe": {
+    "available": false,
+    "configured_files": {
+      "database": {
+        "exists": false,
+        "name": null
+      },
+      "executable": {
+        "exists": false,
+        "name": null
+      },
+      "license": {
+        "exists": false,
+        "name": null
+      }
+    },
+    "discovery_notes": [],
+    "edition": "unavailable",
+    "machine_config": "C:\\code\\nonlinear_photonics\\nextnano\\config\\machines\\nextnano_machine.local.yaml",
+    "reason": "missing configured Professional file(s): executable, database, license",
+    "results_root": "C:\\nn_results",
+    "run_solver": false
+  },
+  "python": "3.11.15 | packaged by conda-forge | (main, Mar  5 2026, 16:36:00) [MSC v.1944 64 bit (AMD64)]",
+  "repository_root": "C:\\code\\nonlinear_photonics",
+  "scientific_assertions": {
+    "primary_geometry": "30 nm ideal-abrupt paper model",
+    "published_observable": "|chi(2)|",
+    "secondary_control": "same 30 nm design with four 1 nm linear interfaces (Demo 21 Case 04)",
+    "synthetic_fallback_allowed": false
+  },
+  "syntax_validation": [
+    {
+      "deck": "abrupt_integration.in",
+      "log": "00_setup_and_provenance\\syntax_logs\\abrupt_integration.txt",
+      "notes": "No physics was executed.",
+      "parser_edition": "LIMITED FREE; syntax only",
+      "return_code": 0,
+      "status": "PASS"
+    },
+    {
+      "deck": "abrupt_dispersion.in",
+      "log": "00_setup_and_provenance\\syntax_logs\\abrupt_dispersion.txt",
+      "notes": "No physics was executed.",
+      "parser_edition": "LIMITED FREE; syntax only",
+      "return_code": 0,
+      "status": "PASS"
+    },
+    {
+      "deck": "linear_1nm_integration.in",
+      "log": "00_setup_and_provenance\\syntax_logs\\linear_1nm_integration.txt",
+      "notes": "No physics was executed.",
+      "parser_edition": "LIMITED FREE; syntax only",
+      "return_code": 0,
+      "status": "PASS"
+    },
+    {
+      "deck": "linear_1nm_dispersion.in",
+      "log": "00_setup_and_provenance\\syntax_logs\\linear_1nm_dispersion.txt",
+      "notes": "No physics was executed.",
+      "parser_edition": "LIMITED FREE; syntax only",
+      "return_code": 0,
+      "status": "PASS"
+    },
+    {
+      "deck": "abrupt_integration_k048.in",
+      "log": "00_setup_and_provenance\\syntax_logs\\abrupt_integration_k048.txt",
+      "notes": "No physics was executed.",
+      "parser_edition": "LIMITED FREE; syntax only",
+      "return_code": 0,
+      "status": "PASS"
+    },
+    {
+      "deck": "abrupt_integration_k072.in",
+      "log": "00_setup_and_provenance\\syntax_logs\\abrupt_integration_k072.txt",
+      "notes": "No physics was executed.",
+      "parser_edition": "LIMITED FREE; syntax only",
+      "return_code": 0,
+      "status": "PASS"
+    }
+  ]
+}

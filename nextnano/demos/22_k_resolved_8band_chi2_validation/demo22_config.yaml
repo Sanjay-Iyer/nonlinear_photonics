@@ -1,0 +1,82 @@
+demo:
+  id: 22
+  name: k_resolved_8band_chi2_validation
+  title: k-Resolved 8-Band k.p Validation of the chi2 Spectrum
+
+geometry:
+  thick_well_nm: 7.1
+  tunnel_barrier_nm: 1.8
+  thin_well_nm: 2.9
+  period_barrier_nm: 18.2
+  total_period_nm: 30.0
+  primary_interface_model: abrupt
+  secondary_interface_model: linear_1nm
+  secondary_grade_width_nm: 1.0
+  quantum_region_padding_nm: 2.0
+
+materials:
+  barrier_al_fraction: 0.55
+  well_al_fraction: 0.0
+  temperature_K: 300.0
+  substrate: GaAs
+  growth_direction: "[1, 0, 0]"
+  inplane_k_direction: "[0, 1, 0]"
+
+mesh:
+  active_spacing_nm: 0.05
+  outer_spacing_nm: 0.5
+
+kp8:
+  number_of_electron_states: 6
+  number_of_hole_states: 8
+  output_state_count: 14
+  # nextnano++ 3.0.0 grammar restricts k_integration num_points to 2..100.
+  integration_points: 96
+  integration_relative_size: 0.10
+  integration_symmetry: none
+  integration_convergence_points: [48, 72, 96]
+  dispersion_kmax_per_nm: 1.2
+  dispersion_points: 301
+  classification: classify_by_energy
+  all_k_state_output: true
+
+solver:
+  threads: 1
+  timeout_seconds_per_deck: 14400
+  run_secondary_control: true
+
+state_tracking:
+  minimum_overlap_score: 0.60
+  minimum_assignment_margin: 0.15
+  energy_tie_break_weight: 0.05
+  spinor_character_threshold: 0.60
+
+chi2:
+  wavelength_min_nm: 400.0
+  wavelength_max_nm: 1850.0
+  wavelength_step_nm: 1.0
+  broadening_meV: 5.0
+  broadening_sweep_meV: [1.0, 2.0, 5.0, 10.0, 20.0]
+  r_e_hh_nm: 0.751
+  n_periods_per_metre: 33333333.333333332
+  spin_degeneracy: 2
+  max_states_per_band: 2
+
+paper:
+  node1_nm: 605.0
+  node2_nm: 1330.0
+  dominant_peak_nm: 1520.0
+  digitization_source: docs/demo21/compare_demo21_hybrid_spectra.py
+  published_observable_label: "|chi(2)|"
+
+validation:
+  energy_finite_required: true
+  maximum_boundary_probability: 0.001
+  normalization_tolerance: 0.001
+  k0_energy_tolerance_meV: 20.0
+  completion_markers: ["simulation completed", "calculation successfully completed"]
+  fatal_markers: ["terminating program", "fatal error", "license expired", "failed to converge"]
+
+paths:
+  results_root: demo_results/demo22
+  raw_subdir: raw

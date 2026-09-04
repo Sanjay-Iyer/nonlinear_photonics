@@ -1,0 +1,193 @@
+================================================================================
+START
+================================================================================
+
+nextnano++ 3.0.0 from 2026-06-16 (kernel: 2026-06-16a, lib: 2026-06-15)
+
+================================================================================
+COPYRIGHT NOTICE                                                                
+================================================================================
+ANY USE OF THE NEXTNANO++ CODE CONSTITUTES ACCEPTANCE OF THE TERMS OF THE       
+COPYRIGHT NOTICE.                                                               
+                                                                                
+The terms of copyright of the nextnano++ code and of third party source codes   
+and libraries used in the nextnano++ code can be found in the file              
+'documentation/copyright/copyright_notice_nextnano++.pdf' in your               
+installation folder.                                                            
+                                                                                
+In case this file is missing or seems incomplete or corrupted, please contact   
+our support team at https://nextnano.com/goto/support to receive a new copy.    
+================================================================================
+
+
+Checking input files...
+
+Reading environment and checking paths...
+
+================================================================================
+RUNNING..
+================================================================================
+Starting execution as:
+C:\Code\optics\nextnano\2026_07_03\nextnano++\bin\nextnano++_Intel_64bit.exe -d C:\Code\optics\nextnano\2026_07_03\nextnano++\database\database.nnp -l C:\Code\optics\nextnano\2026_07_03\License\License_nnp.lic --threads 1 -o C:\Code\optics\nextnano\nonlinear_photonics\demo_results\demo20\data\case_04\nextnano_output C:\Code\optics\nextnano\nonlinear_photonics\demo_results\demo20\data\case_04\nextnano_input\case.in 
+
+
+================================================================================
+ PROCESSING INPUT FILE: C:\Code\optics\nextnano\nonlinear_photonics\demo_results\demo20\data\case_04\nextnano_input\case.in
+================================================================================
+
+Start time: Thu 2026-08-20, 09:56:57 (-0400)
+
+Simulation process uses 1 of 16 available OpenMP threads (specified via command line).
+
+BLAS and LAPACK libraries use 1 of 12 available threads (specified via command line).
+
+Reading input file (C:\Code\optics\nextnano\nonlinear_photonics\demo_results\demo20\data\case_04\nextnano_input\case.in)...
+
+
+WARNING: Using database specified in command line.
+
+Reading database file (C:\Code\optics\nextnano\2026_07_03\nextnano++\database\database.nnp)...
+
+Checking database for errors...
+
+
+Material database initialized.
+
+Checking license:
+	 Valid from  2026-7-21  to  2027-7-20
+	 Licensed to: Sanjay Iyer, AFRL, sanjay.iyer.ctr@afrl.af.mil
+	 License key: ekaterina.poutrina.1.ctr@afrl.af.mil-2027-07-20-us-0397-01-9qyz, Computer name: RXDN5018731W
+
+********* SETUP SIMULATION *****************************************************
+
+NOTE: Using output directory specified from command line (nextnanomat), 
+
+
+WARNING: Appending output directory with same name as input file to path (see command line options).
+NOTE: Setting output directory to: C:\Code\optics\nextnano\nonlinear_photonics\demo_results\demo20\data\case_04\nextnano_output\case\
+
+********* Simulation Grid *********
+
+Creating grid 1 using:
+    pos = 0     	spacing = 0.5
+    pos = 9.1     	spacing = 0.05
+    pos = 20.9     	spacing = 0.05
+    pos = 30     	spacing = 0.5
+
+Grid dimension: 329 * 1 * 1 
+Number of unique grid points: 329
+Range in 1-direction:   0 , ... , 30
+
+
+********* Rotation Matrix *********
+ 1.0000000,  0.0000000,  0.0000000
+ 0.0000000,  1.0000000,  0.0000000
+ 0.0000000,  0.0000000,  1.0000000
+
+********* Periodicity *************
+  0-direction:  not periodic
+
+
+Start initializing structure.
+Finished initializing structure.
+
+Setting reference vacuum level to 6.3 eV.
+
+NOTE: Electron minimum density is 1 cm^-3.
+NOTE: Hole minimum density is 1 cm^-3.
+
+NOTE: Electron maximum density is 1e+30 cm^-3.
+NOTE: Hole maximum density is 1e+30 cm^-3.
+
+***** Quantum Subgrid (acqw) ******     
+      dimensions: (7.1,22.9) (0,0) (0,0)
+Grid dimension: 281 * 1 * 1 
+Number of unique grid points: 281
+Range in 1-direction:   7.11423177 , ... , 22.8857682
+
+   spin quantization axis: (1,0,0)
+Calculating quantum density of states ... (HH)
+Calculating quantum density of states ... (Gamma)
+
+********* STRUCTURE OUTPUT *****************************************************
+
+Writing (final) region indices...
+Writing last material region indices...
+Writing material indices...
+Writing alloy compositions...
+
+********* START CALCULATION ****************************************************
+
+Determine dirichlet points for contacts...
+   No Dirichlet points for electrostatic potential were found.
+
+
+
+
+========= STARTING CALCULATION FOR BIAS POINT ==================================
+qw_contact  0.000000 V   
+
+Determine electron Fermi level dirichlet values in contacts...
+Determine hole Fermi level dirichlet values in contacts...
+Initialize Fermi levels...
+
+No charge neutrality initialization for contacts needed (no ohmic or charge neutral contact points found).
+Determine potential Dirichlet values in Schottky and ohmic contacts...
+
+Initialize electrostatic potential...
+
+Computing classical densities...
+
+Solving Quantum Mechanics ---- (and calculate densities)
+
+
+Computing quantum densities...
+
+Solving Quantum Mechanics ---- (quantum regions without densities only)
+
+  valence band maximum: 1.45966667
+  conduction band minimum: 2.88214881
+
+ Solving 1 exact 1-band real Schroedinger equation(s):
+    Tridiagonal real symmetric eigenvalue solver:         276         281
+         281
+      
+ Solving 1 exact 1-band real Schroedinger equation(s):
+    Tridiagonal real symmetric eigenvalue solver:           1           6
+         281
+      
+
+Solving Quantum Mechanics ---- determine k-dispersions
+
+   Calculating overlap integrals...
+   Calculating (only) transition energies...
+   Calculating dipole moment matrix elements...
+   Calculating dipole moment matrix elements...
+
+********* OUTPUT ***************************************************************
+
+Writing characteristics data for bias point...
+Writing global characteristics data...
+
+
+Writing band gaps...
+Writing band edges...
+   Writing band 'Gamma'.
+   Writing band 'HH'.
+   Writing band 'LH'.
+   Writing band 'SO'.
+
+
+Writing results from quantum calculations...
+     Writing spectra, states, and quantum densities...
+     Writing matrix elements...
+
+
+********* FINISHED CALCULATION *************************************************
+
+End time: Thu 2026-08-20, 09:56:58 (-0400)
+Total Time: 0.581[s]
+
+================================================================================
+DONE.
+================================================================================

@@ -1,0 +1,15 @@
+file,line,code,matrix_element_sign_risk
+nextnano\demos\20_quantum_well_interface_grading_scaled\s06_chi2.py,429,"""max_absolute_deviation"": float(np.max(np.abs(ratios - expected))),",reviewed_no_loss
+nextnano\demos\20_quantum_well_interface_grading_scaled\s06_chi2.py,433,np.max(np.abs(ratios - expected)) <= 1.0e-9 * expected,reviewed_no_loss
+nextnano\demos\20_quantum_well_interface_grading_scaled\s06_chi2.py,571,return np.abs(self.chi2),no
+nextnano\demos\20_quantum_well_interface_grading_scaled\s06_chi2.py,763,denominator = abs(finest) or 1.0,reviewed_no_loss
+nextnano\demos\20_quantum_well_interface_grading_scaled\s06_chi2.py,764,relative = abs(production - finest) / denominator,reviewed_no_loss
+nextnano\demos\20_quantum_well_interface_grading_scaled\s06_chi2.py,770,"""chi2_abs_by_point_count"": {str(c): abs(v) for c, v in values.items()},",no
+docs\demo21\compare_demo21_hybrid_spectra.py,112,HBAR_J_S**2 * (k * 1.0e9) ** 2,no
+docs\demo21\compare_demo21_hybrid_spectra.py,128,e1 = electron[0] + 54.492 * k_angstrom**2 - 851.1 * k_angstrom**4,no
+docs\demo21\compare_demo21_hybrid_spectra.py,129,e2 = electron[1] + 50.864 * k_angstrom**2 - 732.61 * k_angstrom**4,no
+docs\demo21\compare_demo21_hybrid_spectra.py,132,- 6.9771 * k_angstrom**2,no
+docs\demo21\compare_demo21_hybrid_spectra.py,136,h2 = hole[1] - 10.165 * k_angstrom**2,no
+docs\demo21\compare_demo21_hybrid_spectra.py,141,"transitions[n, m] = np.abs(bands[n] - bands[2 + m])",reviewed_no_loss
+docs\demo21\compare_demo21_hybrid_spectra.py,299,demo_raw = np.abs(,reviewed_no_loss
+docs\demo21\compare_demo21_hybrid_spectra.py,304,hybrid_eq2 = np.abs(,reviewed_no_loss

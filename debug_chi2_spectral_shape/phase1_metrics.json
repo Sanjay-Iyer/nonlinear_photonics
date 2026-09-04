@@ -1,0 +1,84 @@
+{
+  "paper_node1": [
+    605.0,
+    0.0
+  ],
+  "paper_node2": [
+    1330.0,
+    0.0
+  ],
+  "demo21": {
+    "node1": [
+      550.0,
+      0.04508341942636751
+    ],
+    "node2": [
+      1200.0,
+      0.2797005782086151
+    ],
+    "dominant_peak": [
+      1502.0,
+      1.0
+    ],
+    "shape_rmse_magnitude": 0.29124138370204866,
+    "shape_rmse_abs_real": 0.21264121679653442,
+    "real_node1": [
+      550.0,
+      0.04895528038092776
+    ],
+    "real_node2": [
+      1395.0,
+      0.001902826653598092
+    ],
+    "real_crossings_node1": [],
+    "real_crossings_node2": [
+      1394.5722663253964
+    ],
+    "imag_at_first_real_crossing_node1_pm_per_V": null,
+    "magnitude_norm_at_first_real_crossing_node1": null,
+    "imag_at_first_real_crossing_node2_pm_per_V": -30.492303923645053,
+    "magnitude_norm_at_first_real_crossing_node2": 0.6760056855533092,
+    "phase_jump_node1_deg": 6.653823735528661,
+    "phase_jump_node2_deg": 3.325134929895853,
+    "phase_span_node1_deg": 50.401402127646335,
+    "phase_span_node2_deg": 91.03378802893668
+  },
+  "hybrid": {
+    "node1": [
+      584.0,
+      0.2544988747894631
+    ],
+    "node2": [
+      1269.0,
+      0.5028424275458602
+    ],
+    "dominant_peak": [
+      1045.0,
+      1.0
+    ],
+    "shape_rmse_magnitude": 0.20377168523644773,
+    "shape_rmse_abs_real": 0.11260388788835303,
+    "real_node1": [
+      577.0,
+      0.0007626925786660301
+    ],
+    "real_node2": [
+      1268.0,
+      0.00013543669965387928
+    ],
+    "real_crossings_node1": [
+      577.3706954250227
+    ],
+    "real_crossings_node2": [
+      1268.099198501241
+    ],
+    "imag_at_first_real_crossing_node1_pm_per_V": 23.9021054000431,
+    "magnitude_norm_at_first_real_crossing_node1": 0.25480494737390336,
+    "imag_at_first_real_crossing_node2_pm_per_V": -47.1741983438641,
+    "magnitude_norm_at_first_real_crossing_node2": 0.5028937378207986,
+    "phase_jump_node1_deg": 0.9815189796204038,
+    "phase_jump_node2_deg": 0.20087915257275313,
+    "phase_span_node1_deg": 38.685588950783824,
+    "phase_span_node2_deg": 33.463889777487296
+  }
+}

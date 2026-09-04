@@ -1,0 +1,7 @@
+path,exists,size_bytes,role
+docs\case_04\nextnano_output\case\case.in,True,2724,cached full-30-nm scalar/envelope k=0 geometry input
+docs\case_04\nextnano_output\case\bias_00000\bandedges.dat,True,100544,cached full-30-nm scalar/envelope k=0 geometry input
+docs\case_04\nextnano_output\case\bias_00000\Quantum\acqw\Gamma\energy_spectrum_k00000.dat,True,165,cached full-30-nm scalar/envelope k=0 geometry input
+docs\case_04\nextnano_output\case\bias_00000\Quantum\acqw\HH\energy_spectrum_k00000.dat,True,165,cached full-30-nm scalar/envelope k=0 geometry input
+docs\demo21\trace_linear_1nm\06_case04_envelopes.csv,True,61774,cached full-30-nm scalar/envelope k=0 geometry input
+docs/case_04/**/*kp8*,False,0,true k-resolved 8-band outputs

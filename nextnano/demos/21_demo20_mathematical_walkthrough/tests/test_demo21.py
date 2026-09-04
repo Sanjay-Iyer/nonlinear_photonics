@@ -569,6 +569,70 @@ def test_step08_falls_back_only_when_case04_is_absent(tmp_path, monkeypatch):
         assert "fallback" in fallback["source"].lower()
 
 
+def test_real_case04_envelopes_reproduce_the_recorded_matrix_elements():
+    """The real thing, when the licensed parsed run is in the checkout.
+
+    Skipped on a checkout without it. Where it does run, it is the strongest
+    statement Demo 21 makes: case 04's own wavefunctions, put back through the
+    production integrals, return the matrix elements the licensed run recorded -
+    and those are the same numbers STEPS 09-13 feed into chi2.
+    """
+
+    if not (trace.CASE04_PARSED / "envelopes.csv").is_file():
+        pytest.skip(f"no licensed Case 04 parsed run at {trace.CASE04_PARSED}")
+
+    result = trace.case04_envelope_demo(None)
+    assert result is not None and result["is_case04"] is True
+    assert result["source"] == "Demo 20 Case 04 licensed envelopes"
+    assert len(result["columns_present"]) == 13
+    assert result["grid_points"] == 281
+
+    for value in result["norm_after"].values():
+        assert value == pytest.approx(1.0, abs=1e-14)
+    for value in result["orthonormality_error"].values():
+        assert value < 1e-12
+
+    assert len(result["element_comparisons"]) == 12
+    for row in result["element_comparisons"]:
+        assert row["absolute_difference"] <= row["allowed"], row["element"]
+
+    # The envelope-derived matrix elements must equal the ones the master table
+    # carries - otherwise STEP 08 and STEPS 09-13 would be describing different
+    # numbers and the walkthrough would not be continuous.
+    by_element = {row["element"]: row["recomputed"]
+                  for row in result["element_comparisons"]}
+    table = trace._stored_row(trace.DEMO20_TABLE, ref.WORKED_CASE_ID)
+    if table is not None and table.get("O11"):
+        assert by_element["O[e1,hh1]"] == pytest.approx(float(table["O11"]), rel=1e-15)
+        assert by_element["O[e2,hh2]"] == pytest.approx(float(table["O22"]), rel=1e-15)
+        assert by_element["z_e[e1,e1]"] == pytest.approx(
+            float(table["z_e11_nm"]), rel=1e-15)
+        assert by_element["z_e[e2,e2]"] == pytest.approx(
+            float(table["z_e22_nm"]), rel=1e-15)
+        assert by_element["z_hh[hh1,hh1]"] == pytest.approx(
+            float(table["z_hh11_nm"]), rel=1e-15)
+        assert by_element["z_hh[hh2,hh2]"] == pytest.approx(
+            float(table["z_hh22_nm"]), rel=1e-15)
+
+
+def test_walkthrough_case04_envelope_numbers_are_current():
+    """Section 11's printed Case 04 numbers must match what STEP 08 computes."""
+
+    if not (trace.CASE04_PARSED / "envelopes.csv").is_file():
+        pytest.skip("no licensed Case 04 parsed run in this checkout")
+    text = WALKTHROUGH.read_text(encoding="utf-8")
+    result = trace.case04_envelope_demo(None)
+    assert f"{result['grid_points']} grid points" in text
+    assert f"{result['orthonormality_error']['electron']:.3e}" in text
+    assert f"{result['orthonormality_error']['heavy_hole']:.3e}" in text
+    assert "Source: Demo 20 Case 04 licensed envelopes" in text
+    # and it must no longer claim the envelopes are missing
+    for stale in ("case 04's own envelopes are not in this repo",
+                  "They are not\nin this repository",
+                  "Where are case 04's envelopes?"):
+        assert stale not in text, stale
+
+
 def test_leading_block_slices_a_six_by_six_correctly():
     big = np.arange(36, dtype=float).reshape(6, 6)
     assert np.array_equal(trace._leading_block(big),

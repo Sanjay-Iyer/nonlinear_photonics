@@ -1,0 +1,26 @@
+{
+  "assumptions": [
+    "Envelope wavefunctions are taken to be independent of in-plane k; only the transition energies disperse. This follows the paper, which pulls the unit-cell matrix element out of the k sum.",
+    "In-plane dispersion is parabolic with the reduced electron/heavy-hole mass. The paper does not state which masses it used.",
+    "The sum over in-plane k is read as (1/A) * sum -> integral d^2k/(2*pi)^2. Dimensional analysis leaves no other choice that yields m/V.",
+    "Spin degeneracy is applied as an explicit multiplicative factor; the paper does not say whether it folded one in.",
+    "Only the first `max_states_per_band` states of each band enter the m, n, l sums; the default is 2, as the paper states. This truncation is independent of how many states the solver was asked for, so requesting more states from nextnano++ does NOT by itself widen the sum -- raising max_states_per_band is what does, and every result records both numbers.",
+    "The Fermi factor is unity: the valence band is full and the conduction band empty, as the paper states."
+  ],
+  "broadening_meV": 5.0,
+  "calibration_source": null,
+  "calibration_target_pm_per_V": null,
+  "calibration_wavelength_nm": null,
+  "electron_mass_m0": 0.067,
+  "heavy_hole_inplane_mass_m0": 0.112,
+  "k_max_per_nm": 0.5557144392322634,
+  "k_parallel_fraction_of_bz": 0.1,
+  "k_parallel_points": 96,
+  "lattice_constant_nm": 0.565325,
+  "max_states_per_band": 2,
+  "mode": "absolute",
+  "n_wells_per_metre": 33333333.33333333,
+  "r_e_hh_nm": 0.751,
+  "spin_degeneracy": 2,
+  "units": "pm/V"
+}

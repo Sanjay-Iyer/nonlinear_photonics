@@ -1,0 +1,145 @@
+{
+  "bound_filter_layer": {
+    "electron_states_after_policy": 6,
+    "electron_states_passing_bound_criterion": 3,
+    "heavy_hole_states_after_policy": 6,
+    "quasi_bound_policy": "warn"
+  },
+  "case_layer_yaml": {
+    "metric.max_states_per_band": 2,
+    "numerical.number_of_electron_states": 6,
+    "numerical.number_of_hole_states": 6
+  },
+  "exclusion_reasons": [
+    {
+      "band": "electron",
+      "included_in_chi2": true,
+      "reason": "boundary probability 2.908e-03 > 1.0e-03",
+      "state": 2
+    },
+    {
+      "band": "electron",
+      "included_in_chi2": false,
+      "reason": "state 3 is beyond max_states_per_band=2, so Eq. 2 never sees it; boundary probability 3.137e-03 > 1.0e-03",
+      "state": 3
+    },
+    {
+      "band": "electron",
+      "included_in_chi2": false,
+      "reason": "state 4 is beyond max_states_per_band=2, so Eq. 2 never sees it; boundary probability 1.115e-02 > 1.0e-03; fails the bound-state criterion: energy 3.39093 eV is above the enclosing barrier maximum 3.32443 eV",
+      "state": 4
+    },
+    {
+      "band": "electron",
+      "included_in_chi2": false,
+      "reason": "state 5 is beyond max_states_per_band=2, so Eq. 2 never sees it; boundary probability 3.170e-02 > 1.0e-03; fails the bound-state criterion: energy 3.56295 eV is above the enclosing barrier maximum 3.32443 eV; confined probability 0.4991 < 0.5",
+      "state": 5
+    },
+    {
+      "band": "electron",
+      "included_in_chi2": false,
+      "reason": "state 6 is beyond max_states_per_band=2, so Eq. 2 never sees it; boundary probability 5.600e-02 > 1.0e-03; fails the bound-state criterion: energy 3.77223 eV is above the enclosing barrier maximum 3.32443 eV",
+      "state": 6
+    },
+    {
+      "band": "heavy_hole",
+      "included_in_chi2": false,
+      "reason": "state 3 is beyond max_states_per_band=2, so Eq. 2 never sees it",
+      "state": 3
+    },
+    {
+      "band": "heavy_hole",
+      "included_in_chi2": false,
+      "reason": "state 4 is beyond max_states_per_band=2, so Eq. 2 never sees it",
+      "state": 4
+    },
+    {
+      "band": "heavy_hole",
+      "included_in_chi2": false,
+      "reason": "state 5 is beyond max_states_per_band=2, so Eq. 2 never sees it; boundary probability 1.767e-03 > 1.0e-03",
+      "state": 5
+    },
+    {
+      "band": "heavy_hole",
+      "included_in_chi2": false,
+      "reason": "state 6 is beyond max_states_per_band=2, so Eq. 2 never sees it; boundary probability 3.670e-03 > 1.0e-03",
+      "state": 6
+    }
+  ],
+  "extracted_layer": {
+    "electron_energy_rows": 6,
+    "electron_envelope_columns": 6,
+    "electron_state_table_rows": 6,
+    "heavy_hole_energy_rows": 6,
+    "heavy_hole_envelope_columns": 6
+  },
+  "rendered_input_layer": {
+    "number_of_electron_states": 6,
+    "number_of_hole_states": 6,
+    "output_state_count": 6
+  },
+  "solver_states_not_reaching_the_sum": 8,
+  "summation_layer": {
+    "electron_energy_count": 2,
+    "electron_envelope_shape": [
+      281,
+      2
+    ],
+    "electron_states_discarded_by_truncation": 4,
+    "electron_states_supplied": 6,
+    "electron_states_used": 2,
+    "heavy_hole_energy_count": 2,
+    "heavy_hole_envelope_shape": [
+      281,
+      2
+    ],
+    "heavy_hole_states_discarded_by_truncation": 4,
+    "heavy_hole_states_supplied": 6,
+    "heavy_hole_states_used": 2,
+    "largest_numerator_magnitude": 12.277453780429905,
+    "max_states_per_band": 2,
+    "overlap_electron_hole_shape": [
+      2,
+      2
+    ],
+    "position_matrix_electron_nm": [
+      [
+        12.72452731946466,
+        1.0251735847808658
+      ],
+      [
+        1.0251735847808656,
+        18.661190322705767
+      ]
+    ],
+    "position_matrix_electron_shape": [
+      2,
+      2
+    ],
+    "position_matrix_heavy_hole_nm": [
+      [
+        12.65139233424412,
+        1.4323684065114455
+      ],
+      [
+        1.4323684065114457,
+        12.73014553601777
+      ]
+    ],
+    "position_matrix_heavy_hole_shape": [
+      2,
+      2
+    ],
+    "significance_floor": 1.2277453780429904e-11,
+    "triple_sum_terms_conduction": 8,
+    "triple_sum_terms_evaluated": 16,
+    "triple_sum_terms_exactly_zero": 0,
+    "triple_sum_terms_nonzero": 16,
+    "triple_sum_terms_significant": 16,
+    "triple_sum_terms_valence": 8
+  },
+  "supplied_to_chi2_layer": {
+    "electron_states_supplied": 6,
+    "heavy_hole_states_supplied": 6
+  }
+}

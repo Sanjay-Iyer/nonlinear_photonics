@@ -75,6 +75,13 @@ home laptop. Their validation state is recorded in
 [`demos/demo_registry.yaml`](demos/demo_registry.yaml). They do not replace or
 modify the validated smoke-test workflow below.
 
+The research sequence now also includes
+[`Demo 22`](demos/22_k_resolved_8band_chi2_validation/README.md), a strictly
+Professional-gated, k-resolved 8-band validation of the coupled-well χ²
+spectrum. Its default command is a safe deck/provenance preflight; physics mode
+refuses free-edition or missing solver configurations and never fabricates kp8
+output.
+
 ---
 
 ## Quick reference
