@@ -255,7 +255,8 @@ def write_final_report(
     lines += [
         "",
         "P1 overlays absolute simulated susceptibility curves; the paper experiment is represented "
-        "only by its separately labeled peak-location marker. P2 compares normalized shape. P3 "
+        "only by its separately labeled peak-location marker. P2 compares normalized shape, and "
+        "P2b explicitly diagnoses the digitized paper zeros near 605 and 1330 nm. P3 "
         "compares peak locations, P4 compares 1550-nm values with an explicit abrupt-versus-graded "
         "caveat, and P5 reports digitization-dependent errors.",
         "",

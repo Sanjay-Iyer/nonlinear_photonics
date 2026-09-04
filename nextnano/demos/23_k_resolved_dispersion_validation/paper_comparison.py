@@ -79,6 +79,86 @@ def comparison_metrics(result: Any, paper: PaperCurve) -> dict[str, Any]:
     }
 
 
+def paper_zero_wavelengths(
+    paper: PaperCurve,
+    *,
+    normalized_threshold: float = 0.05,
+) -> np.ndarray:
+    """Return interior near-zero local minima in the digitized paper curve."""
+    values = normalized(paper.chi2_pm_per_V)
+    if len(values) < 3:
+        return np.asarray([], dtype=float)
+    indices = [
+        index
+        for index in range(1, len(values) - 1)
+        if values[index] <= normalized_threshold
+        and values[index] <= values[index - 1]
+        and values[index] <= values[index + 1]
+    ]
+    return np.asarray(paper.wavelength_nm[indices], dtype=float)
+
+
+def shape_zero_diagnostics(
+    results: Mapping[str, Any],
+    paper: PaperCurve,
+    *,
+    window_half_width_nm: float = 75.0,
+    near_zero_threshold: float = 0.05,
+) -> list[dict[str, Any]]:
+    """Compare Demo 23 curves with the paper's digitized near-zero spectral nodes."""
+    targets = paper_zero_wavelengths(paper, normalized_threshold=near_zero_threshold)
+    paper_values = normalized(paper.chi2_pm_per_V)
+    rows: list[dict[str, Any]] = []
+    for mode, result in results.items():
+        wavelength = np.asarray(result.spectrum.wavelength_nm, dtype=float)
+        demo_values = normalized(result.magnitude)
+        for target in targets:
+            window_min = max(float(wavelength[0]), float(target - window_half_width_nm))
+            window_max = min(float(wavelength[-1]), float(target + window_half_width_nm))
+            mask = (wavelength >= window_min) & (wavelength <= window_max)
+            if not np.any(mask):
+                raise ValueError(f"Demo {mode} has no samples around paper zero at {target:g} nm")
+            local_indices = np.flatnonzero(mask)
+            minima = np.asarray([
+                index for index in local_indices
+                if 0 < index < len(demo_values) - 1
+                and demo_values[index] <= demo_values[index - 1]
+                and demo_values[index] <= demo_values[index + 1]
+            ], dtype=int)
+            if len(minima):
+                local_index = int(minima[np.argmin(demo_values[minima])])
+                local_wavelength = float(wavelength[local_index])
+                local_minimum = float(demo_values[local_index])
+                local_offset = float(wavelength[local_index] - target)
+                status = (
+                    "NEAR_ZERO_PRESENT" if local_minimum <= near_zero_threshold
+                    else "LOCAL_MINIMUM_NOT_NEAR_ZERO"
+                )
+            else:
+                local_wavelength = float("nan")
+                local_minimum = float("nan")
+                local_offset = float("nan")
+                status = "NO_LOCAL_MINIMUM_NEAR_PAPER_ZERO"
+            rows.append({
+                "mode": str(mode),
+                "paper_zero_wavelength_nm": float(target),
+                "paper_normalized_chi2_at_zero": float(
+                    np.interp(target, paper.wavelength_nm, paper_values)
+                ),
+                "demo_normalized_chi2_at_paper_zero": float(
+                    np.interp(target, wavelength, demo_values)
+                ),
+                "demo_local_minimum_wavelength_nm": local_wavelength,
+                "demo_local_minimum_normalized_chi2": local_minimum,
+                "local_minimum_offset_nm": local_offset,
+                "search_window_min_nm": window_min,
+                "search_window_max_nm": window_max,
+                "near_zero_threshold": float(near_zero_threshold),
+                "diagnostic_status": status,
+            })
+    return rows
+
+
 def reference_rows(cfg: Mapping[str, Any], paper: PaperCurve) -> list[dict[str, Any]]:
     block = cfg["paper_comparison"]
     return [

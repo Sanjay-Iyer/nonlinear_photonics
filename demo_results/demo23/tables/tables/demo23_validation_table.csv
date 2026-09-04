@@ -1,0 +1,11 @@
+Check,Result,Threshold,PASS/FAIL
+23A regression,4.804577333433123e-13,<= 1e-09 pm/V,PASS
+state tracking,finite-k spinors absent; solver band columns + Kramers-pair averaging used,finite-k overlap; score >= 0.6; margin >= 0.15; no ambiguous,FAIL
+e1 fit,RMSE 1.20147 meV,<= 1 meV,FAIL
+e2 fit,RMSE 0.759617 meV,<= 1 meV,PASS
+23C-vs-23D spectral RMSE,0.00674169749715477,<= 0.01,PASS
+k-grid convergence,N=201 vs 301,max complex relative change <= 0.001,FAIL
+kmax convergence,nominal fraction 0.1,max complex relative change <= 0.001,FAIL
+isotropy,11.31775702642912,<= 1.0 meV,FAIL
+interpolation bounds,4.440892098500626e-16,node residual <= 1e-12 eV; no extrapolation,PASS
+normalization consistency,39.47841760435743,bare/production = (2pi)^2 = 39.4784176044,PASS

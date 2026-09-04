@@ -109,7 +109,7 @@ synthetic spinors.
 
 Real runs are written under `demo_results/demo23/demo23_<UTC stamp>/` and
 contain copied input decks, solver logs, raw Professional output, tables,
-spectra, 16 internal diagnostic figure families, five paper-comparison figure
+spectra, 16 internal diagnostic figure families, six paper-comparison figure
 families, the resolved configuration, and `DEMO23_FINAL_REPORT.md`.
 
 The paper comparison uses the repository's existing 45-point eye digitization

@@ -364,6 +364,87 @@ def paper_normalized(path: Path, results: Mapping[str, Any], paper: Any, dpi: in
     _save(fig, path, dpi)
 
 
+def paper_normalized_zero_diagnostic(
+    path: Path,
+    results: Mapping[str, Any],
+    paper: Any,
+    zero_rows: Sequence[Mapping[str, Any]],
+    dpi: int,
+) -> None:
+    """Plot normalized shapes and quantify the paper's near-zero spectral nodes."""
+    if not zero_rows:
+        return
+    fig, (axis, bars_axis) = plt.subplots(
+        2, 1, figsize=(10.7, 8.0), gridspec_kw={"height_ratios": [2.4, 1.0]}
+    )
+    normalized_by_mode: dict[str, np.ndarray] = {}
+    for mode, result in results.items():
+        values = result.magnitude / max(float(np.max(result.magnitude)), 1e-300)
+        normalized_by_mode[str(mode)] = values
+        linewidth = 2.0 if mode in ("23C", "23D") else 1.1
+        alpha = 1.0 if mode in ("23C", "23D") else 0.65
+        axis.plot(
+            result.spectrum.wavelength_nm, values, color=COLORS[mode],
+            linewidth=linewidth, alpha=alpha, label=f"Demo {mode}",
+        )
+    paper_values = paper.chi2_pm_per_V / max(float(np.max(paper.chi2_pm_per_V)), 1e-300)
+    axis.plot(
+        paper.wavelength_nm, paper_values, "k--", linewidth=2.0,
+        marker="o", markersize=3.0, label=paper.label,
+    )
+    targets = sorted({float(row["paper_zero_wavelength_nm"]) for row in zero_rows})
+    for index, target in enumerate(targets):
+        matching = [row for row in zero_rows if np.isclose(float(row["paper_zero_wavelength_nm"]), target)]
+        window_min = min(float(row["search_window_min_nm"]) for row in matching)
+        window_max = max(float(row["search_window_max_nm"]) for row in matching)
+        axis.axvspan(window_min, window_max, color="#94a3b8", alpha=0.10)
+        axis.axvline(
+            target, color="black", linestyle=":", linewidth=1.0,
+            label="paper zero locations" if index == 0 else None,
+        )
+        axis.annotate(
+            f"paper zero\n{target:g} nm", (target, 0.0), xytext=(5, 12),
+            textcoords="offset points", fontsize=8, va="bottom",
+        )
+    _decorate(
+        axis, xlabel="Fundamental wavelength (nm)", ylabel=r"Normalized $|\chi^{(2)}|$",
+        title="P2b — normalized shape: paper spectral zeros versus Demo 23",
+    )
+    axis.set_ylim(-0.025, 1.05)
+    axis.legend(fontsize=7.5, ncol=2)
+    axis.text(
+        0.01, 0.98,
+        "Zeros are read from the 45-point eye digitization and are diagnostic, not exact author data.",
+        transform=axis.transAxes, va="top", fontsize=8,
+        bbox={"facecolor": "white", "alpha": 0.86, "edgecolor": "#cbd5e1"},
+    )
+
+    modes = list(results)
+    x = np.arange(len(targets), dtype=float)
+    width = 0.78 / (len(modes) + 1)
+    series = [("Paper", "#111827")] + [(mode, COLORS[mode]) for mode in modes]
+    for offset, (label, color) in enumerate(series):
+        if label == "Paper":
+            values = [float(np.interp(target, paper.wavelength_nm, paper_values)) for target in targets]
+        else:
+            result = results[label]
+            values = [
+                float(np.interp(target, result.spectrum.wavelength_nm, normalized_by_mode[label]))
+                for target in targets
+            ]
+        positions = x - 0.39 + width / 2 + offset * width
+        bars = bars_axis.bar(positions, values, width=width, color=color, label=label)
+        bars_axis.bar_label(bars, labels=[f"{value:.3f}" for value in values], fontsize=7, padding=2)
+    bars_axis.axhline(0.05, color="#dc2626", linestyle="--", linewidth=0.9,
+                      label="5% near-zero diagnostic")
+    bars_axis.set_xticks(x, [f"{target:g} nm" for target in targets])
+    bars_axis.set_ylabel("Normalized value\nat paper zero")
+    bars_axis.set_xlabel("Digitized paper zero location")
+    bars_axis.grid(axis="y", alpha=0.25)
+    bars_axis.legend(fontsize=7.2, ncol=3)
+    _save(fig, path, dpi)
+
+
 def paper_peaks(path: Path, metrics: Sequence[Mapping[str, Any]], simulated_peak_nm: float,
                 measured_peak_nm: float, dpi: int) -> None:
     labels = [str(row["mode"]) for row in metrics] + ["paper simulation", "paper measurement"]

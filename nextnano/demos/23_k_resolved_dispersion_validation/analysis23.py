@@ -328,6 +328,7 @@ def analyze_run(
     paper_path = Path(__file__).resolve().parent / str(cfg["paper_comparison"]["digitized_simulation_csv"])
     paper_curve = paper_comparison.load_digitized_curve(paper_path)
     paper_rows = [paper_comparison.comparison_metrics(result, paper_curve) for result in results.values()]
+    shape_zero_rows = paper_comparison.shape_zero_diagnostics(results, paper_curve)
     paper_by_mode = {str(row["mode"]): row for row in paper_rows}
     for row in summary_rows:
         paper_row = paper_by_mode[str(row["mode"])]
@@ -338,6 +339,7 @@ def analyze_run(
     reporting.write_csv(output / "tables" / "mode_summary.csv", summary_rows)
     reporting.write_csv(output / "tables" / "pathway_summary_1550nm.csv", pathway_rows)
     reporting.write_csv(output / "tables" / "paper_comparison_metrics.csv", paper_rows)
+    reporting.write_csv(output / "tables" / "paper_shape_zero_diagnostics.csv", shape_zero_rows)
     reporting.write_csv(
         output / "tables" / "paper_reference_values.csv",
         paper_comparison.reference_rows(cfg, paper_curve),
@@ -540,6 +542,10 @@ def analyze_run(
         plotting.paper_full_overlay(paper_plots / "paper_P1_full_spectrum_overlay.png", results, paper_curve,
                                     float(paper_block["simulated_peak_nm"]), float(paper_block["measured_peak_nm"]), dpi)
         plotting.paper_normalized(paper_plots / "paper_P2_normalized_spectral_shape.png", results, paper_curve, dpi)
+        plotting.paper_normalized_zero_diagnostic(
+            paper_plots / "paper_P2b_normalized_zero_shape_diagnostic.png",
+            results, paper_curve, shape_zero_rows, dpi,
+        )
         plotting.paper_peaks(paper_plots / "paper_P3_peak_location_comparison.png", summary_rows,
                              float(paper_block["simulated_peak_nm"]), float(paper_block["measured_peak_nm"]), dpi)
         plotting.paper_1550(paper_plots / "paper_P4_chi2_1550_comparison.png", summary_rows,

@@ -397,3 +397,21 @@ def test_24_actual_professional_touching_dispersion_fields_are_repaired(tmp_path
     assert bands[0, 6] == pytest.approx(2.3390669310193)
     assert bands[0, 12] == pytest.approx(3.0911484520154)
     assert bands[0, 13] == pytest.approx(3.0911484520155)
+
+
+def test_25_paper_zero_shape_diagnostic_detects_missing_nodes(tmp_path):
+    paper = paper_comparison.load_digitized_curve(DEMO / "paper_figure2d_digitized_simulation.csv")
+    np.testing.assert_allclose(paper_comparison.paper_zero_wavelengths(paper), [605.0, 1330.0])
+    wavelength = np.arange(400.0, 1851.0, 1.0)
+    magnitude = 0.2 + (wavelength - wavelength[0]) / (wavelength[-1] - wavelength[0])
+    fake = SimpleNamespace(
+        mode="23D", magnitude=magnitude,
+        spectrum=SimpleNamespace(wavelength_nm=wavelength),
+    )
+    rows = paper_comparison.shape_zero_diagnostics({"23D": fake}, paper)
+    assert len(rows) == 2
+    assert {row["paper_zero_wavelength_nm"] for row in rows} == {605.0, 1330.0}
+    assert {row["diagnostic_status"] for row in rows} == {"NO_LOCAL_MINIMUM_NEAR_PAPER_ZERO"}
+    figure = tmp_path / "paper_zero_diagnostic.png"
+    plotting.paper_normalized_zero_diagnostic(figure, {"23D": fake}, paper, rows, 60)
+    assert figure.is_file() and figure.stat().st_size > 0

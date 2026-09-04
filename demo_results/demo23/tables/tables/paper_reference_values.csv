@@ -1,0 +1,5 @@
+reference,value,category,source_type,use
+Fig. 2d simulated spectrum,"45 points, 400-1850 nm",paper simulation,eye-digitized published figure,shape/peak/diagnostic error comparison
+simulated resonance,~1520 nm,paper simulation,paper text,peak-location comparison
+measured resonance,~1560 nm,paper experiment,paper text,separate peak-location marker only
+ideal abrupt chi2 at 1550 nm,~2340 pm/V,paper simulation,"paper text, growth-interruption discussion",1550-nm point comparison with geometry caveat

@@ -17,7 +17,7 @@ Equation 2 physics was altered.
 | Fig. 13 pathway change A–D | No | `major_pathway_changes` | largest integrated pathways | Added |
 | Figs. 14–15 convergence | Minimal plots | `convergence` | configured grid/cutoff decks | Changed: χ1550, peak, peak λ, PASS/FAIL |
 | Fig. 16 isotropy | Yes | `isotropy` | matched y and yz45 kp8 paths | Changed: tolerance and PASS/FAIL |
-| P1–P5 paper comparison | No | paper plotters + `paper_comparison.py` | 45-point eye digitization and paper-reported points | Added with explicit provenance |
+| P1–P5 plus P2b zero-shape diagnostic | No | paper plotters + `paper_comparison.py` | 45-point eye digitization and paper-reported points | Added with explicit provenance; P2b quantifies the paper zeros near 605 and 1330 nm |
 | Master mode table | Partial | `mode_summary.csv` | A–D spectra | Added consolidated CSV with FWHM and paper errors |
 | Validation table | No | `demo23_validation_table.csv` | regression/tracking/fits/convergence/isotropy audits | Added |
 | 21-section final report | Partial | `reporting.write_final_report` | all preceding tables | Expanded |
