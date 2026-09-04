@@ -289,22 +289,54 @@ def _run_professional(cfg: dict[str, Any], decks: list[Path], machine: Any) -> P
     stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     run_root = result_root(cfg) / f"demo22_{stamp}"
     run_root.mkdir(parents=True, exist_ok=False)
-    records = []
-    for deck in decks:
-        raw = run_root / "raw" / deck.stem
-        logs = run_root / "logs" / deck.stem
-        invocation = solver14.execute_real(
-            executable=Path(machine.executable), database=Path(machine.database),
-            license_path=Path(machine.license), deck=deck, output_dir=raw,
-            threads=int(cfg["solver"]["threads"]),
-            timeout_seconds=float(cfg["solver"]["timeout_seconds_per_deck"]), logs_dir=logs,
-        )
-        records.append(invocation.as_record())
-    _write_json(run_root / "solver_invocations.json", records)
+    monitor = _start_progress_monitor(run_root)
+    try:
+        records = []
+        for deck in decks:
+            raw = run_root / "raw" / deck.stem
+            logs = run_root / "logs" / deck.stem
+            invocation = solver14.execute_real(
+                executable=Path(machine.executable), database=Path(machine.database),
+                license_path=Path(machine.license), deck=deck, output_dir=raw,
+                threads=int(cfg["solver"]["threads"]),
+                timeout_seconds=float(cfg["solver"]["timeout_seconds_per_deck"]), logs_dir=logs,
+            )
+            records.append(invocation.as_record())
+        _write_json(run_root / "solver_invocations.json", records)
+    finally:
+        _stop_progress_monitor(monitor)
+    print("Demo 22 solver progress: 100%. Starting analysis...", flush=True)
     primary = run_root / "raw" / "abrupt_integration"
     summary = analysis22.run_analysis(cfg, primary, interface_model="abrupt", stage_root=DEMO_DIR)
     _write_json(run_root / "analysis_summary.json", summary)
     return run_root
+
+
+def _start_progress_monitor(run_root: Path) -> subprocess.Popen[str] | None:
+    """Show the read-only Demo 22 completion tracker in this terminal."""
+    tracker = DEMO_DIR / "progress22.py"
+    argv = [
+        sys.executable, "-u", str(tracker), "--run", str(run_root),
+        "--interval", "60", "--embedded",
+    ]
+    try:
+        print("Starting Demo 22 completion tracker (updates every 60 s)...", flush=True)
+        return subprocess.Popen(argv, cwd=REPO_ROOT)
+    except OSError as exc:
+        print(f"WARNING: completion tracker could not start: {exc}", file=sys.stderr)
+        return None
+
+
+def _stop_progress_monitor(monitor: subprocess.Popen[str] | None) -> None:
+    """Stop only the tracker process created for this Demo 22 run."""
+    if monitor is None or monitor.poll() is not None:
+        return
+    monitor.terminate()
+    try:
+        monitor.wait(timeout=5)
+    except subprocess.TimeoutExpired:
+        monitor.kill()
+        monitor.wait(timeout=5)
 
 
 def main(argv: list[str] | None = None) -> int:
