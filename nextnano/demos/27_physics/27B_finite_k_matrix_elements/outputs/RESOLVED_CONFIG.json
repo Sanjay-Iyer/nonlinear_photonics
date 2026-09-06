@@ -1,0 +1,40 @@
+{
+  "sub_demo": "27B",
+  "title": "Finite-k matrix elements - is M(k) = M(0) valid?",
+  "question": "Does the frozen-numerator approximation M(k) = M(0) change any Equation 2 pathway?",
+  "tier": 2,
+  "prerequisites": [
+    "27A"
+  ],
+  "pass_condition": "O_nm(k), z_e,nl(k) and z_hh,ml(k) are reconstructed at every computed k, and M(k)/M(0) is reported for P1, Z1 (~605 nm), P2, P3, Z2 (~1330 nm) and P4. The sub-demo PASSES when that ratio exists and is quantified; it does not require the ratio to be large. A finding that M(k) is flat to 5% is a real answer and retires hypothesis 5 in the Demo 26 ranking.",
+  "stages": {
+    "preflight": {
+      "kind": "delegated"
+    },
+    "physics": {
+      "kind": "delegated"
+    },
+    "analyze": {
+      "kind": "delegated"
+    }
+  },
+  "delegate": {
+    "demo": "25_finite_k_matrix_element_validation",
+    "runner": "run_demo25.py",
+    "commands": {
+      "preflight": "--preflight",
+      "physics": "--production",
+      "analyze": "--analyse"
+    },
+    "reason": "Demo 25's production stage is gated on its own pilot verdict, sizes the k grid from measured cost against explicit hour and gigabyte budgets, and refuses to substitute M(k)=M(0) anywhere. Reimplementing that in Demo 27 would duplicate the gate and risk losing it."
+  },
+  "controlled_change": {
+    "summary": "The k grid on which state output is written. Geometry is untouched: this sub-demo exists to test an approximation, not a structure.",
+    "fields": [],
+    "max_fields_per_deck": 0
+  },
+  "baseline": {
+    "source": "23_k_resolved_dispersion_validation/demo23_config.yaml"
+  },
+  "decks": []
+}

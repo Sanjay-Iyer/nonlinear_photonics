@@ -1,0 +1,6 @@
+k,state,energy,CB fraction,HH fraction,LH fraction,SO fraction,tracking score,assignment margin,max Kramers splitting meV,selection role,limitation
+0.0,e1,2.95251167921,0.962603697,0.0,0.027828132,0.009568171,not available,not available,1.5997668044001045,Demo 23 selected,finite-k spinor composition was not exported; k=0 fractions only
+0.0,e2,3.091148452015,0.930981035930981,0.0,0.05070777305070777,0.01831119101831119,not available,not available,2.832523611300264,Demo 23 selected,finite-k spinor composition was not exported; k=0 fractions only
+0.0,hh1,1.44377212187,0.0,1.0,0.0,0.0,not available,not available,5.478879194700026,Demo 23 selected,finite-k spinor composition was not exported; k=0 fractions only
+0.0,hh2,1.4167478423565,0.019573136019573136,0.0,0.9757567199757569,0.004670144004670144,not available,not available,6.195494000699853,Demo 23 selected,finite-k spinor composition was not exported; k=0 fractions only
+0.0,hh2_character_candidate,1.39769425308,0.0,1.0,0.0,0.0,not available,not available,not evaluated,unselected pair 1+2; 100% HH at k=0,finite-k spinor composition was not exported; k=0 fractions only

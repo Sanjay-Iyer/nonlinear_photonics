@@ -1,0 +1,65 @@
+demo:
+  id: 27B
+  slug: finite_k_matrix_elements
+  title: Finite-k matrix elements - is M(k) = M(0) valid?
+  question: Does the frozen-numerator approximation M(k) = M(0) change any Equation 2 pathway?
+  tier: 2
+  tier_planned: 2
+  priority: 4
+  professional_required: true
+  prerequisites: [27A]
+  unlocks: [27M, 27O]
+
+pass_condition: >-
+  O_nm(k), z_e,nl(k) and z_hh,ml(k) are reconstructed at every computed k, and
+  M(k)/M(0) is reported for P1, Z1 (~605 nm), P2, P3, Z2 (~1330 nm) and P4. The
+  sub-demo PASSES when that ratio exists and is quantified; it does not require
+  the ratio to be large. A finding that M(k) is flat to 5% is a real answer and
+  retires hypothesis 5 in the Demo 26 ranking.
+
+delegate:
+  demo: 25_finite_k_matrix_element_validation
+  runner: run_demo25.py
+  commands:
+    preflight: "--preflight"
+    physics: "--production"
+    analyze: "--analyse"
+  reason: >-
+    Demo 25's production stage is gated on its own pilot verdict, sizes the k
+    grid from measured cost against explicit hour and gigabyte budgets, and
+    refuses to substitute M(k)=M(0) anywhere. Reimplementing that in Demo 27
+    would duplicate the gate and risk losing it.
+
+cost:
+  decks: 1
+  k_points_per_deck: 301
+  states_per_deck: 32
+  runtime_hours: [1.0, 3.0]
+  output_gb: [10.0, 15.0]
+  basis: >-
+    Demo 25's README, calibrated on the Demo 23 work-laptop timing: roughly
+    10-30 s per k point at 32 states with full per-k envelopes. Disk dominates -
+    Demo 23 wrote 18 MB per case with envelopes at k=0 only. The real number is
+    measured by the 27A pilot, and Demo 25 will recommend a smaller matrix-element
+    grid if 301 points would exceed its 12 h / 60 GB budgets. Matrix elements vary
+    slowly with k while energies set the resonance positions, so a coarser M(k)
+    grid interpolated onto the fine energy grid loses very little.
+
+stages:
+  preflight: {kind: delegated}
+  physics:   {kind: delegated}
+  analyze:   {kind: delegated}
+
+controlled_change:
+  summary: >-
+    The k grid on which state output is written. Geometry is untouched: this
+    sub-demo exists to test an approximation, not a structure.
+  fields: []
+  max_fields_per_deck: 0
+
+harvest_overrides: {}
+
+analysis:
+  produces:
+    - MATRIX_ELEMENT_K_DEPENDENCE.csv
+    - PATHWAY_M_RATIO.csv

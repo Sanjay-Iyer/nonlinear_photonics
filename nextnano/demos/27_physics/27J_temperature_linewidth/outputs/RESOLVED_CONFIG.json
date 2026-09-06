@@ -1,0 +1,52 @@
+{
+  "sub_demo": "27J",
+  "title": "Temperature-dependent parameters and physically motivated linewidths",
+  "question": "Do temperature-dependent material parameters or improved linewidths explain the remaining peak shifts?",
+  "tier": 2,
+  "prerequisites": [],
+  "pass_condition": "Two things are reported separately. (a) The measured band-gap and state-energy shift per kelvin, converted into a wavelength shift per feature using Demo 24's measured dLambda/dE, so the temperature effect is compared against the actual paper-model gaps rather than asserted. (b) A linewidth study in which every Gamma model is PHYSICALLY MOTIVATED - state-dependent, energy-dependent or k-dependent from a stated mechanism. Demo 26 already found that no single Gamma repairs all features (its hypothesis 8, \"NOT SUFFICIENT\", high confidence), so using Gamma as a free fitting parameter is out of scope and a fitted Gamma is not an acceptable conclusion here.",
+  "stages": {
+    "preflight": {
+      "kind": "generate_and_parse"
+    },
+    "physics": {
+      "kind": "professional"
+    },
+    "analyze": {
+      "kind": "python"
+    }
+  },
+  "delegate": {},
+  "controlled_change": {
+    "summary": "The lattice temperature, which drives nextnano's temperature-dependent band parameters. Nothing else moves, so any energy shift is attributable to the material model rather than to the structure.",
+    "fields": [
+      "temperature_K"
+    ],
+    "max_fields_per_deck": 1
+  },
+  "baseline": {
+    "source": "23_k_resolved_dispersion_validation/demo23_config.yaml"
+  },
+  "decks": [
+    {
+      "name": "T_077K",
+      "question": "How far do the states and the gap move at liquid-nitrogen temperature?",
+      "changes": {
+        "temperature_K": {
+          "baseline": 300.0,
+          "deck": 77.0
+        }
+      }
+    },
+    {
+      "name": "T_200K",
+      "question": "Intermediate point, so the shift is measured as a slope rather than from two ends",
+      "changes": {
+        "temperature_K": {
+          "baseline": 300.0,
+          "deck": 200.0
+        }
+      }
+    }
+  ]
+}

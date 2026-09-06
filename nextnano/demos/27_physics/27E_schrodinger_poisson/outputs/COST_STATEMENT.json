@@ -1,0 +1,23 @@
+{
+  "sub_demo": "27E",
+  "tier": 3,
+  "professional_required": true,
+  "decks_declared": 2,
+  "decks_generated": 2,
+  "k_points_per_deck": [
+    301,
+    301
+  ],
+  "total_k_point_solves": 602,
+  "states_per_deck": [
+    14,
+    14
+  ],
+  "max_states": 14,
+  "runtime_hours_low": 2.0,
+  "runtime_hours_high": 8.0,
+  "runtime_text": "2 h - 8 h",
+  "output_gb_low": 0.6,
+  "output_gb_high": 2.0,
+  "basis": "The flat-band arm costs one Demo 23 production run (10 min 20 s measured). The self-consistent arm repeats the quantum solve once per Poisson iteration, so it is the iteration count times that, and Demo 6 needed tens of iterations on a much smaller problem. 2-8 h is the honest range; the run is capped by --timeout and by the iteration limit in the deck."
+}

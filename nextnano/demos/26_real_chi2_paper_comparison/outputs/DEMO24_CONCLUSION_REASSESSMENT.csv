@@ -1,0 +1,10 @@
+Demo24_conclusion,classification,Demo26_real_evidence
+missing P1/P3,STILL VALID,Neither signed Re nor |chi| has a significant corresponding extremum in the configured P1/P3 windows; changing observable does not create the missing peak pair.
+missing 605 node,STILL VALID,"Nearest Re zero is about 714 nm, outside 550-650 nm; |chi| at 605 nm is finite."
+missing 1330 node,STILL VALID,"Nearest Re zero is about 1437 nm, outside 1250-1400 nm; |chi| at 1330 nm is finite."
+2.296 eV missing transition,STILL VALID,The P1/P3 one-/two-photon pair remains absent in both observables; taking Re cannot supply a missing denominator resonance.
+kmax artifact,UNRELATED TO REAL-vs-MAGNITUDE ISSUE,Changing the displayed complex component cannot cure a feature that moves with the integration cutoff.
+finite-k M(k) required,WEAKENED,"Finite-k matrices remain required for the next discriminating test of cancellation and high-k damping, but existing perturbations do not prove that physical M(k) will cure the missing features."
+additional states required,WEAKENED,"The missing 2.296 eV resonance remains, but the paper explicitly states only two bound states per band. Extra optical-sum states would change the stated model; structure/cutoff/state-tracking must be isolated first."
+geometry mismatch,UNRELATED TO REAL-vs-MAGNITUDE ISSUE,The published design/abrupt-interface versus Demo 23 linear-1-nm mismatch is independent of whether Re or magnitude is plotted.
+need for Demo 25 Professional run,STILL VALID,"The observable reinterpretation fails the direct zero-crossing test and gives worse overall normalized RMSE, so unresolved finite-k/model-consistency questions remain."

@@ -1,0 +1,115 @@
+# Demo 27 parent configuration.
+#
+# Demo 27 is a STAGED PHYSICS CAMPAIGN, not a simulation. This file holds only
+# what every sub-demo shares: where the frozen structure comes from, what the
+# tier vocabulary means, what the standard data harvest is, and the execution
+# policy that forbids a "run everything" path.
+#
+# No sub-demo restates geometry, materials, mesh or solver settings. Those are
+# inherited verbatim from Demo 23 and may only be changed through a sub-demo's
+# explicit `controlled_change:` block, which the framework records and tests.
+
+demo:
+  id: 27
+  name: physics
+  title: Professional Physics Campaign for the Remaining Ramesh Disagreement
+  parent_demos: [22, 23, 24, 25, 26]
+  philosophy: "COLLECT BROADLY. ANALYZE NARROWLY. RUN ONE PHYSICS QUESTION AT A TIME."
+
+inherit:
+  from_demo: 23_k_resolved_dispersion_validation
+  config_file: demo23_config.yaml
+  frozen_blocks: [geometry, materials, mesh, solver, integration, dispersion, chi2]
+
+# Execution policy. run_demo27.py enforces every line of this block.
+policy:
+  require_explicit_demo: true
+  # Any argv token matching one of these is refused with a non-zero exit.
+  forbidden_batch_flags:
+    - "--all-physics"
+    - "--all"
+    - "--run-all"
+    - "--all-tiers"
+    - "--everything"
+    - "--full-campaign"
+    - "--batch"
+  # A --physics stage refuses to start unless every prerequisite is PASS/COMPLETE.
+  enforce_prerequisites: true
+  # A --physics stage refuses to start against a Free build.
+  require_professional_for_physics: true
+  # --analyze and --preflight must never launch the solver (parse-only is allowed
+  # in preflight because --parse is not a physics calculation).
+  analysis_stages_are_solver_free: true
+
+tiers:
+  0:
+    label: capture / post-processing only
+    burden: negligible new solver cost
+  1:
+    label: short pilot
+    burden: minutes to roughly 1 hour
+  2:
+    label: medium targeted Professional calculation
+    burden: roughly 1-4 hours
+  3:
+    label: large
+    burden: several hours to roughly one day
+  4:
+    label: very large
+    burden: potentially day-scale
+  5:
+    label: advanced / external physics
+    burden: potentially multiple days, or tools beyond nextnano
+
+# The standard broad harvest. Whenever the Professional solver is already
+# running a deck, these outputs are requested, because re-running the solver
+# later to get them costs far more than writing them now. Anything that would
+# enable NEW expensive physics is deliberately absent.
+harvest:
+  eigenenergies: true
+  envelopes: true
+  envelopes_CB_HH_LH_SO: true
+  probabilities: true
+  probabilities_partial_CB_HH_LH_SO: true
+  spinor_composition: true
+  spinor_composition_CB_HH_LH_SO: true
+  transition_energies: true
+  dipole_moment_matrix_elements: true
+  momentum_matrix_elements: true
+  oscillator_strengths: true
+  band_edges: true
+  alloy_composition: true
+  bandgap: true
+  k_vectors: true
+  dispersions: true
+  masses: true
+  # Only written when the deck actually computes them; never enabled to "look".
+  electrostatic_potential_if_computed: true
+  strain_if_computed: true
+
+paths:
+  results_root: demo_results/demo27
+
+# Artifacts Demo 27 reads but must never modify. The reuse audit hashes these.
+reuse_sources:
+  - id: demo23
+    path: nextnano/demos/23_k_resolved_dispersion_validation
+    raw: demo_results/demo23/raw
+    role: frozen structure, k-resolved dispersion, k=0 matrix elements
+  - id: demo24
+    path: nextnano/demos/24_equation2_spectral_shape_audit/outputs
+    raw: null
+    role: reachability finding, feature causal traceback, kmax/grid sensitivity
+  - id: demo25
+    path: nextnano/demos/25_finite_k_matrix_element_validation
+    raw: demo_results/demo25
+    role: finite-k output pilot and production machinery (27A/27B delegate to it)
+  - id: demo26
+    path: nextnano/demos/26_real_chi2_paper_comparison/outputs
+    raw: null
+    role: root-cause ranking, feature diagnosis, implementation audit
+
+outputs:
+  status_json: MASTER_STATUS.json
+  status_md: MASTER_STATUS.md
+  dpi: 180

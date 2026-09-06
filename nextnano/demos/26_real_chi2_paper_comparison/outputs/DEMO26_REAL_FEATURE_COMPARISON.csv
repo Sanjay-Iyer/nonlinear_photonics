@@ -1,0 +1,7 @@
+Feature,Feature_type,Paper_wavelength_nm,Paper_normalized_value,signed_Re_chi2_wavelength_nm,signed_Re_chi2_error_nm,signed_Re_chi2_normalized_value,signed_Re_chi2_note,abs_chi2_wavelength_nm,abs_chi2_error_nm,abs_chi2_normalized_value,abs_chi2_note,Which_observable_agrees_better_in_wavelength
+P1,peak,540.0,0.3189873417721519,,,,no significant interior signed extremum in search window,,,,no significant interior magnitude maximum in search window,neither: no corresponding feature
+Z1,zero/minimum,605.0,0.0,714.0286425430866,109.02864254308656,6.361556247058697e-17,nearest actual Re zero crossing (outside paper feature window),720.0,115.0,0.3327042991951266,nearest local |chi2| minimum; magnitude remains nonzero,signed Re[chi2]
+P2,peak,760.0,0.620253164556962,753.0,-7.0,-0.5416250941899795,significant signed extremum,752.0,-8.0,0.5298169782402193,significant magnitude maximum,signed Re[chi2]
+P3,peak,1080.0,0.8227848101265823,,,,no significant interior signed extremum in search window,,,,no significant interior magnitude maximum in search window,neither: no corresponding feature
+Z2,zero/minimum,1330.0,0.0,1437.4801147300982,107.4801147300982,6.483528991463317e-16,nearest actual Re zero crossing (outside paper feature window),1455.0,125.0,0.6453445266625417,nearest local |chi2| minimum; magnitude remains nonzero,signed Re[chi2]
+P4,peak,1520.0,1.0,1505.0,-15.0,1.0,significant signed extremum,1503.0,-17.0,1.0,significant magnitude maximum,signed Re[chi2]

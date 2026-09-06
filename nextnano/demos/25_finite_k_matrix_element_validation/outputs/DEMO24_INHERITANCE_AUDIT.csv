@@ -1,0 +1,10 @@
+item,source,status,detail
+geometry block,demo23_config.yaml,INHERITED,"{""grade_width_nm"": 1.0, ""interface_model"": ""linear_1nm"", ""period_barrier_nm"": 18.2, ""quantum_region_padding_nm"": 2.0, ""thick_well_nm"": 7.1, ""thin_well_nm"": 2.9,"
+materials block,demo23_config.yaml,INHERITED,"{""barrier_al_fraction"": 0.55, ""growth_direction"": ""[1, 0, 0]"", ""substrate"": ""GaAs"", ""temperature_K"": 300.0, ""well_al_fraction"": 0.0}"
+mesh block,demo23_config.yaml,INHERITED,"{""active_spacing_nm"": 0.05, ""outer_spacing_nm"": 0.5}"
+solver block,demo23_config.yaml,INHERITED,"{""threads"": 1, ""timeout_seconds_per_deck"": 14400}"
+DEMO24_FINAL_REPORT.md,C:\code\nonlinear_photonics\nextnano\demos\24_equation2_spectral_shape_audit\outputs\DEMO24_FINAL_REPORT.md,FOUND,Demo 24 evidence Demo 25 is built on
+RESONANCE_REACHABILITY.csv,C:\code\nonlinear_photonics\nextnano\demos\24_equation2_spectral_shape_audit\outputs\RESONANCE_REACHABILITY.csv,FOUND,Demo 24 evidence Demo 25 is built on
+SPECTRAL_FEATURE_CAUSAL_DIAGNOSIS.csv,C:\code\nonlinear_photonics\nextnano\demos\24_equation2_spectral_shape_audit\outputs\SPECTRAL_FEATURE_CAUSAL_DIAGNOSIS.csv,FOUND,Demo 24 evidence Demo 25 is built on
+PROFESSIONAL_RERUN_RECOMMENDATION.md,C:\code\nonlinear_photonics\nextnano\demos\24_equation2_spectral_shape_audit\outputs\PROFESSIONAL_RERUN_RECOMMENDATION.md,FOUND,Demo 24 evidence Demo 25 is built on
+FINITE_K_DATA_INVENTORY.md,C:\code\nonlinear_photonics\nextnano\demos\24_equation2_spectral_shape_audit\outputs\FINITE_K_DATA_INVENTORY.md,FOUND,Demo 24 evidence Demo 25 is built on

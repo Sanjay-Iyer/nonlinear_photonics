@@ -1,0 +1,34 @@
+status: REQUIRES_PROFESSIONAL_NEXTNANO
+purpose: finite-k matrix-element and exact-paper-geometry discriminator
+geometry:
+  thick_well_nm: 7.1
+  tunnel_barrier_nm: 1.8
+  thin_well_nm: 2.9
+  period_barrier_nm: 18.2
+  total_period_nm: 30.0
+  barrier_al_fraction: 0.55
+  interface_model: abrupt
+  temperature_K: 300.0
+k_path:
+  direction: [0.0, 1.0, 0.0]
+  start: Gamma
+  # Demo 24N: at 0.125 pi/a the integrand still peaks at the cutoff, and the
+  # resonance the paper's 1330 nm node needs sits near 0.116 pi/a, so the grid
+  # must pass it with margin rather than stop on it.
+  stop_fraction_of_pi_over_a: 0.20
+  points: 301
+required_outputs:
+  - explicit k vectors
+  - all-k energies for at least 14 states
+  - all-k complex spinor/envelope coefficients for state tracking
+  - all-k CB/HH/LH/SO fractions per state
+  - all-k complex O_nm(k) or sufficient envelopes to construct it
+  - all-k complex z_e_nl(k)
+  - all-k complex z_hh_ml(k)
+  - oscillator strengths for every solved state, to test whether anything reaches 2.296 eV
+  - bandedges.dat
+  - solver/database/material metadata
+pilot_check:
+  reason: Demo 23 requested all_k_state_output but received only k00000 state and matrix files.
+  action: validate the output syntax on a small k grid before launching the production job.
+note: The existing Demo 23 deck renderer exports dispersions but not the required all-k matrices, so this proposal is intentionally not presented as an executable deck.

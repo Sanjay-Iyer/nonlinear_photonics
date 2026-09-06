@@ -1,0 +1,21 @@
+{
+  "sub_demo": "27C",
+  "tier": 2,
+  "professional_required": true,
+  "decks_declared": 1,
+  "decks_generated": 1,
+  "k_points_per_deck": [
+    301
+  ],
+  "total_k_point_solves": 301,
+  "states_per_deck": [
+    48
+  ],
+  "max_states": 48,
+  "runtime_hours_low": 0.5,
+  "runtime_hours_high": 2.0,
+  "runtime_text": "30 min - 2 h",
+  "output_gb_low": 1.0,
+  "output_gb_high": 3.0,
+  "basis": "Demo 23 solved 301 k points for 14 states in 10 min 20 s. The eigenvalue cost grows faster than linearly in the state count, so 48 states is taken as 3-10x that. Envelopes are written at k=0 only unless 27A unlocks per-k output, which is why 27C is cheap compared with 27B."
+}

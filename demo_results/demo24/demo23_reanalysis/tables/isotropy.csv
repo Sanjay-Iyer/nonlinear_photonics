@@ -1,0 +1,5 @@
+state,direction_1,direction_2,max_absolute_anisotropy_meV,relative_to_band_excursion,radial_assumption_pass,tolerance_meV
+e1,y,yz45,1.706199570580047,0.01079017331085406,False,1.0
+e2,y,yz45,1.3300892212511073,0.009739112716776908,False,1.0
+hh1,y,yz45,11.31775702642912,0.45706903653127073,False,1.0
+hh2,y,yz45,2.6052832056293607,0.11627456355601631,False,1.0

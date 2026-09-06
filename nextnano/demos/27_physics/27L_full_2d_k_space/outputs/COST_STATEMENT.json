@@ -1,0 +1,21 @@
+{
+  "sub_demo": "27L",
+  "tier": 4,
+  "professional_required": true,
+  "decks_declared": 1,
+  "decks_generated": 1,
+  "k_points_per_deck": [
+    61
+  ],
+  "total_k_point_solves": 61,
+  "states_per_deck": [
+    14
+  ],
+  "max_states": 14,
+  "runtime_hours_low": 8.0,
+  "runtime_hours_high": 24.0,
+  "runtime_text": "8 h - 24 h",
+  "output_gb_low": 4.0,
+  "output_gb_high": 20.0,
+  "basis": "k_integration builds a two-dimensional in-plane grid, so num_points = 61 with symmetry = none is of order 61^2 = 3700 k-point solves against the 301 of a dispersion path - roughly twelve times the Demo 23 production run before the per-k output volume is counted. This is a planning estimate with wide bounds and it should be re-derived from the 27A pilot's measured seconds-per-k and bytes-per-k before the run is launched."
+}

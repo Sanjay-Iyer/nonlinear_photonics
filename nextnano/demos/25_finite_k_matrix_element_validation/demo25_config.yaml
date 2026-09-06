@@ -1,0 +1,119 @@
+demo:
+  id: 25
+  name: finite_k_matrix_element_validation
+  title: Finite-k Matrix Element and Extended-State Professional Validation
+  parent_demos: [22, 23, 24]
+
+# ---------------------------------------------------------------------------
+# Structure is INHERITED from Demo 23, never restated here. config25.py loads
+# demo23_config.yaml and copies these blocks verbatim; a test asserts they are
+# byte-identical. Demo 25 changes OUTPUT AVAILABILITY and STATE RANGE only.
+# ---------------------------------------------------------------------------
+inherit:
+  from_demo: 23_k_resolved_dispersion_validation
+  config_file: demo23_config.yaml
+  frozen_blocks: [geometry, materials, mesh, solver]
+  frozen_kp8_keys: [production_direction, directions]
+
+# Why Demo 23 saw only k00000 --------------------------------------------------
+# Demo 23 set `k_integration_disabled{}` and obtained k dependence from
+# `dispersion{ path{} }`. `all_k_points = yes` follows the k-INTEGRATION grid,
+# which then held exactly one point (k=0), so only `..._k00000` state and
+# matrix files were ever written. The dispersion path emits energies/masses
+# only. Demo 25 therefore enables `k_integration{}`.
+root_cause_hypothesis:
+  demo23_setting: k_integration_disabled{}
+  consequence: all_k_points had a single k-integration point, so only k00000 state files
+  demo25_fix: enable k_integration{} so the k grid carries more than one point
+
+kp8:
+  # Extended beyond Demo 23's 6/8/14 so the ~2.296 eV search has states to find.
+  number_of_electron_states: 14
+  number_of_hole_states: 18
+  output_state_count: 32
+
+pilot:
+  # Deliberately tiny. Each variant tests ONE candidate explanation for the
+  # missing finite-k output, so a single work-laptop trip settles the syntax.
+  num_points: 4
+  relative_size: 0.20
+  timeout_seconds_per_deck: 3600
+  variants:
+    - name: A1_kint_nodensity
+      question: Does k_integration{} alone produce multi-k state output?
+      k_integration: true
+      no_density: true
+      k_point_subdirectories: false
+      symmetry: none
+      keep_dispersion_path: false
+    - name: A2_kint_density
+      question: Does no_density=yes suppress the k-integration loop?
+      k_integration: true
+      no_density: false
+      k_point_subdirectories: false
+      symmetry: none
+      keep_dispersion_path: false
+    - name: A3_kint_subdirs
+      question: Does per-k output require k_point_subdirectories=yes?
+      k_integration: true
+      no_density: true
+      k_point_subdirectories: true
+      symmetry: none
+      keep_dispersion_path: false
+    - name: A4_kint_symmetry_C4
+      question: How does symmetry change the emitted k-point set?
+      k_integration: true
+      no_density: true
+      k_point_subdirectories: true
+      symmetry: C4
+      keep_dispersion_path: false
+    - name: A5_kint_plus_dispersion
+      question: Can k_integration and dispersion{path{}} coexist for cross-check?
+      k_integration: true
+      no_density: true
+      k_point_subdirectories: true
+      symmetry: none
+      keep_dispersion_path: true
+    - name: A0_control_demo23_style
+      question: Control - reproduce the Demo 23 k=0-only behaviour with extended states
+      k_integration: false
+      no_density: true
+      k_point_subdirectories: false
+      symmetry: none
+      keep_dispersion_path: true
+
+# Production is sized from PILOT MEASUREMENTS, not from a guess. run_demo25.py
+# refuses to launch it until pilot_audit.py has recorded per-k cost and volume.
+production:
+  fraction_of_bz: 0.20
+  requested_k_points: 301
+  # Matrix elements vary slowly with k while energies set the resonances, so the
+  # envelope/matrix grid may be coarser than the energy grid and interpolated up.
+  # Set to null to use requested_k_points; the pilot report recommends a value.
+  matrix_k_points: null
+  interpolate_matrix_elements_onto_energy_grid: true
+  timeout_seconds_per_deck: 86400
+  max_projected_hours: 12.0
+  max_projected_output_gb: 60.0
+
+transition_search:
+  target_eV: 2.296
+  tolerance_eV: 0.050
+  # Demo 24 derived this ceiling: no bound-bound transition can exceed the
+  # barrier gap. Candidates above it must be flagged as unbound/quasi-bound.
+  bound_bound_ceiling_source: barrier_gap_from_bandedges
+  min_oscillator_strength_fraction: 0.01
+  min_overlap_fraction: 0.05
+
+analysis:
+  # Equation 2 physics is inherited unchanged from Demo 23/24.
+  matrix_variation_flag_fractions: [0.05, 0.10]
+  paper_curve: nextnano/demos/23_k_resolved_dispersion_validation/paper_figure2d_digitized_simulation.csv
+  demo24_outputs: nextnano/demos/24_equation2_spectral_shape_audit/outputs
+
+paths:
+  results_root: demo_results/demo25
+
+outputs:
+  root: nextnano/demos/25_finite_k_matrix_element_validation/outputs
+  dpi: 180

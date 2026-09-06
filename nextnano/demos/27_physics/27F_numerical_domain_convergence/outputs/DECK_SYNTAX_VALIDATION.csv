@@ -1,0 +1,8 @@
+deck,parse_ok,message
+mesh_fine_0p025nm.in,True,parsed
+mesh_coarse_0p100nm.in,True,parsed
+padding_4nm.in,True,parsed
+padding_8nm.in,True,parsed
+outer_barrier_28p2nm.in,True,parsed
+states_24.in,True,parsed
+boundary_neumann.in,True,parsed

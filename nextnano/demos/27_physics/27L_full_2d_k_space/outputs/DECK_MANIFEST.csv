@@ -1,0 +1,2 @@
+deck,question,band_model,k_mode,k_points,kmax_per_nm,states_out,electrostatics,interface_model,changed_fields,structural_diff_lines,path
+k2d_integration_n61.in,Does the 2D in-plane integral differ from the radial one?,kp8,integration,61,0.555714,14,flat_band,linear_graded,k_mode;k_points,0,C:\code\nonlinear_photonics\nextnano\demos\27_physics\27L_full_2d_k_space\inputs\k2d_integration_n61.in

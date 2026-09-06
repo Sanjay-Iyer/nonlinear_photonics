@@ -1,0 +1,128 @@
+[
+  {
+    "name": "grid_y_n101_k0100",
+    "path": "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\grid_y_n101_k0100",
+    "file_count": 738,
+    "dispersion_paths": [
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\grid_y_n101_k0100\\grid_y_n101_k0100\\bias_00000\\QuantumDispersions\\acqw\\kp8\\dispersion_Gamma_to_y.dat"
+    ],
+    "kvector_paths": [
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\grid_y_n101_k0100\\grid_y_n101_k0100\\bias_00000\\QuantumDispersions\\acqw\\kp8\\kVectors_Gamma_to_y.dat"
+    ],
+    "spinor_paths": [
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\grid_y_n101_k0100\\grid_y_n101_k0100\\bias_00000\\Quantum\\acqw\\kp8\\spinor_composition_k00000_CbHhLhSo.dat",
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\grid_y_n101_k0100\\grid_y_n101_k0100\\bias_00000\\Quantum\\acqw\\kp8\\spinor_composition_k00000_SXYZ.dat"
+    ],
+    "finite_k_wavefunction_or_matrix_files": 0,
+    "max_k_per_nm": "100   0.000000000000    0.555714439232    0.000000000000",
+    "reuse": "Real graded kp8 energies; M(k)=M(0) only, energy-column tracking limited"
+  },
+  {
+    "name": "grid_y_n201_k0100",
+    "path": "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\grid_y_n201_k0100",
+    "file_count": 738,
+    "dispersion_paths": [
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\grid_y_n201_k0100\\grid_y_n201_k0100\\bias_00000\\QuantumDispersions\\acqw\\kp8\\dispersion_Gamma_to_y.dat"
+    ],
+    "kvector_paths": [
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\grid_y_n201_k0100\\grid_y_n201_k0100\\bias_00000\\QuantumDispersions\\acqw\\kp8\\kVectors_Gamma_to_y.dat"
+    ],
+    "spinor_paths": [
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\grid_y_n201_k0100\\grid_y_n201_k0100\\bias_00000\\Quantum\\acqw\\kp8\\spinor_composition_k00000_CbHhLhSo.dat",
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\grid_y_n201_k0100\\grid_y_n201_k0100\\bias_00000\\Quantum\\acqw\\kp8\\spinor_composition_k00000_SXYZ.dat"
+    ],
+    "finite_k_wavefunction_or_matrix_files": 0,
+    "max_k_per_nm": "200   0.000000000000    0.555714439232    0.000000000000",
+    "reuse": "Real graded kp8 energies; M(k)=M(0) only, energy-column tracking limited"
+  },
+  {
+    "name": "isotropy_yz45_n301_k0100",
+    "path": "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\isotropy_yz45_n301_k0100",
+    "file_count": 738,
+    "dispersion_paths": [
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\isotropy_yz45_n301_k0100\\isotropy_yz45_n301_k0100\\bias_00000\\QuantumDispersions\\acqw\\kp8\\dispersion_Gamma_to_yz45.dat"
+    ],
+    "kvector_paths": [
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\isotropy_yz45_n301_k0100\\isotropy_yz45_n301_k0100\\bias_00000\\QuantumDispersions\\acqw\\kp8\\kVectors_Gamma_to_yz45.dat"
+    ],
+    "spinor_paths": [
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\isotropy_yz45_n301_k0100\\isotropy_yz45_n301_k0100\\bias_00000\\Quantum\\acqw\\kp8\\spinor_composition_k00000_CbHhLhSo.dat",
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\isotropy_yz45_n301_k0100\\isotropy_yz45_n301_k0100\\bias_00000\\Quantum\\acqw\\kp8\\spinor_composition_k00000_SXYZ.dat"
+    ],
+    "finite_k_wavefunction_or_matrix_files": 0,
+    "max_k_per_nm": "300   0.000000000000    0.392949448384    0.392949448384",
+    "reuse": "Real graded kp8 energies; M(k)=M(0) only, energy-column tracking limited"
+  },
+  {
+    "name": "kmax_y_n301_k0050",
+    "path": "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\kmax_y_n301_k0050",
+    "file_count": 738,
+    "dispersion_paths": [
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\kmax_y_n301_k0050\\kmax_y_n301_k0050\\bias_00000\\QuantumDispersions\\acqw\\kp8\\dispersion_Gamma_to_y.dat"
+    ],
+    "kvector_paths": [
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\kmax_y_n301_k0050\\kmax_y_n301_k0050\\bias_00000\\QuantumDispersions\\acqw\\kp8\\kVectors_Gamma_to_y.dat"
+    ],
+    "spinor_paths": [
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\kmax_y_n301_k0050\\kmax_y_n301_k0050\\bias_00000\\Quantum\\acqw\\kp8\\spinor_composition_k00000_CbHhLhSo.dat",
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\kmax_y_n301_k0050\\kmax_y_n301_k0050\\bias_00000\\Quantum\\acqw\\kp8\\spinor_composition_k00000_SXYZ.dat"
+    ],
+    "finite_k_wavefunction_or_matrix_files": 0,
+    "max_k_per_nm": "300   0.000000000000    0.277857219616    0.000000000000",
+    "reuse": "Real graded kp8 energies; M(k)=M(0) only, energy-column tracking limited"
+  },
+  {
+    "name": "kmax_y_n301_k0075",
+    "path": "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\kmax_y_n301_k0075",
+    "file_count": 738,
+    "dispersion_paths": [
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\kmax_y_n301_k0075\\kmax_y_n301_k0075\\bias_00000\\QuantumDispersions\\acqw\\kp8\\dispersion_Gamma_to_y.dat"
+    ],
+    "kvector_paths": [
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\kmax_y_n301_k0075\\kmax_y_n301_k0075\\bias_00000\\QuantumDispersions\\acqw\\kp8\\kVectors_Gamma_to_y.dat"
+    ],
+    "spinor_paths": [
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\kmax_y_n301_k0075\\kmax_y_n301_k0075\\bias_00000\\Quantum\\acqw\\kp8\\spinor_composition_k00000_CbHhLhSo.dat",
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\kmax_y_n301_k0075\\kmax_y_n301_k0075\\bias_00000\\Quantum\\acqw\\kp8\\spinor_composition_k00000_SXYZ.dat"
+    ],
+    "finite_k_wavefunction_or_matrix_files": 0,
+    "max_k_per_nm": "300   0.000000000000    0.416785829424    0.000000000000",
+    "reuse": "Real graded kp8 energies; M(k)=M(0) only, energy-column tracking limited"
+  },
+  {
+    "name": "kmax_y_n301_k0125",
+    "path": "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\kmax_y_n301_k0125",
+    "file_count": 738,
+    "dispersion_paths": [
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\kmax_y_n301_k0125\\kmax_y_n301_k0125\\bias_00000\\QuantumDispersions\\acqw\\kp8\\dispersion_Gamma_to_y.dat"
+    ],
+    "kvector_paths": [
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\kmax_y_n301_k0125\\kmax_y_n301_k0125\\bias_00000\\QuantumDispersions\\acqw\\kp8\\kVectors_Gamma_to_y.dat"
+    ],
+    "spinor_paths": [
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\kmax_y_n301_k0125\\kmax_y_n301_k0125\\bias_00000\\Quantum\\acqw\\kp8\\spinor_composition_k00000_CbHhLhSo.dat",
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\kmax_y_n301_k0125\\kmax_y_n301_k0125\\bias_00000\\Quantum\\acqw\\kp8\\spinor_composition_k00000_SXYZ.dat"
+    ],
+    "finite_k_wavefunction_or_matrix_files": 0,
+    "max_k_per_nm": "300   0.000000000000    0.694643049040    0.000000000000",
+    "reuse": "Real graded kp8 energies; M(k)=M(0) only, energy-column tracking limited"
+  },
+  {
+    "name": "production_y_n301_k0100",
+    "path": "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\production_y_n301_k0100",
+    "file_count": 738,
+    "dispersion_paths": [
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\production_y_n301_k0100\\production_y_n301_k0100\\bias_00000\\QuantumDispersions\\acqw\\kp8\\dispersion_Gamma_to_y.dat"
+    ],
+    "kvector_paths": [
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\production_y_n301_k0100\\production_y_n301_k0100\\bias_00000\\QuantumDispersions\\acqw\\kp8\\kVectors_Gamma_to_y.dat"
+    ],
+    "spinor_paths": [
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\production_y_n301_k0100\\production_y_n301_k0100\\bias_00000\\Quantum\\acqw\\kp8\\spinor_composition_k00000_CbHhLhSo.dat",
+      "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\production_y_n301_k0100\\production_y_n301_k0100\\bias_00000\\Quantum\\acqw\\kp8\\spinor_composition_k00000_SXYZ.dat"
+    ],
+    "finite_k_wavefunction_or_matrix_files": 0,
+    "max_k_per_nm": "300   0.000000000000    0.555714439232    0.000000000000",
+    "reuse": "Real graded kp8 energies; M(k)=M(0) only, energy-column tracking limited"
+  }
+]

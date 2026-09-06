@@ -1,0 +1,79 @@
+demo:
+  id: 27K
+  slug: continuum_states
+  title: Continuum and quasi-bound state contributions
+  question: Do physically meaningful continuum or quasi-bound states contribute to the high-energy features?
+  tier: 3
+  tier_planned: "3-4"
+  priority: null
+  professional_required: true
+  prerequisites: [27C, 27F]
+  unlocks: []
+
+pass_condition: >-
+  Every state above the Al0.55Ga0.45As barrier edge is classified by evidence,
+  not by index: confinement fraction inside the wells, sensitivity to the domain
+  size and to the boundary condition, and oscillator strength to the states
+  Equation 2 uses. PASS means each such state is labelled REAL QUASI-BOUND (its
+  energy and localization survive the domain change) or DIRICHLET BOX STATE (it
+  moves with the walls). A box state may not be entered into Equation 2 under any
+  circumstances, and 27K produces no chi2 contribution from unlabelled states.
+
+# This sub-demo is deliberately prerequisite-gated on evidence rather than on
+# schedule. 27C says whether extra states exist at all; 27F says whether they
+# move with the numerical domain. If 27F shows the high states are box states,
+# the correct outcome here is NOT NEEDED, and that costs nothing.
+run_only_if: >-
+  27C reports optically relevant candidates above the current window AND 27F does
+  not already label them as artifacts of the Dirichlet box.
+
+cost:
+  decks: 3
+  k_points_per_deck: 301
+  states_per_deck: 64
+  runtime_hours: [4.0, 12.0]
+  output_gb: [3.0, 9.0]
+  basis: >-
+    64 states is more than four times the Demo 23 production count of 14, and the
+    eigenvalue cost grows faster than linearly in the state count, so each deck is
+    taken as 1-3 h against the measured 10 min 20 s baseline. Three decks are
+    needed because a continuum claim is only meaningful if the domain is varied
+    underneath it - one deck could not distinguish a resonance from a box level.
+
+stages:
+  preflight: {kind: generate_and_parse}
+  physics:   {kind: professional}
+  analyze:   {kind: python}
+
+controlled_change:
+  summary: >-
+    Many more states than the structure binds, solved on three different
+    numerical domains. The state count is the sub-demo's subject; the domain is
+    varied because that is the only way to tell a real quasi-bound resonance from
+    a Dirichlet box level, and holding it fixed would make the question
+    unanswerable rather than controlled.
+  fields: [num_electrons, num_holes, output_state_count,
+           quantum_region_padding_nm, period_barrier_nm]
+  max_fields_per_deck: 4
+
+decks:
+  - name: continuum_pad2_outer18
+    question: What lies above the barrier edge on the Demo 23 domain?
+    overrides: {num_electrons: 28, num_holes: 36, output_state_count: 64}
+  - name: continuum_pad8_outer18
+    question: Which of those states move when the Dirichlet walls move?
+    overrides: {num_electrons: 28, num_holes: 36, output_state_count: 64,
+                quantum_region_padding_nm: 8.0}
+  - name: continuum_pad2_outer34
+    question: Which of them move when the outer barrier gets thicker?
+    overrides: {num_electrons: 28, num_holes: 36, output_state_count: 64,
+                period_barrier_nm: 34.2}
+
+harvest_overrides: {}
+
+analysis:
+  produces:
+    - ABOVE_BARRIER_STATE_INVENTORY.csv
+    - DOMAIN_SENSITIVITY_PER_STATE.csv
+    - QUASIBOUND_VS_BOX_LABELS.csv
+    - CONTINUUM_VERDICT.md

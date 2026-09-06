@@ -1,0 +1,52 @@
+[
+  {
+    "dataset": "Demo19 scalar grading",
+    "path": "C:/code/nonlinear_photonics/demo_results/demo19/tables/demo19_master_results.csv",
+    "cases": 13,
+    "abrupt_present": true,
+    "solver_pass": true,
+    "physical_valid": false,
+    "limitation": "Unknown specific failed physical QC subcheck; original raw tree missing; no kp8 dispersions",
+    "reuse": "Scalar/parabolic spectrum and matrix-source diagnostics"
+  },
+  {
+    "dataset": "Demo20",
+    "path": "C:/code/nonlinear_photonics/demo_results/demo20/data",
+    "cases": 13,
+    "limitation": "Postprocessing same Demo19; saved focused spectra start1400nm",
+    "reuse": "Normalized scaling invariance; regenerate full window cheaply from matrices"
+  },
+  {
+    "dataset": "Demo20_license",
+    "path": "C:/code/nonlinear_photonics/demo_results/demo20_license/tables/demo20_master_results.csv",
+    "limitation": "states_provenance master_table:demo19_master_results.csv; not independent licensed solve"
+  },
+  {
+    "dataset": "Demo22",
+    "path": "C:/code/nonlinear_photonics/nextnano/demos/22_k_resolved_8band_chi2_validation/00_setup_and_provenance/RUN_MANIFEST.json",
+    "run_solver": false,
+    "limitation": "Inputs and syntax results not eigenstates"
+  },
+  {
+    "dataset": "Existing Free abrupt fixture",
+    "path": "C:/code/nonlinear_photonics/nextnano/tests/fixtures/nextnano_pp_3_0_0/demo11_acqw_paper",
+    "limitation": "Coarse1nm Free scalar only, not converged physics",
+    "reuse": "Parser/integration verification"
+  },
+  {
+    "dataset": "Existing Free Poisson fixture",
+    "path": "C:/code/nonlinear_photonics/nextnano/tests/fixtures/nextnano_pp_3_0_0/demo06_doped_scf",
+    "limitation": "Different doped structure, coarse mesh, non-convergence example",
+    "reuse": "Parser verification only"
+  },
+  {
+    "dataset": "Other nn_results",
+    "path": "C:/nn_results",
+    "limitation": "Only Demo17 and17e syntax/preflight, run_solver_enabled=false"
+  },
+  {
+    "dataset": "Other codes",
+    "path": "C:/code/nonlinear_photonics/replication/qw_metasurface",
+    "limitation": "Aestimo/kdotpy, not baseline nextnano eigenstates"
+  }
+]

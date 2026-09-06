@@ -1,0 +1,67 @@
+demo:
+  id: 27A
+  slug: finite_k_output_pilot
+  title: Finite-k Professional output pilot
+  question: Can nextnano++ Professional export usable finite-k state, spinor and matrix data at k != 0?
+  tier: 1
+  tier_planned: 1
+  priority: 1
+  professional_required: true
+  prerequisites: []
+  unlocks: [27B, 27C]
+
+pass_condition: >-
+  Demo 25's PILOT_GATE.json records status PASS: more than one k point carries
+  both energies and envelopes, and an identifiable k-vector file exists so each
+  state can be tied to a k value. That is exactly enough to construct O_nm(k),
+  z_e,nl(k) and z_hh,ml(k). Anything less is a FAIL and 27B stays blocked.
+
+# 27A does not implement the pilot. Demo 25 already does, deck for deck, and its
+# gate is filesystem-based rather than exit-code-based. Forking it would create a
+# second answer to the same question.
+delegate:
+  demo: 25_finite_k_matrix_element_validation
+  runner: run_demo25.py
+  commands:
+    preflight: "--preflight"
+    physics: "--pilot"
+    analyze: "--pilot-audit"
+  reason: >-
+    Demo 25 was built for this exact question and has never been run. Its six
+    variants isolate one candidate explanation each (k_integration, no_density,
+    k_point_subdirectories, symmetry, dispersion coexistence, plus the Demo 23
+    control), so one work-laptop trip settles the syntax.
+
+cost:
+  decks: 6
+  k_points_per_deck: 4
+  states_per_deck: 32
+  runtime_hours: [0.08, 0.35]
+  output_gb: [0.2, 2.0]
+  basis: >-
+    Demo 23 solved 301 dispersion k points for 14 states in 10 min 20 s on the
+    work laptop. The pilot is 6 decks x 4 k points but with 32 states and full
+    envelope output at every k, so it is dominated by output volume, not by the
+    eigenvalue problem. Demo 25's own pilot_audit then measures seconds-per-k and
+    bytes-per-k for real and sizes 27B from the measurement rather than from this
+    estimate.
+
+stages:
+  preflight: {kind: delegated}
+  physics:   {kind: delegated}
+  analyze:   {kind: delegated}
+
+controlled_change:
+  summary: >-
+    Which per-k outputs nextnano++ is asked for, and whether the k-integration
+    grid is enabled. Geometry, materials, mesh and temperature are Demo 23's,
+    unchanged; Demo 25 enforces that with a structural diff against the Demo 23
+    deck.
+  fields: []
+  max_fields_per_deck: 0
+
+harvest_overrides: {}
+
+analysis:
+  produces:
+    - PILOT_OUTPUT_AUDIT.md

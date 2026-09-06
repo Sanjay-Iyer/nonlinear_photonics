@@ -1,0 +1,17 @@
+{
+  "sub_demo": "27B",
+  "tier": 2,
+  "professional_required": true,
+  "decks_declared": 1,
+  "decks_generated": 0,
+  "k_points_per_deck": [],
+  "total_k_point_solves": 0,
+  "states_per_deck": [],
+  "max_states": 0,
+  "runtime_hours_low": 1.0,
+  "runtime_hours_high": 3.0,
+  "runtime_text": "1 h - 3 h",
+  "output_gb_low": 10.0,
+  "output_gb_high": 15.0,
+  "basis": "Demo 25's README, calibrated on the Demo 23 work-laptop timing: roughly 10-30 s per k point at 32 states with full per-k envelopes. Disk dominates - Demo 23 wrote 18 MB per case with envelopes at k=0 only. The real number is measured by the 27A pilot, and Demo 25 will recommend a smaller matrix-element grid if 301 points would exceed its 12 h / 60 GB budgets. Matrix elements vary slowly with k while energies set the resonance positions, so a coarser M(k) grid interpolated onto the fine energy grid loses very little."
+}

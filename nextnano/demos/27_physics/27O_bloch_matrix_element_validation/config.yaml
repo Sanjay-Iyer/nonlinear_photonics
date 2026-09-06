@@ -1,0 +1,64 @@
+demo:
+  id: 27O
+  slug: bloch_matrix_element_validation
+  title: Microscopic Bloch matrix element validation
+  question: Is the approximation r_e,hh(k) = constant adequate?
+  tier: 5
+  tier_planned: 5
+  priority: null
+  professional_required: false
+  prerequisites: [27B]
+  unlocks: []
+
+pass_condition: >-
+  The interband Bloch matrix element is derived from the k.p parameters rather
+  than assumed, its dependence on band character, k and composition is reported,
+  and the constant r_e,hh = 0.751 nm the chi2 engine currently uses is either
+  confirmed within a stated tolerance or replaced with a justified k-dependent
+  form. PASS requires the derivation and its uncertainty, not agreement.
+
+# This is the only sub-demo that may need software outside nextnano. It is last
+# on purpose: a microscopic correction to the Bloch factor is only meaningful
+# once the envelope-function physics above it is understood, and 27A-27L are what
+# establish that.
+external_tooling:
+  status: NOT PROVISIONED
+  candidates:
+    - kp8 interband momentum matrix elements from 27B's harvest (no new tool)
+    - an independent DFT/HSE06 calculation of GaAs and Al0.55Ga0.45As (new tool)
+  note: >-
+    The first candidate needs no new software and should be attempted first. A
+    DFT validation is a separate provisioning decision with its own cost, and
+    Demo 27 does not assume it will happen.
+
+cost:
+  decks: 0
+  k_points_per_deck: 0
+  states_per_deck: 0
+  runtime_hours: [1.0, 48.0]
+  output_gb: [0.0, 5.0]
+  basis: >-
+    The kp8-derived route is hours of post-processing on 27B's harvest. The DFT
+    route is day-scale and needs software this project does not have, which is
+    why the range is this wide and why the sub-demo starts as a scoping exercise.
+
+stages:
+  preflight: {kind: python}
+  physics:   {kind: external}
+  analyze:   {kind: python}
+
+controlled_change:
+  summary: >-
+    None inside nextnano. 27O changes the model of the microscopic dipole, not
+    the structure or the solver settings.
+  fields: []
+  max_fields_per_deck: 0
+
+harvest_overrides: {}
+
+analysis:
+  produces:
+    - BLOCH_MATRIX_ELEMENT_SCOPE.md
+    - R_EHH_K_DEPENDENCE.csv
+    - R_EHH_COMPOSITION_DEPENDENCE.csv
+    - BLOCH_VERDICT.md

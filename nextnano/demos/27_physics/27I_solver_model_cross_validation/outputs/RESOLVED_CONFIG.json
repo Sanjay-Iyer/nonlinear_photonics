@@ -1,0 +1,57 @@
+{
+  "sub_demo": "27I",
+  "title": "Solver and model cross-validation",
+  "question": "Which spectral features come specifically from the 8-band k.p treatment?",
+  "tier": 1,
+  "prerequisites": [],
+  "pass_condition": "The same physical structure is solved with three models and the state energies, transition energies and optical matrix elements are tabulated side by side. PASS means each of the six Equation 2 features is attributed to the simplest model that reproduces it. The comparison must be like-for-like: the geometry, mesh, temperature and domain are identical across arms, which is exactly what the single controlled change guarantees.",
+  "stages": {
+    "preflight": {
+      "kind": "generate_and_parse"
+    },
+    "physics": {
+      "kind": "professional"
+    },
+    "analyze": {
+      "kind": "python"
+    }
+  },
+  "delegate": {},
+  "controlled_change": {
+    "summary": "The quantum model. The single-band deck also drops the k path, because a decoupled Gamma/HH model has no in-plane k dependence to sample in this deck form - that is the second field, and it is a consequence of the first rather than an independent choice.",
+    "fields": [
+      "band_model",
+      "k_mode"
+    ],
+    "max_fields_per_deck": 2
+  },
+  "baseline": {
+    "source": "23_k_resolved_dispersion_validation/demo23_config.yaml"
+  },
+  "decks": [
+    {
+      "name": "model_kp6_valence",
+      "question": "Which features survive a 6-band valence treatment with a decoupled conduction band?",
+      "changes": {
+        "band_model": {
+          "baseline": "kp8",
+          "deck": "kp6"
+        }
+      }
+    },
+    {
+      "name": "model_single_band",
+      "question": "Which features survive a decoupled parabolic Gamma/HH treatment?",
+      "changes": {
+        "band_model": {
+          "baseline": "kp8",
+          "deck": "single_band"
+        },
+        "k_mode": {
+          "baseline": "dispersion",
+          "deck": "none"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "sub_demo": "27I",
+  "tier": 1,
+  "professional_required": true,
+  "decks_declared": 2,
+  "decks_generated": 2,
+  "k_points_per_deck": [
+    301,
+    0
+  ],
+  "total_k_point_solves": 301,
+  "states_per_deck": [
+    14,
+    14
+  ],
+  "max_states": 14,
+  "runtime_hours_low": 0.1,
+  "runtime_hours_high": 0.5,
+  "runtime_text": "6 min - 30 min",
+  "output_gb_low": 0.1,
+  "output_gb_high": 0.5,
+  "basis": "The single-band arm is an ordinary 1D Schroedinger solve on 600 grid points and takes seconds. The kp6 arm is the Demo 23 production cost scaled by roughly (6/8), i.e. minutes. The kp8 arm is not rerun: it is demo_results/demo23/raw/production_y_n301_k0100 on this exact structure."
+}

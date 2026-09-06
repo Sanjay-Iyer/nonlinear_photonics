@@ -1,0 +1,99 @@
+{
+  "sub_demo": "27H",
+  "title": "In-plane crystal-direction anisotropy",
+  "question": "Is the radial (isotropic) in-plane assumption valid for these states and matrix elements?",
+  "tier": 2,
+  "prerequisites": [],
+  "pass_condition": "E_n(k), state character, HH/LH mixing and the optical matrix elements are compared across the in-plane angles. PASS is reached when the maximum angular spread is quantified against an explicit tolerance and the recommendation for 27L is stated. If the spread is negligible, the correct outcome is to record 27L as NOT NEEDED - that is a successful result, not a failure.",
+  "stages": {
+    "preflight": {
+      "kind": "generate_and_parse"
+    },
+    "physics": {
+      "kind": "professional"
+    },
+    "analyze": {
+      "kind": "python"
+    }
+  },
+  "delegate": {},
+  "controlled_change": {
+    "summary": "The in-plane direction of the dispersion path, and nothing else. Growth is along [100] throughout, so [010] and [001] are symmetry-equivalent and the physically distinct sweep is from [010] to [011].",
+    "fields": [
+      "direction_name",
+      "direction"
+    ],
+    "max_fields_per_deck": 2
+  },
+  "baseline": {
+    "source": "23_k_resolved_dispersion_validation/demo23_config.yaml"
+  },
+  "decks": [
+    {
+      "name": "dir_yz15",
+      "question": "15 degrees off [010] - where does the anisotropy first appear?",
+      "changes": {
+        "direction_name": {
+          "baseline": "y",
+          "deck": "yz15"
+        },
+        "direction": {
+          "baseline": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "deck": [
+            0.0,
+            0.9659258262890683,
+            0.25881904510252074
+          ]
+        }
+      }
+    },
+    {
+      "name": "dir_yz30",
+      "question": "30 degrees off [010]",
+      "changes": {
+        "direction_name": {
+          "baseline": "y",
+          "deck": "yz30"
+        },
+        "direction": {
+          "baseline": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "deck": [
+            0.0,
+            0.8660254037844387,
+            0.49999999999999994
+          ]
+        }
+      }
+    },
+    {
+      "name": "dir_yz60",
+      "question": "60 degrees off [010] - past the [011] diagonal Demo 23 already has",
+      "changes": {
+        "direction_name": {
+          "baseline": "y",
+          "deck": "yz60"
+        },
+        "direction": {
+          "baseline": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "deck": [
+            0.0,
+            0.49999999999999994,
+            0.8660254037844387
+          ]
+        }
+      }
+    }
+  ]
+}

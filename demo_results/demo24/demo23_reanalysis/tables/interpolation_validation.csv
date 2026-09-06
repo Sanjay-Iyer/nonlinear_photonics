@@ -1,0 +1,5 @@
+state,interpolation,max_node_residual_eV,extrapolation_allowed,validated_kmin_per_nm,validated_kmax_per_nm
+e1,pchip,4.440892098500626e-16,False,0.0,0.555714439232
+e2,pchip,0.0,False,0.0,0.555714439232
+hh1,pchip,2.220446049250313e-16,False,0.0,0.555714439232
+hh2,pchip,2.220446049250313e-16,False,0.0,0.555714439232

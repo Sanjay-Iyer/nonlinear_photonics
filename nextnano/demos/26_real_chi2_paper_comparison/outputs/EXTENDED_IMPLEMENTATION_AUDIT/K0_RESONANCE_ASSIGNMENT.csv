@@ -1,0 +1,5 @@
+transition,energy_eV,one_photon_nm,two_photon_nm,assignment_warning
+DeltaE_11,1.4933526957039993,830.2405637775416,1660.4811275550833,proximity is not pathway proof
+DeltaE_12,1.5283667159019991,811.2202203175302,1622.4404406350604,proximity is not pathway proof
+DeltaE_21,1.6132174157740005,768.5523177947716,1537.1046355895432,proximity is not pathway proof
+DeltaE_22,1.6482314359720003,752.2256625744044,1504.4513251488088,proximity is not pathway proof

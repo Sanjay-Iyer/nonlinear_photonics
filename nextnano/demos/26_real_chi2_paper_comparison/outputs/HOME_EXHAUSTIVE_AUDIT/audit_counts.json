@@ -1,0 +1,14 @@
+{
+  "total_tests": 176,
+  "improved_agreement": 52,
+  "did_not_improve": 96,
+  "fit_not_applicable": 28,
+  "inconclusive": 43,
+  "requires_new_pro": 6,
+  "status_counts": {
+    "PASS": 25,
+    "FAIL": 102,
+    "INCONCLUSIVE": 43,
+    "NOT TESTABLE": 6
+  }
+}

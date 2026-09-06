@@ -1,0 +1,7 @@
+deck,parse_ok,message
+A0_control_demo23_style.in,True,parsed
+A1_kint_nodensity.in,True,parsed
+A2_kint_density.in,True,parsed
+A3_kint_subdirs.in,True,parsed
+A4_kint_symmetry_C4.in,True,parsed
+A5_kint_plus_dispersion.in,True,parsed

@@ -1,0 +1,4 @@
+deck,question,band_model,k_mode,k_points,kmax_per_nm,states_out,electrostatics,interface_model,changed_fields,structural_diff_lines,path
+dir_yz15.in,15 degrees off [010] - where does the anisotropy first appear?,kp8,dispersion,301,0.555714,14,flat_band,linear_graded,direction;direction_name,0,C:\code\nonlinear_photonics\nextnano\demos\27_physics\27H_crystal_direction_anisotropy\inputs\dir_yz15.in
+dir_yz30.in,30 degrees off [010],kp8,dispersion,301,0.555714,14,flat_band,linear_graded,direction;direction_name,0,C:\code\nonlinear_photonics\nextnano\demos\27_physics\27H_crystal_direction_anisotropy\inputs\dir_yz30.in
+dir_yz60.in,60 degrees off [010] - past the [011] diagonal Demo 23 already has,kp8,dispersion,301,0.555714,14,flat_band,linear_graded,direction;direction_name,0,C:\code\nonlinear_photonics\nextnano\demos\27_physics\27H_crystal_direction_anisotropy\inputs\dir_yz60.in

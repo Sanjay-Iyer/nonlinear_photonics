@@ -1,0 +1,20 @@
+{
+  "23_k_resolved_dispersion_validation": {
+    "file_count": 41,
+    "sha256": "0cb9a39544d491cdcbb4aeb0fabec490dd55bb7241cbcd75e3c3b81e90b5f6dc",
+    "expected": "0cb9a39544d491cdcbb4aeb0fabec490dd55bb7241cbcd75e3c3b81e90b5f6dc",
+    "unchanged": true
+  },
+  "24_equation2_spectral_shape_audit": {
+    "file_count": 96,
+    "sha256": "dbe4c3a9012b9d9bfa2966efea76904b444f4f188a806eb18cb5625cb9622641",
+    "expected": "dbe4c3a9012b9d9bfa2966efea76904b444f4f188a806eb18cb5625cb9622641",
+    "unchanged": true
+  },
+  "26_real_chi2_paper_comparison": {
+    "file_count": 22,
+    "sha256": "fbf4a561aea956582350a2b9c286e2bf2897060593b21a9c3b1d658a32f14219",
+    "expected": "fbf4a561aea956582350a2b9c286e2bf2897060593b21a9c3b1d658a32f14219",
+    "unchanged": true
+  }
+}

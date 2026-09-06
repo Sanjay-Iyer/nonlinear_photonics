@@ -1,0 +1,1 @@
+REQUIRES_NEW_PROFESSIONAL_DATA: finite-k envelope components, finite-k overlap O_nm(k), finite-k electron z matrix z_e(k), finite-k heavy-hole z matrix z_hh(k)

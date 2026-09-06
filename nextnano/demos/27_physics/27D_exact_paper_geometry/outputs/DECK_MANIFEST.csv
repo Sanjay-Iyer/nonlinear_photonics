@@ -1,0 +1,2 @@
+deck,question,band_model,k_mode,k_points,kmax_per_nm,states_out,electrostatics,interface_model,changed_fields,structural_diff_lines,path
+abrupt_paper_geometry.in,Does the ideal abrupt structure move P1/Z1/P2/P3/Z2/P4 towards the paper?,kp8,dispersion,301,0.555714,14,flat_band,abrupt,interface_model,4,C:\code\nonlinear_photonics\nextnano\demos\27_physics\27D_exact_paper_geometry\inputs\abrupt_paper_geometry.in

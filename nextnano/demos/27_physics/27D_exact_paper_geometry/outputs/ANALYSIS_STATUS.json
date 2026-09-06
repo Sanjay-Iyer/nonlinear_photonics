@@ -1,0 +1,22 @@
+{
+  "sub_demo": "27D",
+  "stage_kind": "python",
+  "raw_output_status": "NO DATA",
+  "cases": [],
+  "planned_artifacts": [
+    "GEOMETRY_FEATURE_COMPARISON.csv",
+    "NORMALIZED_CHI2_SPECTRA.csv",
+    "GEOMETRY_VERDICT.md"
+  ],
+  "artifacts_written": [
+    ".gitkeep",
+    "ANALYSIS.md",
+    "CONTROLLED_CHANGE_DIFF.md",
+    "COST_STATEMENT.json",
+    "COST_STATEMENT.md",
+    "DECK_MANIFEST.csv",
+    "DECK_SYNTAX_VALIDATION.csv",
+    "PREFLIGHT.md",
+    "RESOLVED_CONFIG.json"
+  ]
+}

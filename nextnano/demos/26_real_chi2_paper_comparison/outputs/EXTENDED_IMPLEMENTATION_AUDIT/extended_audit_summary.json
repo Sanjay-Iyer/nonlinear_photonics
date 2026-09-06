@@ -1,0 +1,63 @@
+{
+  "status": "COMPLETE",
+  "existing_engine_max_error_pm_per_V": 5.326466091769124e-10,
+  "observable_metrics": [
+    {
+      "observable": "Re",
+      "normalized_RMSE": 0.38337877530443165,
+      "correlation": 0.3643059329585638,
+      "local_RMSE_500_700": 0.12791078919273197,
+      "local_RMSE_950_1200": 0.5729082615625011,
+      "local_RMSE_1200_1450": 0.45426734306613537,
+      "P1_nm": 687.0,
+      "Z1_nm": 753.0,
+      "P2_nm": 831.0,
+      "P3_nm": 953.0,
+      "Z2_nm": 1374.0,
+      "P4_nm": 1505.0
+    },
+    {
+      "observable": "abs_Re",
+      "normalized_RMSE": 0.23787347931116054,
+      "correlation": 0.3096300795070898,
+      "local_RMSE_500_700": 0.12791078919273197,
+      "local_RMSE_950_1200": 0.37251580786061517,
+      "local_RMSE_1200_1450": 0.3033520455317535,
+      "P1_nm": 687.0,
+      "Z1_nm": 714.0,
+      "P2_nm": 753.0,
+      "P3_nm": NaN,
+      "Z2_nm": 1437.0,
+      "P4_nm": 1505.0
+    },
+    {
+      "observable": "magnitude",
+      "normalized_RMSE": 0.26239111786932695,
+      "correlation": 0.24755539373540594,
+      "local_RMSE_500_700": 0.13250979068445662,
+      "local_RMSE_950_1200": 0.38445562672151445,
+      "local_RMSE_1200_1450": 0.37203268184290783,
+      "P1_nm": 688.0,
+      "Z1_nm": 720.0,
+      "P2_nm": 752.0,
+      "P3_nm": NaN,
+      "Z2_nm": 1455.0,
+      "P4_nm": 1503.0
+    }
+  ],
+  "best_diagnostic": {
+    "name": "subset offdiagonal_only",
+    "RMSE": 0.22149362434378725
+  },
+  "best_global_phase_absRe": {
+    "observable": "abs_Re",
+    "normalized_RMSE": 0.22969981149055052,
+    "correlation": 0.40405776928475823,
+    "phase_deg": 161,
+    "status": "DIAGNOSTIC ONLY"
+  },
+  "gauge_max_error": 0.0,
+  "origin_max_error": 1.6167931168329112e-12,
+  "preserved": true,
+  "demo25_decision": "DEMO 25 SHOULD WAIT \u2014 NEED FRIEND'S REPRODUCTION DETAILS FIRST"
+}

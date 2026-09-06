@@ -1,0 +1,62 @@
+demo:
+  id: 27C
+  slug: extended_states
+  title: Extended state capture - are e1, e2, hh1, hh2 enough?
+  question: Are the four states Equation 2 currently uses sufficient, or do other states carry optical weight?
+  tier: 2
+  tier_planned: 2
+  priority: 8
+  professional_required: true
+  prerequisites: [27A]
+  unlocks: [27K]
+
+pass_condition: >-
+  E_n(k) is available for every requested state over the whole k path, each state
+  carries a physical identity (CB/HH/LH/SO fractions, localization, confinement)
+  rather than an energy index, and every candidate transition in the search window
+  is classified bound / quasi-bound / continuum. The ~2.296 eV question is
+  answered with evidence, not assumed: Demo 24 showed no bound-bound transition in
+  this structure can exceed the 2.145 eV barrier gap, so a bound candidate there
+  would contradict that and needs the stronger evidence.
+
+cost:
+  decks: 1
+  k_points_per_deck: 301
+  states_per_deck: 48
+  runtime_hours: [0.5, 2.0]
+  output_gb: [1.0, 3.0]
+  basis: >-
+    Demo 23 solved 301 k points for 14 states in 10 min 20 s. The eigenvalue cost
+    grows faster than linearly in the state count, so 48 states is taken as 3-10x
+    that. Envelopes are written at k=0 only unless 27A unlocks per-k output, which
+    is why 27C is cheap compared with 27B.
+
+stages:
+  preflight: {kind: generate_and_parse}
+  physics:   {kind: professional}
+  analyze:   {kind: python}
+
+controlled_change:
+  summary: >-
+    The number of states solved and written. Geometry, mesh, temperature, k range
+    and k sampling are all the Demo 23 baseline, so any new state is a property of
+    the structure and not of a changed calculation.
+  fields: [num_electrons, num_holes, output_state_count]
+  max_fields_per_deck: 3
+
+decks:
+  - name: extended_states_e20_h28
+    question: Which states exist between the Demo 23 window and the barrier continuum?
+    overrides:
+      num_electrons: 20
+      num_holes: 28
+      output_state_count: 48
+
+harvest_overrides: {}
+
+analysis:
+  produces:
+    - STATE_INVENTORY.csv
+    - TRANSITION_CANDIDATES.csv
+    - BOUND_QUASIBOUND_CONTINUUM.csv
+    - STATE_MIXING_REGIONS.csv

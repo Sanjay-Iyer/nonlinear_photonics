@@ -1,0 +1,3 @@
+deck,parse_ok,message
+A_flat_band_control.in,True,parsed
+B_self_consistent.in,True,parsed

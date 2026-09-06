@@ -1,0 +1,33 @@
+{
+  "sub_demo": "27F",
+  "tier": 2,
+  "professional_required": true,
+  "decks_declared": 7,
+  "decks_generated": 7,
+  "k_points_per_deck": [
+    301,
+    301,
+    301,
+    301,
+    301,
+    301,
+    301
+  ],
+  "total_k_point_solves": 2107,
+  "states_per_deck": [
+    14,
+    14,
+    14,
+    14,
+    14,
+    24,
+    14
+  ],
+  "max_states": 24,
+  "runtime_hours_low": 2.5,
+  "runtime_hours_high": 6.0,
+  "runtime_text": "2.5 h - 6 h",
+  "output_gb_low": 1.5,
+  "output_gb_high": 4.0,
+  "basis": "Seven decks at roughly the Demo 23 production cost (10 min 20 s each), except the 0.025 nm mesh, which doubles the grid and therefore costs several times more. The 0.05 nm / 2 nm-padding / 18.2 nm-outer-barrier / Dirichlet control is NOT rerun: demo_results/demo23/raw/production_y_n301_k0100 is that exact case. Demo 23 also already holds 101 and 201 k-point grids, so k-grid convergence is reused rather than recomputed."
+}

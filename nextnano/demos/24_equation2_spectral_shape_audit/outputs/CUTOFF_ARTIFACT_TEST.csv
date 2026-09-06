@@ -1,0 +1,5 @@
+peak_wavelength_at_largest_kmax_nm,tracked_wavelengths_nm,spread_across_kmax_nm,dLambda_dFractionOfBZ_nm,classification,best_match_to_cutoff_resonance,mean_abs_error_vs_one_photon_at_kmax_nm,mean_abs_error_vs_two_photon_at_kmax_nm
+659.0,kmax=0.05 pi/a=751; kmax=0.075 pi/a=751; kmax=0.1 pi/a=752; kmax=0.125 pi/a=659,93.0,-1100.0000000000025,TRACKS_CUTOFF (truncation artifact),one-photon at kmax,29.25339687538201,669.743206249236
+752.0,kmax=0.05 pi/a=751; kmax=0.075 pi/a=751; kmax=0.1 pi/a=752; kmax=0.125 pi/a=752,1.0,15.9999999999984,STABLE (physical resonance),n/a,52.50339687538201,646.493206249236
+1318.0,kmax=0.05 pi/a=1502; kmax=0.075 pi/a=1431; kmax=0.1 pi/a=1376; kmax=0.125 pi/a=1318,184.0,-2428.0000000000005,TRACKS_CUTOFF (truncation artifact),two-photon at kmax,707.753396875382,8.756793750764018
+1503.0,kmax=0.05 pi/a=1502; kmax=0.075 pi/a=1503; kmax=0.1 pi/a=1503; kmax=0.125 pi/a=1503,1.0,11.99999999999691,STABLE (physical resonance),n/a,803.753396875382,104.75679375076402

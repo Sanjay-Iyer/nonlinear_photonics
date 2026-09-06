@@ -1,0 +1,14 @@
+Hypothesis,Tested?,Result,Likelihood,Pro rerun?
+missing states / model-space truncation (transition above the bound-subband range),yes,"the paper text restricts Eq. 2 to the first two electron and HH bound states, so this implies the compared curve is not that four-state calculation",0.94,yes
+missing finite-k M(k),no,"no finite-k envelope or matrix data exist in the copied output, so the required M(k) variation is bounded, not measured",0.90,yes
+kmax / k-truncation artifact,yes,"the two features that do match the paper (752 and 1503 nm) are stable to 1 nm across all four cutoffs, so truncation does not explain the P2/P4 residual; extending kmax alone would move the artifact rather than remove it",0.88,yes
+geometry mismatch,partly,all nominal layer dimensions match and the P2/P4 pair is already reproduced to 8-17 nm,0.72,yes
+energy-dispersion mismatch,yes,"a 17 meV offset is within band-parameter uncertainty and cannot touch P1/Z1/P3/Z2, which are energy-insensitive to machine precision",0.55,maybe
+HH/LH state misassignment,yes,"24N shows the reassignment moves E_hh2 down 19 meV, which drives P2/P4 the wrong way (dLambda/dE_hh2 = +0.46/+0.92 nm/meV, and the paper needs +17 meV); the state-corrected candidate scores worse on the only two features that currently match",0.45,yes
+anisotropy / radial reduction,partly,only two directions exist and no 2D chi can be formed; anisotropy cannot supply a 2.296 eV transition,0.40,maybe
+Equation-2 specialization / missing frequency permutation,yes,literal Eq. 2 and all 16 implemented terms agree; the instrumented mirror reproduces the production engine to 1e-14 relative,0.30,no
+paper digitization / peak correspondence,yes,"P1 is a well-resolved digitized maximum (1260 between 450 and 680) and the 540/1080 and 760/1520 pairs are both exact 1:2 ratios, which eye error would not manufacture; errors are far larger than plausible digitization uncertainty",0.24,no
+broadening,yes,the 2.5-10 meV ladder does not restore topology and cannot move a resonance band; paper uses 5 meV,0.18,no
+pathway sign/indexing,yes,"literal-equation, sign, conjugation and phase-invariance audits pass; the 16 terms sum to the total and the electron/heavy-hole split reproduces it",0.12,no
+k-grid,yes,"101/201/301 copied cases show stable normalized topology; 24N shows the cutoff, not the sampling density, sets the artifact",0.08,no
+normalization,yes,global factors cannot alter normalized shape or create nodes,0.02,no

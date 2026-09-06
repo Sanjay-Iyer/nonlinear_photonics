@@ -1,0 +1,23 @@
+{
+  "sub_demo": "27J",
+  "tier": 2,
+  "professional_required": true,
+  "decks_declared": 2,
+  "decks_generated": 2,
+  "k_points_per_deck": [
+    301,
+    301
+  ],
+  "total_k_point_solves": 602,
+  "states_per_deck": [
+    14,
+    14
+  ],
+  "max_states": 14,
+  "runtime_hours_low": 0.3,
+  "runtime_hours_high": 1.0,
+  "runtime_text": "18 min - 1 h",
+  "output_gb_low": 0.6,
+  "output_gb_high": 1.6,
+  "basis": "Two decks at the measured Demo 23 production cost of 10 min 20 s each. The 300 K arm is reused from demo_results/demo23/raw/production_y_n301_k0100. The linewidth half of this sub-demo adds no solver cost at all."
+}

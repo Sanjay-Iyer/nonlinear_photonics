@@ -1,0 +1,11 @@
+model,feature,window_nm,wavelength_nm,normalized_amplitude,real_crossings_nm,imag_crossings_nm,nearest_real_crossing_nm,nearest_imag_crossing_nm,full_complex_zero,threshold_fraction
+23A,Z1,550-650,550.0,0.04508129286892499,,,,,False,0.02
+23A,Z2,1250-1400,1250.0,0.4277626108061773,1394.6,,1394.5980110107428,,False,0.02
+23B,Z1,550-650,550.0,0.022910028544721097,,,,,False,0.02
+23B,Z2,1250-1400,1250.0,0.17955097527494754,,,,,False,0.02
+23C,Z1,550-650,550.0,0.020413113633735,,,,,False,0.02
+23C,Z2,1250-1400,1250.0,0.16026058814817717,,,,,False,0.02
+23D,Z1,550-650,550.0,0.020805620815258073,,,,,False,0.02
+23D,Z2,1250-1400,1250.0,0.16325487004214348,,,,,False,0.02
+24_state_corrected_hh2_pair1+2,Z1,550-650,550.0,0.02366714942685447,,,,,False,0.02
+24_state_corrected_hh2_pair1+2,Z2,1250-1400,1250.0,0.18766040950258106,,,,,False,0.02

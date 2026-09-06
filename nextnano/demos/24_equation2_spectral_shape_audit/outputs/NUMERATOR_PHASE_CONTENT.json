@@ -1,0 +1,6 @@
+{
+  "max_abs_imaginary_numerator": 0.0,
+  "max_abs_real_numerator": 12.277453780429905,
+  "numerator_phase_is_a_free_parameter": false,
+  "interpretation": "Overlaps and z matrix elements are real, so every pathway numerator phase is pinned to 0 or pi by construction. The k-integrated pathway terms are still genuinely complex through the iGamma denominators, so a rotation of a term is a well-defined robustness probe, not a free physical parameter."
+}

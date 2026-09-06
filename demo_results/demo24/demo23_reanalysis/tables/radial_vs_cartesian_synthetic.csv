@@ -1,0 +1,2 @@
+test_function,relative_error,note
+exp(-(k/kmax)^2) inside circular domain,8.913610751999232e-05,quadrature implementation diagnostic; physical isotropy is assessed separately

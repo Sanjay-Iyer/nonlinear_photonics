@@ -1,0 +1,25 @@
+{
+  "sub_demo": "27K",
+  "tier": 3,
+  "professional_required": true,
+  "decks_declared": 3,
+  "decks_generated": 3,
+  "k_points_per_deck": [
+    301,
+    301,
+    301
+  ],
+  "total_k_point_solves": 903,
+  "states_per_deck": [
+    64,
+    64,
+    64
+  ],
+  "max_states": 64,
+  "runtime_hours_low": 4.0,
+  "runtime_hours_high": 12.0,
+  "runtime_text": "4 h - 12 h",
+  "output_gb_low": 3.0,
+  "output_gb_high": 9.0,
+  "basis": "64 states is more than four times the Demo 23 production count of 14, and the eigenvalue cost grows faster than linearly in the state count, so each deck is taken as 1-3 h against the measured 10 min 20 s baseline. Three decks are needed because a continuum claim is only meaningful if the domain is varied underneath it - one deck could not distinguish a resonance from a box level."
+}

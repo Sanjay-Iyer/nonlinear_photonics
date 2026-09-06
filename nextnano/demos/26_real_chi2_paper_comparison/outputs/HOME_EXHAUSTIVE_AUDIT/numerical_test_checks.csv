@@ -1,0 +1,9 @@
+check,passed
+radial_kdk,True
+bare_2pi_kdk,True
+raw_production_rebuild,True
+independent_baseline_matches_stored,True
+pathway_subtotal,True
+strict_P1_does_not_alias_P2,True
+all_metrics_finite,True
+cubic_monotone_no_invented_extrema,True

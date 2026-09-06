@@ -1,0 +1,81 @@
+demo:
+  id: 27F
+  slug: numerical_domain_convergence
+  title: Numerical domain and boundary convergence
+  question: Could numerical-domain choices be creating or moving the higher states?
+  tier: 2
+  tier_planned: "1-2"
+  priority: 6
+  professional_required: true
+  prerequisites: []
+  unlocks: [27K]
+
+pass_condition: >-
+  Every state energy is reported against each numerical knob, and each state is
+  labelled converged or not-converged under an explicit tolerance. A physical
+  state must not depend strongly on the outer boundary; any state that moves with
+  the padding, the outer barrier width or the boundary condition is recorded as a
+  numerical artifact of the Dirichlet box, not as physics. PASS is reached when
+  every state carries that label.
+
+cost:
+  decks: 7
+  k_points_per_deck: 301
+  states_per_deck: 14
+  runtime_hours: [2.5, 6.0]
+  output_gb: [1.5, 4.0]
+  basis: >-
+    Seven decks at roughly the Demo 23 production cost (10 min 20 s each), except
+    the 0.025 nm mesh, which doubles the grid and therefore costs several times
+    more. The 0.05 nm / 2 nm-padding / 18.2 nm-outer-barrier / Dirichlet control
+    is NOT rerun: demo_results/demo23/raw/production_y_n301_k0100 is that exact
+    case. Demo 23 also already holds 101 and 201 k-point grids, so k-grid
+    convergence is reused rather than recomputed.
+
+stages:
+  preflight: {kind: generate_and_parse}
+  physics:   {kind: professional}
+  analyze:   {kind: python}
+
+controlled_change:
+  summary: >-
+    One numerical knob per deck, against the shared Demo 23 baseline. The
+    sub-demo owns several knobs because the question is about the numerical
+    domain as a whole, but no single deck turns more than one of them - except
+    the state-count deck, where raising the number of states written requires
+    raising the number solved.
+  fields: [active_spacing_nm, quantum_region_padding_nm, period_barrier_nm,
+           boundary, num_electrons, num_holes, output_state_count]
+  max_fields_per_deck: 3
+
+decks:
+  - name: mesh_fine_0p025nm
+    question: Is the 0.05 nm active mesh converged?
+    overrides: {active_spacing_nm: 0.025}
+  - name: mesh_coarse_0p100nm
+    question: How far does a coarser mesh move the states? (sets the convergence slope)
+    overrides: {active_spacing_nm: 0.10}
+  - name: padding_4nm
+    question: Do the states depend on where the Dirichlet walls are placed?
+    overrides: {quantum_region_padding_nm: 4.0}
+  - name: padding_8nm
+    question: Same question, further out - a physical state must stop moving
+    overrides: {quantum_region_padding_nm: 8.0}
+  - name: outer_barrier_28p2nm
+    question: Does a thicker outer barrier change the high states or the continuum onset?
+    overrides: {period_barrier_nm: 28.2}
+  - name: states_24
+    question: Does simply asking for more states create new levels below the ones we use?
+    overrides: {num_electrons: 10, num_holes: 14, output_state_count: 24}
+  - name: boundary_neumann
+    question: Is any state an artifact of the Dirichlet wall rather than of the barriers?
+    overrides: {boundary: neumann}
+
+harvest_overrides: {}
+
+analysis:
+  produces:
+    - CONVERGENCE_TABLE.csv
+    - STATE_ARTIFACT_LABELS.csv
+    - BOUNDARY_SENSITIVITY.csv
+    - CONVERGENCE_VERDICT.md

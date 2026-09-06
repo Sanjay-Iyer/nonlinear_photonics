@@ -1,0 +1,3 @@
+deck,question,band_model,k_mode,k_points,kmax_per_nm,states_out,electrostatics,interface_model,changed_fields,structural_diff_lines,path
+T_077K.in,How far do the states and the gap move at liquid-nitrogen temperature?,kp8,dispersion,301,0.555714,14,flat_band,linear_graded,temperature_K,2,C:\code\nonlinear_photonics\nextnano\demos\27_physics\27J_temperature_linewidth\inputs\T_077K.in
+T_200K.in,"Intermediate point, so the shift is measured as a slope rather than from two ends",kp8,dispersion,301,0.555714,14,flat_band,linear_graded,temperature_K,2,C:\code\nonlinear_photonics\nextnano\demos\27_physics\27J_temperature_linewidth\inputs\T_200K.in

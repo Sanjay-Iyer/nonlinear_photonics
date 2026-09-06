@@ -1,0 +1,47 @@
+demo:
+  id: 24
+  name: equation2_spectral_shape_audit
+  baseline_mode: 23D
+
+inputs:
+  demo23_results_root: demo_results/demo23
+  demo23_reanalysis: demo_results/demo24/demo23_reanalysis
+  paper_curve: nextnano/demos/23_k_resolved_dispersion_validation/paper_figure2d_digitized_simulation.csv
+  paper_pdf: 2602.23246v1.pdf
+
+paper_features:
+  digitization_uncertainty_nm: 12.0
+  peak_prominence_fraction: 0.08
+  minimum_peak_distance_nm: 120.0
+  expected:
+    - {name: P1, type: peak, wavelength_nm: 540.0, window_nm: [490.0, 575.0], confidence: medium}
+    - {name: Z1, type: minimum, wavelength_nm: 605.0, window_nm: [550.0, 650.0], confidence: high}
+    - {name: P2, type: peak, wavelength_nm: 760.0, window_nm: [680.0, 830.0], confidence: high}
+    - {name: P3, type: peak, wavelength_nm: 1080.0, window_nm: [950.0, 1160.0], confidence: high}
+    - {name: Z2, type: minimum, wavelength_nm: 1330.0, window_nm: [1250.0, 1400.0], confidence: high}
+    - {name: P4, type: peak, wavelength_nm: 1520.0, window_nm: [1420.0, 1620.0], confidence: high}
+
+analysis:
+  complex_zero_threshold_fraction: 0.02
+  peak_prominence_fraction: 0.04
+  peak_minimum_distance_nm: 70.0
+  local_windows_nm:
+    visible_node: [500.0, 700.0]
+    visible_resonance: [700.0, 900.0]
+    nir_resonance: [950.0, 1200.0]
+    nir_node: [1200.0, 1450.0]
+    main_resonance: [1400.0, 1620.0]
+  gamma_meV: [2.5, 5.0, 7.5, 10.0]
+
+# Demo 24N. Diagnostic one-at-a-time perturbations only; none of these values
+# is fitted to the paper and none of them changes the Demo 23 production physics.
+causal_sensitivity:
+  energy_shifts_meV: [-10.0, -5.0, 0.0, 5.0, 10.0]
+  amplitude_scales: [0.90, 0.95, 1.00, 1.05, 1.10]
+  phase_degrees: [-10.0, -5.0, 0.0, 5.0, 10.0]
+  dominant_pathway_count: 4
+  local_window_span_nm: 90.0
+
+outputs:
+  root: nextnano/demos/24_equation2_spectral_shape_audit/outputs
+  dpi: 180

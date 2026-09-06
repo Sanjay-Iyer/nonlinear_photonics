@@ -80,6 +80,16 @@ demo_results/demo_1[0-9]*/p[0-9][0-9]/
 demo_results/demo_1[0-9]*/**/raw/
 demo_results/demo_1[0-9]*/**/*.log
 demo_results/demo_1[0-9]*/**/*.dat
+# Demo 27 is a staged Professional campaign: a single sub-demo can write tens of
+# gigabytes of per-k envelopes and spinors, and 27B alone is budgeted at 10-15 GB.
+# Ignore that bulk here, before the curated-set exceptions below re-include the
+# small hand-off files, so the split-machine flow works for Demo 27 exactly as it
+# does for the earlier demos.
+demo_results/demo27/**/raw/
+demo_results/demo27/**/syntax_check/
+demo_results/demo27/**/*.log
+demo_results/demo27/**/*.dat
+
 # ...but the Demo 17/17b hand-off DOES carry envelopes and matrix elements, which
 # are the inputs Demo 17b re-evaluates Eq. 2 from. Those are curated inputs, not
 # bulk solver output, so they stay tracked wherever they land.

@@ -1,0 +1,67 @@
+demo:
+  id: 27J
+  slug: temperature_linewidth
+  title: Temperature-dependent parameters and physically motivated linewidths
+  question: Do temperature-dependent material parameters or improved linewidths explain the remaining peak shifts?
+  tier: 2
+  tier_planned: 3
+  tier_note: >-
+    Planned as Tier 3. The temperature arm is two ordinary Demo 23-cost decks;
+    the linewidth arm is pure post-processing on data that already exists. The
+    solver burden is therefore Tier 2 at most.
+  priority: 10
+  professional_required: true
+  prerequisites: []
+  unlocks: []
+
+pass_condition: >-
+  Two things are reported separately. (a) The measured band-gap and state-energy
+  shift per kelvin, converted into a wavelength shift per feature using Demo 24's
+  measured dLambda/dE, so the temperature effect is compared against the actual
+  paper-model gaps rather than asserted. (b) A linewidth study in which every
+  Gamma model is PHYSICALLY MOTIVATED - state-dependent, energy-dependent or
+  k-dependent from a stated mechanism. Demo 26 already found that no single Gamma
+  repairs all features (its hypothesis 8, "NOT SUFFICIENT", high confidence), so
+  using Gamma as a free fitting parameter is out of scope and a fitted Gamma is
+  not an acceptable conclusion here.
+
+cost:
+  decks: 2
+  k_points_per_deck: 301
+  states_per_deck: 14
+  runtime_hours: [0.3, 1.0]
+  output_gb: [0.6, 1.6]
+  basis: >-
+    Two decks at the measured Demo 23 production cost of 10 min 20 s each. The
+    300 K arm is reused from demo_results/demo23/raw/production_y_n301_k0100. The
+    linewidth half of this sub-demo adds no solver cost at all.
+
+stages:
+  preflight: {kind: generate_and_parse}
+  physics:   {kind: professional}
+  analyze:   {kind: python}
+
+controlled_change:
+  summary: >-
+    The lattice temperature, which drives nextnano's temperature-dependent band
+    parameters. Nothing else moves, so any energy shift is attributable to the
+    material model rather than to the structure.
+  fields: [temperature_K]
+  max_fields_per_deck: 1
+
+decks:
+  - name: T_077K
+    question: How far do the states and the gap move at liquid-nitrogen temperature?
+    overrides: {temperature_K: 77.0}
+  - name: T_200K
+    question: Intermediate point, so the shift is measured as a slope rather than from two ends
+    overrides: {temperature_K: 200.0}
+
+harvest_overrides: {}
+
+analysis:
+  produces:
+    - TEMPERATURE_STATE_SHIFTS.csv
+    - PREDICTED_FEATURE_SHIFTS.csv
+    - LINEWIDTH_MODEL_COMPARISON.csv
+    - TEMPERATURE_LINEWIDTH_VERDICT.md

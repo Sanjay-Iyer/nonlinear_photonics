@@ -1,0 +1,59 @@
+{
+  "baseline_final_max_error_pm_per_V": 8.76450868816199e-13,
+  "stored_final_max_error_pm_per_V": 5.326466091769124e-10,
+  "electron_subtotal_max_error_pm_per_V": 4.099037227506403e-13,
+  "hole_subtotal_max_error_pm_per_V": 4.764346674119284e-13,
+  "denominator_max_error_eV": 0.0,
+  "max_pathway_error_pm_per_V": 4.687428401686771e-13,
+  "independent_function_calls": [
+    "integration_weights",
+    "np.zeros",
+    "np.zeros_like",
+    "prefactor",
+    "range",
+    "Evaluation",
+    "np.asarray",
+    "np.asarray",
+    "np.asarray",
+    "len",
+    "range",
+    "range",
+    "range",
+    "np.conj",
+    "np.conj"
+  ],
+  "original_artifacts_preserved": true,
+  "continuous_gauge_tests": [
+    {
+      "phases_radians": "[0.3, 0, 0, 0]",
+      "production_max_complex_change_pm_per_V": 1.8347311758033302,
+      "production_max_magnitude_change_pm_per_V": 1.7842456244512874,
+      "independent_max_complex_change_pm_per_V": 3.4576501834057003e-13
+    },
+    {
+      "phases_radians": "[0, 0.7, 0, 0]",
+      "production_max_complex_change_pm_per_V": 105.63233966807353,
+      "production_max_magnitude_change_pm_per_V": 3.290456451330787,
+      "independent_max_complex_change_pm_per_V": 2.2737367544323206e-13
+    },
+    {
+      "phases_radians": "[0, 0, 1.1, 0]",
+      "production_max_complex_change_pm_per_V": 7.256495741510796,
+      "production_max_magnitude_change_pm_per_V": 4.518167741832244,
+      "independent_max_complex_change_pm_per_V": 4.582862941503293e-13
+    },
+    {
+      "phases_radians": "[0, 0, 0, 1.7]",
+      "production_max_complex_change_pm_per_V": 160.4150118445615,
+      "production_max_magnitude_change_pm_per_V": 3.8150737431883535,
+      "independent_max_complex_change_pm_per_V": 1.1718571004216928e-13
+    },
+    {
+      "phases_radians": "[0.3, 0.7, 1.1, 1.7]",
+      "production_max_complex_change_pm_per_V": 136.3237471899314,
+      "production_max_magnitude_change_pm_per_V": 2.9024652969437383,
+      "independent_max_complex_change_pm_per_V": 4.582862941503293e-13
+    }
+  ],
+  "scope": "No solver invoked. Production complex-input conjugation limitation does not alter real frozen baseline."
+}

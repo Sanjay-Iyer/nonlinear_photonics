@@ -1,0 +1,75 @@
+demo:
+  id: 27E
+  slug: schrodinger_poisson
+  title: Schroedinger versus self-consistent Schroedinger-Poisson
+  question: Does self-consistent electrostatics materially change the QW states or the chi2 spectrum?
+  tier: 3
+  tier_planned: "2-3"
+  priority: 5
+  professional_required: true
+  prerequisites: [27D]
+  unlocks: []
+
+pass_condition: >-
+  Both arms converge (a quantum_poisson run that exits DONE without converging is
+  a FAIL, not a result - the evidence is the convergence warning in summary.log
+  and the residuals in iteration_quantum_poisson.dat, both of which are checked),
+  and the Hartree potential, charge density, band edges, state energies,
+  localization and matrix elements are compared arm to arm. PASS means the size of
+  the electrostatic effect is quantified, whatever that size is.
+
+cost:
+  decks: 2
+  k_points_per_deck: 301
+  states_per_deck: 14
+  runtime_hours: [2.0, 8.0]
+  output_gb: [0.6, 2.0]
+  basis: >-
+    The flat-band arm costs one Demo 23 production run (10 min 20 s measured).
+    The self-consistent arm repeats the quantum solve once per Poisson iteration,
+    so it is the iteration count times that, and Demo 6 needed tens of iterations
+    on a much smaller problem. 2-8 h is the honest range; the run is capped by
+    --timeout and by the iteration limit in the deck.
+
+# The paper's carrier input is not known. Demo 26 records this as hypothesis 4
+# with the note "unknown carrier inputs in paper". Demo 27 will not invent doping
+# to manufacture a difference, so both arms are undoped and the difference they
+# measure is the solver's own self-consistent redistribution of the states'
+# charge. If a carrier density is ever established from the paper or from the
+# authors, add it here as a doping entry WITH its justification; decks.Doping
+# refuses a region that has none.
+carrier_input_decision: UNRESOLVED_NO_DOPING_ASSUMED
+
+stages:
+  preflight: {kind: generate_and_parse}
+  physics:   {kind: professional}
+  analyze:   {kind: python}
+
+controlled_change:
+  summary: >-
+    Whether Poisson is solved self-consistently with the Schroedinger equation.
+    Both decks are otherwise the Demo 23 baseline structure, so the pair isolates
+    electrostatics. Note that the flat-band arm is regenerated rather than reused
+    from Demo 23: if 27D changes the geometry decision, both arms must move
+    together, and a control from a different structure would not be a control.
+  fields: [electrostatics]
+  max_fields_per_deck: 1
+
+decks:
+  - name: A_flat_band_control
+    question: Control - the Demo 23 flat-band quantum solve, regenerated for a like-for-like pair
+    overrides: {}
+  - name: B_self_consistent
+    question: Does self-consistent electrostatics move the states or the spectrum?
+    overrides:
+      electrostatics: quantum_poisson
+
+harvest_overrides: {}
+
+analysis:
+  produces:
+    - ELECTROSTATIC_POTENTIAL_COMPARISON.csv
+    - CHARGE_DENSITY.csv
+    - STATE_ENERGY_SHIFTS.csv
+    - CONVERGENCE_EVIDENCE.md
+    - SP_VERDICT.md

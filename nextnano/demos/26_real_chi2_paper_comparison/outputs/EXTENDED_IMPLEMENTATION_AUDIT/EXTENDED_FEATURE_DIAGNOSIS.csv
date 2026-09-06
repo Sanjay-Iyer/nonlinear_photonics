@@ -1,0 +1,7 @@
+Feature,Paper_wavelength_nm,Existing_abs_chi_wavelength_nm,Best_diagnostic_variant,Best_diagnostic_wavelength_nm,Which_test_improved_it_most,Energy_issue,Numerator_issue,Integration_issue,Observable_issue,Geometry_issue,Implementation_issue,Still_unexplained
+P1,540.0,688.0,subset offdiagonal_only,661.0,subset offdiagonal_only,P1/P3 likely,possible,tested; not sufficient,limited,plausible,no Eq2/gauge/origin bug found,YES
+Z1,605.0,720.0,subset offdiagonal_only,682.0,subset offdiagonal_only,possible,possible,tested; not sufficient,|Re| helps globally,plausible,no Eq2/gauge/origin bug found,YES
+P2,760.0,752.0,subset offdiagonal_only,755.0,subset offdiagonal_only,possible,possible,tested; not sufficient,limited,plausible,no Eq2/gauge/origin bug found,NO/NEAR
+P3,1080.0,nan,subset offdiagonal_only,nan,subset offdiagonal_only,P1/P3 likely,possible,tested; not sufficient,limited,plausible,no Eq2/gauge/origin bug found,NO/NEAR
+Z2,1330.0,1455.0,subset offdiagonal_only,1369.0,subset offdiagonal_only,possible,possible,tested; not sufficient,|Re| helps globally,plausible,no Eq2/gauge/origin bug found,YES
+P4,1520.0,1503.0,subset offdiagonal_only,1509.0,subset offdiagonal_only,possible,possible,tested; not sufficient,limited,plausible,no Eq2/gauge/origin bug found,NO/NEAR

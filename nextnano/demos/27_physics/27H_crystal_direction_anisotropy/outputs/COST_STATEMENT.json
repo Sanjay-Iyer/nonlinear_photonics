@@ -1,0 +1,25 @@
+{
+  "sub_demo": "27H",
+  "tier": 2,
+  "professional_required": true,
+  "decks_declared": 3,
+  "decks_generated": 3,
+  "k_points_per_deck": [
+    301,
+    301,
+    301
+  ],
+  "total_k_point_solves": 903,
+  "states_per_deck": [
+    14,
+    14,
+    14
+  ],
+  "max_states": 14,
+  "runtime_hours_low": 0.5,
+  "runtime_hours_high": 1.5,
+  "runtime_text": "30 min - 1.5 h",
+  "output_gb_low": 0.9,
+  "output_gb_high": 2.5,
+  "basis": "Three decks at the measured Demo 23 production cost of 10 min 20 s each, plus margin. The two endpoint directions are reused rather than recomputed."
+}

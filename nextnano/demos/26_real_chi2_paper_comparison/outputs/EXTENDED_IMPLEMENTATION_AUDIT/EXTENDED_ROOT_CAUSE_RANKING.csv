@@ -1,0 +1,16 @@
+Rank,Hypothesis,Evidence_for,Evidence_against,Home_laptop_test_result,Explains_P1_P3?,Explains_605_1330?,Confidence,Requires_Pro?
+1,geometry mismatch,Paper ideal/abrupt; Demo23 has 1-nm grading,No same-structure rerun,SUPPORTED,YES,POSSIBLE,medium-high,YES
+2,kmax/BZ convention,0.1 Γ-X can mean 0.2π/a; current 0.1π/a not converged,existing data stop at 0.125π/a,POSSIBLE,YES,YES,medium-high,YES
+3,k=0 matrix provenance/state identity,raw 8-band projection differs strongly from frozen scalar matrices,not like-for-like reconstruction,METHOD LIMITED,YES,YES,medium,friend data decisive
+4,Schrodinger-Poisson mismatch,paper states Schrödinger-Poisson; Demo23 evidence has zero fixed charge and no documented self-consistency,unknown carrier inputs in paper,UNCERTAIN,YES,POSSIBLE,medium,YES
+5,truly missing finite-k M(k),can alter cancellations,colleague reportedly used M(0),UNRESOLVED,YES,YES,medium,YES
+6,|Re chi| convention,RMSE improves over magnitude,paper explicitly labels magnitude,HELPFUL NOT EXPLANATORY,NO,YES,medium,NO
+7,incorrect state energies / 2.296-eV reading,current states cannot make P1/P3 pair,paper does not assign both peaks to one transition,WEAKENED INFERENCE,YES,NO,medium,friend data
+8,Gamma convention,full sweep changes line shape,no tested Γ repairs all features,NOT SUFFICIENT,NO,NO,high,NO
+9,k integration weighting,constant radial scalings normalize out; equal/k0 fail,nonisotropic paper details uncertain,NOT PRIMARY,NO,NO,high,NO
+10,Equation 2 transcription/sign/conjugation,independent engine matches stored pathways,shared inputs could still be wrong,NO BUG FOUND,NO,NO,high,NO
+11,global phase convention,best phase is diagnostic only,does not physically explain magnitude curve,NOT PHYSICAL EXPLANATION,NO,POSSIBLE,high,NO
+12,wavefunction gauge bug / z-origin issue,all tests invariant,finite basis concerns cancel analytically here,RULED OUT,NO,NO,high,NO
+13,wavelength-axis interpretation,paper explicitly says fundamental,none,RULED OUT,NO,NO,high,NO
+14,digitization error,integrity checks pass,eye digitization remains approximate,UNLIKELY PRIMARY,NO,NO,medium,NO
+15,genuinely missing higher states,could supply resonances,paper Eq2 calculation states first two e/HH states,LOW PRIORITY,POSSIBLE,POSSIBLE,medium,YES

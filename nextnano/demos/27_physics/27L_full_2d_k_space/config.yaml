@@ -1,0 +1,65 @@
+demo:
+  id: 27L
+  slug: full_2d_k_space
+  title: Full 2D in-plane (kx, ky) validation
+  question: Does full 2D in-plane physics materially change chi2 compared with radial integration?
+  tier: 4
+  tier_planned: 4
+  priority: null
+  professional_required: true
+  prerequisites: [27A, 27H]
+  unlocks: []
+
+pass_condition: >-
+  chi2 is computed by genuine 2D integration over the in-plane zone and compared
+  directly against the radial model on the same structure and the same cutoff.
+  PASS means the difference is quantified. A difference below the 27H tolerance
+  is a successful result that validates every radial calculation this project has
+  done.
+
+run_only_if: >-
+  27H reports directional anisotropy above its stated tolerance. If it does not,
+  this sub-demo must be recorded NOT NEEDED. It is the most expensive calculation
+  in the campaign and there is no reason to spend it on a question 27H can close
+  for a fifth of the cost.
+
+cost:
+  decks: 1
+  k_points_per_deck: 61
+  states_per_deck: 14
+  runtime_hours: [8.0, 24.0]
+  output_gb: [4.0, 20.0]
+  basis: >-
+    k_integration builds a two-dimensional in-plane grid, so num_points = 61 with
+    symmetry = none is of order 61^2 = 3700 k-point solves against the 301 of a
+    dispersion path - roughly twelve times the Demo 23 production run before the
+    per-k output volume is counted. This is a planning estimate with wide bounds
+    and it should be re-derived from the 27A pilot's measured seconds-per-k and
+    bytes-per-k before the run is launched.
+
+stages:
+  preflight: {kind: generate_and_parse}
+  physics:   {kind: professional}
+  analyze:   {kind: python}
+
+controlled_change:
+  summary: >-
+    The k sampling changes from a 1D radial path to the 2D k-integration grid.
+    The point count changes with it because 61 points along a path and 61 points
+    across a 2D grid are not the same object; the cutoff, the structure and the
+    state count are the Demo 23 baseline.
+  fields: [k_mode, k_points, symmetry]
+  max_fields_per_deck: 3
+
+decks:
+  - name: k2d_integration_n61
+    question: Does the 2D in-plane integral differ from the radial one?
+    overrides: {k_mode: integration, k_points: 61, symmetry: none}
+
+harvest_overrides: {}
+
+analysis:
+  produces:
+    - CHI2_2D_VS_RADIAL.csv
+    - K_SPACE_WEIGHT_MAP.csv
+    - TWO_D_VERDICT.md

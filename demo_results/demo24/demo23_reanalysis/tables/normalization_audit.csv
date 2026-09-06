@@ -1,0 +1,3 @@
+convention,status,weight_sum_per_nm2,factor_vs_production
+d2k_over_2pi_squared,PRODUCTION,0.04914999683653328,1.0
+bare_d2k,DIAGNOSTIC_ONLY,1.9403641003655077,39.47841760435743

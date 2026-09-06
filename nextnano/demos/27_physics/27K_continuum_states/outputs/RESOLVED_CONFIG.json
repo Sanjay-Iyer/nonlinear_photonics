@@ -1,0 +1,101 @@
+{
+  "sub_demo": "27K",
+  "title": "Continuum and quasi-bound state contributions",
+  "question": "Do physically meaningful continuum or quasi-bound states contribute to the high-energy features?",
+  "tier": 3,
+  "prerequisites": [
+    "27C",
+    "27F"
+  ],
+  "pass_condition": "Every state above the Al0.55Ga0.45As barrier edge is classified by evidence, not by index: confinement fraction inside the wells, sensitivity to the domain size and to the boundary condition, and oscillator strength to the states Equation 2 uses. PASS means each such state is labelled REAL QUASI-BOUND (its energy and localization survive the domain change) or DIRICHLET BOX STATE (it moves with the walls). A box state may not be entered into Equation 2 under any circumstances, and 27K produces no chi2 contribution from unlabelled states.",
+  "stages": {
+    "preflight": {
+      "kind": "generate_and_parse"
+    },
+    "physics": {
+      "kind": "professional"
+    },
+    "analyze": {
+      "kind": "python"
+    }
+  },
+  "delegate": {},
+  "controlled_change": {
+    "summary": "Many more states than the structure binds, solved on three different numerical domains. The state count is the sub-demo's subject; the domain is varied because that is the only way to tell a real quasi-bound resonance from a Dirichlet box level, and holding it fixed would make the question unanswerable rather than controlled.",
+    "fields": [
+      "num_electrons",
+      "num_holes",
+      "output_state_count",
+      "quantum_region_padding_nm",
+      "period_barrier_nm"
+    ],
+    "max_fields_per_deck": 4
+  },
+  "baseline": {
+    "source": "23_k_resolved_dispersion_validation/demo23_config.yaml"
+  },
+  "decks": [
+    {
+      "name": "continuum_pad2_outer18",
+      "question": "What lies above the barrier edge on the Demo 23 domain?",
+      "changes": {
+        "num_electrons": {
+          "baseline": 6,
+          "deck": 28
+        },
+        "num_holes": {
+          "baseline": 8,
+          "deck": 36
+        },
+        "output_state_count": {
+          "baseline": 14,
+          "deck": 64
+        }
+      }
+    },
+    {
+      "name": "continuum_pad8_outer18",
+      "question": "Which of those states move when the Dirichlet walls move?",
+      "changes": {
+        "quantum_region_padding_nm": {
+          "baseline": 2.0,
+          "deck": 8.0
+        },
+        "num_electrons": {
+          "baseline": 6,
+          "deck": 28
+        },
+        "num_holes": {
+          "baseline": 8,
+          "deck": 36
+        },
+        "output_state_count": {
+          "baseline": 14,
+          "deck": 64
+        }
+      }
+    },
+    {
+      "name": "continuum_pad2_outer34",
+      "question": "Which of them move when the outer barrier gets thicker?",
+      "changes": {
+        "period_barrier_nm": {
+          "baseline": 18.2,
+          "deck": 34.2
+        },
+        "num_electrons": {
+          "baseline": 6,
+          "deck": 28
+        },
+        "num_holes": {
+          "baseline": 8,
+          "deck": 36
+        },
+        "output_state_count": {
+          "baseline": 14,
+          "deck": 64
+        }
+      }
+    }
+  ]
+}

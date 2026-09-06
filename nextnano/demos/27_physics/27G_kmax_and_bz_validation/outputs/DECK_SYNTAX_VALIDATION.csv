@@ -1,0 +1,4 @@
+deck,parse_ok,message
+bz_0p15_pi_over_a.in,True,parsed
+bz_0p10_gamma_x.in,True,parsed
+bz_0p30_pi_over_a.in,True,parsed

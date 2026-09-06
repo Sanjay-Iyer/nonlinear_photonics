@@ -1,0 +1,7 @@
+variant,role,question,k_integration,no_density,k_point_subdirectories,symmetry,keep_dispersion_path,num_points,path
+A1_kint_nodensity,pilot,Does k_integration{} alone produce multi-k state output?,True,True,False,none,False,4,C:\code\nonlinear_photonics\demo_results\demo25\inputs\pilot\A1_kint_nodensity.in
+A2_kint_density,pilot,Does no_density=yes suppress the k-integration loop?,True,False,False,none,False,4,C:\code\nonlinear_photonics\demo_results\demo25\inputs\pilot\A2_kint_density.in
+A3_kint_subdirs,pilot,Does per-k output require k_point_subdirectories=yes?,True,True,True,none,False,4,C:\code\nonlinear_photonics\demo_results\demo25\inputs\pilot\A3_kint_subdirs.in
+A4_kint_symmetry_C4,pilot,How does symmetry change the emitted k-point set?,True,True,True,C4,False,4,C:\code\nonlinear_photonics\demo_results\demo25\inputs\pilot\A4_kint_symmetry_C4.in
+A5_kint_plus_dispersion,pilot,Can k_integration and dispersion{path{}} coexist for cross-check?,True,True,True,none,True,4,C:\code\nonlinear_photonics\demo_results\demo25\inputs\pilot\A5_kint_plus_dispersion.in
+A0_control_demo23_style,pilot,Control - reproduce the Demo 23 k=0-only behaviour with extended states,False,True,False,none,True,4,C:\code\nonlinear_photonics\demo_results\demo25\inputs\pilot\A0_control_demo23_style.in

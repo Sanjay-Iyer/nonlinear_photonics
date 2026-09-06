@@ -1,0 +1,7 @@
+Input file: 'C:\Code\optics\nextnano\nonlinear_photonics\demo_results\demo23\demo23_20260904T163548Z\inputs\kmax_y_n301_k0075.in'
+
+Input directory from command line:  ''
+Output directory from command line: 'C:\Code\optics\nextnano\nonlinear_photonics\demo_results\demo23\demo23_20260904T163548Z\raw\kmax_y_n301_k0075\'
+
+Create automatic subdirectory: yes
+

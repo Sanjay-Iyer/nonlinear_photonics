@@ -1,0 +1,3 @@
+deck,parse_ok,message
+T_077K.in,True,parsed
+T_200K.in,True,parsed

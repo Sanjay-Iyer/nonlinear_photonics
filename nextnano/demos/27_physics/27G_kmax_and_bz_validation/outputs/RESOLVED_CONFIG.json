@@ -1,0 +1,84 @@
+{
+  "sub_demo": "27G",
+  "title": "kmax and Brillouin-zone convention validation",
+  "question": "What does the paper's \"one tenth of the Brillouin zone\" physically correspond to?",
+  "tier": 2,
+  "prerequisites": [],
+  "pass_condition": "The chi2 spectrum is computed out to at least 0.2 pi/a, and every spectral feature is classified as either STABLE (its position stops moving as kmax grows) or CUTOFF ARTIFACT (its position tracks the zone-edge transition energy). Demo 24 already showed that the model's own 1250-1450 nm structure is the second kind: it marched 1502 -> 1431 -> 1376 -> 1318 nm as kmax went 0.05 -> 0.125 pi/a and tracked 2hc/DeltaE(kmax) to 9 nm, while the two real peaks moved less than 1 nm. PASS means every feature carries that label out to the Gamma-X reading of the paper's cutoff.",
+  "stages": {
+    "preflight": {
+      "kind": "generate_and_parse"
+    },
+    "physics": {
+      "kind": "professional"
+    },
+    "analyze": {
+      "kind": "python"
+    }
+  },
+  "delegate": {},
+  "controlled_change": {
+    "summary": "The in-plane cutoff only. The k-point count moves with it so that the k spacing stays at the Demo 23 value - widening the range while holding the point count fixed would confound a cutoff effect with a sampling effect, and Demo 24 has already shown this spectrum is sensitive to both.",
+    "fields": [
+      "relative_size",
+      "kmax_per_nm",
+      "k_points"
+    ],
+    "max_fields_per_deck": 3
+  },
+  "baseline": {
+    "source": "23_k_resolved_dispersion_validation/demo23_config.yaml"
+  },
+  "decks": [
+    {
+      "name": "bz_0p15_pi_over_a",
+      "question": "Intermediate cutoff - does the 1250-1450 nm feature keep marching?",
+      "changes": {
+        "k_points": {
+          "baseline": 301,
+          "deck": 451
+        },
+        "kmax_per_nm": {
+          "baseline": 0.5557144392322634,
+          "deck": 0.8335716588483951
+        },
+        "relative_size": {
+          "baseline": 0.1,
+          "deck": 0.15
+        }
+      }
+    },
+    {
+      "name": "bz_0p10_gamma_x",
+      "question": "The competing reading of the paper - 0.1 |Gamma-X| = 0.2 pi/a",
+      "changes": {
+        "k_points": {
+          "baseline": 301,
+          "deck": 601
+        },
+        "kmax_per_nm": {
+          "baseline": 0.5557144392322634,
+          "deck": 1.1114288784645268
+        }
+      }
+    },
+    {
+      "name": "bz_0p30_pi_over_a",
+      "question": "Past both readings - has the response actually saturated?",
+      "changes": {
+        "k_points": {
+          "baseline": 301,
+          "deck": 901
+        },
+        "kmax_per_nm": {
+          "baseline": 0.5557144392322634,
+          "deck": 1.6671433176967903
+        },
+        "relative_size": {
+          "baseline": 0.1,
+          "deck": 0.3
+        }
+      }
+    }
+  ]
+}

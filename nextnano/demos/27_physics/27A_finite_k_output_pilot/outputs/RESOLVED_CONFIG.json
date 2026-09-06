@@ -1,0 +1,38 @@
+{
+  "sub_demo": "27A",
+  "title": "Finite-k Professional output pilot",
+  "question": "Can nextnano++ Professional export usable finite-k state, spinor and matrix data at k != 0?",
+  "tier": 1,
+  "prerequisites": [],
+  "pass_condition": "Demo 25's PILOT_GATE.json records status PASS: more than one k point carries both energies and envelopes, and an identifiable k-vector file exists so each state can be tied to a k value. That is exactly enough to construct O_nm(k), z_e,nl(k) and z_hh,ml(k). Anything less is a FAIL and 27B stays blocked.",
+  "stages": {
+    "preflight": {
+      "kind": "delegated"
+    },
+    "physics": {
+      "kind": "delegated"
+    },
+    "analyze": {
+      "kind": "delegated"
+    }
+  },
+  "delegate": {
+    "demo": "25_finite_k_matrix_element_validation",
+    "runner": "run_demo25.py",
+    "commands": {
+      "preflight": "--preflight",
+      "physics": "--pilot",
+      "analyze": "--pilot-audit"
+    },
+    "reason": "Demo 25 was built for this exact question and has never been run. Its six variants isolate one candidate explanation each (k_integration, no_density, k_point_subdirectories, symmetry, dispersion coexistence, plus the Demo 23 control), so one work-laptop trip settles the syntax."
+  },
+  "controlled_change": {
+    "summary": "Which per-k outputs nextnano++ is asked for, and whether the k-integration grid is enabled. Geometry, materials, mesh and temperature are Demo 23's, unchanged; Demo 25 enforces that with a structural diff against the Demo 23 deck.",
+    "fields": [],
+    "max_fields_per_deck": 0
+  },
+  "baseline": {
+    "source": "23_k_resolved_dispersion_validation/demo23_config.yaml"
+  },
+  "decks": []
+}

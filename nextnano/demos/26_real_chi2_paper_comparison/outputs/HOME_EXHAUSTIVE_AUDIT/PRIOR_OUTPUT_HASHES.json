@@ -1,0 +1,207 @@
+[
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\DEMO24_CONCLUSION_REASSESSMENT.csv",
+    "sha256": "5b3db6841d10cf53aa61250f343473864766d56ab9a96c13e2a3b76f48e1af49",
+    "bytes": 1677
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\DEMO26_REAL_FEATURE_COMPARISON.csv",
+    "sha256": "0d49357b275302db9833d0e4769007630919fffe5355bfa569e850fee9bce7f9",
+    "bytes": 1479
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\DEMO26_REAL_FINAL_REPORT.md",
+    "sha256": "bfbc476116ab074d21e95d51659a2c023bf9a25f13d8d7ad128f887145998a71",
+    "bytes": 24020
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\DEMO26_REAL_INPUT_AUDIT.md",
+    "sha256": "e66d3c4dc3d4a5314e2767fc33259f0e7940726c584db8c067aa492f6c61339d",
+    "bytes": 2793
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\DEMO26_REAL_METRICS.csv",
+    "sha256": "fc9375a4aa8521f27e06f79e64272e630c5e8cfac0f3faff063b6faa186e3b4a",
+    "bytes": 1756
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\DEMO26_REAL_SPECTRA.csv",
+    "sha256": "7add1fb7c08a7fd15acdaee128cb327933762f4104668476a7e2022a92267f40",
+    "bytes": 221084
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\demo26_real_summary.json",
+    "sha256": "f426ac9524bb647d5603b5a97f4a8fe0d139831d89d0e0088bfc69f482f0d47f",
+    "bytes": 620
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\DEMO26_REAL_ZERO_CROSSINGS.csv",
+    "sha256": "12733448d505c2f9f1192a92ce96621af1b51e2210435d78921784c6be88e3bd",
+    "bytes": 850
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\PAPER_OBSERVABLE_AUDIT.md",
+    "sha256": "c83afcc7de75c06a8d0ca5a32698fd36a54213e0f48e939943a5b3722a1af288",
+    "bytes": 1800
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\PHYSICS_PROFESSOR_REVIEW_DEMO26_REAL.md",
+    "sha256": "94c71aec12b37dee756b1b7bb85b017f78926943d14b0934a198afb033d0f827",
+    "bytes": 15580
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\EXTENDED_IMPLEMENTATION_AUDIT\\BZ_CONVENTION_AUDIT.md",
+    "sha256": "2eaf01d8739facf2a4cf61eb01f52eff65a96023daded8705a29fef3f340ed4b",
+    "bytes": 827
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\EXTENDED_IMPLEMENTATION_AUDIT\\CUMULATIVE_K_CUTOFF_AUDIT.csv",
+    "sha256": "8fc56be9c247a7d9dc8012d8ec4bc974f2aa38f03508dcdb26a148ef58ec669d",
+    "bytes": 373
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\EXTENDED_IMPLEMENTATION_AUDIT\\CUMULATIVE_K_NORMALIZED_SPECTRA.csv",
+    "sha256": "0e2ab2cd1bc398a6bd469ebb0930b27764c069f705322e5a469fffc292b269a5",
+    "bytes": 128106
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\EXTENDED_IMPLEMENTATION_AUDIT\\DEMO26_REAL_EXTENDED_AUDIT_REPORT.md",
+    "sha256": "9102753a5dc15ec9ed3ab4ed24611705f92f97828637140aa2099bf07c4d6630",
+    "bytes": 11764
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\EXTENDED_IMPLEMENTATION_AUDIT\\EQUATION2_TERM_BY_TERM_AUDIT.md",
+    "sha256": "1f224641b0aa0b58ab260cae9f1a6d122e957ebbde0f8d89b143ca6a382e4448",
+    "bytes": 1430
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\EXTENDED_IMPLEMENTATION_AUDIT\\extended_audit_summary.json",
+    "sha256": "a2086c119174ea8dd3d2a673782875a5601dd7168d602a9c6871ea49ce86f78d",
+    "bytes": 1902
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\EXTENDED_IMPLEMENTATION_AUDIT\\EXTENDED_FEATURE_DIAGNOSIS.csv",
+    "sha256": "20c36975b0725830b876db88053c06277383649e6eca6d673b728c98c5362424",
+    "bytes": 1285
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\EXTENDED_IMPLEMENTATION_AUDIT\\EXTENDED_ROOT_CAUSE_RANKING.csv",
+    "sha256": "83a2b79ffc1bca3d65793bdf4ce8748df1fe0618d1802c225e3285f856df26dd",
+    "bytes": 2280
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\EXTENDED_IMPLEMENTATION_AUDIT\\FRIEND_REPRODUCTION_CHECKLIST.md",
+    "sha256": "1724083ee48b9b73acefff72dc751e34227f18ddb837a5c4032e24e50cbb2566",
+    "bytes": 952
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\EXTENDED_IMPLEMENTATION_AUDIT\\GAMMA_OBSERVABLE_SWEEP.csv",
+    "sha256": "02231443e13ba40277433e2cd229e57b937fe5c987c3f684a3b76129c834d0a6",
+    "bytes": 1742
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\EXTENDED_IMPLEMENTATION_AUDIT\\GLOBAL_PHASE_DIAGNOSTIC.csv",
+    "sha256": "03a04a5f22e8474262fea5e0695cf95c83bc4a03ea030f81f1b22563b0513fba",
+    "bytes": 47006
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\EXTENDED_IMPLEMENTATION_AUDIT\\IGAMMA_TIME_CONVENTION.csv",
+    "sha256": "dfd3d9cb599a7f0745af9bd003283026df0226ce7272ab76f54430c20d020bb6",
+    "bytes": 109
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\EXTENDED_IMPLEMENTATION_AUDIT\\INDEPENDENT_DENOMINATOR_AUDIT.csv",
+    "sha256": "5c9aec6898dca9c5926dcb4b6b85e7e4355a5736771e501a54ec25152922a179",
+    "bytes": 1025
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\EXTENDED_IMPLEMENTATION_AUDIT\\INDEPENDENT_ENGINE_COMPARISON.csv",
+    "sha256": "bc2d7c416d8e15301349001b7666b56385d43cd13591931296d2c28428f8d79c",
+    "bytes": 3625194
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\EXTENDED_IMPLEMENTATION_AUDIT\\K0_MATRIX_ELEMENT_AUDIT.csv",
+    "sha256": "acec79343f3f51db370bcf7d1fb31a5ffb5dd1d7a5b86ff354b2ab6babfd86e4",
+    "bytes": 2471
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\EXTENDED_IMPLEMENTATION_AUDIT\\K0_RESONANCE_ASSIGNMENT.csv",
+    "sha256": "0542a2783f286866c65f1ad8f167b95cdc6c2606039e342dfa75e96173d1e94c",
+    "bytes": 461
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\EXTENDED_IMPLEMENTATION_AUDIT\\K_INTEGRATION_CONVENTION_AUDIT.csv",
+    "sha256": "b5b4415c34fb47f7dbcac7fd8e4397890ccaa9b2efcc9741e83e158bc7239a94",
+    "bytes": 459
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\EXTENDED_IMPLEMENTATION_AUDIT\\K_INTEGRATION_NORMALIZED_SPECTRA.csv",
+    "sha256": "6c72b2b8cf6a5d512d64272ff8ad22a1bd03ca0a1ee3d44e1fcc4fe8808d2c78",
+    "bytes": 156330
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\EXTENDED_IMPLEMENTATION_AUDIT\\OBSERVABLE_COMPARISON.csv",
+    "sha256": "bacc2eb30e02bc232a34f628c0764eebb69e44e47ed8a0149dd35634cf9b038f",
+    "bytes": 565
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\EXTENDED_IMPLEMENTATION_AUDIT\\P1_P3_2296EV_REASSESSMENT.md",
+    "sha256": "b45585158e3bfb547a7c94d2dcfe4e565a4ae40f9fa5abe71f11071ecf7d05a4",
+    "bytes": 824
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\EXTENDED_IMPLEMENTATION_AUDIT\\PAPER_DIGITIZATION_AUDIT.md",
+    "sha256": "67ba5e2a340e4fc4144dd8b48a89781f89bb4f87740a672598549da029ff0f69",
+    "bytes": 805
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\EXTENDED_IMPLEMENTATION_AUDIT\\PAPER_STRUCTURE_REPRODUCTION_AUDIT.md",
+    "sha256": "a5c3d2316125591304dc8241cff5cda0d6a0b5fc0fafe1c76221c0ae9337b7f1",
+    "bytes": 1196
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\EXTENDED_IMPLEMENTATION_AUDIT\\PATHWAY_SIGN_CONJUGATION_STRESS.csv",
+    "sha256": "461f804aa620861463f9a1455e2732bb1b2cef524b734a753161f7b379b4bc83",
+    "bytes": 693
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\EXTENDED_IMPLEMENTATION_AUDIT\\PATHWAY_SUBSET_COMPARISON.csv",
+    "sha256": "22c6ae6c3dd01f28df1e4bbadc8bb84826f5c7960a4d46cae6cf10ab9191d9e3",
+    "bytes": 588
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\EXTENDED_IMPLEMENTATION_AUDIT\\PATHWAY_SUBSET_NORMALIZED_SPECTRA.csv",
+    "sha256": "bf0a63475b9fe5404f29939f39fb9b4acb1b6a9f1e5a83f627896662a0c457b7",
+    "bytes": 154170
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\EXTENDED_IMPLEMENTATION_AUDIT\\PRESERVATION_HASHES.json",
+    "sha256": "8f8dc4c25b305139f812b80cf77a98663e90ffa9b25568495475684d01ff2839",
+    "bytes": 789
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\EXTENDED_IMPLEMENTATION_AUDIT\\SCHRODINGER_POISSON_AUDIT.md",
+    "sha256": "d542144e30d84ef481e11a2dcaf32cac08da4f3d8183fe0827f414d90eb7cf7d",
+    "bytes": 724
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\EXTENDED_IMPLEMENTATION_AUDIT\\WAVEFUNCTION_GAUGE_INVARIANCE.csv",
+    "sha256": "205fe61466ffd64457aa302c7e243bf443c567dd82e2939deb42381f0f9bc454",
+    "bytes": 376
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\EXTENDED_IMPLEMENTATION_AUDIT\\WAVELENGTH_CONVENTION_AUDIT.md",
+    "sha256": "a3e38776dcb927501d12a971a92eed3c97c8372450e686965609ddd34d02ac71",
+    "bytes": 429
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\EXTENDED_IMPLEMENTATION_AUDIT\\WAVELENGTH_MAPPING_DIAGNOSTICS.csv",
+    "sha256": "725e2b87d752deec30a99cb729dba29d2d95e3342aa1a77fda2bb1497053c8ea",
+    "bytes": 226
+  },
+  {
+    "path": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\EXTENDED_IMPLEMENTATION_AUDIT\\Z_ORIGIN_INVARIANCE.csv",
+    "sha256": "e8587aadacbfb1d79afc827434cbc424287b86fd9b4c2f8eb9de2f2507620993",
+    "bytes": 263
+  }
+]

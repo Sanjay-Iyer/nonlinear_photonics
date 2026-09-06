@@ -1,0 +1,7 @@
+Feature,Paper,Demo23D,Best Demo24 diagnostic,Best diagnostic source,Difference,Status,24N mechanism,Model feature is a window edge
+P1,540.0,575.0,575.0,n/a - the model has no extremum in this window,35.0,DIAGNOSTIC_ONLY_MISMATCH,MISSING PHYSICS / MODEL SPACE,True
+Z1,605.0,550.0,550.0,n/a - the model has no extremum in this window,-55.0,DIAGNOSTIC_ONLY_MISMATCH,MISSING PHYSICS / MODEL SPACE,True
+P2,760.0,752.0,756.0,e2-10 meV,-4.0,DIAGNOSTIC_ONLY_MATCH,ENERGY / DENOMINATOR,False
+P3,1080.0,1160.0,1160.0,n/a - the model has no extremum in this window,80.0,DIAGNOSTIC_ONLY_MISMATCH,MISSING PHYSICS / MODEL SPACE,True
+Z2,1330.0,1250.0,1250.0,n/a - the model has no extremum in this window,-80.0,DIAGNOSTIC_ONLY_MISMATCH,k CUTOFF,True
+P4,1520.0,1503.0,1512.0,e2-10 meV,-8.0,DIAGNOSTIC_ONLY_MATCH,ENERGY / DENOMINATOR,False

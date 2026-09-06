@@ -1,0 +1,17 @@
+{
+  "sub_demo": "27A",
+  "tier": 1,
+  "professional_required": true,
+  "decks_declared": 6,
+  "decks_generated": 0,
+  "k_points_per_deck": [],
+  "total_k_point_solves": 0,
+  "states_per_deck": [],
+  "max_states": 0,
+  "runtime_hours_low": 0.08,
+  "runtime_hours_high": 0.35,
+  "runtime_text": "5 min - 21 min",
+  "output_gb_low": 0.2,
+  "output_gb_high": 2.0,
+  "basis": "Demo 23 solved 301 dispersion k points for 14 states in 10 min 20 s on the work laptop. The pilot is 6 decks x 4 k points but with 32 states and full envelope output at every k, so it is dominated by output volume, not by the eigenvalue problem. Demo 25's own pilot_audit then measures seconds-per-k and bytes-per-k for real and sizes 27B from the measurement rather than from this estimate."
+}

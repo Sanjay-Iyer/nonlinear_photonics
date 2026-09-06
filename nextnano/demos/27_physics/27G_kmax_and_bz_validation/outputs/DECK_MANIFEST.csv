@@ -1,0 +1,4 @@
+deck,question,band_model,k_mode,k_points,kmax_per_nm,states_out,electrostatics,interface_model,changed_fields,structural_diff_lines,path
+bz_0p15_pi_over_a.in,Intermediate cutoff - does the 1250-1450 nm feature keep marching?,kp8,dispersion,451,0.833572,14,flat_band,linear_graded,k_points;kmax_per_nm;relative_size,0,C:\code\nonlinear_photonics\nextnano\demos\27_physics\27G_kmax_and_bz_validation\inputs\bz_0p15_pi_over_a.in
+bz_0p10_gamma_x.in,The competing reading of the paper - 0.1 |Gamma-X| = 0.2 pi/a,kp8,dispersion,601,1.111429,14,flat_band,linear_graded,k_points;kmax_per_nm,0,C:\code\nonlinear_photonics\nextnano\demos\27_physics\27G_kmax_and_bz_validation\inputs\bz_0p10_gamma_x.in
+bz_0p30_pi_over_a.in,Past both readings - has the response actually saturated?,kp8,dispersion,901,1.667143,14,flat_band,linear_graded,k_points;kmax_per_nm;relative_size,0,C:\code\nonlinear_photonics\nextnano\demos\27_physics\27G_kmax_and_bz_validation\inputs\bz_0p30_pi_over_a.in

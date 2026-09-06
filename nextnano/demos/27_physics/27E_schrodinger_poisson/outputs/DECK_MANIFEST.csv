@@ -1,0 +1,3 @@
+deck,question,band_model,k_mode,k_points,kmax_per_nm,states_out,electrostatics,interface_model,changed_fields,structural_diff_lines,path
+A_flat_band_control.in,"Control - the Demo 23 flat-band quantum solve, regenerated for a like-for-like pair",kp8,dispersion,301,0.555714,14,flat_band,linear_graded,none,0,C:\code\nonlinear_photonics\nextnano\demos\27_physics\27E_schrodinger_poisson\inputs\A_flat_band_control.in
+B_self_consistent.in,Does self-consistent electrostatics move the states or the spectrum?,kp8,dispersion,301,0.555714,14,quantum_poisson,linear_graded,electrostatics,6,C:\code\nonlinear_photonics\nextnano\demos\27_physics\27E_schrodinger_poisson\inputs\B_self_consistent.in

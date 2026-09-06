@@ -1,0 +1,60 @@
+demo:
+  id: 27M
+  slug: advanced_multiband_optics
+  title: Advanced multiband optical physics
+  question: Do spin-resolved, branch-resolved or strongly mixed HH/LH/SO contributions change the Equation 2 pathways?
+  tier: 0
+  tier_planned: 4
+  tier_note: >-
+    Planned as Tier 4 on the assumption that new decks would be needed. They are
+    not, for the first pass: 27B's harvest already contains the full kp8 spinors,
+    the CB/HH/LH/SO fractions and the polarization-resolved matrix elements at
+    every k, which is what a spin- and branch-resolved decomposition needs. This
+    is the campaign's collect-broadly rule paying for itself. If the decomposition
+    then shows a quantity that was NOT harvested is decisive, that finding is
+    recorded and a Tier 4 deck is proposed at that point - not before.
+  priority: null
+  professional_required: false
+  prerequisites: [27B]
+  unlocks: []
+
+pass_condition: >-
+  The Equation 2 pathways are decomposed by spin branch and by band character
+  using 27B's harvested spinors, and the decomposition either accounts for a
+  named spectral discrepancy or does not. PASS is reached when the decomposition
+  exists and its conclusion is stated. If a decisive quantity turns out to be
+  missing from the harvest, that is also a PASS, provided the missing quantity is
+  named and a costed deck is proposed.
+
+cost:
+  decks: 0
+  k_points_per_deck: 0
+  states_per_deck: 0
+  runtime_hours: [0.05, 0.5]
+  output_gb: [0.0, 0.1]
+  basis: >-
+    Post-processing of 27B's output. The cost is parsing time over the finite-k
+    envelope and spinor files, which Demo 25 estimates at 2-10 minutes for a
+    301-point production run.
+
+stages:
+  preflight: {kind: python}
+  physics:   {kind: none}
+  analyze:   {kind: python}
+
+controlled_change:
+  summary: >-
+    None. 27M changes no deck and runs no solver. It reads 27B's harvest, which
+    is why the harvest was requested broadly in the first place.
+  fields: []
+  max_fields_per_deck: 0
+
+harvest_overrides: {}
+
+analysis:
+  produces:
+    - SPIN_RESOLVED_PATHWAYS.csv
+    - BRANCH_RESOLVED_CHI2.csv
+    - HH_LH_SO_MIXING_MAP.csv
+    - KRAMERS_PAIR_CHECK.csv
+    - MULTIBAND_VERDICT.md

@@ -1,0 +1,72 @@
+demo:
+  id: 27H
+  slug: crystal_direction_anisotropy
+  title: In-plane crystal-direction anisotropy
+  question: Is the radial (isotropic) in-plane assumption valid for these states and matrix elements?
+  tier: 2
+  tier_planned: 3
+  tier_note: >-
+    Planned as Tier 3 assuming every direction had to be computed. Two of them
+    already exist - Demo 23 ran [010] (production_y_n301_k0100) and [011]
+    (isotropy_yz45_n301_k0100) on this structure - so only the intermediate
+    angles are new solver work, which lands the real burden in Tier 2.
+  priority: 7
+  professional_required: true
+  prerequisites: []
+  unlocks: [27L]
+
+pass_condition: >-
+  E_n(k), state character, HH/LH mixing and the optical matrix elements are
+  compared across the in-plane angles. PASS is reached when the maximum
+  angular spread is quantified against an explicit tolerance and the recommendation
+  for 27L is stated. If the spread is negligible, the correct outcome is to record
+  27L as NOT NEEDED - that is a successful result, not a failure.
+
+cost:
+  decks: 3
+  k_points_per_deck: 301
+  states_per_deck: 14
+  runtime_hours: [0.5, 1.5]
+  output_gb: [0.9, 2.5]
+  basis: >-
+    Three decks at the measured Demo 23 production cost of 10 min 20 s each, plus
+    margin. The two endpoint directions are reused rather than recomputed.
+
+stages:
+  preflight: {kind: generate_and_parse}
+  physics:   {kind: professional}
+  analyze:   {kind: python}
+
+controlled_change:
+  summary: >-
+    The in-plane direction of the dispersion path, and nothing else. Growth is
+    along [100] throughout, so [010] and [001] are symmetry-equivalent and the
+    physically distinct sweep is from [010] to [011].
+  fields: [direction_name, direction]
+  max_fields_per_deck: 2
+
+decks:
+  - name: dir_yz15
+    question: 15 degrees off [010] - where does the anisotropy first appear?
+    overrides:
+      direction_name: yz15
+      direction: [0.0, 0.9659258262890683, 0.25881904510252074]
+  - name: dir_yz30
+    question: 30 degrees off [010]
+    overrides:
+      direction_name: yz30
+      direction: [0.0, 0.8660254037844387, 0.49999999999999994]
+  - name: dir_yz60
+    question: 60 degrees off [010] - past the [011] diagonal Demo 23 already has
+    overrides:
+      direction_name: yz60
+      direction: [0.0, 0.49999999999999994, 0.8660254037844387]
+
+harvest_overrides: {}
+
+analysis:
+  produces:
+    - DIRECTIONAL_DISPERSION.csv
+    - HH_LH_MIXING_VS_ANGLE.csv
+    - MATRIX_ELEMENT_ANISOTROPY.csv
+    - ANISOTROPY_VERDICT.md

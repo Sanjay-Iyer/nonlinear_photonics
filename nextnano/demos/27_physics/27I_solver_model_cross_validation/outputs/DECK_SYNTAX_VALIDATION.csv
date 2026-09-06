@@ -1,0 +1,3 @@
+deck,parse_ok,message
+model_kp6_valence.in,True,parsed
+model_single_band.in,True,parsed

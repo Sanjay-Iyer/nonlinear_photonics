@@ -1,0 +1,51 @@
+{
+  "sub_demo": "27L",
+  "title": "Full 2D in-plane (kx, ky) validation",
+  "question": "Does full 2D in-plane physics materially change chi2 compared with radial integration?",
+  "tier": 4,
+  "prerequisites": [
+    "27A",
+    "27H"
+  ],
+  "pass_condition": "chi2 is computed by genuine 2D integration over the in-plane zone and compared directly against the radial model on the same structure and the same cutoff. PASS means the difference is quantified. A difference below the 27H tolerance is a successful result that validates every radial calculation this project has done.",
+  "stages": {
+    "preflight": {
+      "kind": "generate_and_parse"
+    },
+    "physics": {
+      "kind": "professional"
+    },
+    "analyze": {
+      "kind": "python"
+    }
+  },
+  "delegate": {},
+  "controlled_change": {
+    "summary": "The k sampling changes from a 1D radial path to the 2D k-integration grid. The point count changes with it because 61 points along a path and 61 points across a 2D grid are not the same object; the cutoff, the structure and the state count are the Demo 23 baseline.",
+    "fields": [
+      "k_mode",
+      "k_points",
+      "symmetry"
+    ],
+    "max_fields_per_deck": 3
+  },
+  "baseline": {
+    "source": "23_k_resolved_dispersion_validation/demo23_config.yaml"
+  },
+  "decks": [
+    {
+      "name": "k2d_integration_n61",
+      "question": "Does the 2D in-plane integral differ from the radial one?",
+      "changes": {
+        "k_mode": {
+          "baseline": "dispersion",
+          "deck": "integration"
+        },
+        "k_points": {
+          "baseline": 301,
+          "deck": 61
+        }
+      }
+    }
+  ]
+}

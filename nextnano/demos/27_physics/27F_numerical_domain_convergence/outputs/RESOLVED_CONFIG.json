@@ -1,0 +1,116 @@
+{
+  "sub_demo": "27F",
+  "title": "Numerical domain and boundary convergence",
+  "question": "Could numerical-domain choices be creating or moving the higher states?",
+  "tier": 2,
+  "prerequisites": [],
+  "pass_condition": "Every state energy is reported against each numerical knob, and each state is labelled converged or not-converged under an explicit tolerance. A physical state must not depend strongly on the outer boundary; any state that moves with the padding, the outer barrier width or the boundary condition is recorded as a numerical artifact of the Dirichlet box, not as physics. PASS is reached when every state carries that label.",
+  "stages": {
+    "preflight": {
+      "kind": "generate_and_parse"
+    },
+    "physics": {
+      "kind": "professional"
+    },
+    "analyze": {
+      "kind": "python"
+    }
+  },
+  "delegate": {},
+  "controlled_change": {
+    "summary": "One numerical knob per deck, against the shared Demo 23 baseline. The sub-demo owns several knobs because the question is about the numerical domain as a whole, but no single deck turns more than one of them - except the state-count deck, where raising the number of states written requires raising the number solved.",
+    "fields": [
+      "active_spacing_nm",
+      "quantum_region_padding_nm",
+      "period_barrier_nm",
+      "boundary",
+      "num_electrons",
+      "num_holes",
+      "output_state_count"
+    ],
+    "max_fields_per_deck": 3
+  },
+  "baseline": {
+    "source": "23_k_resolved_dispersion_validation/demo23_config.yaml"
+  },
+  "decks": [
+    {
+      "name": "mesh_fine_0p025nm",
+      "question": "Is the 0.05 nm active mesh converged?",
+      "changes": {
+        "active_spacing_nm": {
+          "baseline": 0.05,
+          "deck": 0.025
+        }
+      }
+    },
+    {
+      "name": "mesh_coarse_0p100nm",
+      "question": "How far does a coarser mesh move the states? (sets the convergence slope)",
+      "changes": {
+        "active_spacing_nm": {
+          "baseline": 0.05,
+          "deck": 0.1
+        }
+      }
+    },
+    {
+      "name": "padding_4nm",
+      "question": "Do the states depend on where the Dirichlet walls are placed?",
+      "changes": {
+        "quantum_region_padding_nm": {
+          "baseline": 2.0,
+          "deck": 4.0
+        }
+      }
+    },
+    {
+      "name": "padding_8nm",
+      "question": "Same question, further out - a physical state must stop moving",
+      "changes": {
+        "quantum_region_padding_nm": {
+          "baseline": 2.0,
+          "deck": 8.0
+        }
+      }
+    },
+    {
+      "name": "outer_barrier_28p2nm",
+      "question": "Does a thicker outer barrier change the high states or the continuum onset?",
+      "changes": {
+        "period_barrier_nm": {
+          "baseline": 18.2,
+          "deck": 28.2
+        }
+      }
+    },
+    {
+      "name": "states_24",
+      "question": "Does simply asking for more states create new levels below the ones we use?",
+      "changes": {
+        "num_electrons": {
+          "baseline": 6,
+          "deck": 10
+        },
+        "num_holes": {
+          "baseline": 8,
+          "deck": 14
+        },
+        "output_state_count": {
+          "baseline": 14,
+          "deck": 24
+        }
+      }
+    },
+    {
+      "name": "boundary_neumann",
+      "question": "Is any state an artifact of the Dirichlet wall rather than of the barriers?",
+      "changes": {
+        "boundary": {
+          "baseline": "dirichlet",
+          "deck": "neumann"
+        }
+      }
+    }
+  ]
+}

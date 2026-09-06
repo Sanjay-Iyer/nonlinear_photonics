@@ -1,0 +1,69 @@
+demo:
+  id: 27N
+  slug: exciton_manybody_feasibility
+  title: Exciton and many-body feasibility study
+  question: Could excitonic or many-body effects be large enough to matter for this spectrum?
+  tier: 0
+  tier_planned: "4-5"
+  tier_note: >-
+    Planned as Tier 4-5. The FIRST pass is deliberately a feasibility study, not
+    an implementation: estimate the binding energy, the Coulomb enhancement and
+    the screening from the structure Demo 27 already has, and compare those
+    numbers against the size of the disagreement. That costs no solver time. A
+    many-body solver is only justified if the estimate says the effect is
+    comparable to the gap being explained, and this sub-demo's job is to answer
+    that question before anyone builds one.
+  priority: null
+  professional_required: false
+  prerequisites: []
+  unlocks: []
+
+pass_condition: >-
+  Three numbers are produced with their assumptions stated: an estimated 2D
+  exciton binding energy for this well pair, an estimated Coulomb enhancement of
+  the interband resonances, and an estimated screening / state-filling correction
+  at the experiment's carrier density. Each is compared against the measured
+  paper-vs-model feature gaps in Demo 26's EXTENDED_FEATURE_DIAGNOSIS.csv. PASS
+  is the recommendation - IMPLEMENT or DO NOT IMPLEMENT - with the arithmetic
+  shown. Building a many-body solver is explicitly NOT in scope here.
+
+cost:
+  decks: 0
+  k_points_per_deck: 0
+  states_per_deck: 0
+  runtime_hours: [0.05, 0.3]
+  output_gb: [0.0, 0.01]
+  basis: >-
+    Analytic estimates over existing envelopes and band parameters. No solver.
+
+# nextnano++ has a native route for the first estimate. Read out of
+# nextnano++/keywords/keywords_nnp.xml for 2026_07_03:
+#   transition_energies{ excitons{ electron_mass hole_mass
+#                                  density_averaged_masses dielectric_const } }
+# Try that before writing anything - it needs no new tooling and it attaches the
+# estimate to the same states the rest of the campaign uses. It is NOT enabled in
+# any current Demo 27 deck, because doing so would be new physics turned on
+# merely because an output looked interesting.
+native_route:
+  block: "transition_energies{ excitons{} }"
+  status: AVAILABLE_NOT_ENABLED
+  note: enabling it is 27N's decision to make, with its own cost statement
+
+stages:
+  preflight: {kind: python}
+  physics:   {kind: none}
+  analyze:   {kind: python}
+
+controlled_change:
+  summary: None. 27N runs no solver and generates no deck.
+  fields: []
+  max_fields_per_deck: 0
+
+harvest_overrides: {}
+
+analysis:
+  produces:
+    - EXCITON_BINDING_ESTIMATE.csv
+    - COULOMB_ENHANCEMENT_ESTIMATE.csv
+    - SCREENING_STATE_FILLING_ESTIMATE.csv
+    - MANYBODY_FEASIBILITY_VERDICT.md

@@ -1,0 +1,4 @@
+deck,parse_ok,message
+dir_yz15.in,True,parsed
+dir_yz30.in,True,parsed
+dir_yz60.in,True,parsed

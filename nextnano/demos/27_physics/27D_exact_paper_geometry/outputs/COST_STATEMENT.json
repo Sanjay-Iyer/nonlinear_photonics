@@ -1,0 +1,21 @@
+{
+  "sub_demo": "27D",
+  "tier": 2,
+  "professional_required": true,
+  "decks_declared": 1,
+  "decks_generated": 1,
+  "k_points_per_deck": [
+    301
+  ],
+  "total_k_point_solves": 301,
+  "states_per_deck": [
+    14
+  ],
+  "max_states": 14,
+  "runtime_hours_low": 0.15,
+  "runtime_hours_high": 0.5,
+  "runtime_text": "9 min - 30 min",
+  "output_gb_low": 0.3,
+  "output_gb_high": 1.0,
+  "basis": "One deck identical in cost to the Demo 23 production run (301 k points, 14 states, 10 min 20 s measured on the work laptop), plus margin. Only one deck is needed because the graded arm ALREADY EXISTS: demo_results/demo23/raw/ production_y_n301_k0100 is this exact structure and solver configuration, so rerunning it would buy nothing. See REUSE_AUDIT.md."
+}

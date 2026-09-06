@@ -1,0 +1,49 @@
+{
+  "sub_demo": "27E",
+  "title": "Schroedinger versus self-consistent Schroedinger-Poisson",
+  "question": "Does self-consistent electrostatics materially change the QW states or the chi2 spectrum?",
+  "tier": 3,
+  "prerequisites": [
+    "27D"
+  ],
+  "pass_condition": "Both arms converge (a quantum_poisson run that exits DONE without converging is a FAIL, not a result - the evidence is the convergence warning in summary.log and the residuals in iteration_quantum_poisson.dat, both of which are checked), and the Hartree potential, charge density, band edges, state energies, localization and matrix elements are compared arm to arm. PASS means the size of the electrostatic effect is quantified, whatever that size is.",
+  "stages": {
+    "preflight": {
+      "kind": "generate_and_parse"
+    },
+    "physics": {
+      "kind": "professional"
+    },
+    "analyze": {
+      "kind": "python"
+    }
+  },
+  "delegate": {},
+  "controlled_change": {
+    "summary": "Whether Poisson is solved self-consistently with the Schroedinger equation. Both decks are otherwise the Demo 23 baseline structure, so the pair isolates electrostatics. Note that the flat-band arm is regenerated rather than reused from Demo 23: if 27D changes the geometry decision, both arms must move together, and a control from a different structure would not be a control.",
+    "fields": [
+      "electrostatics"
+    ],
+    "max_fields_per_deck": 1
+  },
+  "baseline": {
+    "source": "23_k_resolved_dispersion_validation/demo23_config.yaml"
+  },
+  "decks": [
+    {
+      "name": "A_flat_band_control",
+      "question": "Control - the Demo 23 flat-band quantum solve, regenerated for a like-for-like pair",
+      "changes": {}
+    },
+    {
+      "name": "B_self_consistent",
+      "question": "Does self-consistent electrostatics move the states or the spectrum?",
+      "changes": {
+        "electrostatics": {
+          "baseline": "flat_band",
+          "deck": "quantum_poisson"
+        }
+      }
+    }
+  ]
+}

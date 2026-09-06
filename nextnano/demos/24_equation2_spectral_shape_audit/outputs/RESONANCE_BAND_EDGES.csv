@@ -1,0 +1,17 @@
+transition,order,edge,transition_energy_eV,wavelength_nm,origin
+DeltaE_11,one-photon,k=0,1.4933526957039993,830.2405637775416,physical joint-density edge
+DeltaE_11,one-photon,k=kmax,1.6762396043313998,739.6567774656145,k-truncation edge (artifact)
+DeltaE_11,two-photon,k=0,1.4933526957039993,1660.4811275550833,physical joint-density edge
+DeltaE_11,two-photon,k=kmax,1.6762396043313998,1479.313554931229,k-truncation edge (artifact)
+DeltaE_12,one-photon,k=0,1.5283667159019991,811.2202203175302,physical joint-density edge
+DeltaE_12,one-photon,k=kmax,1.706091837445949,726.7146801757555,k-truncation edge (artifact)
+DeltaE_12,two-photon,k=0,1.5283667159019991,1622.4404406350604,physical joint-density edge
+DeltaE_12,two-photon,k=kmax,1.706091837445949,1453.429360351511,k-truncation edge (artifact)
+DeltaE_21,one-photon,k=0,1.6132174157740005,768.5523177947716,physical joint-density edge
+DeltaE_21,one-photon,k=kmax,1.7745509174058007,698.6792950480751,k-truncation edge (artifact)
+DeltaE_21,two-photon,k=0,1.6132174157740005,1537.1046355895432,physical joint-density edge
+DeltaE_21,two-photon,k=kmax,1.7745509174058007,1397.3585900961502,k-truncation edge (artifact)
+DeltaE_22,one-photon,k=0,1.6482314359720003,752.2256625744044,physical joint-density edge
+DeltaE_22,one-photon,k=kmax,1.80440315052035,687.1202722309906,k-truncation edge (artifact)
+DeltaE_22,two-photon,k=0,1.6482314359720003,1504.4513251488088,physical joint-density edge
+DeltaE_22,two-photon,k=kmax,1.80440315052035,1374.2405444619812,k-truncation edge (artifact)

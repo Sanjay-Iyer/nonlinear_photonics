@@ -1,0 +1,4 @@
+mapping,overlap_points,RMSE_on_overlap,status
+fundamental_lambda,1451,0.26239111786932695,CORRECT
+2lambda_diagnostic,526,0.3032125035132629,DIAGNOSTIC ONLY
+lambda_over_2_diagnostic,1051,0.25969179773401435,DIAGNOSTIC ONLY

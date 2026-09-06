@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "artifacts": {
+    "demo23_config": {
+      "kind": "file",
+      "exists": true,
+      "sha256": "508029e018177a9d2c57321ad4bf44d3922a1e972e3803d0a178582b22fdf342",
+      "bytes": 2779,
+      "entries": 1
+    },
+    "demo23_production_raw": {
+      "kind": "dir",
+      "exists": true,
+      "sha256": "aaac26cb1354d1be53a4907f32ef312fc53228f5c2199bd1d72c00dcc9dfdfe9",
+      "bytes": 16298436,
+      "entries": 738
+    },
+    "demo23_kmax_sensitivity_raw": {
+      "kind": "dir",
+      "exists": true,
+      "sha256": "36c6a8455157150c278d0477a7fc94d132f6630bd9f36de997e8ba8b330e76de",
+      "bytes": 113883421,
+      "entries": 5166
+    },
+    "demo24_reachability": {
+      "kind": "file",
+      "exists": true,
+      "sha256": "0b9228cb03dc50a92370281dc1c25d6ddfbe49f37dd3a131f3148eaceb7b08f8",
+      "bytes": 54449,
+      "entries": 1
+    },
+    "demo24_feature_sensitivity": {
+      "kind": "file",
+      "exists": true,
+      "sha256": "ded0bc20ae6c2dce879356666fdf056af72d2753a70c899c7acf2762b162a552",
+      "bytes": 4569,
+      "entries": 1
+    },
+    "demo25_pilot_decks": {
+      "kind": "dir",
+      "exists": true,
+      "sha256": "8af88689e48de1491b13d1d22cef4d9595683931f7a43cb00f9ed5db6e368180",
+      "bytes": 186716,
+      "entries": 19
+    },
+    "demo26_root_cause_ranking": {
+      "kind": "file",
+      "exists": true,
+      "sha256": "83a2b79ffc1bca3d65793bdf4ce8748df1fe0618d1802c225e3285f856df26dd",
+      "bytes": 2280,
+      "entries": 1
+    },
+    "demo26_feature_diagnosis": {
+      "kind": "file",
+      "exists": true,
+      "sha256": "20c36975b0725830b876db88053c06277383649e6eca6d673b728c98c5362424",
+      "bytes": 1285,
+      "entries": 1
+    },
+    "paper_curve": {
+      "kind": "file",
+      "exists": true,
+      "sha256": "87f4b624ff576eca7ed1293674f95ceba8846ae271b95989313083ecc3cd99cb",
+      "bytes": 457,
+      "entries": 1
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "status": "COMPLETE",
+  "paper_observable": "explicitly |chi^(2)| in Figure 2d",
+  "main_result": "paper does not match signed Re[chi2] better",
+  "paper_vs_signed_Re_RMSE": 0.3833787753044691,
+  "paper_vs_abs_chi_RMSE": 0.26239111786936786,
+  "paper_vs_signed_Re_correlation": 0.36430593295853303,
+  "paper_vs_abs_chi_correlation": 0.24755539373508825,
+  "demo25_verdict": "DEMO 25 STILL REQUIRED",
+  "professional_solver_invoked": false,
+  "primary_plot": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\26_real_chi2_paper_comparison\\outputs\\plots\\figure01_paper_vs_signed_real_vs_magnitude.png"
+}

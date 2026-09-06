@@ -1,0 +1,11 @@
+{
+  "source": "C:\\code\\nonlinear_photonics\\demo_results\\demo23\\raw\\production_y_n301_k0100\\production_y_n301_k0100\\bias_00000\\bandedges.dat",
+  "barrier_conduction_edge_eV": 3.3244289271371,
+  "barrier_valence_edge_eV": 1.1795333333333,
+  "barrier_gap_eV": 2.1448955938038,
+  "barrier_position_nm": 0.0,
+  "well_conduction_edge_eV": 2.8821488095238,
+  "well_valence_edge_eV": 1.4596666666667,
+  "well_gap_eV": 1.4224821428571,
+  "well_position_nm": 9.6002
+}

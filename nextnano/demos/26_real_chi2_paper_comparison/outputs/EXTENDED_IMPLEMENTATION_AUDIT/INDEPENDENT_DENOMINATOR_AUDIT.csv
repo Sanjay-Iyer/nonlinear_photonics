@@ -1,0 +1,17 @@
+pathway,two_photon_transition,d2_shape,d1_shape,Gamma_meV,all_finite,formula_checked_for_every_wavelength_and_k
+C_m1_n1_l1,n1/m1,"(1451, 301)","(1451, 301)",5,True,YES
+C_m1_n1_l2,n1/m1,"(1451, 301)","(1451, 301)",5,True,YES
+V_m1_n1_l1,n1/m1,"(1451, 301)","(1451, 301)",5,True,YES
+V_m1_n1_l2,n1/m1,"(1451, 301)","(1451, 301)",5,True,YES
+C_m1_n2_l1,n2/m1,"(1451, 301)","(1451, 301)",5,True,YES
+C_m1_n2_l2,n2/m1,"(1451, 301)","(1451, 301)",5,True,YES
+V_m1_n2_l1,n2/m1,"(1451, 301)","(1451, 301)",5,True,YES
+V_m1_n2_l2,n2/m1,"(1451, 301)","(1451, 301)",5,True,YES
+C_m2_n1_l1,n1/m2,"(1451, 301)","(1451, 301)",5,True,YES
+C_m2_n1_l2,n1/m2,"(1451, 301)","(1451, 301)",5,True,YES
+V_m2_n1_l1,n1/m2,"(1451, 301)","(1451, 301)",5,True,YES
+V_m2_n1_l2,n1/m2,"(1451, 301)","(1451, 301)",5,True,YES
+C_m2_n2_l1,n2/m2,"(1451, 301)","(1451, 301)",5,True,YES
+C_m2_n2_l2,n2/m2,"(1451, 301)","(1451, 301)",5,True,YES
+V_m2_n2_l1,n2/m2,"(1451, 301)","(1451, 301)",5,True,YES
+V_m2_n2_l2,n2/m2,"(1451, 301)","(1451, 301)",5,True,YES

@@ -1,0 +1,2 @@
+comparison,max_complex_error,max_magnitude_error,result
+minus_iGamma_vs_conjugate_plus_iGamma,0.0,0.0,PASS
