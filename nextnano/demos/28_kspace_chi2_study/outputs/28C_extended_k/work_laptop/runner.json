@@ -1,0 +1,46 @@
+{
+  "threads": 1,
+  "timeout_seconds_per_deck": 14400,
+  "kp8": {
+    "purpose": "Provisional extended-k state/model audit, NOT a validated physical extension",
+    "temperature_K": 300.0,
+    "substrate": "GaAs",
+    "barrier_alloy_x": 0.55,
+    "total_nm": 30.0,
+    "wells_nm": [
+      [
+        9.1,
+        16.2
+      ],
+      [
+        18.0,
+        20.9
+      ]
+    ],
+    "interface_model": "linear_1nm",
+    "grade_width_nm": 1.0,
+    "coarse_spacing_nm": 0.5,
+    "fine_spacing_nm": 0.05,
+    "quantum_region_nm": [
+      7.1,
+      22.9
+    ],
+    "num_electrons": 6,
+    "num_holes": 8,
+    "output_states": 14,
+    "k_direction": [
+      0,
+      1,
+      0
+    ],
+    "k_max_per_nm": 0.8335716588483951,
+    "k_points": 901
+  },
+  "legacy_single_band": [
+    {
+      "job": "singleband_case04_graded",
+      "deck": "nextnano/inputs/singleband_case04_graded.in",
+      "purpose": "Historical Case04 single-band anchors and frozen matrix elements"
+    }
+  ]
+}

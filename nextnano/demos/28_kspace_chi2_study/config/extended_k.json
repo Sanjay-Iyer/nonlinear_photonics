@@ -1,0 +1,13 @@
+{
+  "raw_input": "nextnano/raw_extended",
+  "baseline_config": "config/baseline.json",
+  "lattice_constant_nm": 0.565325,
+  "k_cutoffs_pi_over_a": [0.05, 0.1, 0.1125, 0.125],
+  "probe_wavelengths_nm": [540,760,1080,1520,1550],
+  "feature_windows_nm": {"Re_positive_short": [630, 710], "Re_negative_long": [1250, 1450], "Im_negative_moving": [1300, 1450]},
+  "source_provenance": "Copied raw Professional demo_results/demo23/raw/kmax_y_n301_k0125; no runtime access to that original location",
+  "physical_status": "Diagnostic fixed-column historical model; finite-k state validity not established",
+  "future_candidate_max_pi_over_a": 0.15,
+  "future_candidate_k_points": 901,
+  "future_status": "Provisional extension only; review state character before using new region physically"
+}

@@ -1,0 +1,1214 @@
+{
+  "timestamp_utc": "2026-09-11T01:51:48.265467+00:00",
+  "equation_implementation_sha256": "6f69da8fe002f7954f6f5013712522c9e63445f7aa5e7ac447e608e36283a460",
+  "configuration": {
+    "model": "demo26-baseline",
+    "raw_input": "nextnano/raw_results",
+    "settings": {
+      "gamma_meV": 5.0,
+      "gamma_sign": 1,
+      "spin_degeneracy": 2,
+      "period_nm": 30.0,
+      "r_e_hh_nm": 0.751
+    },
+    "wavelength_nm": {
+      "min": 400.0,
+      "max": 1850.0,
+      "step": 1.0
+    },
+    "reference_tolerance_pm_per_V": 1e-08,
+    "feature_zero_tolerance_nm": 1e-05,
+    "save_integrand": true
+  },
+  "settings": {
+    "gamma_meV": 0.1,
+    "spin_degeneracy": 2,
+    "period_nm": 30.0,
+    "r_e_hh_nm": 0.751,
+    "gamma_sign": 1
+  },
+  "gamma_eV": 0.0001,
+  "raw_root": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\28_kspace_chi2_study\\nextnano\\raw_results",
+  "raw_manifest": "../../../28D_imaginary_source/raw_manifest.json",
+  "python": "3.11.15",
+  "code_version": "source SHA256 manifest (includes uncommitted code)",
+  "code_manifest": "../../../28D_imaginary_source/code_manifest.json",
+  "k_units": "nm^-1",
+  "BZ_conversion": "q = k/(pi/a); radial isotropic disk approximation, not an asserted exact BZ geometry",
+  "numpy": "2.4.6",
+  "licensed_solver_executed": false,
+  "model": "historical Demo26 baseline: kp8 dispersion shifts + single-band matrices",
+  "state_pairs": [
+    [
+      11,
+      12
+    ],
+    [
+      13,
+      14
+    ],
+    [
+      5,
+      6
+    ],
+    [
+      3,
+      4
+    ]
+  ],
+  "limitations": [
+    "Valence pair (3,4) is light-hole dominated; retained for historical reproduction",
+    "No finite-k spinor tracking; fixed solver columns and pair averaging",
+    "Single-band overlaps and matrix elements frozen at k=0",
+    "No explicit carrier occupations, excitons or additional pathways"
+  ],
+  "wavelength_points": 1451,
+  "wavelength_min_nm": 400.0,
+  "wavelength_max_nm": 1850.0,
+  "integration_measure": "g_s*k*dk/(2*pi), trapezoidal; isotropic in-plane approximation",
+  "prefactor": 56.69816882497043,
+  "prefactor_units": "maps nm/eV^2 times nm^-2 to historical pm/V convention",
+  "pathway_count": 16,
+  "normalization": "signed Re/Im and all sweep plots unnormalized; optional paper comparison uses own maxima",
+  "git_commit": "88c54ac559bfe90cce29e3d0d3229e95a3ada982",
+  "code_sha256": {
+    "chi2\\__init__.py": "0bd8e881d387715844ef63b6095fdb5817a3ec8b4a776d09b8d7e57ad5f27275",
+    "chi2\\artifacts.py": "543f488acc2b7f54b3ec65afd41160d6377773433e7147e75b5123f2a14a575d",
+    "chi2\\causality.py": "47ef40d8fb5d2eb4a16cdefcfb8278e2c2cd42bc95cf49f2a81ae7f5e9bb367d",
+    "chi2\\decks.py": "db08342483f4988d6df91b8c0a1b541b16eb42aab7e8c6127af8a099fc79cfd3",
+    "chi2\\diagnostics.py": "864ca3af9b26ec8ad848b4d0f081bc22be061bc10e78da54f47b383d847985c8",
+    "chi2\\equation2.py": "6f69da8fe002f7954f6f5013712522c9e63445f7aa5e7ac447e608e36283a460",
+    "chi2\\input_builder.py": "e3209cbaebda5951dae5832fe7e69d6408d38f238669da298780e692e7dea6df",
+    "chi2\\k_integration.py": "c0e2085e7c33817a6583712cac17637bef45ae565fbdbe8f310bbfb7f85adbe6",
+    "chi2\\matrix_elements.py": "a655fc37046f7f047a5a7c40c2f017fa87d96d713893407ffe235ebc3bc67407",
+    "chi2\\nextnano_runner.py": "2e14cce692d52bc9fbaf0c10bd24a124a490f5981e1909fcb099f5512412f046",
+    "chi2\\numerical_audit.py": "8e96e5b962e440bc8051d17cf69a75d834cd2fb30ec4e03696615e701a65f374",
+    "chi2\\parse_nextnano.py": "0f0577055b39c6ab33aa20e4b6d5965c18b894cde7a1176d26a0ba112efaa2a2",
+    "chi2\\plotting.py": "48ae1612dddde5b846e991688b678852009d52313307671fe838bb5a0ff20be1",
+    "chi2\\response_audit.py": "51ab5209b5bf3db2e298c76d9fe9113491cf1deaafb9b17b5c13e5b6dbd054f1",
+    "chi2\\state_audit.py": "b122ff6a7f5b41fa552702281e65f880b37dfe9daf2f6488ceafc83eefcc8e16",
+    "chi2\\studies.py": "4af12d80038a4c1dd5514bef7059819dcf0cf4fffe4ce61c5275943ad9c7c480"
+  },
+  "equation_implementation": "chi2/equation2.py::calculate_chi2",
+  "code_note": "Source hashes identify working-tree code even if Git commit is unavailable or dirty.",
+  "response_configuration": {
+    "baseline_config": "config/baseline.json",
+    "gamma_meV": [
+      0.1,
+      0.5,
+      1.0,
+      2.0,
+      5.0,
+      10.0,
+      20.0
+    ],
+    "selected_gamma_meV": [
+      1.0,
+      2.0,
+      5.0,
+      20.0
+    ],
+    "near_resonance_detuning_meV": 25.0,
+    "off_resonance_detuning_meV": 100.0,
+    "ratio_real_floor_fraction": 0.001,
+    "feature_wavelengths_nm": [
+      540.0,
+      760.0,
+      1080.0,
+      1520.0,
+      1550.0
+    ],
+    "top_pathways": 4,
+    "lattice_constant_nm": 0.565325
+  },
+  "k_points": 301,
+  "k_min_per_nm": 0.0,
+  "k_max_per_nm": 0.555714439232,
+  "lattice_constant_nm": 0.565325,
+  "input_arrays": "../../../28D_imaginary_source/chi2_inputs",
+  "numerical_warning": "Small Gamma on fixed 301-point k and 1 nm wavelength grids is not a converged Gamma-to-zero limit.",
+  "study": "28E_linewidth",
+  "features": {
+    "dominant_abs_Re_wavelength_nm": 1505.0,
+    "dominant_abs_Im_wavelength_nm": 1375.0,
+    "max_abs_Re_pm_per_V": 138.36009182841565,
+    "max_abs_Im_pm_per_V": 188.89118136259225,
+    "Re_peaks": [
+      {
+        "wavelength_nm": 687.0,
+        "signed_value_pm_per_V": 61.42075709030313
+      },
+      {
+        "wavelength_nm": 690.0,
+        "signed_value_pm_per_V": 49.26588253833742
+      },
+      {
+        "wavelength_nm": 693.0,
+        "signed_value_pm_per_V": 57.537403313174565
+      },
+      {
+        "wavelength_nm": 697.0,
+        "signed_value_pm_per_V": 41.53248601233844
+      },
+      {
+        "wavelength_nm": 701.0,
+        "signed_value_pm_per_V": 43.71495304742193
+      },
+      {
+        "wavelength_nm": 706.0,
+        "signed_value_pm_per_V": 40.66688218258376
+      },
+      {
+        "wavelength_nm": 712.0,
+        "signed_value_pm_per_V": -31.265183956278122
+      },
+      {
+        "wavelength_nm": 715.0,
+        "signed_value_pm_per_V": 31.820100506909498
+      },
+      {
+        "wavelength_nm": 722.0,
+        "signed_value_pm_per_V": -33.40283503592448
+      },
+      {
+        "wavelength_nm": 727.0,
+        "signed_value_pm_per_V": -33.98567958039911
+      },
+      {
+        "wavelength_nm": 730.0,
+        "signed_value_pm_per_V": -21.571334065552684
+      },
+      {
+        "wavelength_nm": 733.0,
+        "signed_value_pm_per_V": -22.76267584178258
+      },
+      {
+        "wavelength_nm": 736.0,
+        "signed_value_pm_per_V": -5.844892055355588
+      },
+      {
+        "wavelength_nm": 739.0,
+        "signed_value_pm_per_V": -29.474523018297454
+      },
+      {
+        "wavelength_nm": 741.0,
+        "signed_value_pm_per_V": -11.859058840158013
+      },
+      {
+        "wavelength_nm": 744.0,
+        "signed_value_pm_per_V": -15.816089206437994
+      },
+      {
+        "wavelength_nm": 746.0,
+        "signed_value_pm_per_V": -27.61882646569517
+      },
+      {
+        "wavelength_nm": 752.0,
+        "signed_value_pm_per_V": -71.09412288370152
+      },
+      {
+        "wavelength_nm": 1374.0,
+        "signed_value_pm_per_V": -127.51840362631106
+      },
+      {
+        "wavelength_nm": 1377.0,
+        "signed_value_pm_per_V": -109.4846429152193
+      },
+      {
+        "wavelength_nm": 1380.0,
+        "signed_value_pm_per_V": -103.04919532788506
+      },
+      {
+        "wavelength_nm": 1383.0,
+        "signed_value_pm_per_V": -107.74322839802306
+      },
+      {
+        "wavelength_nm": 1386.0,
+        "signed_value_pm_per_V": -119.53586240599984
+      },
+      {
+        "wavelength_nm": 1389.0,
+        "signed_value_pm_per_V": -107.65543409327378
+      },
+      {
+        "wavelength_nm": 1391.0,
+        "signed_value_pm_per_V": -64.80993478230948
+      },
+      {
+        "wavelength_nm": 1394.0,
+        "signed_value_pm_per_V": -87.00758832822856
+      },
+      {
+        "wavelength_nm": 1397.0,
+        "signed_value_pm_per_V": -104.16830402095829
+      },
+      {
+        "wavelength_nm": 1399.0,
+        "signed_value_pm_per_V": -57.09694880819842
+      },
+      {
+        "wavelength_nm": 1402.0,
+        "signed_value_pm_per_V": -92.1436918567077
+      },
+      {
+        "wavelength_nm": 1404.0,
+        "signed_value_pm_per_V": -41.510813128142786
+      },
+      {
+        "wavelength_nm": 1407.0,
+        "signed_value_pm_per_V": -82.25803690553141
+      },
+      {
+        "wavelength_nm": 1409.0,
+        "signed_value_pm_per_V": -39.34433592469571
+      },
+      {
+        "wavelength_nm": 1412.0,
+        "signed_value_pm_per_V": -86.87378514728505
+      },
+      {
+        "wavelength_nm": 1415.0,
+        "signed_value_pm_per_V": 59.144230177950135
+      },
+      {
+        "wavelength_nm": 1417.0,
+        "signed_value_pm_per_V": -30.127718729860973
+      },
+      {
+        "wavelength_nm": 1419.0,
+        "signed_value_pm_per_V": -75.90798479165366
+      },
+      {
+        "wavelength_nm": 1422.0,
+        "signed_value_pm_per_V": 53.741752502657604
+      },
+      {
+        "wavelength_nm": 1424.0,
+        "signed_value_pm_per_V": 58.83860305848147
+      },
+      {
+        "wavelength_nm": 1428.0,
+        "signed_value_pm_per_V": -66.8076160201708
+      },
+      {
+        "wavelength_nm": 1430.0,
+        "signed_value_pm_per_V": -69.96843510990743
+      },
+      {
+        "wavelength_nm": 1432.0,
+        "signed_value_pm_per_V": -63.694579648442726
+      },
+      {
+        "wavelength_nm": 1434.0,
+        "signed_value_pm_per_V": -58.45631677004543
+      },
+      {
+        "wavelength_nm": 1436.0,
+        "signed_value_pm_per_V": -57.986267107120696
+      },
+      {
+        "wavelength_nm": 1438.0,
+        "signed_value_pm_per_V": -60.480551739886366
+      },
+      {
+        "wavelength_nm": 1440.0,
+        "signed_value_pm_per_V": -56.30630940146156
+      },
+      {
+        "wavelength_nm": 1444.0,
+        "signed_value_pm_per_V": 63.14440657380156
+      },
+      {
+        "wavelength_nm": 1447.0,
+        "signed_value_pm_per_V": -47.73276738902379
+      },
+      {
+        "wavelength_nm": 1451.0,
+        "signed_value_pm_per_V": 49.80038275872535
+      },
+      {
+        "wavelength_nm": 1454.0,
+        "signed_value_pm_per_V": 62.55287581150951
+      },
+      {
+        "wavelength_nm": 1457.0,
+        "signed_value_pm_per_V": 60.41826582334133
+      },
+      {
+        "wavelength_nm": 1461.0,
+        "signed_value_pm_per_V": 43.031276458996146
+      },
+      {
+        "wavelength_nm": 1465.0,
+        "signed_value_pm_per_V": 53.8316280824444
+      },
+      {
+        "wavelength_nm": 1472.0,
+        "signed_value_pm_per_V": 6.045177181057243
+      },
+      {
+        "wavelength_nm": 1478.0,
+        "signed_value_pm_per_V": 51.954225265440826
+      },
+      {
+        "wavelength_nm": 1481.0,
+        "signed_value_pm_per_V": 57.83774699647596
+      },
+      {
+        "wavelength_nm": 1483.0,
+        "signed_value_pm_per_V": 36.76488474748112
+      },
+      {
+        "wavelength_nm": 1485.0,
+        "signed_value_pm_per_V": 54.299089439290796
+      },
+      {
+        "wavelength_nm": 1489.0,
+        "signed_value_pm_per_V": 25.880325596251254
+      },
+      {
+        "wavelength_nm": 1492.0,
+        "signed_value_pm_per_V": 49.7685125336867
+      },
+      {
+        "wavelength_nm": 1495.0,
+        "signed_value_pm_per_V": 45.0895660370428
+      },
+      {
+        "wavelength_nm": 1497.0,
+        "signed_value_pm_per_V": 44.7013491550249
+      },
+      {
+        "wavelength_nm": 1505.0,
+        "signed_value_pm_per_V": 138.36009182841565
+      },
+      {
+        "wavelength_nm": 1556.0,
+        "signed_value_pm_per_V": 26.76388702596408
+      },
+      {
+        "wavelength_nm": 1560.0,
+        "signed_value_pm_per_V": 26.227995790482176
+      },
+      {
+        "wavelength_nm": 1563.0,
+        "signed_value_pm_per_V": 24.74300021715758
+      },
+      {
+        "wavelength_nm": 1581.0,
+        "signed_value_pm_per_V": 20.64790404369483
+      },
+      {
+        "wavelength_nm": 1584.0,
+        "signed_value_pm_per_V": 20.181131867817534
+      }
+    ],
+    "Im_peaks": [
+      {
+        "wavelength_nm": 689.0,
+        "signed_value_pm_per_V": 81.73355414254675
+      },
+      {
+        "wavelength_nm": 693.0,
+        "signed_value_pm_per_V": 35.64678201849577
+      },
+      {
+        "wavelength_nm": 696.0,
+        "signed_value_pm_per_V": 78.94886842358602
+      },
+      {
+        "wavelength_nm": 700.0,
+        "signed_value_pm_per_V": 65.51690713385767
+      },
+      {
+        "wavelength_nm": 705.0,
+        "signed_value_pm_per_V": 73.5562925072854
+      },
+      {
+        "wavelength_nm": 713.0,
+        "signed_value_pm_per_V": 78.17360802865855
+      },
+      {
+        "wavelength_nm": 721.0,
+        "signed_value_pm_per_V": 71.49990556605385
+      },
+      {
+        "wavelength_nm": 726.0,
+        "signed_value_pm_per_V": 35.056207842751164
+      },
+      {
+        "wavelength_nm": 729.0,
+        "signed_value_pm_per_V": 36.27944912104485
+      },
+      {
+        "wavelength_nm": 731.0,
+        "signed_value_pm_per_V": 27.704605722356916
+      },
+      {
+        "wavelength_nm": 733.0,
+        "signed_value_pm_per_V": 55.92222993634448
+      },
+      {
+        "wavelength_nm": 738.0,
+        "signed_value_pm_per_V": 37.9086142291994
+      },
+      {
+        "wavelength_nm": 743.0,
+        "signed_value_pm_per_V": 37.97681312431496
+      },
+      {
+        "wavelength_nm": 746.0,
+        "signed_value_pm_per_V": 36.7581119455031
+      },
+      {
+        "wavelength_nm": 752.0,
+        "signed_value_pm_per_V": 49.549251306651385
+      },
+      {
+        "wavelength_nm": 1375.0,
+        "signed_value_pm_per_V": -188.89118136259225
+      },
+      {
+        "wavelength_nm": 1378.0,
+        "signed_value_pm_per_V": -164.06600440445408
+      },
+      {
+        "wavelength_nm": 1381.0,
+        "signed_value_pm_per_V": -115.33165815778275
+      },
+      {
+        "wavelength_nm": 1384.0,
+        "signed_value_pm_per_V": -69.64937900188357
+      },
+      {
+        "wavelength_nm": 1386.0,
+        "signed_value_pm_per_V": -71.55513520226188
+      },
+      {
+        "wavelength_nm": 1389.0,
+        "signed_value_pm_per_V": -145.86738896385515
+      },
+      {
+        "wavelength_nm": 1392.0,
+        "signed_value_pm_per_V": -158.479691131126
+      },
+      {
+        "wavelength_nm": 1395.0,
+        "signed_value_pm_per_V": -60.67275912086474
+      },
+      {
+        "wavelength_nm": 1397.0,
+        "signed_value_pm_per_V": -117.18163428759755
+      },
+      {
+        "wavelength_nm": 1400.0,
+        "signed_value_pm_per_V": -131.14970795712946
+      },
+      {
+        "wavelength_nm": 1402.0,
+        "signed_value_pm_per_V": -61.798453198153794
+      },
+      {
+        "wavelength_nm": 1405.0,
+        "signed_value_pm_per_V": -163.73090032771137
+      },
+      {
+        "wavelength_nm": 1407.0,
+        "signed_value_pm_per_V": -55.72977498371206
+      },
+      {
+        "wavelength_nm": 1410.0,
+        "signed_value_pm_per_V": -147.25871781015678
+      },
+      {
+        "wavelength_nm": 1412.0,
+        "signed_value_pm_per_V": -77.64742047216052
+      },
+      {
+        "wavelength_nm": 1415.0,
+        "signed_value_pm_per_V": -76.35924822993289
+      },
+      {
+        "wavelength_nm": 1417.0,
+        "signed_value_pm_per_V": -160.27384397737302
+      },
+      {
+        "wavelength_nm": 1419.0,
+        "signed_value_pm_per_V": -66.44534382032876
+      },
+      {
+        "wavelength_nm": 1422.0,
+        "signed_value_pm_per_V": -53.73904015642735
+      },
+      {
+        "wavelength_nm": 1424.0,
+        "signed_value_pm_per_V": -113.49661367530143
+      },
+      {
+        "wavelength_nm": 1426.0,
+        "signed_value_pm_per_V": -156.49279958039875
+      },
+      {
+        "wavelength_nm": 1428.0,
+        "signed_value_pm_per_V": -114.03302745647778
+      },
+      {
+        "wavelength_nm": 1430.0,
+        "signed_value_pm_per_V": -77.52075208015123
+      },
+      {
+        "wavelength_nm": 1432.0,
+        "signed_value_pm_per_V": -60.091492143254655
+      },
+      {
+        "wavelength_nm": 1434.0,
+        "signed_value_pm_per_V": -54.826443977408815
+      },
+      {
+        "wavelength_nm": 1436.0,
+        "signed_value_pm_per_V": -58.113515413625706
+      },
+      {
+        "wavelength_nm": 1438.0,
+        "signed_value_pm_per_V": -71.28876855753956
+      },
+      {
+        "wavelength_nm": 1440.0,
+        "signed_value_pm_per_V": -103.20605308198171
+      },
+      {
+        "wavelength_nm": 1442.0,
+        "signed_value_pm_per_V": -142.5749063029806
+      },
+      {
+        "wavelength_nm": 1444.0,
+        "signed_value_pm_per_V": -91.04930504022607
+      },
+      {
+        "wavelength_nm": 1447.0,
+        "signed_value_pm_per_V": -54.05673878676956
+      },
+      {
+        "wavelength_nm": 1449.0,
+        "signed_value_pm_per_V": -136.35843573277117
+      },
+      {
+        "wavelength_nm": 1452.0,
+        "signed_value_pm_per_V": -69.10228434898787
+      },
+      {
+        "wavelength_nm": 1454.0,
+        "signed_value_pm_per_V": -68.05780325734548
+      },
+      {
+        "wavelength_nm": 1458.0,
+        "signed_value_pm_per_V": -71.3005354557641
+      },
+      {
+        "wavelength_nm": 1461.0,
+        "signed_value_pm_per_V": -110.22938399803999
+      },
+      {
+        "wavelength_nm": 1466.0,
+        "signed_value_pm_per_V": -110.66324961737931
+      },
+      {
+        "wavelength_nm": 1477.0,
+        "signed_value_pm_per_V": -105.51531256401628
+      },
+      {
+        "wavelength_nm": 1481.0,
+        "signed_value_pm_per_V": -71.69429145705723
+      },
+      {
+        "wavelength_nm": 1483.0,
+        "signed_value_pm_per_V": -95.57134561811
+      },
+      {
+        "wavelength_nm": 1486.0,
+        "signed_value_pm_per_V": -77.14233893413262
+      },
+      {
+        "wavelength_nm": 1492.0,
+        "signed_value_pm_per_V": -72.32155432069723
+      },
+      {
+        "wavelength_nm": 1497.0,
+        "signed_value_pm_per_V": -84.2133595232489
+      },
+      {
+        "wavelength_nm": 1504.0,
+        "signed_value_pm_per_V": -99.5323342187913
+      },
+      {
+        "wavelength_nm": 1516.0,
+        "signed_value_pm_per_V": 5.963755774724117
+      },
+      {
+        "wavelength_nm": 1525.0,
+        "signed_value_pm_per_V": 7.354793822659426
+      },
+      {
+        "wavelength_nm": 1531.0,
+        "signed_value_pm_per_V": 6.587675441948596
+      },
+      {
+        "wavelength_nm": 1543.0,
+        "signed_value_pm_per_V": 4.827446410525946
+      },
+      {
+        "wavelength_nm": 1564.0,
+        "signed_value_pm_per_V": 4.970340822521607
+      }
+    ],
+    "Re_zero_crossings": [
+      {
+        "wavelength_nm": 688.9982719804793,
+        "real_pm_per_V": -1.4489387467619963e-10,
+        "imag_pm_per_V": 84.27175055927606
+      },
+      {
+        "wavelength_nm": 689.0620594576391,
+        "real_pm_per_V": -1.4196643860486802e-11,
+        "imag_pm_per_V": 21.247872404717583
+      },
+      {
+        "wavelength_nm": 691.9561973595991,
+        "real_pm_per_V": -9.097789188672323e-11,
+        "imag_pm_per_V": 89.25421277900801
+      },
+      {
+        "wavelength_nm": 692.0514983105506,
+        "real_pm_per_V": 3.565446604625322e-09,
+        "imag_pm_per_V": 14.67188845900096
+      },
+      {
+        "wavelength_nm": 694.8945219162098,
+        "real_pm_per_V": -6.191669399413513e-11,
+        "imag_pm_per_V": 89.46672722074709
+      },
+      {
+        "wavelength_nm": 696.1091638183825,
+        "real_pm_per_V": -6.338041202980094e-12,
+        "imag_pm_per_V": 12.01024737069245
+      },
+      {
+        "wavelength_nm": 698.8971889552148,
+        "real_pm_per_V": -1.864606247181655e-10,
+        "imag_pm_per_V": 88.01458954139792
+      },
+      {
+        "wavelength_nm": 700.476356094573,
+        "real_pm_per_V": -1.0970779840135947e-11,
+        "imag_pm_per_V": 10.957022065673623
+      },
+      {
+        "wavelength_nm": 703.9213082249632,
+        "real_pm_per_V": -2.559943368396489e-10,
+        "imag_pm_per_V": 85.22842949651525
+      },
+      {
+        "wavelength_nm": 705.8460907967846,
+        "real_pm_per_V": -2.9416469260468148e-12,
+        "imag_pm_per_V": 10.534775722260509
+      },
+      {
+        "wavelength_nm": 708.1569409101215,
+        "real_pm_per_V": 1.5016610177553957e-10,
+        "imag_pm_per_V": 82.75076067318739
+      },
+      {
+        "wavelength_nm": 712.4871616517714,
+        "real_pm_per_V": -8.071765478234738e-12,
+        "imag_pm_per_V": 10.829439084547435
+      },
+      {
+        "wavelength_nm": 720.9994395436223,
+        "real_pm_per_V": -1.0533085514907725e-10,
+        "imag_pm_per_V": 71.4119381457289
+      },
+      {
+        "wavelength_nm": 724.9893467214923,
+        "real_pm_per_V": -9.224265795637621e-10,
+        "imag_pm_per_V": 12.474242723623302
+      },
+      {
+        "wavelength_nm": 726.0388011852044,
+        "real_pm_per_V": -7.190692485892214e-11,
+        "imag_pm_per_V": 66.15297275945056
+      },
+      {
+        "wavelength_nm": 728.3319014199901,
+        "real_pm_per_V": -2.7330315788276494e-10,
+        "imag_pm_per_V": 12.614539945292254
+      },
+      {
+        "wavelength_nm": 729.3256492114054,
+        "real_pm_per_V": 6.482991921075154e-11,
+        "imag_pm_per_V": 62.8663400560786
+      },
+      {
+        "wavelength_nm": 730.9419111369598,
+        "real_pm_per_V": 3.0240698833949864e-11,
+        "imag_pm_per_V": 12.600450100827366
+      },
+      {
+        "wavelength_nm": 731.0457752423536,
+        "real_pm_per_V": -1.7045067579601891e-09,
+        "imag_pm_per_V": 60.550344917815565
+      },
+      {
+        "wavelength_nm": 733.6951976317251,
+        "real_pm_per_V": 1.4700844985782169e-09,
+        "imag_pm_per_V": 13.829676654984333
+      },
+      {
+        "wavelength_nm": 734.0469830322351,
+        "real_pm_per_V": 1.0510348147363402e-10,
+        "imag_pm_per_V": 56.61619173219249
+      },
+      {
+        "wavelength_nm": 737.7225634736752,
+        "real_pm_per_V": -7.73070496506989e-12,
+        "imag_pm_per_V": 19.173778813651452
+      },
+      {
+        "wavelength_nm": 738.4793790730174,
+        "real_pm_per_V": 1.2505211088864598e-08,
+        "imag_pm_per_V": 49.546501452212325
+      },
+      {
+        "wavelength_nm": 739.9894501157073,
+        "real_pm_per_V": -8.095639714156277e-10,
+        "imag_pm_per_V": 25.14855623113911
+      },
+      {
+        "wavelength_nm": 740.0219269773172,
+        "real_pm_per_V": 1.879470801213756e-09,
+        "imag_pm_per_V": 42.52246288888148
+      },
+      {
+        "wavelength_nm": 1377.9994871455149,
+        "real_pm_per_V": -6.698996912746225e-11,
+        "imag_pm_per_V": -164.8363072486522
+      },
+      {
+        "wavelength_nm": 1378.11313289979,
+        "real_pm_per_V": -1.5615739812346874e-09,
+        "imag_pm_per_V": -46.95738790484123
+      },
+      {
+        "wavelength_nm": 1380.9608960279895,
+        "real_pm_per_V": -8.51514414534904e-11,
+        "imag_pm_per_V": -173.65158102367417
+      },
+      {
+        "wavelength_nm": 1381.1117855694251,
+        "real_pm_per_V": 1.4210854715202004e-11,
+        "imag_pm_per_V": -36.755832307352264
+      },
+      {
+        "wavelength_nm": 1383.9146004270017,
+        "real_pm_per_V": 8.611777957412414e-11,
+        "imag_pm_per_V": -176.7563642871558
+      },
+      {
+        "wavelength_nm": 1384.0901788742344,
+        "real_pm_per_V": 8.133667961374158e-09,
+        "imag_pm_per_V": -31.846564940627708
+      },
+      {
+        "wavelength_nm": 1386.8582660488898,
+        "real_pm_per_V": -1.9889512259396724e-10,
+        "imag_pm_per_V": -177.83316393992175
+      },
+      {
+        "wavelength_nm": 1387.053024575331,
+        "real_pm_per_V": -4.934008757118136e-11,
+        "imag_pm_per_V": -28.83235536183882
+      },
+      {
+        "wavelength_nm": 1389.7910383683259,
+        "real_pm_per_V": 7.634071153006516e-11,
+        "imag_pm_per_V": -177.90313717764155
+      },
+      {
+        "wavelength_nm": 1390.0018156414208,
+        "real_pm_per_V": -4.831690603168681e-12,
+        "imag_pm_per_V": -26.759748539145065
+      },
+      {
+        "wavelength_nm": 1391.983139812784,
+        "real_pm_per_V": 2.078195393551141e-10,
+        "imag_pm_per_V": -177.55591490744882
+      },
+      {
+        "wavelength_nm": 1392.2045624780742,
+        "real_pm_per_V": -8.782308213994838e-11,
+        "imag_pm_per_V": -25.577038122876182
+      },
+      {
+        "wavelength_nm": 1394.895592967926,
+        "real_pm_per_V": -1.5586465451633558e-10,
+        "imag_pm_per_V": -176.7457715250996
+      },
+      {
+        "wavelength_nm": 1395.1300667493374,
+        "real_pm_per_V": -3.904119694198016e-09,
+        "imag_pm_per_V": -24.31439297190066
+      },
+      {
+        "wavelength_nm": 1397.7957047918067,
+        "real_pm_per_V": 1.2931877790833823e-10,
+        "imag_pm_per_V": -175.60147670128924
+      },
+      {
+        "wavelength_nm": 1398.0455038321472,
+        "real_pm_per_V": -7.457856554538012e-10,
+        "imag_pm_per_V": -22.256661692681732
+      },
+      {
+        "wavelength_nm": 1399.9630344339764,
+        "real_pm_per_V": 2.4541066068195505e-08,
+        "imag_pm_per_V": -174.30822061990585
+      },
+      {
+        "wavelength_nm": 1400.9399830844577,
+        "real_pm_per_V": -5.034053174313158e-10,
+        "imag_pm_per_V": -22.41975624461317
+      },
+      {
+        "wavelength_nm": 1402.8413263696089,
+        "real_pm_per_V": 1.9457047528703697e-08,
+        "imag_pm_per_V": -171.98862388677736
+      },
+      {
+        "wavelength_nm": 1403.1027163861556,
+        "real_pm_per_V": 5.6047042562568095e-09,
+        "imag_pm_per_V": -22.106638377429462
+      },
+      {
+        "wavelength_nm": 1404.9901912628693,
+        "real_pm_per_V": 5.786660040030256e-11,
+        "imag_pm_per_V": -170.65913942737882
+      },
+      {
+        "wavelength_nm": 1405.9737412351476,
+        "real_pm_per_V": -4.888534022029489e-12,
+        "imag_pm_per_V": -21.556492001603594
+      },
+      {
+        "wavelength_nm": 1407.8443678251654,
+        "real_pm_per_V": 7.581149930047104e-09,
+        "imag_pm_per_V": -169.87010480389432
+      },
+      {
+        "wavelength_nm": 1408.1178075033292,
+        "real_pm_per_V": -5.4285465012071654e-11,
+        "imag_pm_per_V": -20.389653705665197
+      },
+      {
+        "wavelength_nm": 1409.2660692056286,
+        "real_pm_per_V": -4.8203219193965197e-11,
+        "imag_pm_per_V": -168.9880271854213
+      },
+      {
+        "wavelength_nm": 1410.9710348142985,
+        "real_pm_per_V": -1.8172841009800322e-10,
+        "imag_pm_per_V": -20.24988776182245
+      },
+      {
+        "wavelength_nm": 1412.8038755018033,
+        "real_pm_per_V": 9.947598300641403e-12,
+        "imag_pm_per_V": -166.5026145366686
+      },
+      {
+        "wavelength_nm": 1413.094429578565,
+        "real_pm_per_V": 1.34718902700115e-11,
+        "imag_pm_per_V": -20.609077810193725
+      },
+      {
+        "wavelength_nm": 1414.2122217787305,
+        "real_pm_per_V": 3.2304114938597195e-10,
+        "imag_pm_per_V": -165.35854060334185
+      },
+      {
+        "wavelength_nm": 1415.911893047418,
+        "real_pm_per_V": 1.7848833522293717e-11,
+        "imag_pm_per_V": -20.581212949670487
+      },
+      {
+        "wavelength_nm": 1417.714627695979,
+        "real_pm_per_V": 1.3943690646556206e-10,
+        "imag_pm_per_V": -161.5467939504727
+      },
+      {
+        "wavelength_nm": 1418.0140341137408,
+        "real_pm_per_V": -3.760646904993337e-09,
+        "imag_pm_per_V": -20.485002291902212
+      },
+      {
+        "wavelength_nm": 1419.8030611049114,
+        "real_pm_per_V": 9.504788067715708e-10,
+        "imag_pm_per_V": -161.1023728805107
+      },
+      {
+        "wavelength_nm": 1420.1061299903733,
+        "real_pm_per_V": 2.2851054382044822e-11,
+        "imag_pm_per_V": -20.332977821870195
+      },
+      {
+        "wavelength_nm": 1421.1901506790834,
+        "real_pm_per_V": 2.6341240300098434e-10,
+        "imag_pm_per_V": -160.35923717091077
+      },
+      {
+        "wavelength_nm": 1422.8792868620744,
+        "real_pm_per_V": 6.252776074688882e-13,
+        "imag_pm_per_V": -19.772703006172136
+      },
+      {
+        "wavelength_nm": 1423.262091197714,
+        "real_pm_per_V": -2.8881572688987944e-09,
+        "imag_pm_per_V": -158.90236919599533
+      },
+      {
+        "wavelength_nm": 1424.9498595422576,
+        "real_pm_per_V": -1.2197460819152184e-09,
+        "imag_pm_per_V": -18.81646777767758
+      },
+      {
+        "wavelength_nm": 1426.0077144595773,
+        "real_pm_per_V": 1.240891833731439e-09,
+        "imag_pm_per_V": -156.7587542344416
+      },
+      {
+        "wavelength_nm": 1427.0112967966634,
+        "real_pm_per_V": 2.080014382954687e-09,
+        "imag_pm_per_V": -19.220547793922094
+      },
+      {
+        "wavelength_nm": 1428.732907803704,
+        "real_pm_per_V": 4.506773620960303e-09,
+        "imag_pm_per_V": -154.49450807654546
+      },
+      {
+        "wavelength_nm": 1429.0561655398385,
+        "real_pm_per_V": 6.474465408246033e-11,
+        "imag_pm_per_V": -19.914319329738646
+      },
+      {
+        "wavelength_nm": 1430.0874542524205,
+        "real_pm_per_V": 5.629715360555565e-09,
+        "imag_pm_per_V": -153.3099985500628
+      },
+      {
+        "wavelength_nm": 1431.087855810926,
+        "real_pm_per_V": -3.6277469916967675e-09,
+        "imag_pm_per_V": -20.232047056344356
+      },
+      {
+        "wavelength_nm": 1432.7795833169782,
+        "real_pm_per_V": 1.2032046470267233e-09,
+        "imag_pm_per_V": -150.73142574413197
+      },
+      {
+        "wavelength_nm": 1433.106677326878,
+        "real_pm_per_V": -2.3305801732931286e-11,
+        "imag_pm_per_V": -20.418397821825188
+      },
+      {
+        "wavelength_nm": 1434.7829772716188,
+        "real_pm_per_V": -3.2815705708344467e-10,
+        "imag_pm_per_V": -148.42127252175032
+      },
+      {
+        "wavelength_nm": 1435.111961796412,
+        "real_pm_per_V": 3.808509063674137e-12,
+        "imag_pm_per_V": -20.56611458593082
+      },
+      {
+        "wavelength_nm": 1436.7717298844132,
+        "real_pm_per_V": 3.171862772433087e-11,
+        "imag_pm_per_V": -146.2000388023269
+      },
+      {
+        "wavelength_nm": 1437.102960972714,
+        "real_pm_per_V": -3.9335645851679146e-11,
+        "imag_pm_per_V": -20.703671972518563
+      },
+      {
+        "wavelength_nm": 1438.089356668444,
+        "real_pm_per_V": -2.6985560452885693e-08,
+        "imag_pm_per_V": -145.36986199902515
+      },
+      {
+        "wavelength_nm": 1439.0789016801211,
+        "real_pm_per_V": 1.1425527191022411e-11,
+        "imag_pm_per_V": -20.83779887474924
+      },
+      {
+        "wavelength_nm": 1440.7045854159671,
+        "real_pm_per_V": -1.2499867807491682e-10,
+        "imag_pm_per_V": -143.73818741606215
+      },
+      {
+        "wavelength_nm": 1441.0389781095723,
+        "real_pm_per_V": 1.223099843628006e-09,
+        "imag_pm_per_V": -20.962659095538413
+      },
+      {
+        "wavelength_nm": 1443.29082253561,
+        "real_pm_per_V": 4.575895218295045e-11,
+        "imag_pm_per_V": -141.6335433194044
+      },
+      {
+        "wavelength_nm": 1444.9082317158668,
+        "real_pm_per_V": -3.950617610826157e-11,
+        "imag_pm_per_V": -21.062684610289125
+      },
+      {
+        "wavelength_nm": 1445.2101225543588,
+        "real_pm_per_V": 1.745092959026806e-11,
+        "imag_pm_per_V": -139.91856406545355
+      },
+      {
+        "wavelength_nm": 1446.8162116124008,
+        "real_pm_per_V": -4.888534022029489e-12,
+        "imag_pm_per_V": -20.888388168577848
+      },
+      {
+        "wavelength_nm": 1447.7402742283577,
+        "real_pm_per_V": 1.538182914373465e-10,
+        "imag_pm_per_V": -137.54211498014286
+      },
+      {
+        "wavelength_nm": 1449.333428629933,
+        "real_pm_per_V": 5.67297320230864e-11,
+        "imag_pm_per_V": -20.77541017526209
+      },
+      {
+        "wavelength_nm": 1450.8532347450414,
+        "real_pm_per_V": 1.2755663192365319e-10,
+        "imag_pm_per_V": -134.44756434359704
+      },
+      {
+        "wavelength_nm": 1451.8144755788426,
+        "real_pm_per_V": -7.844391802791506e-12,
+        "imag_pm_per_V": -22.01090962885405
+      },
+      {
+        "wavelength_nm": 1452.081927751257,
+        "real_pm_per_V": -1.1471001926111057e-10,
+        "imag_pm_per_V": -133.13825394533103
+      },
+      {
+        "wavelength_nm": 1454.85410926014,
+        "real_pm_per_V": -4.51223058917094e-09,
+        "imag_pm_per_V": -23.091073526573552
+      },
+      {
+        "wavelength_nm": 1455.1094783723445,
+        "real_pm_per_V": 1.3318413039087318e-09,
+        "imag_pm_per_V": -128.73325004621347
+      },
+      {
+        "wavelength_nm": 1457.8273883824224,
+        "real_pm_per_V": -6.816662789788097e-10,
+        "imag_pm_per_V": -23.893361833824798
+      },
+      {
+        "wavelength_nm": 1459.2366245828237,
+        "real_pm_per_V": 2.177102942368947e-10,
+        "imag_pm_per_V": -124.73422573923989
+      },
+      {
+        "wavelength_nm": 1461.8585795756271,
+        "real_pm_per_V": 2.603428583825007e-11,
+        "imag_pm_per_V": -21.416467085739285
+      },
+      {
+        "wavelength_nm": 1463.775129476403,
+        "real_pm_per_V": 2.523847797419876e-11,
+        "imag_pm_per_V": -119.28649880139844
+      },
+      {
+        "wavelength_nm": 1466.8316749185722,
+        "real_pm_per_V": 5.1159076974727213e-11,
+        "imag_pm_per_V": -27.307966760996564
+      },
+      {
+        "wavelength_nm": 1470.1779912159495,
+        "real_pm_per_V": 3.2173375075217336e-11,
+        "imag_pm_per_V": -109.46906218394048
+      },
+      {
+        "wavelength_nm": 1473.0037640894145,
+        "real_pm_per_V": -1.0345502232667059e-11,
+        "imag_pm_per_V": -28.409606712694398
+      },
+      {
+        "wavelength_nm": 1476.5058859174515,
+        "real_pm_per_V": -6.52562448522076e-11,
+        "imag_pm_per_V": -101.93147327795216
+      },
+      {
+        "wavelength_nm": 1479.9501091664188,
+        "real_pm_per_V": 1.3642420526593924e-11,
+        "imag_pm_per_V": -39.58294418326523
+      },
+      {
+        "wavelength_nm": 1480.061085910983,
+        "real_pm_per_V": 3.6834535421803594e-11,
+        "imag_pm_per_V": -94.49585663068342
+      },
+      {
+        "wavelength_nm": 1485.9479113446575,
+        "real_pm_per_V": -4.75210981676355e-11,
+        "imag_pm_per_V": -51.52664032979703
+      },
+      {
+        "wavelength_nm": 1486.0008739012735,
+        "real_pm_per_V": -1.1245901987422258e-09,
+        "imag_pm_per_V": -77.62401594426979
+      }
+    ],
+    "target_wavelength_nm": 1550.0,
+    "Re_at_target_pm_per_V": 26.424903380604817,
+    "Im_at_target_pm_per_V": 3.174574079300504,
+    "feature_policy": "maxima refer to absolute component amplitude; labels do not track physical branches across peak switches"
+  },
+  "near_resonance": {
+    "samples": 500,
+    "safe_ratio_samples": 500,
+    "l2_abs_Im_over_Re": 1.102731039611826,
+    "median_safe_abs_Im_over_Re": 0.16151746480379908,
+    "fraction_Im_dominant": 0.288,
+    "fraction_Re_dominant": 0.712
+  },
+  "off_resonance": {
+    "samples": 736,
+    "safe_ratio_samples": 736,
+    "l2_abs_Im_over_Re": 0.00028781586941305335,
+    "median_safe_abs_Im_over_Re": 0.00015555886285301704,
+    "fraction_Im_dominant": 0.0,
+    "fraction_Re_dominant": 1.0
+  },
+  "ratio_real_floor_pm_per_V": 0.13836009182841566,
+  "apparent_lobe_width": {
+    "Re": {
+      "status": "SAMPLED_HALF_PROMINENCE_LOBE",
+      "width_nm": 8.278061084892897,
+      "points_across_width": 8.278061084892897,
+      "peak_nm": 1505.0
+    },
+    "Im": {
+      "status": "SAMPLED_HALF_PROMINENCE_LOBE",
+      "width_nm": 1.095932541268212,
+      "points_across_width": 1.0959325412684393,
+      "peak_nm": 1375.0
+    }
+  },
+  "resonance_definition": "min over solved k, n,m and p=1,2 of |E_nm(k)-p*hc/lambda|; fixed energy masks across all Gamma",
+  "wavelength_energy_step_max_eV": 0.0077296881795509975
+}

@@ -1,0 +1,2978 @@
+[
+  {
+    "file": "kp8/bias_00000/bandedges.dat",
+    "sha256": "256229846f76eed7f444d130fbbe44743ec35ce84b93bb87619b7d47235dc9a3"
+  },
+  {
+    "file": "kp8/bias_00000/bandgap.dat",
+    "sha256": "c1c959216946ef5402e8e921e0aa9d2ca055e385a11b90b57e2b07c800505efa"
+  },
+  {
+    "file": "kp8/bias_00000/bias_points.log",
+    "sha256": "5ccb270233bd2eb5266243ecd0053612cde782295217994e4e80928dfe89c19c"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/energy_spectrum_k00000.dat",
+    "sha256": "75f33be44511234b4332d333ff97e0373b2359489b6e607b39b65c78a466e102"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0001_cb1.dat",
+    "sha256": "ca03a8f4b140d6ade63ba866dee4475d98d12f41e0b22a318214015e0ad9c4ff"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0001_cb2.dat",
+    "sha256": "8c7980b5936558c0aa9d58825d66b628395192a08eb35bac2c6c1d1cc02bb052"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0001_hh1.dat",
+    "sha256": "7bdeda4e2e6c76d0583b89f3b0b7606fb8000d12dbe3c611a81002f8874ff88c"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0001_hh2.dat",
+    "sha256": "4feb78563d84e42206936ab426968673ffc5d2d70363ffa698af2bc3aab0055b"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0001_lh1.dat",
+    "sha256": "673ba82335bcc2399d0ec3a2ce5efe80064589aac92c982430a4dcc3733e265a"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0001_lh2.dat",
+    "sha256": "bc4d45775ec8930f5dfb4c65a5c496aa0bdaef00c41f842167c15d9a4bcd7058"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0001_s1.dat",
+    "sha256": "bee7c9fd31501c3f8c904cc67f01b1ad0414e6e7a827db7de01a97b75c922b5e"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0001_s2.dat",
+    "sha256": "7184d21bbeb87b5385946947f89f6138780979bc31f8eba993f8b4e8a917dc80"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0001_so1.dat",
+    "sha256": "5f31ecdf099dbe715f6b41a69c9329fac041c405aea6981d1e63a43b25c2acba"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0001_so2.dat",
+    "sha256": "28ba32b8a26d15b13e9e39b0e8db8f15faef005381e156ab0e25afb736e2353e"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0001_x1.dat",
+    "sha256": "19a268120bf7399f800b0a231098438fe557e437ed66701473cb4420fdd00ae1"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0001_x2.dat",
+    "sha256": "088994cc9901257248abb5f999265297aaa5c781ba460686c9204976ee1002a4"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0001_y1.dat",
+    "sha256": "9beb2fea5cd05170123a023b172c461f4294ffbadc743e47adc50e2b67b54b5d"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0001_y2.dat",
+    "sha256": "221bd6751ed233df4009fc867149b6dc2bf5c5002a76d5446e1b99a9172ac9f1"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0001_z1.dat",
+    "sha256": "5c1a2872e629b24843db1a2392adc42ee7d01c0be68b2e02964e30e29c49df95"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0001_z2.dat",
+    "sha256": "adb67652b31ab3a866f96a5b6562ccdd5205006ba97003c812680077f51d5dc2"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0002_cb1.dat",
+    "sha256": "5243853115d5069cdd1d2a5ed98ae46fdfeaf8a10df1fcd79c16e997a0b7dcda"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0002_cb2.dat",
+    "sha256": "77a49859595b17bb3a55c6a5b8aa084cffbcbb4c9f721a005451dc6486dec60c"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0002_hh1.dat",
+    "sha256": "81996f49b2d86beb2b39f4bb9586ca57e36854dbdebf2c946bc201574ccd712a"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0002_hh2.dat",
+    "sha256": "2887d3909eea2274f9aed895a7b3e17c97cf82ab907a49c265f8465515817eee"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0002_lh1.dat",
+    "sha256": "178af1b6c89bd1df6031e4df716bddded037efd9a843f8f329a7da39db9f0628"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0002_lh2.dat",
+    "sha256": "5eae8ee44c503e4f3ed0fa464ba48451fdce8c7e42447f3da2381849bee8168a"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0002_s1.dat",
+    "sha256": "87a09db05f8505975fa5db90b16fa9a3b4cbdd9d5ad8b881cc383b2e0c444d24"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0002_s2.dat",
+    "sha256": "10149a75ab79dc0d7d7503351186dd1e6773bee76e8d80c1a91533333e96a3ad"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0002_so1.dat",
+    "sha256": "9a9f9a1954d064c18d278da95e7c4fc8824c4904d9c4b6724410d9d1816c3394"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0002_so2.dat",
+    "sha256": "b53f1132666a47267cd443825188ed568a017602eeba08eba7f2485ae6bcf03d"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0002_x1.dat",
+    "sha256": "d3a090a0fb024ab332f4b5bdd8a52883ba26d23e6c1819c3bcaf8a92e7d6601f"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0002_x2.dat",
+    "sha256": "1ac65a9b0f5594c6e2818925e537eed25220954bbec28c1d6fdbaab21118d9a3"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0002_y1.dat",
+    "sha256": "c04f6b27781f38a138940d1d981efe740683325372d4e6dc9f3cf40357cf4d53"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0002_y2.dat",
+    "sha256": "b2bd8edfa35377728148e4a1975c0a7acc9a7bbb78f753b55961dd3a070c5da1"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0002_z1.dat",
+    "sha256": "076534aa9bf107103076a63de8aa9e0be9d812ca7afdcaf0736580294f4e1d3d"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0002_z2.dat",
+    "sha256": "33f5b5ce2e5436ffb2912effd27ed9f8452755be33c515fccbe2a935a94b16c5"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0003_cb1.dat",
+    "sha256": "400414f60a306544b5ed063f1a155c8b8d0695f804f861871f087cc6909b0501"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0003_cb2.dat",
+    "sha256": "3ca16e1e09ad4f4aa2a2b9b42cec8d8faa0bdcc11489f0bfd32a9f51cca199c4"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0003_hh1.dat",
+    "sha256": "d015d176b1a094ff648e206303a85ef66bc1b1ad61b9da3d5a725608e27e561b"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0003_hh2.dat",
+    "sha256": "a075c6a9e276d050b200ce8178d5eb0db147432c5e7add1b749d4d1344f33bf5"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0003_lh1.dat",
+    "sha256": "ad54b9a7bdd8ab4423eb6692b425c21c1ed8b8e4054f3d32e8586e3bc901f216"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0003_lh2.dat",
+    "sha256": "a490cdf9d01a502d89ba30ea40b9cc8873d0cd9e74e28b0a7a612d4efcb4925b"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0003_s1.dat",
+    "sha256": "6f7f97cccb9142f170f827e0a05bf988ca01541fb2a78dbddb8db99352fea0b6"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0003_s2.dat",
+    "sha256": "b523f268d0ae1cfc473b832b3a32532c8e1222a1210582809042d245ab95bcaf"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0003_so1.dat",
+    "sha256": "3532438fe2372677c585017a76423a8cd33b7173718970f69bf40ac33c788221"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0003_so2.dat",
+    "sha256": "9442152575cedcf60649b4bed850906dffc4b93e9b1711909c0c4e26d2c8494c"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0003_x1.dat",
+    "sha256": "c5a23559cb7c4d6b5cf63e7cb9d61a2bde9813e004700995a7fd307b8e77f208"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0003_x2.dat",
+    "sha256": "071ae6a7754732f64f4b1f2d1ceda7a65250c2abd8470de7248e239d65825b51"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0003_y1.dat",
+    "sha256": "11257f7737fd44d4c296a04b68c962f979677db3e42061f90892bd0131b61656"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0003_y2.dat",
+    "sha256": "e2e1bc75563b7b22a67ba190f5acdbd7321e3be9521ca9387b3831296429cfbb"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0003_z1.dat",
+    "sha256": "8e957f830ecc3e169c6bc1e1b90dea4012beddf955741cb595369a70b8c43454"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0003_z2.dat",
+    "sha256": "2fe9ac86e3f274351fcfd308917d96df5e4594b44c83a3c6b109e2fccf1c0891"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0004_cb1.dat",
+    "sha256": "042d089f081d87d2912681ddc995c166f9b681ad2d3a205aa5559246ac6ba4fe"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0004_cb2.dat",
+    "sha256": "546b53aade784b1c9d5dd28893d01495cb850caec2ef731401399ce3a1a27890"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0004_hh1.dat",
+    "sha256": "9bcb6725f9011fec6d4c3f16fb7897a884c6a13b029e509412651e6a0ce0499b"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0004_hh2.dat",
+    "sha256": "12c2535cd3e9315cd0c763c1fafbec690c1b12d90525c9e49ab9c12fce5528fc"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0004_lh1.dat",
+    "sha256": "6e200c5f495e4ae4e014683e370ea99a71d1ded1e2ce4cc58bab68fa0753e6c1"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0004_lh2.dat",
+    "sha256": "d0cf08a639f424c94af48d93938c229167c6029bb689ab609ac9a2aa1f5b70de"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0004_s1.dat",
+    "sha256": "18c1dd79f13948f867ae2dd0a39699af0afede20bdd3c14673a872281e8469a4"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0004_s2.dat",
+    "sha256": "4c07aa6c34fe491a643d5967b3a4664c5585100c397f35835b60dd0a9540462e"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0004_so1.dat",
+    "sha256": "72b40f98c227e83ad4b4af7f7107d9b70c13e531a8abfd226ddb110494b5587c"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0004_so2.dat",
+    "sha256": "9118502d9c8e8f51de8a9d410ce8898a1e24fee24798d26dadd54b1a7cc83242"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0004_x1.dat",
+    "sha256": "0030be0575ff0de1a9e42a96e5db18ae31197887770d0341231158847bdeb17c"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0004_x2.dat",
+    "sha256": "b687ec8607404f10d8294389b85b288669c3bb28d2126a794fb3d395298b22dc"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0004_y1.dat",
+    "sha256": "5d82eb88e5f90257a1334c21bac5854ddadf20027b007ccafdb72ced59c19622"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0004_y2.dat",
+    "sha256": "e85c1fbe2e8b1ca3aa387924ab522ce0c1ddfeecdbcee85d36c7b7f1378ef86f"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0004_z1.dat",
+    "sha256": "c788aac0e7f2242e24a5f5bab2ffad3eb3c17be42ebcc29676cd883182e7d19b"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0004_z2.dat",
+    "sha256": "d9fcaac5a1a262a2e54b92e54bb79ba9c8ace8d8d71a71f001875abd35971aba"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0005_cb1.dat",
+    "sha256": "25f1bc82056fc231811391552a3d1fd0418c3f2f05cf13731ce1d884f4f02f1c"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0005_cb2.dat",
+    "sha256": "d4b0f71a25cf59f1f11e7fb3dd0b39f77f68d42229b1f51d3fe1aba64d84e549"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0005_hh1.dat",
+    "sha256": "7585b9b75ac2c45025b6440d30e0da6381a2e1bc1e0d2ee8169c4814f4b04c8f"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0005_hh2.dat",
+    "sha256": "2ab810df132ae27e07e60a563807917d1f52052c1a5d89c0ae9cc85ed30b8434"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0005_lh1.dat",
+    "sha256": "2af3071351cda0d45c20705c9eabe082b2bcee1f586294a82582c6985d7be35e"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0005_lh2.dat",
+    "sha256": "be025723412a3a0ccc36bff10640ad041e1efb0563e0cb88b6babc1406c50807"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0005_s1.dat",
+    "sha256": "6bc2f4540e6f590fad301f3ff663c2c271dd9e09a7b78cd75c1247dd43934c56"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0005_s2.dat",
+    "sha256": "73388a4812b10771185de2026b1cc9c6a2b508bd3cf3e7d1ffa268bcac0709b6"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0005_so1.dat",
+    "sha256": "1df21cd3f9c79bdc7d704a692ae768642e512129892cda331ee82b1f5876f847"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0005_so2.dat",
+    "sha256": "b7fa66a58f2959a3acaaa99195f6e01563cf222d12f0df38d1c105ba1c181447"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0005_x1.dat",
+    "sha256": "4bd68b8f4e2e865c38798ed410012837a74ec0bbd33f8984956e6efc4e90d498"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0005_x2.dat",
+    "sha256": "d66789dbb3334bbd8ecab656b89e4c576507511d72c5e9b9b8e46840285e64c9"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0005_y1.dat",
+    "sha256": "facf35f3ca617e2972db16759512c82fe58af6608262a7eeaefeb1ccd84295c0"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0005_y2.dat",
+    "sha256": "e89db4b4308059b41696973b0c6da366e9b12f62965b2cf6733200a4d5841266"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0005_z1.dat",
+    "sha256": "4007d47990e0e481d8441279bf4a3418993b9e3f54313e2ed31e6910b8b18bea"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0005_z2.dat",
+    "sha256": "f3bc7f69eb289d75b9f1447d1c8b1745dadb7760e240e1ba27e174dc6635f9d0"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0006_cb1.dat",
+    "sha256": "04050609d245987c0d2f991a87c1c874e3a4e429112a4801f68860d3d2a0104d"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0006_cb2.dat",
+    "sha256": "e9bb8c35d5ce98b9b4465da1c4eac5e4f23f829682515b8f35279d9e6618b82c"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0006_hh1.dat",
+    "sha256": "685d45f2d5097ad665e8be477448d970816c1b331899dfbdc73df15f23a84305"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0006_hh2.dat",
+    "sha256": "ad97f8655819a83659257ca715969ce5fc3623baaa93b5fc471014d5678a755a"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0006_lh1.dat",
+    "sha256": "7ddcfc745d1d6d2a0e54c1ad13850f64c651f5fb1de1a3de7f944f9e00a48480"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0006_lh2.dat",
+    "sha256": "4718904b784fc60bd39a4e0a2e5c7239dc962e7feb5827eb94602d54b8f07088"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0006_s1.dat",
+    "sha256": "26d2fce2ad15ec9c10be0925054ca7e2ba65540a0a7df849a27391f7a64e7a5e"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0006_s2.dat",
+    "sha256": "26e1e33c4f50e9e959a76c66d1de037fb036480dfe476e6a37030fdae0524235"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0006_so1.dat",
+    "sha256": "8214931b3d7489b829d24bf6364913bf13f5ce22e79c8e84bd51b37e08ad35ae"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0006_so2.dat",
+    "sha256": "057dd61445a743ec7b281a1d72171c503110e3dfa3090df38073dc2757ddd17e"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0006_x1.dat",
+    "sha256": "f144a65fedb71496a3ef1b948bc6c7c4831fc5dda0914738549a95b160aec59a"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0006_x2.dat",
+    "sha256": "a64324fe135c0da1b77ea4be895e6fea672ed4252ce6ed068fbddc1e351be55b"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0006_y1.dat",
+    "sha256": "367f5c544db6e0be8a523986d83e8d69333fe75d5d8c40836a01f14f8ffd48aa"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0006_y2.dat",
+    "sha256": "0e429a3f1b7197720879bebab077e9715433aa0d94332a49f5e4575015cd9122"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0006_z1.dat",
+    "sha256": "0ac50aae9f78017ba745637d46eac808c4bc4cf166484e549e2845fc114f3193"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0006_z2.dat",
+    "sha256": "8f5d02767db2975ced1ab907564753814290a5f8319bf5d2971ac27bbb2841ec"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0007_cb1.dat",
+    "sha256": "82c603f890739e95d843997f6abfefb47eaa48b6efa2110b1a757c44a65eaeeb"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0007_cb2.dat",
+    "sha256": "bc522b06cfaea6ee86ad13dd2b45127bf8edbf6f87129f9ffca5f83741acbf89"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0007_hh1.dat",
+    "sha256": "e35c48127fe94aea8369ffcb5df1dfdb362c684164c12ff1766032ccd2dff14b"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0007_hh2.dat",
+    "sha256": "5d3814f61e89d2c1132ef61fe29484ae6fbb2736ff258141aa8d92b55364eb03"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0007_lh1.dat",
+    "sha256": "c59dac9c83bb26f7c754d5823776ea471f51043c25572e113b46eeea9cdeed42"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0007_lh2.dat",
+    "sha256": "7380004ab27c163f6e58bdcdf47021dd0b13bc7bc71c5c56717d59ff23de58f8"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0007_s1.dat",
+    "sha256": "bbafc15395caef4e0989989390ef2a4e3af6b14a1fdf7c7989fc3d7fc26f1197"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0007_s2.dat",
+    "sha256": "2b6e236ba60a7dca220f710748ad08cbcbf99345ef63c44ebe9b67f21e36e4a0"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0007_so1.dat",
+    "sha256": "8e945499828149baa81564112932255a5180b05bd3152b00a0b428029a3d8f4e"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0007_so2.dat",
+    "sha256": "3fd447b65af902587be983538f62cc0afbeb3b48c5a2632cb9f4a19ebf3eaf61"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0007_x1.dat",
+    "sha256": "3bd7ca2567d553122a02d7ea6ce86846f755a93f05a42a2b2ed6419629e505e1"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0007_x2.dat",
+    "sha256": "2c8e865d1dd2b428cb0ebbaf41ed5d827896e80b22ebb75eef189207638484c7"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0007_y1.dat",
+    "sha256": "54c566ec7c49ec5c0e76d987d38aef0217b04fb48278ccdb7213f71e3060aa57"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0007_y2.dat",
+    "sha256": "b969c7761139ec726b97457fc59b1f69d7ac023d676f91de212fc1f8ad62b5a8"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0007_z1.dat",
+    "sha256": "67c6295ea59582524f1916f6c1a54edaaa72358ea1be3786278e45827ccddadb"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0007_z2.dat",
+    "sha256": "d39ad16363d584f825e245daf1b03c110cc483fc774dc9cbdcfab69cc7de0108"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0008_cb1.dat",
+    "sha256": "cca7a4265ed5431619584c4b5605df6316adb2f9aa1e408f053449da7861a01d"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0008_cb2.dat",
+    "sha256": "ed729007bbda0600816720c5634f52e54003772ce58150f08ff8630a87a0b98c"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0008_hh1.dat",
+    "sha256": "f1e5e4cef0e6206184fa5d536d9d1f5f47fbaae141bb4c5c681694f270b3c0e3"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0008_hh2.dat",
+    "sha256": "995f4514f8f952daa306f8ef457320a527e07f22d4e1bb6f96cb9eb3db951027"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0008_lh1.dat",
+    "sha256": "6d4b764e4dcbea338be0e40dc5a639a920d191d03593ae5e505c938203337bc3"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0008_lh2.dat",
+    "sha256": "e74546457f6e185779453ae0927ffee64727a649109a703ac43efa164f2b4863"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0008_s1.dat",
+    "sha256": "c7da2c4bb41ebf5066eb07f96fafe8159df6b92ad1ffcf1e82f6c89a9d4289ae"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0008_s2.dat",
+    "sha256": "2bd88bf7e206414221305c8bd49d6ee5c2e83323245d1b1f14d9670a0f7029e2"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0008_so1.dat",
+    "sha256": "7ed9fbb001ca0bf4d1dd49dbbccb4ddc4761a641517b5d2ee10a970461acb96e"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0008_so2.dat",
+    "sha256": "8858716882f4b7c71203b102879d7d33907ac28febaa0920209c213feff08559"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0008_x1.dat",
+    "sha256": "d687a9623324fb0c1043d5e99d255d6bc3b95058594af326173ee99b9f6c50c8"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0008_x2.dat",
+    "sha256": "afd9c49e53122587810c3a76340ad65d7775aece3773c65566c80d11bc7c5c02"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0008_y1.dat",
+    "sha256": "2e6aafe7d4a36c1e2bb8491fa261cd2f6100a8cf52967252429b921824454e1a"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0008_y2.dat",
+    "sha256": "b5c4c7b332b51af0f9e49c001daa0c879c343170c8772a0ed26adaa393aacfba"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0008_z1.dat",
+    "sha256": "e36cf6363039a62552ed37f5f1375b1d65fe0eba10ecffed89f1fa5288b6da36"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0008_z2.dat",
+    "sha256": "c93d4deec219739efbda7cde5b77f258f9104d141842d60245052f34c484d465"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0009_cb1.dat",
+    "sha256": "1ef247118b4982142556960a5c3425635a94bd3e0a0ef2ab57c88f0df83dc16f"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0009_cb2.dat",
+    "sha256": "2d356e7acaf6d7a8c447627945fe684c7ba6a9cb2f3eec1699a1b82ffbff8e3e"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0009_hh1.dat",
+    "sha256": "045683b9e16945b337c682eb38f0a19a4ae12a36498959cedabface8d63218d2"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0009_hh2.dat",
+    "sha256": "014a2fbf5ed8f8b8de3b4630fa73ff80d5bb8da3a840a4ebaa6a49a284ab4be5"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0009_lh1.dat",
+    "sha256": "9e7c4ee5eec3f94f9486f2e37ec6a329570afdbc0d51644e9bff042c02ea500e"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0009_lh2.dat",
+    "sha256": "0296dbdd0f6c0db446241e983972fc07f0bba83fb43daa0e95f7defec5e4cb49"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0009_s1.dat",
+    "sha256": "32981fc60c17b8b6cb952176ce40b45e6085ca61123812719d46b0a43fde0c23"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0009_s2.dat",
+    "sha256": "4242441ea382f2e491fe6249d870618c12cbcc95b61b7991afd94aef4ee8c827"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0009_so1.dat",
+    "sha256": "6401cd4330943cf4c847fee19fe2a926e6903196b19d32633c29f49fe9db88d9"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0009_so2.dat",
+    "sha256": "9211066fe472b9d0dfb2e393c099de641a5c7ab2f31744c6aaab2400b49788e6"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0009_x1.dat",
+    "sha256": "fe78f81f95ef909b94e1872ae0ba371652baa2ea4ca53eba818c0bc03498a20b"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0009_x2.dat",
+    "sha256": "b2367bc29548220d3acf3e22464cd1304538a1433804b9ec9e620bfb018c7564"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0009_y1.dat",
+    "sha256": "870cdb1e771d14e44d19a1a10948c7b88ff9d758eedf97aaffc783fe6b070482"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0009_y2.dat",
+    "sha256": "c043e569e9b541354e1bf231fbcaebb3d3df3beed7f41c611ca4711b4a9a67d8"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0009_z1.dat",
+    "sha256": "421a66235af6fa23af739b29ef932f1b65fd7e1d33512e42d8edbe0e2e930f8e"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0009_z2.dat",
+    "sha256": "0d1ce373dfcae85b515bcaf4dd7a1681cc774b9ff30cb1ef12ddaf1a1685a942"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0010_cb1.dat",
+    "sha256": "d0a674c9a54d4fa0b7a7a9848db91f2d759c34a5617ba87070e24bdc4e5e6b53"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0010_cb2.dat",
+    "sha256": "b9b1926b3a2e6b8d479234281c406441061585e85394c6c924711c78276d48fa"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0010_hh1.dat",
+    "sha256": "54a8678b7c5668dac15d3403db1c3791f6dce3b2c62eeed0e0885700f20686f6"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0010_hh2.dat",
+    "sha256": "5cb5863cd8add4625881ad534897156814c9736d0f4ace6e01d1e322d1fa9b60"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0010_lh1.dat",
+    "sha256": "8933384439df3d5e51daa55b3bd101bad88dc704883e6a53ffb3d221f419076b"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0010_lh2.dat",
+    "sha256": "65b1bf1c231053c5833272f51f0fcd536f3e271cdf7b03b2514f84d9bf8d9528"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0010_s1.dat",
+    "sha256": "7b0ead6a6deb9236a5f5581f6f2ac66f96bf6676b77350db423444d678c8ac68"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0010_s2.dat",
+    "sha256": "c1f0a1758c99bf1ce29e15cd18ad607bdd6eeab0f43e208b55ad93be58f9baac"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0010_so1.dat",
+    "sha256": "ad6ef1b3e918c03539e0282ebf4eae6033da6e45caa7fd7f13d8c6a4646e02c2"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0010_so2.dat",
+    "sha256": "30b033f4747648d31d9174823f232fae1d8ed2f73f1fd4a0110807b65eb544a9"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0010_x1.dat",
+    "sha256": "b43ed7afb9ca72506573c66e0751d66de78eff195c739accacfaaebd9e9f47b0"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0010_x2.dat",
+    "sha256": "c936e5ede35f7e15460e429c2822e3033bb596b1dabea7482cd8e549dfa9fce7"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0010_y1.dat",
+    "sha256": "86bbfa48e50a45d30d9c71a42a878291c18f4106459abdc6ba0d8224d3318c7d"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0010_y2.dat",
+    "sha256": "600675acdd3596157b5037fff0a5e3b64a4f4a13a9ba3d358c4f4d3f115321a6"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0010_z1.dat",
+    "sha256": "9814fe81640a4d71dbf3963a5faad9ff487a1d673aff3215c838df69e5e4b865"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0010_z2.dat",
+    "sha256": "620e74068b59545174457f7e589b30b06b50f4142265de033dcd234412249fa4"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0011_cb1.dat",
+    "sha256": "2357383b21cf85ae45c0246fba13c436b2be95d528a7aaa3dc98a60f14282cc1"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0011_cb2.dat",
+    "sha256": "1f032e1cdd31307ae9e18aa007487a6c7e5de8776d201c90e3c1d417dfcc9b81"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0011_hh1.dat",
+    "sha256": "3ea15052c59d69a000e707345685f067f74cb81c6dc93d2929a643af64e1998f"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0011_hh2.dat",
+    "sha256": "96532075e30ada6b44bc333bcc231174a1d9b05b66513b88c1597d6b343ed5b5"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0011_lh1.dat",
+    "sha256": "1ead0106c7fe4a8cf92bf00e114c6f6a2e0d4bc54095aa83646c5bb7bbddd466"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0011_lh2.dat",
+    "sha256": "89908a4487acab70dfd5c5da482612c08c04d27e96a584c69f0bc2e94e5d5cfe"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0011_s1.dat",
+    "sha256": "3a2fdc6fb38a49841b646e1151b2de5e2c59e3100fb3626333e3c67de4a22578"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0011_s2.dat",
+    "sha256": "b7bc635f26eac9b4877a7240e95c24001006cdd00f10cbb690db9840f569fc78"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0011_so1.dat",
+    "sha256": "f46a9811759064baaa610f20953d32b6e3c067a209f48fc679dc849931f8f62f"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0011_so2.dat",
+    "sha256": "dcbd2b1e6c31c703c5455ddd27a524aeb73b95eb6fc65a83db05f88c20c081f8"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0011_x1.dat",
+    "sha256": "f7c67fa8a0bb41263fc3eca7adb30c7947e6ac812a86d6ffc0203e2fae912b66"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0011_x2.dat",
+    "sha256": "ba27bd4eb8bee82c964bbd99c0dc26e6ac3639559fd6253c0887170dcf0323bf"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0011_y1.dat",
+    "sha256": "03a00d71a68fbdc37331e5b68749f1905971cf37934da8c6f4d73a49eea2696c"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0011_y2.dat",
+    "sha256": "2c8f29de4775dd0ce8cdea1aad774fcb3040501f5be72a302d704304b86ffc16"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0011_z1.dat",
+    "sha256": "aecf662861ebb4c6c0887477ea9f53590c2ef7c16172578e0ace7a60fb64363e"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0011_z2.dat",
+    "sha256": "5dd39147a1e909a41a79264784a4ed74ed5b00db5512c1ee88ac9199e6f68ef4"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0012_cb1.dat",
+    "sha256": "c16c32f164cd1edcff254a6d85b89595888a86f9d224e6defae9eee5ce4de4ae"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0012_cb2.dat",
+    "sha256": "df9c16e35b33c009b997c45d973d56960193c47fb9da54ad67a67e66081cf410"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0012_hh1.dat",
+    "sha256": "eb5eee2e97ff931740e5c6d293033ce3c50cb1701ba1f9df5da56556711ec1f9"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0012_hh2.dat",
+    "sha256": "a82ddf91609a4a89c567d6382f44f3afc1d2db8c560831e6794e872f18eea98b"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0012_lh1.dat",
+    "sha256": "ac60ddae2cedd4fde135feba43001816bf043ae6511171cdcc645f39246e44b2"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0012_lh2.dat",
+    "sha256": "5b2204e3b5949d1cba31a68d75cca5447952d2cb9ef90fd29e37a7f7eee0af05"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0012_s1.dat",
+    "sha256": "c18a777d94873b8414e4cb0b88f8f8f30cb36c728f12151311a07ba5bb8cafa9"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0012_s2.dat",
+    "sha256": "217c9f5e7a9308f2b283838200cf2732cb300fd3984ecb4a4966484aa0ba4987"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0012_so1.dat",
+    "sha256": "05ff93eb9e1bbdc6677713202f66f804d1b4227cb100f3051b9efa289ab88e3f"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0012_so2.dat",
+    "sha256": "768d66c743360be3cb5630a5774d61412723e9499823ed0ca4ce20752ec49666"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0012_x1.dat",
+    "sha256": "fe9e984769fd39d706cda5146e1b654d8b075aa4d0c9a380c1aac23b3c0b8eb0"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0012_x2.dat",
+    "sha256": "4e021919979dc367fdd37535bd8c5c5b7d0ef65814baf0c110a43674607c8961"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0012_y1.dat",
+    "sha256": "53e9d6e915687d8fb6b04826c9df3e3bb33fa2ed7af3303f3f0a1e15f5368e15"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0012_y2.dat",
+    "sha256": "8ba1d416e13bbfa6646d6345db9049556fccfc913430f73d45951bd73db03167"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0012_z1.dat",
+    "sha256": "0db319e3c91ac9b5e0413d31c7cad32e2bb379f12a3d2f409d13696042223f78"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0012_z2.dat",
+    "sha256": "0fbc234f416cbe3a24a3408e7fd995025357295f038f8cc2d33f3424bdfec3ea"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0013_cb1.dat",
+    "sha256": "f9b27b7d0ff989928fb8ff2a1487ec8d82194e3b3a94abe5b7bae5ba81a6d3eb"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0013_cb2.dat",
+    "sha256": "fe8a16b3e547454f20e23fb1887bead463db209f0a9a22ac96111e887cdcd79a"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0013_hh1.dat",
+    "sha256": "ea5a942487d20f4f522515e20640e57f5e2556417dd57e9a6b3f66a29e97c8b1"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0013_hh2.dat",
+    "sha256": "74308675b176d8d96e63521297d250e5798b57c467879eb8be0dcc80e5a46cda"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0013_lh1.dat",
+    "sha256": "7d2faeeac7577982d5b2e4f21d8d8712d0732eaf1b2d29a287de9983abacf7cd"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0013_lh2.dat",
+    "sha256": "0c3b8eac9f878f00c76447be974646a771857757e3835138c08c532131a3eaa8"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0013_s1.dat",
+    "sha256": "bf41e1830390cd440648618b0feaf479b78710c92fde3507d85640eb848b623b"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0013_s2.dat",
+    "sha256": "64128628b5b42fe0063d81b4293327be73f9fceb8e676530a89e4ef67a227a22"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0013_so1.dat",
+    "sha256": "7a60c6031f95d00beb6f829726a05f8ea6ba0d0ab08d8fbfb74d2c22e6b4c965"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0013_so2.dat",
+    "sha256": "7dc8064a482b4e0841e93a9b1bf60fa52b589d462c4831d655818eaca79ca992"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0013_x1.dat",
+    "sha256": "b1df486da0a52da31b2a53099539467257c5e6628f519b346de6e7302b501b1e"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0013_x2.dat",
+    "sha256": "891f123fe22a6e657fe5bb4d97fa6d569a032b3a62fb59f985f8756011b48287"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0013_y1.dat",
+    "sha256": "71028e531ac10e300d390b150c75ab4e54311150028ad61dea7936fb8eca5d77"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0013_y2.dat",
+    "sha256": "0f4fd78ed91cd2012d45776b72a525d22855a6350c4e3ca8787f3a0e6892a0d0"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0013_z1.dat",
+    "sha256": "339a61a3f103382c593d124d9e0f34d94c4f22d036625f92af9419f7573496e7"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0013_z2.dat",
+    "sha256": "29c2bfe81567597cb03373fb5a1194bc75afddeb0d8c9ebf4f95c94256f8859e"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0014_cb1.dat",
+    "sha256": "b422c40a615a1039068e1e659dd6bb2273d07d218b0b3d55bd68c23757032d88"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0014_cb2.dat",
+    "sha256": "455caa320163ccb4af48b644ec39ee466234d0c3f9c5da61404ee2a82887d449"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0014_hh1.dat",
+    "sha256": "39ad8fe81d79fe3e852f59688c3adf2768027e6cfa8701cc1a5f9da0c543c661"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0014_hh2.dat",
+    "sha256": "7515faa2080d744869d0110285d527678fef76620132ff35a372a6eedfa9bffc"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0014_lh1.dat",
+    "sha256": "48ba3a32b103daa49fe9d5f2758f38f3afea27c326463d9e2284e435cd21254a"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0014_lh2.dat",
+    "sha256": "bff2cab8559299de08b7099feb450442386ba47bee1ad5475098a7698b54c0ae"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0014_s1.dat",
+    "sha256": "20ad045dda9de63c0cad59660dc1452f6b04dd6369ab83239632fe8de66c1e21"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0014_s2.dat",
+    "sha256": "5ae8226fccb9f5981a0161afee7488e9125538fae76c7861892c3610c4d9c4d5"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0014_so1.dat",
+    "sha256": "bf16e6e83ea73740507ec5d42e3b1c72e98dfbbbd8d2efed8a001a0b7ba8c53d"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0014_so2.dat",
+    "sha256": "02f6f21dc4ec411a39439d6174f7767c601b16753a9d4045ed2fe781a5046d11"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0014_x1.dat",
+    "sha256": "967c5da1ef468f90fbb7e7e46a3774b866d5c34af7da50c064eb1c18ff186cc8"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0014_x2.dat",
+    "sha256": "66d7756992c000ff69e2eeb01e22196aa35a9d754a3a130e6fd884165fbc8592"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0014_y1.dat",
+    "sha256": "8acb0a9c3d3ba99a0a116536f331e97173c745cafeabc16c183354b8c71391fc"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0014_y2.dat",
+    "sha256": "95508c72f9b4b65e2158e422538328604af7560cbba8182ed26f0d719fd5f84a"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0014_z1.dat",
+    "sha256": "c2a266b54896922c011f2621f842aa67cdb217305cdeb59e2304eb6c04cf6285"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_k00000_0014_z2.dat",
+    "sha256": "1dd4d370ab51f21cba2fa1b614abe2e57e92af04e2e31b5d6f7efab525833a5b"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0001_cb1.dat",
+    "sha256": "7ee418c975096cb4493a479073843111fc0bee07fad601cf26528b3ec16b8263"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0001_cb2.dat",
+    "sha256": "dd14ec191d758c41a5b904183f2a7ffa9e7ccf29a5361968b32f0fe828035d62"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0001_hh1.dat",
+    "sha256": "01b3746fa19cd6676493ad1c4091280c28acc6deda215c1f61563b78154cc6f9"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0001_hh2.dat",
+    "sha256": "47d6bb8addee5482059b33836ca0aee8ec991994d7c12c2f5192618bc57b6c98"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0001_lh1.dat",
+    "sha256": "84c7f8a0e91a5c76bf6d5230c774f9087808d6095e04b85240d824864d6fa00a"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0001_lh2.dat",
+    "sha256": "82b4c8862ba7a5c66e322540d64d735608862da52bf680f954d10631295433d1"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0001_s1.dat",
+    "sha256": "976546f98dd7242827ee322a76b47d79d5d1b7f4f7c5f5b7cc304ec11b3ba588"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0001_s2.dat",
+    "sha256": "6c1d5909593a6c9023027765b843d5b5d50476bf7d2d76242e3f555de4f0ef6a"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0001_so1.dat",
+    "sha256": "65009a5f5fc3ef7afa4ce31da49177b1a6f7b23e952199fbf313b2582f7aba97"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0001_so2.dat",
+    "sha256": "5e2d4e8ae4abd8a6f4cb3347fb101608b999c5030f9cebd12e967484f849701a"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0001_x1.dat",
+    "sha256": "f732f495a6a8e838cd8e74991263ad48bd17ff763ef9283eddb4f6575c0f4527"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0001_x2.dat",
+    "sha256": "be6b81ea54c8d484432a7914baf649a0b736ac90ef1090124d1034c028856d6b"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0001_y1.dat",
+    "sha256": "8b4a3b0a3c0d995b2e7e6dc82d95b28122795840f73cc2255dc4f1e2c6d2211b"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0001_y2.dat",
+    "sha256": "3bed62d8c8fa9cae8af510935a3736079f41ef1c7995f271227b107098353298"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0001_z1.dat",
+    "sha256": "c32e3e57f8b7ce34a4c650c8070f63c3c8f31a6b58d0813cd41e304992ead5ab"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0001_z2.dat",
+    "sha256": "2023aab7fcadbf829718ff838113616f6627cbb260206395826efc9655520318"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0002_cb1.dat",
+    "sha256": "2ea30add0127bcac80e3868913fc4dbd272d3226430ca2ae2264b3bf3f18a670"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0002_cb2.dat",
+    "sha256": "d8e835f3ceff1dcb5ab38d2d296c6b4fb2d2e0a04c785f2fc2297d51ffd3fbe1"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0002_hh1.dat",
+    "sha256": "fc2a182f56b404c653b6237eeac646d2623e32c64c62a8a4183047b206535693"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0002_hh2.dat",
+    "sha256": "81045d010ba432b73214eda2d1546b2d26c3eafe6d84b5a8f4e269f06da17ce4"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0002_lh1.dat",
+    "sha256": "217fecad0c4ae00a8ef09f66b61ab6d38acd73ce16587c3de83ccea5ff2ccaf1"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0002_lh2.dat",
+    "sha256": "faee3d54e75e9a18b05e604a16d89bd6d0783a9ff42adba9e15d4bb74d77c898"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0002_s1.dat",
+    "sha256": "991a7aa2f5902889c40dce89d5a0a3ea134c172ead0fc80b711f0e880e0d48b8"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0002_s2.dat",
+    "sha256": "b877496cb2b4c7c44a3d76455f7acc81017c6a7588cdb56edafd65ed61e7b0a3"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0002_so1.dat",
+    "sha256": "612530d1f8da4f603f2f8fdd5375d5d85baaae1ceacbfbaaec1dc47c596e2d00"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0002_so2.dat",
+    "sha256": "e09017a4c1ea0422903216f97bbd2e8ec2291a67c79fbce90a5872dd3c094e09"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0002_x1.dat",
+    "sha256": "6efa952cb1df3a22c6edbc90fa96f10defbeda108dd708c02176edc9f726efcf"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0002_x2.dat",
+    "sha256": "4c7ea64ecdaed747e4ed93cb77925fe8fdcd0147340e8098214f24318c6896da"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0002_y1.dat",
+    "sha256": "3f998daf0fdc979e0d5d80fab5689407d9d10934b116ab30202f15bd8adf9873"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0002_y2.dat",
+    "sha256": "9f16a496de8a6a6f7eff02ac992e1f2c0593e243a4bbef3db5c15befb2833618"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0002_z1.dat",
+    "sha256": "9c812933108ce0575d7db039ed328727cea18b3305ef84caa4b6759114b05d55"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0002_z2.dat",
+    "sha256": "9a0d4e3eaaa9b1f82f601d8e610b90dc53399ca18400e80045ab56966a7b5316"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0003_cb1.dat",
+    "sha256": "775963834114977a55736f7255f8f2ee0d790c689380a52cf7fac272e001aa9b"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0003_cb2.dat",
+    "sha256": "e5d3ed55cb8779e099bcaaa98982dab192456bda8e63760e2d54443a8829daf1"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0003_hh1.dat",
+    "sha256": "18864087fd9ca7445d7007cb33cfe11fcbb6715e563b8c67c500f22b1d70ed0d"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0003_hh2.dat",
+    "sha256": "3bf6b9b3ae47e52d1e1a48e6914f5350bb0afe8802cedd56f490025ac3118144"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0003_lh1.dat",
+    "sha256": "dd338e3673c58f9f2232f89add01b6dc60a1ab2703ca79191a3297a86129439b"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0003_lh2.dat",
+    "sha256": "4d9f061eda02422447c23d1d432802b0c12f988a6b7b8f252b0a47568f371d52"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0003_s1.dat",
+    "sha256": "801a8a462dec1509a78d9a7576d44377b1e5cc007e4361ef1f98a50f4c6d450d"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0003_s2.dat",
+    "sha256": "a4e26b7b8af22de7a41a140e73671f55d5bc8beeda787d66c65b34951fd35ad0"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0003_so1.dat",
+    "sha256": "d47c26994971905800fe8105b05124eac648d2afe12beedaf817db5eb9f093be"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0003_so2.dat",
+    "sha256": "7608e0f945cce45ce4d6b43ccd83912e8c68e7b6719a1a73cca7cb2cac8a0643"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0003_x1.dat",
+    "sha256": "40a6a91e0bbc0a50ec38b30e113d8e12e9f819faa140d7cc5c8fc20111930cd2"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0003_x2.dat",
+    "sha256": "b8b4e42796ff3960e286a94f7e36f1c9986717e0ebd61d6b8f63f6b037607eb3"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0003_y1.dat",
+    "sha256": "0dc144152dcdc858b9168387c1ed5a112cfda64e40501033584390892ce36d99"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0003_y2.dat",
+    "sha256": "e04047baf2d8c7a7bc14f4e50c05176801f26ae6bb70d898b8fa8191fef1564c"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0003_z1.dat",
+    "sha256": "9e8084e1a18d710b92e9d03cdae6faf206006a0fa5d4ecca5d79135f2096e16e"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0003_z2.dat",
+    "sha256": "bf3f8a6a4c6e81c398705e441e1ab0a9d367f8d930396ea94d6da0780c895565"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0004_cb1.dat",
+    "sha256": "b6fad1c0ae336527658300c4abcb2a3b7c262112f3fcb4d907f8579c4e047ce4"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0004_cb2.dat",
+    "sha256": "d6dfffdbdfd14040f063ec928ac182607997ae10cb8189a624155dd636334dff"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0004_hh1.dat",
+    "sha256": "642a8fb7d1e4588683981aa8e1ffe6eded64522832082731e3591c8f8b19559e"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0004_hh2.dat",
+    "sha256": "4df0131fcadc67ec1f6851c32e28e996faab528e5bc4316694fd1835d7a48188"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0004_lh1.dat",
+    "sha256": "1398010a9742108aba9dce0d089024c865811228a8c3c45198e90048542de36f"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0004_lh2.dat",
+    "sha256": "676f758fd98f5945415847df50046b78fb63682f81a4e05b34823c1c7eec3f23"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0004_s1.dat",
+    "sha256": "8ca679097e358bb11ce644d3ddfb3e416d3b48df875f1708ade79b3aec2c0a4f"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0004_s2.dat",
+    "sha256": "b255bc76f79af77a1f6edb96bc96f24ddfc0a5973601af8c66bd20e532ee4a00"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0004_so1.dat",
+    "sha256": "fb85b465378449f03231ef33a49e69e28ddb0bf571a1693fd54002d4fa11430a"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0004_so2.dat",
+    "sha256": "8ddb0f6de4e67f1e726258bb6c57d86590ae55b99af296399bb32a230e958570"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0004_x1.dat",
+    "sha256": "ce5ab7cf1f8dd759c7cb3360460ba68d61bc09cada05f79629c38712fba2b9ae"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0004_x2.dat",
+    "sha256": "c55d8736856b5b8a44731fb5d4b8fbe9439fb3bd2606de5870e0b5a7d8ddcb0f"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0004_y1.dat",
+    "sha256": "8c3ca7d54bc89d639d1e9dde12a72d696fcf2f5a3be9afafbd08fd66e7ae76d6"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0004_y2.dat",
+    "sha256": "04e82e331f7b964c370924ec502b7223e2143f4aa586da8623fcc0962e966fd2"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0004_z1.dat",
+    "sha256": "5d73c2e4c86731a7b0ccf055552a81326bd3309a815e8767314bf1028afed1d4"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0004_z2.dat",
+    "sha256": "3c7f41dd2712e9a10305de79942f629deba6552292e23d1bc2426f03d3ff7657"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0005_cb1.dat",
+    "sha256": "a89d80ccdde96df7d5aebe2c596006dff7c14756d40acba056dfbe9c97e84f40"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0005_cb2.dat",
+    "sha256": "251a4f38c2b44ca161669c133727327c10230b37e7cba350074d53d93cc3c8c8"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0005_hh1.dat",
+    "sha256": "2fac023f855e1eab1485fdbf1b31e34d0737980149149471723a85d4017e916f"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0005_hh2.dat",
+    "sha256": "ee687cd5563be41a6e04660774ff7b065371a0c63595af766d9f42aab70842b5"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0005_lh1.dat",
+    "sha256": "5e142679af535838108e0d456217784509208e23cfe2464cbe189f175887181f"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0005_lh2.dat",
+    "sha256": "9641163675bbe2a0846c2178cf7d1f9ffdc54ad3ffb68b3cfed586ad623a2715"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0005_s1.dat",
+    "sha256": "6828f3e514b7c631d83c2a149be7b1cbc1a944645ae8af67c521618d2f6f4ee7"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0005_s2.dat",
+    "sha256": "192553b884579fdc08c578c724ecc34db7a25d92bdca5389c0c3d05666f8fea4"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0005_so1.dat",
+    "sha256": "9ec1d97bcf43fd3b57cec3d18fc822ba281f6f8049ab821f0c16d107139dc6cb"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0005_so2.dat",
+    "sha256": "28c1122ee0a9766b3df0183e62ee8dc387b45f78a67b230c3972f13de31215c6"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0005_x1.dat",
+    "sha256": "3871622d0a46df1d7e411a19373c8829f4034847e35a959a2507316a57650170"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0005_x2.dat",
+    "sha256": "40fcce7b43d74da11bd24e538526ee2660d2c2a02b9df96e630ac58bd6e4852c"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0005_y1.dat",
+    "sha256": "ae22c8de9d6df051ce46cf0581b02607fdfe0c0c383fe6e2dee99b4b98b1a117"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0005_y2.dat",
+    "sha256": "3aa065769bebe04bd83192ed797595f706ea06e85098a3c962d2eabc976cc90e"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0005_z1.dat",
+    "sha256": "570f1e526a07c0de2eb4ae3e3919aa096ab9a6cdc47d588e89129196bd908815"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0005_z2.dat",
+    "sha256": "f568c9cf197b39025243401501a1e3ae759c91643b289c690daefa1e8987a9f1"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0006_cb1.dat",
+    "sha256": "f25af2713ed0c9f1fe4820c5fc1e88f0fe6e11a5379ece03431c7d658e01e2bd"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0006_cb2.dat",
+    "sha256": "5bf1cebc7cc0804c9f94518d89c44eabce7c1d2d53cfe609f466649245de2cca"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0006_hh1.dat",
+    "sha256": "c939151fb0bf5097e3ffed867ac63bcb631e79ba5085525d77940ba6e8913235"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0006_hh2.dat",
+    "sha256": "f7ba011c3802c9d134cecc0274d65f28cba78f560efe112db6f88819f18ccd21"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0006_lh1.dat",
+    "sha256": "39b64a263a1bbb0586a98a2a18657661417138f4b0ab5ec966f28b46ab86b507"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0006_lh2.dat",
+    "sha256": "29d8024d67cdc7596b80166fb5d34f2a145103a3df026411b883aa8d19f8eefc"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0006_s1.dat",
+    "sha256": "705f36136f2a5122d46c5cc2b28aabfdf09d32d2e4e4bc8cdc77fcb9fc35a360"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0006_s2.dat",
+    "sha256": "8c471310833634a60d56449bef03b6edba85744d61a253cf44f26f29895124cc"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0006_so1.dat",
+    "sha256": "d2a784fba7d8b4f8ed7891e50cde978b0daeb5b24994369dd4fec29a97a8becf"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0006_so2.dat",
+    "sha256": "f2437990dea97f1df79c36a70da33a5c0ff0efb8ab14f9c016e382cdeb671cee"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0006_x1.dat",
+    "sha256": "1b8b9c4358800db71793d2629a3dc5bc7899452d2866a6af204066589e8a9e97"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0006_x2.dat",
+    "sha256": "b33b7a2e637f7c4776a8bf198a643fcbadf2e0e804432b7c8b506394c25fe443"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0006_y1.dat",
+    "sha256": "a1c447418448c420daeef69dfd9406e8442281376e82383f8e618b80772cf231"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0006_y2.dat",
+    "sha256": "749e549e71a02f86a2fa1943c1b675796c5a6854f25c1db9d59f2a9cb2056f4f"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0006_z1.dat",
+    "sha256": "c92c08825b1244373d15ce1a4743c970bf719138e9ad055209cb69500234b255"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0006_z2.dat",
+    "sha256": "34c9ea88e962bed9840b56c3fff69c938d08494df285f283a09e6bb2d5a710f6"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0007_cb1.dat",
+    "sha256": "77a110b5d6d7a601274f6b1f1848d4532ef17f74d96699a406abc70dba040daa"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0007_cb2.dat",
+    "sha256": "9b00fe099e0b4d99dcbdf9d40b0756353d09325d710a3abfb092f9961a160641"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0007_hh1.dat",
+    "sha256": "6fba07d0cb529140d6964d594affc3e02b6780c6e999f643652feee676a55c62"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0007_hh2.dat",
+    "sha256": "9b8fc18dfda23c7521cfaa858c1e7fdea440795803cc0cac5a613991bb9a4880"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0007_lh1.dat",
+    "sha256": "4e3696bae723f26e7f158dc3c1381f084f9d382d5e5fbd0a6e90a289a58471e6"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0007_lh2.dat",
+    "sha256": "d2986e753ce12197b6a69b61878354b2774cde800f1e3270a72e2ba608180c4d"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0007_s1.dat",
+    "sha256": "2540e9dcaac341c42d988449dc1ffd2072484e5e9a730cadcf05eaccfc605fc9"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0007_s2.dat",
+    "sha256": "42d32295ada5c2b7895799a002478c8d797e845159c2a3b2f838ec99f79acb6c"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0007_so1.dat",
+    "sha256": "c988774b1184bfba222609d22ae4cbd8814c000ed4f394743aee23f2b92a22ed"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0007_so2.dat",
+    "sha256": "ab339aba7913da521c263a93cfc9dab0ff9e43e19e66db8eec7674c797310047"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0007_x1.dat",
+    "sha256": "216699490e663d87de6012d940391ce7a57e754d6c3081e3862cf134a61c431b"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0007_x2.dat",
+    "sha256": "9c493e26738e76e5ea319829ffc931bd5c87b76c40d61e4fa64c1e793e94d7c7"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0007_y1.dat",
+    "sha256": "af5c00ea98972d56bb8a549ee15417cadf9b859fdc743426cfdda2c25700e8ca"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0007_y2.dat",
+    "sha256": "935db1dffba51d4f6c08c220fd8f709497ef57f5f1af4e4b0750a754f5aa5ea1"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0007_z1.dat",
+    "sha256": "d1320d91ef72266bd260c9e19adb994b7833ac2d04fa61438bc2445924b193b4"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0007_z2.dat",
+    "sha256": "8a7f4fa1a144b69523b34937714a8d829cadcafbedd522fdf73a4ff2a65d578a"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0008_cb1.dat",
+    "sha256": "127d5c91c173a8d6f085453fa81efbd5def070c8a67b565e5c5eb7bc40b8771f"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0008_cb2.dat",
+    "sha256": "ef42775171275b849dd3dd5f472a8d23199b01e5f759b962736ceacbabf2c007"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0008_hh1.dat",
+    "sha256": "0bb8283b28af2ac17515b94fcb6b586641ab31145b20f4349b98c45036ff05c6"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0008_hh2.dat",
+    "sha256": "3e504de9b81d059d88cebec3c69649deeffc9d9dd23c2b7272732973127256eb"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0008_lh1.dat",
+    "sha256": "7b018226cf77c8a12ab9c151d9a850bcc619e07a1120ac5240f47cfbe8ece020"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0008_lh2.dat",
+    "sha256": "3eafe2551c8d8546c1d20051d8d09f6d5ab5869165598b304ec8794e4c4cde67"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0008_s1.dat",
+    "sha256": "9e5368a6bb71658ca5c3418ac4345c9f2dca68dac5832478ed60dac0cf921447"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0008_s2.dat",
+    "sha256": "e11b6e79e84412a7a69daea31a90f0b739d40c7b500eaa658df663ff9a83c2cf"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0008_so1.dat",
+    "sha256": "e288dd9108f14defb6ec5ab43c17b5a8d706480abd3b2194d0ed88a73ffa9b43"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0008_so2.dat",
+    "sha256": "3e5749cb752ffffd47c3b9e074728171fc4c7b3f3b8dd4c5fd1cb8d3cf877e1c"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0008_x1.dat",
+    "sha256": "df0294f2e8db75f7596b3f704f5aeba8aec43be05044918f56e470535f4cd4b5"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0008_x2.dat",
+    "sha256": "57632bf1223a1ffbfc8b05985a5eaa0e8499021cb8896668f43b8911a624cd08"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0008_y1.dat",
+    "sha256": "b2e6fc4f0da5faa3f8f001b29df1eff4192a94259c2606e42e9bfd409842b13b"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0008_y2.dat",
+    "sha256": "eec54e3e4e0969de20b16eaaa76dc1d7f89b941d5c6655d7ce62124a2d4d652e"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0008_z1.dat",
+    "sha256": "15dfcd637b3342422cc292555a9bd802ee033b1d3240cec9d072988f5df3fa6a"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0008_z2.dat",
+    "sha256": "0ba876a56158e40715d7bbb0eb0f028de80fbc07679fca7d10a125a7ff281d80"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0009_cb1.dat",
+    "sha256": "306bc262d6345fb6926852084099e75a588b12bb2ea56b34737ff97dee249256"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0009_cb2.dat",
+    "sha256": "7d68679a0969881a9b4309f76104819c7c2e84a0f837d492a60f5f1ab67fd8f6"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0009_hh1.dat",
+    "sha256": "a11f3b382f215c86442b16b9008f36e21f0b107eb70318929e001bd0a7a89549"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0009_hh2.dat",
+    "sha256": "fb6537b50ec7b1fbfb01fce007b93e4ab5aa0afbc406b53527c3b033a701e856"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0009_lh1.dat",
+    "sha256": "7bd293c2f347f2d2710cfbd4be556151f7d899833699223b8eb196113359ca56"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0009_lh2.dat",
+    "sha256": "85ad62fe56eef3b8f8e6500a1f8ab641d8df4fd3cbf88db4a988c96495b70d87"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0009_s1.dat",
+    "sha256": "6ef645064dcd2ca60326cf28aa02694d137f73b1f58f65ef2c08ea2b5c453651"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0009_s2.dat",
+    "sha256": "736904e871896a73e9b13871746aa0b1334898cde4f01e4ab6f8a3625ae0d944"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0009_so1.dat",
+    "sha256": "a8046becea00e3b42653092fbb674ee30763c93d3170f1c25cc46f1b6ca13ed6"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0009_so2.dat",
+    "sha256": "3438cadc5b931e0a6047103fd82e43f30dbbe1816c56f4bb58aaef3e8336b3de"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0009_x1.dat",
+    "sha256": "514b385cae40d28f2346d73c74519546aceb1170c2bb87ce05d59a1d20efe1bd"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0009_x2.dat",
+    "sha256": "0353c159954d1865321a4b4e9f97e2d61c7d4cd9655101a6dcaa3f04ee07dc12"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0009_y1.dat",
+    "sha256": "e1a28a9b7f588e8e5f30efeeb399f792f17c1782cf9639e4783f65ba6e51fade"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0009_y2.dat",
+    "sha256": "79cec14a1a0032d2a1cd3f57a7a55f23879f65795582ce9340de8860d42aa732"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0009_z1.dat",
+    "sha256": "2e797a7fed80a99c3688caa4cb555e98f5fbf78cca7c8f099ab2dea57dced2c4"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0009_z2.dat",
+    "sha256": "728caca7a68298c36210712190edb6004da7137cd4217b4758c425e2603066eb"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0010_cb1.dat",
+    "sha256": "62623e3de8893bd7e6ff1a67f31036ba6f67b0cbc2e59c1249a1e6f227692a5a"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0010_cb2.dat",
+    "sha256": "ad3bf9200b2b2b278879f44e937d99133e6469277eb5b43bc17db44d5bbfa057"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0010_hh1.dat",
+    "sha256": "7daaf175602e195a62f920c62030f72a6cc0250ee97640f067f90beb6eac8e2b"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0010_hh2.dat",
+    "sha256": "09c15c40cd7261ce3633cce386439219649bcb729feafb1ba29a7558901d5df0"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0010_lh1.dat",
+    "sha256": "d69274699888d12862e3633e7201ed49828dff7b01723a31be49911cff247d0d"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0010_lh2.dat",
+    "sha256": "fff2d5b4cc25555c85f2929a7c0efa12cd3b59d296e4683f76360c8d9f05addf"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0010_s1.dat",
+    "sha256": "17a6dc1f36de986aed7dc6ca70a31bfbd9a72596cfa2b5ac7f9f67301a57cea6"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0010_s2.dat",
+    "sha256": "edc0bb033b977b1c93188175d5cad53e7174722c1cd8dc81b0d9431409e6ea43"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0010_so1.dat",
+    "sha256": "6b83cd3070a4cf66386b6ad8ca3407e25806cacaf233a03b60d7a455b95ff8b9"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0010_so2.dat",
+    "sha256": "5e4667385ce2b80ffa1fb1783c78524f1b9249c233c3750283fa15609ed3f4e4"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0010_x1.dat",
+    "sha256": "5011fee6f36cdf57ddef4ecfce57216b18babe2381d07454c62ac449e84f096f"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0010_x2.dat",
+    "sha256": "e2401178f593e0cdf32c1f27046eb2342ddd1d77ea9b252f4b9cb383ad6b4f9c"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0010_y1.dat",
+    "sha256": "7691eece28f42df16d4120d4f9a059394489693f867037491a0ca1592ededff3"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0010_y2.dat",
+    "sha256": "1a181618c74d0ebd6edee89f5a8b949a7006e5e50b6bed7e87b53fcb741ab40f"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0010_z1.dat",
+    "sha256": "c2e6c13b5a2126438759f555f6298b9911f9c814e2f365613bfb23dee0074ec3"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0010_z2.dat",
+    "sha256": "5c01389a37be1cabaff56bea1eae1818ea727862cc7e8070931537e2edec5ff7"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0011_cb1.dat",
+    "sha256": "cdcb75755c230de43d2001d148410b2bc231074d57da5a093a7d4552a68d0f16"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0011_cb2.dat",
+    "sha256": "83eab6a3cf20238449cc45a9c4f24155007a584d1239b9d5185198c69ede4646"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0011_hh1.dat",
+    "sha256": "cda42e61edf32bd3777662e546c452602215bedb042dbfaa4949b01425b74468"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0011_hh2.dat",
+    "sha256": "7b2581b2f408ad54b67589ba3da39caf43796576ba80bcd465632c2c77e32f8a"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0011_lh1.dat",
+    "sha256": "9d228359b7f6f25e8a47b959f7d325b8456da0d766be9d69c27d9b90e19eb5ba"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0011_lh2.dat",
+    "sha256": "cb3d7ae2402ba92e29f4c53f2fb10a35dc5aee47c363661d7752b7b37e732193"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0011_s1.dat",
+    "sha256": "5d740b53f8068cfc583d0ef35010640890dba1f2928155b3c0e66b524a5b157f"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0011_s2.dat",
+    "sha256": "82444773e3cde273b1d520ed285722fd08cd214e1c48acdaaa219fdae4da1ea4"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0011_so1.dat",
+    "sha256": "b963b302244c198fdeaa9d411a1bf04e828fe64816682e0e8a9bc33f8c5c72eb"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0011_so2.dat",
+    "sha256": "dd95fb49884c98ac3c0a308203cd2f6a91299c41e45a95a91acbbcad6b5b9e04"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0011_x1.dat",
+    "sha256": "353e715a4e53f70a1a12dd5fff9f62b16b0d3cb267fbd50a07ef11d247817b1b"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0011_x2.dat",
+    "sha256": "f5a837125bcd9b942f6ce2fe7087d2e29323e94a44a361a2e36c473ca8d93b56"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0011_y1.dat",
+    "sha256": "2d949e90f388a06b048f1c437bed0611972bcf66fa13f6efffead358ce719677"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0011_y2.dat",
+    "sha256": "c00fb1cc7df4ba77165d0aeb37ae8c0be3648689a9b42b46aa67f5f9179f3dbe"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0011_z1.dat",
+    "sha256": "a1db09f951ba8fa77c7be7ae4a37fd10a6d75714ed99934053860d2bfb481a05"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0011_z2.dat",
+    "sha256": "8d0c868c00037d88daf260e3d0e90bdacf024587dd8491754957acda8e433f3c"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0012_cb1.dat",
+    "sha256": "e9f16a480622f5329823556fd4d252577dbcde8aa3ad0744f21d142f8adeeddc"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0012_cb2.dat",
+    "sha256": "533f5d0f79ce817a7d728d2a34adcb3e40fa1b5688e0edfdc55b9cba1f6bc5eb"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0012_hh1.dat",
+    "sha256": "b17525e7ec35359829ae82824e304c145a1423647b3092ffc6ed18463c57dfa6"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0012_hh2.dat",
+    "sha256": "7a71cc7485aa113fb3a4c03a8ecb3764379139e46856e0bc022669ebbca56515"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0012_lh1.dat",
+    "sha256": "54eb656e4f9945542e98cb0e9d711cd7945396abe2cf85ec2b6c4f7128af1e82"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0012_lh2.dat",
+    "sha256": "42e7252134e2a354ae3d9feda934a5b1a8c7c0d54df4796fa2f528ebd098b69f"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0012_s1.dat",
+    "sha256": "68120496125c3b17185f069450fc08cdd4567d3d3dce140e365114c786bf2648"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0012_s2.dat",
+    "sha256": "778d52ba34c21a51f12104c7f6f67ae2ac9559379b7ac31fff0a07aa1c078c46"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0012_so1.dat",
+    "sha256": "36892073766c8dfdf6f17c7a247f1aed47191cf40dc7abd005507155cab547f7"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0012_so2.dat",
+    "sha256": "702d73aac0ee2fe74c03752452e24878ad97b08f0a94e6c2cfc71c235e032a7b"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0012_x1.dat",
+    "sha256": "1b8d4d8a96c048df11d4dc79ae4ecc1679ef3025b6429632c116dbc0d43e32a0"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0012_x2.dat",
+    "sha256": "93edb5d2984e6f3f2ac7f4c5eba0a51df7d32ee5cc8ac1cdd38de02fb5396ff9"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0012_y1.dat",
+    "sha256": "652f1112f71cb77c3cc45fa854d2a48608c2822a2bb34c4f57e5b62b4d6d0cce"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0012_y2.dat",
+    "sha256": "b0c34477e38906f581e81648a64c404fb5d596afb09abf3bc00a7d37e585dd57"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0012_z1.dat",
+    "sha256": "bfdbc524ea92df08a3cf5f1d62f3cc7f84ee6c5a7466a8ad97ce0e7a2859f300"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0012_z2.dat",
+    "sha256": "f15752d0f6cb752a900218e702b6d41e09dc23816b2d401c61ceb13ca2847c48"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0013_cb1.dat",
+    "sha256": "00faf984e6a58ecf2abc98af72abd892d3d7a844f69fbbce7d9478ad7b284595"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0013_cb2.dat",
+    "sha256": "f01828fbb46f5e06fe17b9112a3592470fe4ba4e1243294b600dfb3992216f63"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0013_hh1.dat",
+    "sha256": "72da4c633bda769858c74efb7b1d561023fb5c3d52bb3d599e8c4039a0215c60"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0013_hh2.dat",
+    "sha256": "9cb72f1bed4ffa035dfe31d055a097a7c5360b162f279eeb91c5f1c8b6a73f67"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0013_lh1.dat",
+    "sha256": "3f15e6c5a6d4d8d43bfb09823fad6f0a910d11347e86053f90e534f9f6a1ad19"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0013_lh2.dat",
+    "sha256": "92c9985ad22aff3907628820e15e4d08316d0d3f84c7d31ff4f4bf4122301f3e"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0013_s1.dat",
+    "sha256": "150122821a654f2378d18c49f1d193354cec031c005b8ebf2a48f1af98522f28"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0013_s2.dat",
+    "sha256": "c2d5da033e600615cae327d10e9421aafb1bd14f877a57e3a45e3ad0252f2dc9"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0013_so1.dat",
+    "sha256": "eafc7b134620c516801fa35dcd47006d1d8b6c2574fe1be141e7873085e28f44"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0013_so2.dat",
+    "sha256": "10a0356ed58472f8eea7770def3983297b8fff5e0eed82b1c8d4ed8fbf5adb7d"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0013_x1.dat",
+    "sha256": "648ae2bef2b2a4e830c318166650a8937698d6ba4730c5d79c004274a22b86f9"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0013_x2.dat",
+    "sha256": "7a027731c0c369a1c0ce955223d300145134bed403d405c302327129a188aa6b"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0013_y1.dat",
+    "sha256": "da88ebe2c220ad4387a0ff39fb61bb4889e57a873f1a2ca003ed483736ca1ce3"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0013_y2.dat",
+    "sha256": "6a358238ce34c1f232a0ef84ed92f796c3ad32b1e247ecb019ee4e38dd15bf96"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0013_z1.dat",
+    "sha256": "53eec8031978f730485dc4b05de97f25509c5e9f051e23f6feba7206008bd98d"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0013_z2.dat",
+    "sha256": "b4ad3b23d1007585117c00376d9ece360a2bdb188520a8537bc4a8eb86ddb42e"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0014_cb1.dat",
+    "sha256": "8a4289634ad22fe48993bda62276ad01b7e5849bb76a6379cf1ddc952d16bdfc"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0014_cb2.dat",
+    "sha256": "fe145dad9817f1d13f4863142d4c91ac0992f52399504e1e09cba81b38d196f6"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0014_hh1.dat",
+    "sha256": "1544c1c8d551ff6db017889dc0a46e5cfcc55dd9f661f091eb166ecdf6eb039f"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0014_hh2.dat",
+    "sha256": "3b48f2074982ce499c97212eaeae8c1f75e7e07746213f0670ffb4e49175c225"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0014_lh1.dat",
+    "sha256": "10c5c0cc0ed849e7be850644e5b8f2a57af7f79c8f5e38c3d71770fc64521f94"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0014_lh2.dat",
+    "sha256": "b93d59484cce32f192a3ec6088da9d023beabf91923d937b14baf3ae7dac9cd5"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0014_s1.dat",
+    "sha256": "759ac551154de59842f64b828d34d160d24db5b8581ed6bae3f8806ad3552f43"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0014_s2.dat",
+    "sha256": "ffb0cfe32916188307e0bd3be9a59b68e283180f3e2919551510f6fcc3fede72"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0014_so1.dat",
+    "sha256": "4f1a79113fe8199801cec9ae09796439627a0b455f2c58ab8f3b309857763c85"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0014_so2.dat",
+    "sha256": "50a8d22cab99eff482236c527fb4021fb159ce98a16e412f4d1c644025879454"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0014_x1.dat",
+    "sha256": "667290187967d289007dcb0469087d74c8ba3fcbcf4d16ce6d40b2207eb2738c"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0014_x2.dat",
+    "sha256": "6b1d3a060ca7643e988449ffb9fda119c828048d460577951fdb98c74fcb7cd5"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0014_y1.dat",
+    "sha256": "b0ffb694467ce624b9817b812e4855c780be57fb32fc8b5afe6fd8c0791cb13a"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0014_y2.dat",
+    "sha256": "bb564ab96529e4792df3f991b3c0cc9653c23805f5ee3a87bb3b2abc9e1cc256"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0014_z1.dat",
+    "sha256": "99e5a55d8227a62c8bb5a0a20f5e62ba2e7190c509505cb880c4df985692211e"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/envelope_shift_k00000_0014_z2.dat",
+    "sha256": "19c4d87a6f56ea327e016bcf9a76da484feb86559a94067fab83e1a51e0d8671"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/k_points.txt",
+    "sha256": "036d67f2f4adb306228cabb5ddf9945ffafe15121f84a6324a6e73dda2fb257b"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0001.dat",
+    "sha256": "9c32aaf8269207e669f0098def8f76b9d46a36a6efc24950c4c87123b54eb499"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0001_cb1.dat",
+    "sha256": "ef35808cefe18550e162a5a099030d6e421f0d304acf76e3236c22829ec1632d"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0001_cb2.dat",
+    "sha256": "d4866b92f34212d29d56e41c4b42c2e54a142f56c6099ae616e1e326ee8c3548"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0001_hh1.dat",
+    "sha256": "6785ab273ae4d61fafeba7fcc7c5b69212451becd8344dbf272dbe970947efb8"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0001_hh2.dat",
+    "sha256": "ed3f87d0cd01e7d60a7400c7cca10e13446e11e7cca5a42e862fc2eab6a3f07a"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0001_lh1.dat",
+    "sha256": "ccc6b2ba24c21e7d07f096214c0c1925dfcf1c59b4ee5b4d9237063939680c2f"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0001_lh2.dat",
+    "sha256": "881323cdcf8909361aada108e5aad9ca0ffccae768a8a9b7280d91a95b2ef59c"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0001_so1.dat",
+    "sha256": "dd55ed06ef600f85a707669a5f35550ad6dde2bb0a6bfd3ae1f706fff6541f61"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0001_so2.dat",
+    "sha256": "6508b63cb2084330e28e93fc44c98cd483f8a59a9c0385a5f21d8a113ebd5179"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0002.dat",
+    "sha256": "59ab74b8d7e99c56173d8b714fb060909789591e7ff15f7473dd60630b24ac46"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0002_cb1.dat",
+    "sha256": "71f9699bec3c607c076cafe4ea7e84687d919a3e95f2bbd12151fc35a4109edb"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0002_cb2.dat",
+    "sha256": "2a2b9b542c043fd78ad433265804cb1cf9d32de734ccba7f6c989b9f902aa979"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0002_hh1.dat",
+    "sha256": "e9eaf2074f36c5f4dca2a4aa793aa49c30f302d146ee451731924f6284b0bfa0"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0002_hh2.dat",
+    "sha256": "6b8bd4301dfe0ffece59bc7510a036432941085f627f4c31b73a85cc475edc58"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0002_lh1.dat",
+    "sha256": "53c0f055e9eec6b263be5a3f463682c9d57d7ef5b3870dbf82a5d65f852df8a2"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0002_lh2.dat",
+    "sha256": "8870f59c9df8b19a0df39ad93af76e9e01d11dc3a6e71884506bea559d9f7c27"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0002_so1.dat",
+    "sha256": "ea9cc571d3290e43e42fd9c5241e45e07959565aee48884ec15a5f6969e3549e"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0002_so2.dat",
+    "sha256": "c01a907363f0b61bd5a4521efd52488df9efdd56ee63964208a67707b90160ae"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0003.dat",
+    "sha256": "1563f4f0cb92fd9fd716d72867460fc647957ea51e24c19b02dfb03db02cdad6"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0003_cb1.dat",
+    "sha256": "fe1387df0b45aeb06b16eb970c4ada35376d43fccc69ffd0c47895155ebb791c"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0003_cb2.dat",
+    "sha256": "29dfb75ee4b894e5241925b89a032d455a7332a255dd0636c7b5fa5520ce4534"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0003_hh1.dat",
+    "sha256": "85858ede0a0d61fdd76b6e10f67d313da3428c086156e298248dc5bab7d10472"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0003_hh2.dat",
+    "sha256": "af8dc0d9df591eaceae4749d2925db520d0039ec260204ecea983d1eb74e480a"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0003_lh1.dat",
+    "sha256": "f3c705e0aaf9a2c9c62bf170f72a445eb92d67e1100e7f23c9b215f1a1389694"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0003_lh2.dat",
+    "sha256": "50ecbde090b57752d4dc2254ada76b78e95b94db986f00d701e427453a5c68d4"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0003_so1.dat",
+    "sha256": "42a6b7413c37650a96778e4c886eb208ec7658ca9bd62f7bfbec615fa528e829"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0003_so2.dat",
+    "sha256": "d45177ca6504cf56700a3ef22d872b239cc220ad885f610cf897eb678a314a65"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0004.dat",
+    "sha256": "3fde70c242982affb3991f9c2ca153978dedc19d60d1df3ebf1dada9a91e48b9"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0004_cb1.dat",
+    "sha256": "f3d64e1686ff853f7a2949e6bdfbe9879e6e7c2b8400d48876973762ea59c210"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0004_cb2.dat",
+    "sha256": "e24f7631f61fffaed0a26d65b28c3e83e914fd088e00b4920324a829598e37b0"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0004_hh1.dat",
+    "sha256": "c6792f47735838ee47ee1a11b28db663e4ae84f9c762b3e8d9252796f5a09962"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0004_hh2.dat",
+    "sha256": "933c1b4c8d497b216ada37e1509e1292fc0b13e1d5af6c37d9fd8ebabb1f516f"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0004_lh1.dat",
+    "sha256": "e2b0751f9188e544402ad61562e73dde8287364c4574a8cc08fb5732649010bc"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0004_lh2.dat",
+    "sha256": "406f7e0de841f78e180a111afeb22dfa76cde303cbbb73b01051deed3f03bbce"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0004_so1.dat",
+    "sha256": "c59cd92a643f0caef1171194a4e27949302bb156e857052b88d023e858e39293"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0004_so2.dat",
+    "sha256": "881e6d141835a10a253d5c6f03a8399e5f9b13e02e0710760d2bbf0a2fba68e7"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0005.dat",
+    "sha256": "3a3f42d4165b134c760e525bb046219c37b77c291f74150ad2c0f7c8e37f55d0"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0005_cb1.dat",
+    "sha256": "2386257487a9d397cf4a54146ecd66395e514cc4c92fd1807f165cce6c809e44"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0005_cb2.dat",
+    "sha256": "20c6e973c0014669c63da4c5674400eed041f819a61c84de5f7c04a564cc245c"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0005_hh1.dat",
+    "sha256": "688948485c8384d7919b9ed4ec12ac10da0ab13907e93dce2a46e2eb403a64d0"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0005_hh2.dat",
+    "sha256": "e2eaf9fe4d062111a5a258cda258f3f13653eb0d0b27a4d385dd5afb6c40b940"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0005_lh1.dat",
+    "sha256": "124b1fba9278d0df5899a3481f15744c07bb7be71694cb413fe4a63f4d0f4672"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0005_lh2.dat",
+    "sha256": "5ec3aefc10dcd913c7da3f7c4f73c9e8203234b796db0ff13ec951883355f5da"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0005_so1.dat",
+    "sha256": "091c7979fe63f9b7aad48eaa9f4496f994b76c899c64bc249b93182f5c2177c9"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0005_so2.dat",
+    "sha256": "795b43ccc1cbb8e70440c4e44d5fbf6a3c27352bb8d1e3f0af7469c3da32b5cc"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0006.dat",
+    "sha256": "a80c958c07dd0242c771d5255e5cdfc040db883517be97ec26474006b97be200"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0006_cb1.dat",
+    "sha256": "b6eb23e1988edd3c5414ca25c892be8035b753237e07962803f7e46f2a491514"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0006_cb2.dat",
+    "sha256": "68105bd5379eb6df34d7bd7821a0b105ac5ab2b5df54c68a03a5c9f7608e226f"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0006_hh1.dat",
+    "sha256": "92c766a70882ece1c98f461daf9109901238bac9f9a0bc50ffa0214c6868c8e0"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0006_hh2.dat",
+    "sha256": "85a2dbeff41d6bd5548fa44af81ab8e553302d31148ec209cbbd3e262a2258d8"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0006_lh1.dat",
+    "sha256": "8b8964a3268aa30612f93bfb2570c1a09ef4f91d6dbfdd3b7901258cbcaba1b1"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0006_lh2.dat",
+    "sha256": "826864d57a6866dab997aca6a1ba3075ff2d2055c5464074523648055a3fbe53"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0006_so1.dat",
+    "sha256": "5eeca970a2a69a4b380dbbbcf4093c2408b0ed2d16120c130958dbbe057e0ca2"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0006_so2.dat",
+    "sha256": "a0e4aeedfc6af1e02deb6c7aae5dc2b6f061bac1f40c684cfbaf4e7ecbaff440"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0007.dat",
+    "sha256": "36da0a9284a8c843b7b61fe4bf955b0e55103c6eee9af8e24281d2a71a58692a"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0007_cb1.dat",
+    "sha256": "ee24f5ddc4379296686190576cee97458979a1048587e9dfc2930e5480585a1d"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0007_cb2.dat",
+    "sha256": "70f42ac6e2f26b02a24d7d78390a325898cfe861126fa7b414d029c0ab914565"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0007_hh1.dat",
+    "sha256": "9e50e2bd50263f811b987de14e9c07aeb62b214366ba85275a4b30acf88b71aa"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0007_hh2.dat",
+    "sha256": "455dbf30e33f6c45f95eb7e086cdda1aa0c379200e54529cc9880e1c3ff55392"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0007_lh1.dat",
+    "sha256": "e63907c31035e43062d9f9b3fcea1efdc6fef0ae4805ab3584fe79b0eee8d6b5"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0007_lh2.dat",
+    "sha256": "1ef0aec58b4d0da0b32f910fd3fa3036c902e9e5b7d06f877cc1e4c80cafb8d6"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0007_so1.dat",
+    "sha256": "01d0c08d0678ee1e523291892d8084fc37cdf64af6263677e73f51ca17f4c99d"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0007_so2.dat",
+    "sha256": "af7bc746347f807e30081c9546f64ccb2c3ba5f23f18f30f81a575d1fb434976"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0008.dat",
+    "sha256": "019bc9a04d80a6f681ca7ebfa391917aeac73cfb00d4b4637313a0243612fd76"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0008_cb1.dat",
+    "sha256": "ca8064c0ecb8cd9a61594ffc884b80b2ebc7bfa6de8cc414a120f905c6479ff7"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0008_cb2.dat",
+    "sha256": "d8bf00e5458300b92b96653db68b85210750b1687f9199ea8b6a0870512f723f"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0008_hh1.dat",
+    "sha256": "afa316c747d546f13176750ee839da039f331773f3a00df84b1f2915d0a2b261"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0008_hh2.dat",
+    "sha256": "7e5f17748e59f9349104a7b71a5b6e9c07663be0a89561eb4bfe3fcda646a1a1"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0008_lh1.dat",
+    "sha256": "ff6c893f8cc1dfaf2a09435850c72a7f825c84c729375b14fa1a7ecd4ac877bb"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0008_lh2.dat",
+    "sha256": "6532862afa236251c14ada01b84def206e392fe0ab161d8c3fcb360d16603410"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0008_so1.dat",
+    "sha256": "acaf69b18e14163820bdd1f0d607faf21eaf542f078a52106b0ce22c611a3ecf"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0008_so2.dat",
+    "sha256": "b94eabc1bfb1ebe0cbaa9467b36165a7a0327f2120a87eccd51948d4225c41c2"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0009.dat",
+    "sha256": "43461ffd0717c2ac60165bd9fa7e851ba8182e4b97c4f6d07cbec8e07ad8a87a"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0009_cb1.dat",
+    "sha256": "e6a382cf26b344141b8339cd7d5bd1f5601f6603f389a69be78e9d2ec7ff74bc"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0009_cb2.dat",
+    "sha256": "da42b524b5fbe9da8c5815bb9f945dd27d5178e8a04f5305a5f407425d7e5e33"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0009_hh1.dat",
+    "sha256": "ee98131240f1a2c981bd44f28e1ad7c57acb6f9bffabe3ead7f8484bcb82c904"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0009_hh2.dat",
+    "sha256": "1eada37030ef0c2ac3c3d617bc90da19564baf8a07ffe0072bc5b6f6867c3390"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0009_lh1.dat",
+    "sha256": "c9e79bc3622a643c61e84b326fa0c4dabfb544b39559e5a35bd0f9e755fe5391"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0009_lh2.dat",
+    "sha256": "96b7a6a881416ffc2306c4cc01c757638cf4453d82ac83a540af7733c9a522a5"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0009_so1.dat",
+    "sha256": "70c9eb10bc081f0f1eedcc855318e1e972f3f13de778583a6cb7096ccce04a16"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0009_so2.dat",
+    "sha256": "3edf30d6b1298fa9489f76089f2bce9283391475a8886861deb51196d5c8e226"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0010.dat",
+    "sha256": "0ae2becd2186bca3aca85f78dc6e337485e2cf90a5db5994f8d6d9504096e243"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0010_cb1.dat",
+    "sha256": "6e3d0f61ae08b49b73949ff5847bce4692cfbcecb9ec8583dfff9ada200d79c1"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0010_cb2.dat",
+    "sha256": "1cef836c01b3e37914c9e1f2cf51111399c06a88c9c2a3a459fdde9c5ec7ac65"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0010_hh1.dat",
+    "sha256": "3bc77b637b388c29bc5f11c9d6bac93ddd63e6638914ddef8ce8b3c8f7bed4c5"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0010_hh2.dat",
+    "sha256": "bb605719b2c67988887209d265fb6890ca19e06d427dbe55a7c5b19929ff508a"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0010_lh1.dat",
+    "sha256": "dddd0d9ca8f337a6c50bb521fb7513e4e6807d567708608fa0fee2ca7db726db"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0010_lh2.dat",
+    "sha256": "96f0b88c15474cfd8cc4d5b7495a4fa8bc404a97ff92a69d3645af5477a4f3d2"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0010_so1.dat",
+    "sha256": "ebbc1f3dff940cf34331689c3fa7d8801e66d22add89322f09c766bba891a0df"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0010_so2.dat",
+    "sha256": "9d57fe70b785740c1d3b2a652daf6b9a64b7d2c915f74a4a5dcff4c23ac813ff"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0011.dat",
+    "sha256": "ecd6117f3a1bc1ad73fcba45217260ae91d229447de293d1163ff7cf0fe549f2"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0011_cb1.dat",
+    "sha256": "7e07bd98985ab95fe2f85affd69a88ff5aad52bf7b1101ff6ad0bf358acf7fbd"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0011_cb2.dat",
+    "sha256": "8a6f131239ccd78dff51d1f8295a91696771591b572dcd65452f3d303729cd3c"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0011_hh1.dat",
+    "sha256": "2c12a0bc5b4236bc2cff270ad87939f7013e93482be118980dd1880e391bccc5"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0011_hh2.dat",
+    "sha256": "8146cc67f4801b90fd6ccaa1dc1af3e4c4831c18cae7297a3aaf0c8f38dfac03"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0011_lh1.dat",
+    "sha256": "d48f3de1b5b967dd081a1e24df9b0e4c0dd33b4a10c8f4c58478d0a636b9c494"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0011_lh2.dat",
+    "sha256": "43d6cbf1a17c60e2744d2c4682da1f9b17b50298ab65eb21b7a35cda2cd4a43f"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0011_so1.dat",
+    "sha256": "18b116343fbaee31dfbb370e1961377eb1e87028c3c5750b1f39254a8c44c447"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0011_so2.dat",
+    "sha256": "7acaab7552a2371078393890afbb571b4074c58fb752189daa0610759f1ca387"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0012.dat",
+    "sha256": "56815c2f663d7edd656a7a4d6a33ecbe31e0694ad455b81ebe1e344a8d3f7279"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0012_cb1.dat",
+    "sha256": "139c975604bf768314311a0fa64c59868dc28eae02650bfe3092a8b547f6d6ea"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0012_cb2.dat",
+    "sha256": "66eba2940b9f991b10cb197b300b4897dbb64e7068ac38324ee7d406218a994a"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0012_hh1.dat",
+    "sha256": "2f7d901971fe56b6bbbb2ecf3501564a7e16f694cd93d4334d059e4a31537be4"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0012_hh2.dat",
+    "sha256": "5c41e5bbdae4acf3d58c38a7bf4c659bc96694aee7f2297b6de3bb493704efa6"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0012_lh1.dat",
+    "sha256": "16e602561b51275c297ac8c7a8f93ca3c641b9e3e231034fb87aa4559e5d2dc2"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0012_lh2.dat",
+    "sha256": "5efa267da151d90d6c7359f541dbdb4a36c48227936e132fe9cfbc80473cde22"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0012_so1.dat",
+    "sha256": "93796f7eb35747f0354369711daa4db32deda51c0229bf00888368e896e2bc8d"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0012_so2.dat",
+    "sha256": "ab5c7d084854f40d8fc0d790313341a5b55289ff32215ace646cb7cbaac3ced0"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0013.dat",
+    "sha256": "0ef22ce15e175c225baf4837a69dee19ed94f70abac152fefa034a5c02d4b5a9"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0013_cb1.dat",
+    "sha256": "6066081f1af5982268f35a1431a3b90da784eb4765707f5d316318c30bea596a"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0013_cb2.dat",
+    "sha256": "6e3852b297d8814e63cac4dacd6beb6c67d1f42c90348ff92e52f7860eb1b5b4"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0013_hh1.dat",
+    "sha256": "a830e660bb9359087b0426178593db21a5d395fcee8eaee1a72ccae4cea9ea4e"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0013_hh2.dat",
+    "sha256": "e7e4e66d1e985714ebff07de3c32eb27f857515de0b63d1873505fe89e361806"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0013_lh1.dat",
+    "sha256": "d0342d58891429c0331fc60fb74637268fb5fda3ce1ba13609fbf28a407999b1"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0013_lh2.dat",
+    "sha256": "86f02a88efb18cb116506aabd4f773dcdf10bb6b6130abf1161c79e133ae0fa7"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0013_so1.dat",
+    "sha256": "d0ab4dfcee1d925fd6d522187acf742f2bcb35e718092e74fb2f2c33e0d0fc69"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0013_so2.dat",
+    "sha256": "04f7c659ad9776f52bda144085773aa53d4083ff354d54b38a3805b2bf80a719"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0014.dat",
+    "sha256": "d9c3bb8c4027b8e33647690663e4379d9edc175672999c59557a63906af19976"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0014_cb1.dat",
+    "sha256": "4bcbb188029abc87b879364308878863d51e0af588e48b7968e72dc2ab82ca4e"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0014_cb2.dat",
+    "sha256": "81dcea4fae3cec47c0f677db78f4fadecbcf6a9e76b5d261ccf00398336c3446"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0014_hh1.dat",
+    "sha256": "a3333612138c0e8389ab979342104d5be74f9701f4fb22126caffc41d9cf8e57"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0014_hh2.dat",
+    "sha256": "218daf11e4298c381adb90c5259eca7ce4fa9b9cd0403f644c6e618d4e988cfb"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0014_lh1.dat",
+    "sha256": "438bbd4b6d5ce52d5aee8d9712d04cd9b285f1441fe2bcfd4771560c11422a13"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0014_lh2.dat",
+    "sha256": "2543f9aee425c31faeaf6762b34cbca745ac768b66e8fd26155cfdc9cb87c570"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0014_so1.dat",
+    "sha256": "8f57258fd21e01b429b7acd294c88a1007864e160cf51812f7bea3a0f6525180"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_k00000_0014_so2.dat",
+    "sha256": "57f24b8f1d4a1d34185b052efb5ac1de1b2b2640dbbc681cd95b879fece52570"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0001.dat",
+    "sha256": "46d58403ae6d3e97cd0740c1e627ff174394ec872a91b3d63e197e121a939129"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0001_cb1.dat",
+    "sha256": "53e148f102ac170599e061d04b48b2bc242dab586f067aae842563963f44da03"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0001_cb2.dat",
+    "sha256": "aee16ebf459aced8f284f3e11638ce7c955c59fcdef7b3f6628b80717694417a"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0001_hh1.dat",
+    "sha256": "9e8d10a2b6609868abdfcf06acd58ec414b5fb9f416ac350cda35e1532767c36"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0001_hh2.dat",
+    "sha256": "481776b8830ed63f9bab5be07307a311cb13f3441bf5ec898a8b9f0daaafcf46"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0001_lh1.dat",
+    "sha256": "ed76957c11c83cba273fda7fda8696460276b2af0a2d82d0aca8c7cc5d878511"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0001_lh2.dat",
+    "sha256": "a14c4b4be1c2bd1d534032f59a2dc29770902b64239aaee538fa30d46341547e"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0001_so1.dat",
+    "sha256": "ccd9063b1a1635c5566562a2d8b79e6dcf4d4857a0dbd889e9155e8e7b8a88c3"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0001_so2.dat",
+    "sha256": "f16c4418f1546262bbf2cb748338574369e9afde55c72955dd4e381a446b5c43"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0002.dat",
+    "sha256": "1368d07012d417731a086dc51f90c158acecbe85e5c23b1b0985f375470f18d3"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0002_cb1.dat",
+    "sha256": "f4161f85551f727dd35270b59d0f5be2726bf4d77e2528ce3708ef0e64a22176"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0002_cb2.dat",
+    "sha256": "f07fe9712f96e8238f4703a880344b1efc7bc067ab70cde56fc9758487095eab"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0002_hh1.dat",
+    "sha256": "0db7ccd0b68ba49923c74c0eff2e4c11f764c893ca933f91f9b42dd9e06da9a2"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0002_hh2.dat",
+    "sha256": "46b1c3465406d2227a9e137563b741852e684b4b4a489e5bcbadf920785dfe37"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0002_lh1.dat",
+    "sha256": "40896647c0d7f010d83ec68f9d8de0193ce3f17aad255ee2f0951c8aa3bfe800"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0002_lh2.dat",
+    "sha256": "b4a35f8966a9f4a0f6786d6682dacb6f4117fc0b3598c1c331b7b77ea1c3b1ac"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0002_so1.dat",
+    "sha256": "db479c36af81028f54228d1ee6169d362ca75bee9021dab66c11f65d559cb338"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0002_so2.dat",
+    "sha256": "99985477d137d8a3c4433cd9e154f7401ff9921b6b59f4ca1d42c3614449a3a7"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0003.dat",
+    "sha256": "6cb77f9648946fbf8cfd43d62d77b973fe46d3bb378edc1aac008d8c245b8952"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0003_cb1.dat",
+    "sha256": "84f728a42e2ebd1b2ea38ab8fdae37771b25e69cdef9481b4077393706a6a445"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0003_cb2.dat",
+    "sha256": "ac728ca2a0a0baf9f1ef371f5856de2d9976685923864affc55361f4e6120f73"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0003_hh1.dat",
+    "sha256": "fe4f7599796f22198f1a0bf176647533d8f171164005a079d28a1cabcd8b1e09"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0003_hh2.dat",
+    "sha256": "3f659ca3c7b094f64b09f230d3c58b2d793c00d3e7880ab05d8f551f25777f4f"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0003_lh1.dat",
+    "sha256": "e71ea84eedafc8aa2247d1fd20845dc6a0edba7103b3db95e97ce4351156dc06"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0003_lh2.dat",
+    "sha256": "d9c3c478c2a24a350c2a5c1f52c17a0c21192e95997bb23a47d4ed238f75cc2b"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0003_so1.dat",
+    "sha256": "0b85c1ec103e55006f6106e8f2e7d2c02679f3730bcd72e207e5c7a9ad83ded7"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0003_so2.dat",
+    "sha256": "dc8e8b005a7e3010103bf9e2a32561a16aa7f3dbe299499e0b9c0f01bb72ffcc"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0004.dat",
+    "sha256": "bd87afd2e262d520803773688219150d75379a1ec5d40564e2f602dd51b08fdd"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0004_cb1.dat",
+    "sha256": "1b0ea7832343078eea77720f8c709f0bf6404f8bdeb509d0621f0438a77e32d3"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0004_cb2.dat",
+    "sha256": "e20fa793c80a4b010d078bd58108da919ec2cc1ff70d88173e298d1f1ee6b1ad"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0004_hh1.dat",
+    "sha256": "f8161396003b364523f7fa79dd651852a602cb7a419adbee4277efc12b9c91e3"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0004_hh2.dat",
+    "sha256": "8eb1f0b345081eeaa4ebe700175401b7eccfc7f22a8584f29063c2fca814b786"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0004_lh1.dat",
+    "sha256": "fe5b17b2f2332fab755778f5a59338e9db21fc46a782ad828f4c2ef24f1f22a8"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0004_lh2.dat",
+    "sha256": "4c654ff8240754853124dfacc07f518f1dc03cfe2eafe01476c287a3ace9eb7b"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0004_so1.dat",
+    "sha256": "7c030a3658b0dba08d31b9e39f3ba1c37ae79ad535e2fb552bcbf0ecfbc23ea2"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0004_so2.dat",
+    "sha256": "34855ee3e94968f808197f4093ca61722e2b7c305196bb0629b0c3e4a73a0446"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0005.dat",
+    "sha256": "ac715fb8779547ff6d2472c9155fcf4fc9a832e172a8804cee4991a2fea6e9c9"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0005_cb1.dat",
+    "sha256": "60b016c2c89d10b686105d0c52fd4efa111de31c71312681cf7c7d9c324122f8"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0005_cb2.dat",
+    "sha256": "e415c9b172c7c7fc11c2cdc71150cac575e86ba8d894e0a6c4fcbff062a81d36"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0005_hh1.dat",
+    "sha256": "bdfa83ae6f425e316c9c3d00caf7d5ff833ebc8a3a61f4900a4158e722bcff3e"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0005_hh2.dat",
+    "sha256": "0b6199f2584c836623ec8a97714ffd0d5289c7987e138fe041ee85c957244b7c"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0005_lh1.dat",
+    "sha256": "b6f845cc77aa7a45b4dc482ffbae1ada1cc77e5e46939f99b21866e7c3bb3a70"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0005_lh2.dat",
+    "sha256": "dd825a98ff3c25d74d45e8422d8ac512980cc7d835ac0549cde345b930ad6823"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0005_so1.dat",
+    "sha256": "f1331b53db98075bdc2d5ecb521b7c3e5ea7e017b7efcccdd253c4327d17956c"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0005_so2.dat",
+    "sha256": "554a69fcad15e90759f8d835529f3454b0b10fa4c85c90b1196f56a46a51c6f0"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0006.dat",
+    "sha256": "fde3ec9360422c70fa2d7526b4994d24ea1ee5a32ae7b6108e52ae2b75c3afa3"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0006_cb1.dat",
+    "sha256": "e13d9e4e4e0b3ed403b329774cee32daa348f5415101d59008ca93eefe924cd8"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0006_cb2.dat",
+    "sha256": "843d37a98ab20acbfd1ce027b0fdb5ea6671b3536ffebb71336ce77ffb26c9e7"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0006_hh1.dat",
+    "sha256": "d1c3f58c886a846f2fd3e368238c62f0dad156f80b99a481aa2fbd5f2b755acb"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0006_hh2.dat",
+    "sha256": "1d92e29844a2bc7b8c7f0c57d305c08ba56979ec14302e9b1d91bf48b898016c"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0006_lh1.dat",
+    "sha256": "9ffde292285577e43b60b23ac4683e7cf538156339b47e6d5e36f1e839b78a9f"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0006_lh2.dat",
+    "sha256": "a441d0dffed3a63616e83ea99cd904beb13676e48eedfebd089999f83afdb985"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0006_so1.dat",
+    "sha256": "7321da089f92eeaead7ce4fbad6ba52afd41abe12c000e81f33c529ea5ff4c80"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0006_so2.dat",
+    "sha256": "51ab43bcc913bfaa1c08a41ff26611411a61a1642416241197cd71973a1ce2f6"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0007.dat",
+    "sha256": "6d1c90d832e41a3d4873d84b8cc06522c25d96620cf9d7a49c5ecb19400e15ef"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0007_cb1.dat",
+    "sha256": "6aeb36a98a97cc0020632fe3996564c7fc0b74bcd61dc914a595cefb87aa6f08"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0007_cb2.dat",
+    "sha256": "0c6d8c9f5a6299644478e7f564b0d075b19ac1d7bad988eb2ab2dec84ea6df78"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0007_hh1.dat",
+    "sha256": "891ed61827d1bae0399a605251565636a78dedd5d13a5f1f336abe36e0da218b"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0007_hh2.dat",
+    "sha256": "fc30037d7e5209abae67ba2e084f117a9515e796921e47b74cb1f88f1fcc15a5"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0007_lh1.dat",
+    "sha256": "21124e30a3841132a19a58d244c9e24ea2921f61d78dbd5cf48e6950302f9c76"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0007_lh2.dat",
+    "sha256": "6284e572c03da659821f54514d4117ec4d971c6fb62615139d7f5a4d8e3dbf20"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0007_so1.dat",
+    "sha256": "9788e19eb0673e22af15e2ea232d2d91c87be123afdc88ab7bc223fa5511ece7"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0007_so2.dat",
+    "sha256": "e3acd1711fda21d33cbb3622f55b72bd61396b888d5b44ac5cefcc19b3bb7a06"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0008.dat",
+    "sha256": "68ee928eb7b2bf57b553d2b28858f604aeb8e86728475fcd1f6bed1dd62c57df"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0008_cb1.dat",
+    "sha256": "61b1de059f62e391301027ea33fefd365867c066c330bb36f4097663e1bdaf50"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0008_cb2.dat",
+    "sha256": "266755af1b57034d60d0e40b29f497f32d6de87b8f0bcb5af89ec1e3422fa551"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0008_hh1.dat",
+    "sha256": "97493d47e9860a0ab82da74205528dd8f06081461d4a9e3e25dc1e6e13bcc70f"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0008_hh2.dat",
+    "sha256": "97e1332eba85fff2f4aa801d0c3f188178dee1df09e33fe994a346785558290d"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0008_lh1.dat",
+    "sha256": "e9b84ec44eeb70d29605205995c34376b2b1c2bfce4b1ce1c1a6224cab756a2b"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0008_lh2.dat",
+    "sha256": "284cb9c897726603c70468cb15e728db8ed6eaa8424807c49ac523c9db5a0306"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0008_so1.dat",
+    "sha256": "451d332a3c0743436da355365244c9cd5c68d832c9a940c91946211ce530a041"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0008_so2.dat",
+    "sha256": "decc8af1cce9f870816b8fb037d7585e16345d4b9c446c4f83909c936e7351ae"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0009.dat",
+    "sha256": "696426a1af33b6593895c554d5155400842a40c4c57cf570a202734d84799988"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0009_cb1.dat",
+    "sha256": "243c6e134879ed23690f50f5f8369fdbb807699782b8f714801e809a7a1d1015"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0009_cb2.dat",
+    "sha256": "c7d8b88c6e5be5bd7c36d0fc1afd3bdbceb71e56e4fc4b2d30fbf065eff0f536"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0009_hh1.dat",
+    "sha256": "1769cbc87989474418f2f8e5c5c1088637a14bb350da049c002862a7f423dcdf"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0009_hh2.dat",
+    "sha256": "88d3985513236c11f3293e5af784f35b2877d259412b7d438e4ac1a0a279c22f"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0009_lh1.dat",
+    "sha256": "1853055390205f2e080b325ed23f8b4d3d7ff4e8ec9c8cb51fae881f61c83dbf"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0009_lh2.dat",
+    "sha256": "e175969f271b32439fdc0722755fd50cd819406320e6db5311787eb9e383e2de"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0009_so1.dat",
+    "sha256": "359369a332bad9dc11208a96601ec512ea0433f5716406d8781831574a3b6c25"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0009_so2.dat",
+    "sha256": "9869bd0b1fcd9076ea1323a44425df79870f1677f805bc5037454c9c04153f19"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0010.dat",
+    "sha256": "95dcc1e0d0dee1df839575c29956d8efa0b45637b2d1e21e1d9e897f83e22118"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0010_cb1.dat",
+    "sha256": "ad68152a1b8127b50efa7388fe5384704584fc9d58f525c195edd756d60a11f3"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0010_cb2.dat",
+    "sha256": "ee2ae569614095d357c6ad6405d04cd5f084a409788bdd04c85c1dfc6f8a428c"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0010_hh1.dat",
+    "sha256": "e7bb91f9d473c2fa6b06192dd320fda724705bf89443fe1bbd7b1da0f83ac784"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0010_hh2.dat",
+    "sha256": "cc904410d9afcc9ae51e923e8ce34f3c8a2b860f599ecd2cb1186640c0d3285f"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0010_lh1.dat",
+    "sha256": "0a7252a3db9aefcf6d4aa7aa8d079ced5564b78bf9f003c1178fca1b30000093"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0010_lh2.dat",
+    "sha256": "ad3ab33e722e2c7898395703dc81be85f2cb3b56fae9d28c71b7686b80b442b6"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0010_so1.dat",
+    "sha256": "9167be961dfd8654ea875cd01f4c29f052567e4e477d20c15d4817b5cbbff751"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0010_so2.dat",
+    "sha256": "ae3de51b45d2a92db9c2f9b93ad0c11d7e9d8bfffedfe5e262fb290e3b4cc145"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0011.dat",
+    "sha256": "3e5a6c2620da2cc3f66de09403769a8e8c4b30541a65588ee645e51c01daf53f"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0011_cb1.dat",
+    "sha256": "f52223295e2105c8555483f090d9885a6bc89ce7898c069921f12e916346845f"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0011_cb2.dat",
+    "sha256": "5de4900d45ed29288de4fa6ffdad771ebaf5abf31ee489b379f8091cf9c002b9"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0011_hh1.dat",
+    "sha256": "645c6be4ab3209e3d62155516404b97af74d71d9c50b3f628d66464f1d7f51e0"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0011_hh2.dat",
+    "sha256": "99dda0de30dcd49c01ea808bf0a39bb8188663c691959ebcdf7c4716359703e4"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0011_lh1.dat",
+    "sha256": "e8539f1fd29f4ded41e11ace2e4fc288e86d3086727b16047203a4f58d083ef8"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0011_lh2.dat",
+    "sha256": "4f22be056b388d389942917af7a8a65429b292653da0c7f4662cde30fce72061"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0011_so1.dat",
+    "sha256": "5422057c8410f1dec839c0fc56836cdfe401c1573ea1ddf41abc68355d003676"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0011_so2.dat",
+    "sha256": "a9905f186c9cc82332cb5473e5fb860a51f5d8cfaad9f34b98f7e313359766c9"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0012.dat",
+    "sha256": "489bdbef9230697394bb76c25aa199842ade86d474fa31223658743e89957188"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0012_cb1.dat",
+    "sha256": "22609047b5d3f83fd1545938f102b1a075a2431039b3b7b2d358ba581fb7977b"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0012_cb2.dat",
+    "sha256": "b1d4d70eae8ad69a8a307ece3ae4f983b3be0491e1d6029e645d765bd061c497"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0012_hh1.dat",
+    "sha256": "79b7300c3a0b2754fe76f5bf6fd4c772869cc6fb97de7726f0d57facfacb6b5e"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0012_hh2.dat",
+    "sha256": "240493eec60e8f010bcf84b835f44c7074840329081a918cd43ee5d03904460b"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0012_lh1.dat",
+    "sha256": "9c558011a9a34d9e7fb39512c85ce6eea1d465be76ef760fae2c11c83f5b351b"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0012_lh2.dat",
+    "sha256": "d3b1968722dc2038f3630caa12892cedc2d11131e993147c1a03062517466282"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0012_so1.dat",
+    "sha256": "94ada8c8ea04e395968e9544c99c20b08b06d20a0472e647967bd09efb2e4e0a"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0012_so2.dat",
+    "sha256": "e7075a6e25349afff7bf31b1546061f7a4225483af2ebf9c6b655e97011f006e"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0013.dat",
+    "sha256": "14cbcab365f25f6abdabfb2efca778d1080b5fa4df192e808a6e00a223186f75"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0013_cb1.dat",
+    "sha256": "0c9e1e5623ce403f2d183f5dd31da6d47311c4bc49f8577e294e4b16400716b3"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0013_cb2.dat",
+    "sha256": "c71fb250f8cba86d8baa542cc5f4154e27181caa3ee5c56364bb42b43af47fda"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0013_hh1.dat",
+    "sha256": "2ce41190e41599c23bf06f44743b18461986727c257800f83e67463c49177a04"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0013_hh2.dat",
+    "sha256": "cfbc88b03b653acd9f87f2fad61e539f4b0cea7ef2ec6f5bd06e72ea8d6d74bd"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0013_lh1.dat",
+    "sha256": "40b9dfd4f3c9e671ef982b3ff349f55ecb77058a2af895e494b5aec1ecb5ba2b"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0013_lh2.dat",
+    "sha256": "4b9d2d3b6597df3f25dcfd9e286a3446f86874e6fc85a286502a96af014de07d"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0013_so1.dat",
+    "sha256": "c105643dfaa8aae98317563466d6d57325328b1312624950dea09188601578fe"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0013_so2.dat",
+    "sha256": "2cabce6cc9eaac8455e7740e68ddf89eaa480cf93dce785673eb74bf9fd680bf"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0014.dat",
+    "sha256": "e9a66d54eb6eb45829b49498db340cd1bccb4606360013711d9a109682c2ec7b"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0014_cb1.dat",
+    "sha256": "d025eed2edcce4200edefb8c5e5ba4c079ca6dcd6d8c77af131676f92f174638"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0014_cb2.dat",
+    "sha256": "e7a68b3cd6443ecc08ba232bcf2acfb628e362ebbda9184993c30b4905784f67"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0014_hh1.dat",
+    "sha256": "464b070d63c06970b6757055216482c4a651e1c7ef0d46cabc74c0b88eae2007"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0014_hh2.dat",
+    "sha256": "958a5aa98f5b9c60d2be5d39e3e8c745b2db75c86165253a02c0e9ae85a854c3"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0014_lh1.dat",
+    "sha256": "6a49b5eddbc68f3b667d41990dca8b16fb46a2f2a7c4ade46f05c19a09c9cfe0"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0014_lh2.dat",
+    "sha256": "a2a005d4e23a08f56fe28a64ea164d5b525a6d3e0793d724e8ec7c212c56ab82"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0014_so1.dat",
+    "sha256": "5feeb23bf1a12879d22ebe6e5eca6f96d83c1647e9759ae6647a4cd5b3797701"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/probability_shift_k00000_0014_so2.dat",
+    "sha256": "7a7c4d8a1317fa684c1a92d13f779a5f1388949e489becfa8a0a01e2d68143b9"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/spinor_composition_k00000_CbHhLhSo.dat",
+    "sha256": "519f62c68e9c54aecdfe21e382fef63250e35b4e37b095f7c022ba9730a7baf8"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8/spinor_composition_k00000_SXYZ.dat",
+    "sha256": "9a9e384a44482c399ea5088955efe2d2adb2a5a26e6349eb0c2b8d7a2405b9d8"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8_kp8/dipole_moment_matrix_elements_k00000_growth_z.fld",
+    "sha256": "26a95774c36da7a4728db3a48d68b67085f829c0f74879246368a41e5d607046"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8_kp8/dipole_moment_matrix_elements_k00000_growth_z.txt",
+    "sha256": "1574dce1b292b5b0f85e09c9d9803dce768974912923897c08b60360cdabec11"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8_kp8/momentum_matrix_elements_k00000_growth_z.fld",
+    "sha256": "efea3c28de0c9f55bc0aae03189909d1b9ffd21b34fa583f0a064562288e0dac"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8_kp8/momentum_matrix_elements_k00000_growth_z.txt",
+    "sha256": "0d31ccd43d9ec83e1bc83974354a73c583adcded1f9df50c6d248ec621cddfe9"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8_kp8/momentum_matrix_elements_k00000_inplane_y.fld",
+    "sha256": "3a744113daf2b45e7d3a8ce80a1c0a67d39b9a235eb306c13f2922d459b769a8"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8_kp8/momentum_matrix_elements_k00000_inplane_y.txt",
+    "sha256": "cae5ff32e0ec13d030dc0c6efd5d913c220cfd9460b7f525b6e5dde7044dace3"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8_kp8/oscillator_strengths_k00000_growth_z.fld",
+    "sha256": "f50d16a71c25585f6aea5cc9b82cebb88dc6537019bdfd01a3e80c557318e63f"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8_kp8/oscillator_strengths_k00000_growth_z.txt",
+    "sha256": "b588ac5af796b1ea2cd31cb65be62b77174f3554aceff64a894600b95c3430d7"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8_kp8/oscillator_strengths_k00000_inplane_y.fld",
+    "sha256": "915ad9aac912cb894ca056b55e87f2ad3ec075fc4272d1a0a8abde3546230beb"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8_kp8/oscillator_strengths_k00000_inplane_y.txt",
+    "sha256": "8c40618979772959fde0a8400c275273338a9afdb6de37c7ce75868b31e7b304"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8_kp8/transition_energies_k00000.fld",
+    "sha256": "cf5fe5049e38183f4146127b5cf7367a6cbb7282f072d8e70f7e7f7531802e0d"
+  },
+  {
+    "file": "kp8/bias_00000/Quantum/acqw/kp8_kp8/transition_energies_k00000.txt",
+    "sha256": "60858a5a53fcbd85bfd87d17935321fa6fcbd1f6186e41c40fa9ba1f8d9642aa"
+  },
+  {
+    "file": "kp8/bias_00000/QuantumDispersions/acqw/kp8/dispersion_Gamma_to_y.dat",
+    "sha256": "14330dc02eb3819e7d776dd62cf7f560fa4b77053b2280e5357906919989a242"
+  },
+  {
+    "file": "kp8/bias_00000/QuantumDispersions/acqw/kp8/kVectors_Gamma_to_y.dat",
+    "sha256": "b3c24725d14fc0d354365fba5a23039ad8279c48cde76d2fb851ec1f5dfb9ece"
+  },
+  {
+    "file": "kp8/bias_00000/QuantumDispersions/acqw/kp8/masses_Gamma_to_y.dat",
+    "sha256": "37fe9af263732ee87e52bc07d2ae17bf35778f8da292f38287393273853f4511"
+  },
+  {
+    "file": "kp8/bias_00000/total_charges.txt",
+    "sha256": "a0732f72f8f0607aed4b1029091e34660902365d39c80b166fb82308a6270308"
+  },
+  {
+    "file": "kp8/bias_points.log",
+    "sha256": "5ccb270233bd2eb5266243ecd0053612cde782295217994e4e80928dfe89c19c"
+  },
+  {
+    "file": "kp8/grid_x.dat",
+    "sha256": "8ca528e9988dd28c57cc048d84df81d992cdf72c2e36aef388f7c8d546f0b95b"
+  },
+  {
+    "file": "kp8/grid_y_n201_k0100.in",
+    "sha256": "14510372d0bdeab6d08b637a65d9987d91963af92916160f8236ab38c999e8ea"
+  },
+  {
+    "file": "kp8/job_done.txt",
+    "sha256": "cdfbbbabdf788cd3a0b6023c7526aff7a36aa80d6290f06d6ee71c294c32c54e"
+  },
+  {
+    "file": "kp8/simulation_database.txt",
+    "sha256": "316e6cf12e737e7ff8b447382523d1b0bdd1a3b316fda22eeab1df9d7e747817"
+  },
+  {
+    "file": "kp8/simulation_info.txt",
+    "sha256": "f7f66e6b46f5a05391e1c283c1b2aa859f2abf6eedf53724e2a0431e271d01a3"
+  },
+  {
+    "file": "kp8/simulation_input.txt",
+    "sha256": "b49da46d27fbad13d19da822df89e99f6040c59ced5782de766d59cd988c8b54"
+  },
+  {
+    "file": "kp8/Structure/alloy_composition.dat",
+    "sha256": "2e26104cd73956285bad82f1302724b41602f7213ab65ee22aea13fc663974e5"
+  },
+  {
+    "file": "kp8/Structure/material_indices.txt",
+    "sha256": "4c41cf8407e9f3fe9222518a18a465fe6a71cc8bde8e5e37c1665439f19dbdad"
+  },
+  {
+    "file": "kp8/Structure/materials.dat",
+    "sha256": "6f826c671a347599ddb6536ce0a021843070524611729d0523f8277df88f4ca1"
+  },
+  {
+    "file": "kp8/Structure/regions_all.dat",
+    "sha256": "f5636551f92a3fe007f76fef9c0b598cd240ed30c2b4652ab7b357b77673264b"
+  },
+  {
+    "file": "kp8/Structure/regions_material.dat",
+    "sha256": "1049c26fcad835bcc5cd7929c2c40478cf7df8c41918927299fbe15a2cbe6ca1"
+  },
+  {
+    "file": "kp8/summary.log",
+    "sha256": "0d9c3b9b358647b96c13f3fcd1e070e3a7a6f0201e66371ae77535fedd55bbfc"
+  },
+  {
+    "file": "kp8/variables_database.txt",
+    "sha256": "d093edf5a2a5982c8b50d332d2131f2fa7cdc7fc862ecc8d281098d9d945fb63"
+  },
+  {
+    "file": "kp8/variables_input.txt",
+    "sha256": "2f3c2f6746b64984691f153b406b721606d02ac8f8666a379c9d2745732053ed"
+  },
+  {
+    "file": "singleband_case04_graded/bias_00000/Quantum/acqw/Gamma/energy_spectrum_k00000.dat",
+    "sha256": "3fc1961458ccb807e37d66b775a1581d6ed89f3f79ee6229fe26baaff078bed6"
+  },
+  {
+    "file": "singleband_case04_graded/bias_00000/Quantum/acqw/Gamma/envelopes_k00000.dat",
+    "sha256": "df87abf606573e2d74ffa96c5dfa26add3b2cabec8b604b634108e4e87c51cf8"
+  },
+  {
+    "file": "singleband_case04_graded/bias_00000/Quantum/acqw/HH/energy_spectrum_k00000.dat",
+    "sha256": "65b9b6c1a13af93b815ade71b164af0c05fea731c49d19d36fb489ce9bb8968f"
+  },
+  {
+    "file": "singleband_case04_graded/bias_00000/Quantum/acqw/HH/envelopes_k00000.dat",
+    "sha256": "9614a43cccca9a650af79d3f8479c5e6de1e7d99c240ab2eac0d6f4ceede5e33"
+  },
+  {
+    "file": "singleband_case04_graded/case.in",
+    "sha256": "ec5d1e23688f87491e154c2e9e574fefd33c541ed22e901bf6ab336fbf6da115"
+  },
+  {
+    "file": "singleband_case04_graded/simulation_info.txt",
+    "sha256": "8e71f5b0f75964e4040bfbb29baf9d751c15da0e59bc244f8db40dc96a109d4a"
+  }
+]

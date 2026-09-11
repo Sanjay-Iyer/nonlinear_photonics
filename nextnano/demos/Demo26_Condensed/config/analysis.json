@@ -1,0 +1,30 @@
+{
+  "gamma_meV": 5.0,
+  "gamma_sign": 1,
+  "spin_degeneracy": 2,
+  "period_nm": 30.0,
+  "r_e_hh_nm": 0.751,
+  "wavelength_min_nm": 400.0,
+  "wavelength_max_nm": 1850.0,
+  "wavelength_step_nm": 1.0,
+  "pi_over_a_lattice_nm": 0.565325,
+  "truncation_scan_fractions_of_solved_k": [
+    0.5,
+    0.75,
+    1.0
+  ],
+  "cutoff_lattice_nm": 0.56533,
+  "cutoff_fraction_pi_over_a": 0.2,
+  "cutoff_scan_fractions_pi_over_a": [
+    0.1,
+    0.15,
+    0.2,
+    0.25
+  ],
+  "baseline_reference_tolerance_pm_per_V": 1e-08,
+  "cutoff_reference_tolerance_unscaled": 0.0001,
+  "finding_thresholds": {
+    "imag_nonzero_fraction_of_max_abs": 0.05,
+    "abs_nonzero_fraction_of_max_abs": 0.05
+  }
+}

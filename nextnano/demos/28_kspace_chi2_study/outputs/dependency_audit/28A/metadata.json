@@ -1,0 +1,169 @@
+{
+  "timestamp_utc": "2026-09-11T01:49:05.290974+00:00",
+  "equation_implementation_sha256": "6f69da8fe002f7954f6f5013712522c9e63445f7aa5e7ac447e608e36283a460",
+  "configuration": {
+    "model": "demo26-baseline",
+    "raw_input": "nextnano/raw_results",
+    "settings": {
+      "gamma_meV": 5.0,
+      "gamma_sign": 1,
+      "spin_degeneracy": 2,
+      "period_nm": 30.0,
+      "r_e_hh_nm": 0.751
+    },
+    "wavelength_nm": {
+      "min": 400.0,
+      "max": 1850.0,
+      "step": 1.0
+    },
+    "reference_tolerance_pm_per_V": 1e-08,
+    "feature_zero_tolerance_nm": 1e-05,
+    "save_integrand": true
+  },
+  "settings": {
+    "gamma_meV": 5.0,
+    "spin_degeneracy": 2,
+    "period_nm": 30.0,
+    "r_e_hh_nm": 0.751,
+    "gamma_sign": 1
+  },
+  "gamma_eV": 0.005,
+  "raw_root": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\28_kspace_chi2_study\\nextnano\\raw_results",
+  "raw_manifest": "raw_manifest.json",
+  "python": "3.11.15",
+  "code_version": "source SHA256 manifest (includes uncommitted code)",
+  "code_manifest": "code_manifest.json",
+  "k_units": "nm^-1",
+  "BZ_conversion": "f*pi/a with a=0.565325 nm; radial disk approximation, not full BZ geometry",
+  "numpy": "2.4.6",
+  "licensed_solver_executed": false,
+  "model": "historical Demo26 baseline: kp8 dispersion shifts + single-band matrices",
+  "state_pairs": [
+    [
+      11,
+      12
+    ],
+    [
+      13,
+      14
+    ],
+    [
+      5,
+      6
+    ],
+    [
+      3,
+      4
+    ]
+  ],
+  "limitations": [
+    "Valence pair (3,4) is light-hole dominated; retained for historical reproduction",
+    "No finite-k spinor tracking; fixed solver columns and pair averaging",
+    "Single-band overlaps and matrix elements frozen at k=0",
+    "No explicit carrier occupations, excitons or additional pathways"
+  ],
+  "wavelength_points": 1451,
+  "wavelength_min_nm": 400.0,
+  "wavelength_max_nm": 1850.0,
+  "integration_measure": "g_s*k*dk/(2*pi), trapezoidal; isotropic in-plane approximation",
+  "prefactor": 56.69816882497043,
+  "prefactor_units": "maps nm/eV^2 times nm^-2 to historical pm/V convention",
+  "pathway_count": 16,
+  "normalization": "signed Re/Im and all sweep plots unnormalized; optional paper comparison uses own maxima",
+  "study": "28A_baseline",
+  "features": {
+    "dominant_abs_Re_wavelength_nm": 1505.0,
+    "dominant_abs_Im_wavelength_nm": 1496.0,
+    "max_abs_Re_pm_per_V": 71.31058978306794,
+    "max_abs_Im_pm_per_V": 57.897932324202515,
+    "Re_peaks": [
+      {
+        "wavelength_nm": 687.0,
+        "signed_value_pm_per_V": 30.716725271440467
+      },
+      {
+        "wavelength_nm": 753.0,
+        "signed_value_pm_per_V": -38.62360490799301
+      },
+      {
+        "wavelength_nm": 1374.0,
+        "signed_value_pm_per_V": -65.89030231653288
+      },
+      {
+        "wavelength_nm": 1505.0,
+        "signed_value_pm_per_V": 71.31058978306794
+      }
+    ],
+    "Im_peaks": [
+      {
+        "wavelength_nm": 702.0,
+        "signed_value_pm_per_V": 27.772604602464845
+      },
+      {
+        "wavelength_nm": 748.0,
+        "signed_value_pm_per_V": 29.056620741789033
+      },
+      {
+        "wavelength_nm": 804.0,
+        "signed_value_pm_per_V": -1.320689306951413
+      },
+      {
+        "wavelength_nm": 1398.0,
+        "signed_value_pm_per_V": -54.852997948681306
+      },
+      {
+        "wavelength_nm": 1496.0,
+        "signed_value_pm_per_V": -57.897932324202515
+      },
+      {
+        "wavelength_nm": 1611.0,
+        "signed_value_pm_per_V": 1.7974684433579835
+      }
+    ],
+    "Re_zero_crossings": [
+      {
+        "wavelength_nm": 714.0283285725802,
+        "real_pm_per_V": 5.684341886080802e-14,
+        "imag_pm_per_V": 27.278991400142317
+      },
+      {
+        "wavelength_nm": 1437.4792785382026,
+        "real_pm_per_V": 0.0,
+        "imag_pm_per_V": -52.99683658085765
+      }
+    ],
+    "target_wavelength_nm": 1550.0,
+    "Re_at_target_pm_per_V": 26.470241072024216,
+    "Im_at_target_pm_per_V": 0.7973339096454737,
+    "feature_policy": "maxima refer to absolute component amplitude; labels do not track physical branches across peak switches"
+  },
+  "reference_validation": {
+    "status": "PASS",
+    "max_complex_error_pm_per_V": 6.971134427479871e-10,
+    "tolerance_pm_per_V": 1e-08,
+    "source": "validation/demo26_baseline_reference.csv"
+  },
+  "reference_zero_max_error_nm": 0.0,
+  "reference_zero_tolerance_nm": 1e-05,
+  "checks": {
+    "integrand_reintegration_error_pm_per_V": 7.002294115542071e-13,
+    "integrand_reintegration_tolerance_pm_per_V": 1e-09,
+    "integrand_reintegration_PASS": true,
+    "modulus_identity_error": 1.4210854715202004e-14,
+    "pathways": 16,
+    "finite": true
+  },
+  "k_points": 301,
+  "k_max_per_nm": 0.555714439232,
+  "paper_metrics": {
+    "abs_real": {
+      "nRMSE": 0.23787347931114972,
+      "correlation": 0.3096300795071214
+    },
+    "magnitude": {
+      "nRMSE": 0.26239111786930097,
+      "correlation": 0.24755539373543922
+    }
+  },
+  "validation_status": "PASS"
+}

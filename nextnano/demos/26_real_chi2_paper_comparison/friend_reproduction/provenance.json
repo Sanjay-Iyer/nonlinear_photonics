@@ -1,0 +1,52 @@
+[
+  {
+    "source": "demo_results/demo24/demo23_reanalysis/tables/tracked_dispersions_and_fits.csv",
+    "bundled": "data/tracked_dispersions_and_fits.csv",
+    "sha256": "3042fc043c69ab1fb5762aa686ff5c2556f35cc7ceeda00c6aa42a54153abcfd"
+  },
+  {
+    "source": "demo_results/demo24/demo23_reanalysis/spectra/23D_chi2.csv",
+    "bundled": "data/baseline_reference.csv",
+    "sha256": "cd2afab14c96b874314c011535d2a116799ca3416be54ce764695aa70605d469"
+  },
+  {
+    "source": "nextnano/demos/26_real_chi2_paper_comparison/outputs/CUTOFF_ARTIFACT_FINDING/fig2d_chi2_components.csv",
+    "bundled": "data/diagnostic_reference.csv",
+    "sha256": "5d07968420e4d24ea6979a29aaa1b75ce2ead27eb60446254d3ccab33c950c98"
+  },
+  {
+    "source": "nextnano/demos/23_k_resolved_dispersion_validation/paper_figure2d_digitized_simulation.csv",
+    "bundled": "data/paper.csv",
+    "sha256": "87f4b624ff576eca7ed1293674f95ceba8846ae271b95989313083ecc3cd99cb"
+  },
+  {
+    "source": "demo_results/demo23/raw/production_y_n301_k0100/production_y_n301_k0100/production_y_n301_k0100.in",
+    "bundled": "data/nextnano_production.in",
+    "sha256": "41b5c78dfe98e479edc9afa7bc4b92366971e2429b9b36cb4994b4befbfb3a5d"
+  },
+  {
+    "source": "nextnano/demos/23_k_resolved_dispersion_validation/demo23_config.yaml",
+    "bundled": "data/demo23_config.yaml",
+    "sha256": "508029e018177a9d2c57321ad4bf44d3922a1e972e3803d0a178582b22fdf342"
+  },
+  {
+    "source": "demo_results/demo20/inputs/case_00/case.in",
+    "bundled": "data/nextnano_single_band_case00_abrupt.in",
+    "sha256": "8d472c29634c14eea016a2d2cda4256c5f5ec43a83625720a707cb3061e34eb0"
+  },
+  {
+    "source": "demo_results/demo20/inputs/case_04/case.in",
+    "bundled": "data/nextnano_single_band_case04_linear_1nm.in",
+    "sha256": "ec5d1e23688f87491e154c2e9e574fefd33c541ed22e901bf6ab336fbf6da115"
+  },
+  {
+    "source": "demo_results/demo19/tables/demo19_master_results.csv",
+    "sha256": "cd23972bff91cba9e68e9d44f0ca7386367c076c8bc39dbcae21a2b3dcd8272c",
+    "note": "Selected numeric inputs extracted into inputs.json"
+  },
+  {
+    "source": "nextnano/demos/26_real_chi2_paper_comparison/outputs/CUTOFF_ARTIFACT_FINDING/cutoff_test.py",
+    "sha256": "abecef76140e9f843d99d0d751402a2cf77863a3f72b6b6c7945dec251e28f51",
+    "note": "Selected numeric inputs extracted into inputs.json"
+  }
+]

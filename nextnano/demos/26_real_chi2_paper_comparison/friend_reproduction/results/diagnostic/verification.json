@@ -1,0 +1,20 @@
+{
+  "mode": "diagnostic",
+  "reference_max_complex_error": 6.946157454102308e-05,
+  "tolerance": 0.0001,
+  "component_normalization": 41.177139719362174,
+  "zero_crossings_linear_interpolation": [
+    {
+      "wavelength_nm": 617.3432225054208,
+      "imag_normalized": 0.2908573964274568
+    },
+    {
+      "wavelength_nm": 1326.5153217456004,
+      "imag_normalized": -0.622677832962488
+    }
+  ],
+  "units": "unscaled diagnostic response",
+  "gamma_sign": -1,
+  "python_numpy": "2.4.6",
+  "matplotlib": "3.11.0"
+}

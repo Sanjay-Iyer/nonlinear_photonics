@@ -80,15 +80,28 @@ demo_results/demo_1[0-9]*/p[0-9][0-9]/
 demo_results/demo_1[0-9]*/**/raw/
 demo_results/demo_1[0-9]*/**/*.log
 demo_results/demo_1[0-9]*/**/*.dat
-# Demo 27 is a staged Professional campaign: a single sub-demo can write tens of
-# gigabytes of per-k envelopes and spinors, and 27B alone is budgeted at 10-15 GB.
-# Ignore that bulk here, before the curated-set exceptions below re-include the
-# small hand-off files, so the split-machine flow works for Demo 27 exactly as it
-# does for the earlier demos.
+# Demo 27's raw solver output does NOT travel through git. It is moved between the
+# work laptop and the home laptop by hand (external drive / file copy), because the
+# campaign as a whole runs to gigabytes and git is the wrong tool for it. Ignoring
+# it here is what keeps `git status` usable on both machines.
+#
+# For scale, measured on the work laptop 2026-09-05: 27D wrote 740 files / 16.3 MB
+# for 301 k points and 14 states. Sub-demos that do not depend on 27A produce k=0
+# state output only (their decks use k_integration_disabled{}), so they land in the
+# tens of MB each; 27B and 27L, which need per-k envelopes, are budgeted at 10-15 GB
+# and 4-20 GB.
+#
+# The ANALYSIS only ever reads demo_results/<demo>/**/raw/, so copying those
+# directories across is sufficient to analyse anywhere. Everything else the analysis
+# needs - configs, decks, manifests, the Demo 23/24/26 reference outputs - is tracked
+# source and travels normally.
 demo_results/demo27/**/raw/
 demo_results/demo27/**/syntax_check/
 demo_results/demo27/**/*.log
 demo_results/demo27/**/*.dat
+
+# Demo 25 holds 27A's and 27B's raw output, for the same reason and on the same terms.
+demo_results/demo25/raw/
 
 # ...but the Demo 17/17b hand-off DOES carry envelopes and matrix elements, which
 # are the inputs Demo 17b re-evaluates Eq. 2 from. Those are curated inputs, not

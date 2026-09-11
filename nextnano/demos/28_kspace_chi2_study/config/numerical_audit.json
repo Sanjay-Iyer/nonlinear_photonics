@@ -1,0 +1,9 @@
+{
+  "baseline_config": "config/baseline.json",
+  "target_wavelengths_nm": [540,760,1080,1520,1550],
+  "subsample_strides": [10,6,3,2,1],
+  "independent_grid_datasets": ["nextnano/raw_results/grid_n101", "nextnano/raw_results/grid_n201"],
+  "tail_fraction": 0.10,
+  "tail_relative_tolerance": 0.01,
+  "paper_peak_prominence": 0.10
+}

@@ -1,0 +1,98 @@
+{
+  "timestamp_utc": "2026-09-11T01:45:16.078840+00:00",
+  "equation_implementation_sha256": "6f69da8fe002f7954f6f5013712522c9e63445f7aa5e7ac447e608e36283a460",
+  "study": "28I",
+  "source_dataset": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\28_kspace_chi2_study\\nextnano\\raw_results",
+  "k_points": 301,
+  "k_max_per_nm": 0.555714439232,
+  "k_units": "nm^-1",
+  "k_max_pi_over_a": 0.09999999999995259,
+  "BZ_definition": "fraction of pi/a along Gamma-to-y; not asserted to equal paper BZ convention",
+  "state_pairs": [
+    [
+      11,
+      12
+    ],
+    [
+      13,
+      14
+    ],
+    [
+      5,
+      6
+    ],
+    [
+      3,
+      4
+    ]
+  ],
+  "k0_pair_character": [
+    {
+      "label": "e1",
+      "solver_states": [
+        11,
+        12
+      ],
+      "CB": 0.962603697,
+      "HH": 0.0,
+      "LH": 0.027828132,
+      "SO": 0.009568171
+    },
+    {
+      "label": "e2",
+      "solver_states": [
+        13,
+        14
+      ],
+      "CB": 0.930981035930981,
+      "HH": 0.0,
+      "LH": 0.05070777305070777,
+      "SO": 0.01831119101831119
+    },
+    {
+      "label": "historical h1",
+      "solver_states": [
+        5,
+        6
+      ],
+      "CB": 0.0,
+      "HH": 1.0,
+      "LH": 0.0,
+      "SO": 0.0
+    },
+    {
+      "label": "historical h2",
+      "solver_states": [
+        3,
+        4
+      ],
+      "CB": 0.019573136019573133,
+      "HH": 0.0,
+      "LH": 0.9757567199757566,
+      "SO": 0.004670144004670144
+    }
+  ],
+  "composition_k_indices": [
+    0
+  ],
+  "composition_coverage": 0.0033222591362126247,
+  "adjacent_pair_overlaps_available": 0,
+  "max_adjacent_fixed_pair_energy_change_eV": [
+    0.0009786340860999942,
+    0.0008608889370504968,
+    0.00012289362300021978,
+    0.0001514968950500073
+  ],
+  "state_assignment": "fixed original solver columns; not an overlap-tracked relabeling",
+  "high_k_model_validity": "UNRESOLVED: energy continuity alone cannot certify state identity or bound character",
+  "physical_status": "historical h2 already LH dominated at k=0; not a two-HH model",
+  "localization_interpretation": "finite-box well/edge probability is descriptive, not proof of a bound state",
+  "licensed_solver_executed": false,
+  "normalization": "probability normalized per pair; energies unshifted raw eV",
+  "equation_implementation": "chi2/equation2.py (not evaluated by state audit)",
+  "limitations": [
+    "No finite-k character inferred from energies when spinors are missing",
+    "Subspace overlap diagnoses fixed doublets only, does not perform competing-branch assignment",
+    "No model-valid high-k interval is certified by this audit"
+  ]
+}

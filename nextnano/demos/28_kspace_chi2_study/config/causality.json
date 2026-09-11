@@ -1,0 +1,13 @@
+{
+  "baseline_config": "config/baseline.json",
+  "energy_half_widths_eV": [8.0, 16.0, 32.0],
+  "energy_step_eV": 0.001,
+  "padding_multiple": 3,
+  "central_window_eV": [0.65, 3.2],
+  "edge_fraction_window": [0.8, 0.95],
+  "chunk_size": 2048,
+  "analytic_oscillator_energy_eV": 1.5,
+  "analytic_oscillator_gamma_eV": 0.1,
+  "numerical_relative_rms_tolerance": 0.001,
+  "lattice_constant_nm": 0.565325
+}

@@ -1,0 +1,66 @@
+[
+  {
+    "file": "__init__.py",
+    "sha256": "0bd8e881d387715844ef63b6095fdb5817a3ec8b4a776d09b8d7e57ad5f27275"
+  },
+  {
+    "file": "artifacts.py",
+    "sha256": "543f488acc2b7f54b3ec65afd41160d6377773433e7147e75b5123f2a14a575d"
+  },
+  {
+    "file": "causality.py",
+    "sha256": "47ef40d8fb5d2eb4a16cdefcfb8278e2c2cd42bc95cf49f2a81ae7f5e9bb367d"
+  },
+  {
+    "file": "decks.py",
+    "sha256": "db08342483f4988d6df91b8c0a1b541b16eb42aab7e8c6127af8a099fc79cfd3"
+  },
+  {
+    "file": "diagnostics.py",
+    "sha256": "864ca3af9b26ec8ad848b4d0f081bc22be061bc10e78da54f47b383d847985c8"
+  },
+  {
+    "file": "equation2.py",
+    "sha256": "6f69da8fe002f7954f6f5013712522c9e63445f7aa5e7ac447e608e36283a460"
+  },
+  {
+    "file": "input_builder.py",
+    "sha256": "e3209cbaebda5951dae5832fe7e69d6408d38f238669da298780e692e7dea6df"
+  },
+  {
+    "file": "k_integration.py",
+    "sha256": "c0e2085e7c33817a6583712cac17637bef45ae565fbdbe8f310bbfb7f85adbe6"
+  },
+  {
+    "file": "matrix_elements.py",
+    "sha256": "a655fc37046f7f047a5a7c40c2f017fa87d96d713893407ffe235ebc3bc67407"
+  },
+  {
+    "file": "nextnano_runner.py",
+    "sha256": "2e14cce692d52bc9fbaf0c10bd24a124a490f5981e1909fcb099f5512412f046"
+  },
+  {
+    "file": "numerical_audit.py",
+    "sha256": "41d9ea920c267801360cfeff42ab380bc9e962edc333228942ac3d5aba3fe368"
+  },
+  {
+    "file": "parse_nextnano.py",
+    "sha256": "0f0577055b39c6ab33aa20e4b6d5965c18b894cde7a1176d26a0ba112efaa2a2"
+  },
+  {
+    "file": "plotting.py",
+    "sha256": "48ae1612dddde5b846e991688b678852009d52313307671fe838bb5a0ff20be1"
+  },
+  {
+    "file": "response_audit.py",
+    "sha256": "51ab5209b5bf3db2e298c76d9fe9113491cf1deaafb9b17b5c13e5b6dbd054f1"
+  },
+  {
+    "file": "state_audit.py",
+    "sha256": "b122ff6a7f5b41fa552702281e65f880b37dfe9daf2f6488ceafc83eefcc8e16"
+  },
+  {
+    "file": "studies.py",
+    "sha256": "164a6796ee3d7075a7c278a253e7ae5e45f3ac416832785062ade541c070c1ab"
+  }
+]

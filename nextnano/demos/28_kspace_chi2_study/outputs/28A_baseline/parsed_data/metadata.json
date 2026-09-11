@@ -1,0 +1,18 @@
+{
+  "timestamp_utc": "2026-09-11T01:57:05.116712+00:00",
+  "equation_implementation_sha256": "6f69da8fe002f7954f6f5013712522c9e63445f7aa5e7ac447e608e36283a460",
+  "stage": "parsed raw energies + explicitly unit-normalized envelopes",
+  "energy_units": "eV; common nextnano electron-energy reference",
+  "envelope_units": "nm^-1/2",
+  "z_units": "nm",
+  "composition_columns": [
+    "cb1",
+    "cb2",
+    "hh1",
+    "hh2",
+    "lh1",
+    "lh2",
+    "so1",
+    "so2"
+  ]
+}

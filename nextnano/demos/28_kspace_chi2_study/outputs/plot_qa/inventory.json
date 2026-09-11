@@ -1,0 +1,436 @@
+[
+  {
+    "path": "outputs/28A_baseline/plots/28A_abs_real_vs_abs.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28A_baseline/plots/28A_imag.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28A_baseline/plots/28A_paper_comparison.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28A_baseline/plots/28A_real.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28A_baseline/plots/28A_real_imag.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28B_kspace_cutoff/plots/28B_imag_amplitude.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28B_kspace_cutoff/plots/28B_imag_cumulative.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28B_kspace_cutoff/plots/28B_imag_kmax_overlay.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28B_kspace_cutoff/plots/28B_imag_peak_wavelength.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28B_kspace_cutoff/plots/28B_imag_selected.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28B_kspace_cutoff/plots/28B_imag_shell.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28B_kspace_cutoff/plots/28B_imag_target.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28B_kspace_cutoff/plots/28B_real_amplitude.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28B_kspace_cutoff/plots/28B_real_cumulative.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28B_kspace_cutoff/plots/28B_real_kmax_overlay.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28B_kspace_cutoff/plots/28B_real_peak_wavelength.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28B_kspace_cutoff/plots/28B_real_selected.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28B_kspace_cutoff/plots/28B_real_shell.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28B_kspace_cutoff/plots/28B_real_target.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28B_kspace_cutoff/plots/28B_zero_crossings.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28C_extended_k/plots/28C_imag_extended_cutoffs.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28C_extended_k/plots/28C_imag_probe_convergence.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28C_extended_k/plots/28C_real_extended_cutoffs.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28C_extended_k/plots/28C_real_probe_convergence.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28D_imaginary_source/plots/28D_imag_electron_hole.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28D_imaginary_source/plots/28D_imag_gamma_to_zero.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28D_imaginary_source/plots/28D_real_electron_hole.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28D_imaginary_source/plots/28D_real_gamma_to_zero.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28E_linewidth/plots/28E_imag_gamma_selected.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28E_linewidth/plots/28E_imag_gamma_sweep.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28E_linewidth/plots/28E_ratio_selected.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28E_linewidth/plots/28E_real_gamma_selected.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28E_linewidth/plots/28E_real_gamma_sweep.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28F_causality/plots/28F_analytic_checker.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28F_causality/plots/28F_im_from_re_KK.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28F_causality/plots/28F_re_from_im_KK.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28F_causality/plots/28F_reality_symmetry.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28G_pathways/plots/28G_imag_diagonal.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28G_pathways/plots/28G_imag_top_pathways.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28G_pathways/plots/28G_real_diagonal.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28G_pathways/plots/28G_real_top_pathways.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28G_pathways/plots/28G_resonance_map.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28H_grid_convergence/plots/28H_grid_density_convergence_imag.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28H_grid_convergence/plots/28H_grid_density_convergence_real.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28H_grid_convergence/plots/28H_imag_cutoff_convergence.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28H_grid_convergence/plots/28H_imag_error.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28H_grid_convergence/plots/28H_imag_matched_cutoff.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28H_grid_convergence/plots/28H_real_cutoff_convergence.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28H_grid_convergence/plots/28H_real_error.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28H_grid_convergence/plots/28H_real_matched_cutoff.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28I_state_character/extended/plots/28I_electron_energies.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28I_state_character/extended/plots/28I_k0_character.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28I_state_character/extended/plots/28I_valence_energies.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28I_state_character/plots/28I_electron_energies.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28I_state_character/plots/28I_k0_character.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28I_state_character/plots/28I_valence_energies.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28J_paper_comparison/plots/28J_imag.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28J_paper_comparison/plots/28J_paper_error_vs_cutoff.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28J_paper_comparison/plots/28J_paper_vs_abs_real.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28J_paper_comparison/plots/28J_paper_vs_magnitude.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28J_paper_comparison/plots/28J_real.png",
+    "size": [
+      1980,
+      990
+    ]
+  },
+  {
+    "path": "outputs/28J_paper_comparison/plots/28J_signed_shared_scale.png",
+    "size": [
+      1980,
+      990
+    ]
+  }
+]

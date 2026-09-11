@@ -1,0 +1,7 @@
+Input file: 'C:\Code\optics\nextnano\nonlinear_photonics\demo_results\demo20\data\case_04\nextnano_input\case.in'
+
+Input directory from command line:  ''
+Output directory from command line: 'C:\Code\optics\nextnano\nonlinear_photonics\demo_results\demo20\data\case_04\nextnano_output\'
+
+Create automatic subdirectory: yes
+

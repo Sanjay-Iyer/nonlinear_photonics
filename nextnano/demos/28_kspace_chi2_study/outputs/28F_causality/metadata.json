@@ -1,0 +1,231 @@
+{
+  "timestamp_utc": "2026-09-11T01:49:27.092729+00:00",
+  "equation_implementation_sha256": "6f69da8fe002f7954f6f5013712522c9e63445f7aa5e7ac447e608e36283a460",
+  "study": "28F_causality",
+  "git_commit": "88c54ac559bfe90cce29e3d0d3229e95a3ada982",
+  "configuration": {
+    "baseline_config": "config/baseline.json",
+    "energy_half_widths_eV": [
+      8.0,
+      16.0,
+      32.0
+    ],
+    "energy_step_eV": 0.001,
+    "padding_multiple": 3,
+    "central_window_eV": [
+      0.65,
+      3.2
+    ],
+    "edge_fraction_window": [
+      0.8,
+      0.95
+    ],
+    "chunk_size": 2048,
+    "analytic_oscillator_energy_eV": 1.5,
+    "analytic_oscillator_gamma_eV": 0.1,
+    "numerical_relative_rms_tolerance": 0.001,
+    "lattice_constant_nm": 0.565325
+  },
+  "settings": {
+    "gamma_meV": 5.0,
+    "spin_degeneracy": 2,
+    "period_nm": 30.0,
+    "r_e_hh_nm": 0.751,
+    "gamma_sign": 1
+  },
+  "source_dataset": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\28_kspace_chi2_study\\nextnano\\raw_results",
+  "k_points": 301,
+  "k_range_per_nm": [
+    0.0,
+    0.555714439232
+  ],
+  "k_units": "nm^-1",
+  "BZ_conversion": "reported fraction = k*a/pi, radial isotropic disk approximation",
+  "lattice_constant_nm": 0.565325,
+  "state_indices": [
+    [
+      11,
+      12
+    ],
+    [
+      13,
+      14
+    ],
+    [
+      5,
+      6
+    ],
+    [
+      3,
+      4
+    ]
+  ],
+  "integration_method": "g_s*k*dk/(2*pi), native-grid trapezoidal",
+  "normalization": "none; stated historical pm/V",
+  "equation_implementation": "chi2/equation2.py::calculate_chi2_energy",
+  "equation_sha256": "6f69da8fe002f7954f6f5013712522c9e63445f7aa5e7ac447e608e36283a460",
+  "wavelength_grid": null,
+  "spectral_grid": "uniform signed photon energy; negative energies are mathematical analytic continuation, not new bands",
+  "gamma_eV": 0.005,
+  "analytic_checker_status": "PASS",
+  "model_full_line_KK_status": "PASS",
+  "physical_causality_status": "INCONCLUSIVE: resonant-only extension fails real-field conjugation symmetry; full response and paper Fourier convention unresolved",
+  "fourier_convention_for_plus_iGamma": "inverse exp(+i*omega*t), susceptibility forward exp(-i*omega*t), analytic lower half plane",
+  "poles_energy_eV": "d1: transition+iGamma; d2: (transition+iGamma)/2; all upper half plane for gamma_sign=+1",
+  "bandwidth_reports": [
+    {
+      "half_width_eV": 8.0,
+      "energy_points": 16001,
+      "analytic_checker": {
+        "real": {
+          "rms_error": 2.775455570339356e-09,
+          "max_abs_error": 3.032605962410926e-09,
+          "reference_rms": 0.8759955743214802,
+          "relative_rms_error": 3.1683442835760216e-09
+        },
+        "imag": {
+          "rms_error": 2.908967942282657e-08,
+          "max_abs_error": 4.737366687774185e-08,
+          "reference_rms": 0.880716086156635,
+          "relative_rms_error": 3.3029576591216e-08
+        }
+      },
+      "equation2_metrics": {
+        "central": {
+          "real": {
+            "rms_error": 0.0017529780518079254,
+            "max_abs_error": 0.004971880763719128,
+            "reference_rms": 11.469757006115175,
+            "relative_rms_error": 0.00015283480294075227
+          },
+          "imag": {
+            "rms_error": 0.002471022208270075,
+            "max_abs_error": 0.0036270710441925758,
+            "reference_rms": 11.53332935640744,
+            "relative_rms_error": 0.00021425055436375597
+          }
+        },
+        "edge": {
+          "real": {
+            "rms_error": 0.0018290131712904241,
+            "max_abs_error": 0.0018737254534464988,
+            "reference_rms": 0.030007505567782027,
+            "relative_rms_error": 0.06095185643335078
+          },
+          "imag": {
+            "rms_error": 0.009940084289037133,
+            "max_abs_error": 0.017517810162765213,
+            "reference_rms": 3.93912649453328e-05,
+            "relative_rms_error": 252.3423480518329
+          }
+        }
+      },
+      "reality_symmetry_max_relative_error": 0.9971731811574367
+    },
+    {
+      "half_width_eV": 16.0,
+      "energy_points": 32001,
+      "analytic_checker": {
+        "real": {
+          "rms_error": 1.9711378675701573e-11,
+          "max_abs_error": 2.0131385165648996e-11,
+          "reference_rms": 0.8759402689369435,
+          "relative_rms_error": 2.2503108230911278e-11
+        },
+        "imag": {
+          "rms_error": 2.0566915690235425e-10,
+          "max_abs_error": 3.2288294537645467e-10,
+          "reference_rms": 0.8807108520370767,
+          "relative_rms_error": 2.33526311645466e-10
+        }
+      },
+      "equation2_metrics": {
+        "central": {
+          "real": {
+            "rms_error": 0.00046095695685662735,
+            "max_abs_error": 0.0036625315024139127,
+            "reference_rms": 11.46928683799441,
+            "relative_rms_error": 4.01905509355308e-05
+          },
+          "imag": {
+            "rms_error": 0.0003229621494928721,
+            "max_abs_error": 0.002254757076531888,
+            "reference_rms": 11.533329232056529,
+            "relative_rms_error": 2.8002508468691668e-05
+          }
+        },
+        "edge": {
+          "real": {
+            "rms_error": 0.0004554984421790122,
+            "max_abs_error": 0.00046308053774220086,
+            "reference_rms": 0.006588473137861163,
+            "relative_rms_error": 0.06913566051616052
+          },
+          "imag": {
+            "rms_error": 0.0023143332319023077,
+            "max_abs_error": 0.003728893488274588,
+            "reference_rms": 3.7771525620105783e-06,
+            "relative_rms_error": 612.7190241609908
+          }
+        }
+      },
+      "reality_symmetry_max_relative_error": 0.9971731811574363
+    },
+    {
+      "half_width_eV": 32.0,
+      "energy_points": 64001,
+      "analytic_checker": {
+        "real": {
+          "rms_error": 1.780909924260928e-13,
+          "max_abs_error": 1.0258460747536446e-12,
+          "reference_rms": 0.8761120724267621,
+          "relative_rms_error": 2.0327421346083572e-13
+        },
+        "imag": {
+          "rms_error": 1.5696443336973132e-12,
+          "max_abs_error": 2.440424903447317e-12,
+          "reference_rms": 0.8808835912464081,
+          "relative_rms_error": 1.78189757340847e-12
+        }
+      },
+      "equation2_metrics": {
+        "central": {
+          "real": {
+            "rms_error": 0.00018546232404957687,
+            "max_abs_error": 0.0033356634426411347,
+            "reference_rms": 11.471534206594573,
+            "relative_rms_error": 1.6167177006102744e-05
+          },
+          "imag": {
+            "rms_error": 0.0001538609565288029,
+            "max_abs_error": 0.0020902627812056096,
+            "reference_rms": 11.535591334463355,
+            "relative_rms_error": 1.333793405710663e-05
+          }
+        },
+        "edge": {
+          "real": {
+            "rms_error": 0.00011371639227207864,
+            "max_abs_error": 0.00011511487133913185,
+            "reference_rms": 0.0015928339125317803,
+            "relative_rms_error": 0.07139249822433057
+          },
+          "imag": {
+            "rms_error": 0.0005682316697726842,
+            "max_abs_error": 0.000864337368658811,
+            "reference_rms": 4.386058152581081e-07,
+            "relative_rms_error": 1295.5406654567375
+          }
+        }
+      },
+      "reality_symmetry_max_relative_error": 0.997173181157437
+    }
+  ],
+  "licensed_solver_executed": false,
+  "limitations": [
+    "Finite FFT domain and zero-padding introduce edge errors; see bandwidth metrics.",
+    "Broad energy extension tests rational Eq2 algebra only, not material validity across +/-32 eV.",
+    "No negative-frequency symmetrization or missing antiresonant pathways are silently added.",
+    "Causal complex-envelope analyticity is not sufficient to establish complete real-field susceptibility or measured absorption."
+  ]
+}

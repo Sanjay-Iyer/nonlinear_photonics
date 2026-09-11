@@ -1,0 +1,563 @@
+{
+  "generated_by": "tools/build_reference.py",
+  "generated_utc": "2026-09-10T18:08:57.613269+00:00",
+  "policy": "reference = pre-existing or raw nextnano; independent_rederivation = raw files through unrelated code; consistency = dataset-independent limits",
+  "conditions": {
+    "kp8_deck": "validation/decks/demo23_production_y_n301_k0100.in",
+    "singleband_case04_deck": "validation/decks/singleband_case04_graded.in",
+    "analysis_config": {
+      "gamma_meV": 5.0,
+      "gamma_sign": 1,
+      "spin_degeneracy": 2,
+      "period_nm": 30.0,
+      "r_e_hh_nm": 0.751,
+      "wavelength_min_nm": 400.0,
+      "wavelength_max_nm": 1850.0,
+      "wavelength_step_nm": 1.0,
+      "cutoff_lattice_nm": 0.56533,
+      "cutoff_fraction_pi_over_a": 0.2
+    }
+  },
+  "sources": {
+    "spectrum_23D": {
+      "path": "demo_results/demo24/demo23_reanalysis/spectra/23D_chi2.csv",
+      "sha256": "cd2afab14c96b874314c011535d2a116799ca3416be54ce764695aa70605d469"
+    },
+    "zero_table": {
+      "path": "nextnano/demos/26_real_chi2_paper_comparison/outputs/DEMO26_REAL_ZERO_CROSSINGS.csv",
+      "sha256": "12733448d505c2f9f1192a92ce96621af1b51e2210435d78921784c6be88e3bd"
+    },
+    "audit_summary": {
+      "path": "nextnano/demos/26_real_chi2_paper_comparison/outputs/HOME_EXHAUSTIVE_AUDIT/EXHAUSTIVE_HOME_TEST_SUMMARY.csv",
+      "sha256": "480733c63cac1b7e09d5c827c1da38a1d70db42f1ea9d9d4b3aa8021704260ad"
+    },
+    "kmax_table": {
+      "path": "demo_results/demo24/demo23_reanalysis/tables/kmax_convergence.csv",
+      "sha256": "a71db61c96c14f2aca23f420600ca4ec8bfc69f9ade605f1713e67f0e2db58be"
+    },
+    "cutoff_spectrum": {
+      "path": "nextnano/demos/26_real_chi2_paper_comparison/outputs/CUTOFF_ARTIFACT_FINDING/fig2d_chi2_components.csv",
+      "sha256": "5d07968420e4d24ea6979a29aaa1b75ce2ead27eb60446254d3ccab33c950c98"
+    },
+    "character_table": {
+      "path": "nextnano/demos/26_real_chi2_paper_comparison/outputs/HOME_EXHAUSTIVE_AUDIT/RAW_K0_STATE_CHARACTER.csv",
+      "sha256": "28b5f43295aeb6907564033105e7a5ffe4521381eb44c0b798900f2eb1124025"
+    },
+    "walkthrough": {
+      "path": "nextnano/demos/21_demo20_mathematical_walkthrough/DEMO20_MATH_WALKTHROUGH_LINEAR_1NM.md",
+      "sha256": "0198e43c1c85339be0d88d41fe27fae7dbda25a9b02aae434e1620c5b32238af"
+    },
+    "paper": {
+      "path": "nextnano/demos/23_k_resolved_dispersion_validation/paper_figure2d_digitized_simulation.csv",
+      "sha256": "87f4b624ff576eca7ed1293674f95ceba8846ae271b95989313083ecc3cd99cb"
+    },
+    "kp8_spectrum": {
+      "path": "nextnano/demos/Demo26_Condensed/cached_raw/kp8/bias_00000/Quantum/acqw/kp8/energy_spectrum_k00000.dat",
+      "sha256": "75f33be44511234b4332d333ff97e0373b2359489b6e607b39b65c78a466e102"
+    },
+    "kp8_dipole": {
+      "path": "nextnano/demos/Demo26_Condensed/cached_raw/kp8/bias_00000/Quantum/acqw/kp8_kp8/dipole_moment_matrix_elements_k00000_growth_z.txt",
+      "sha256": "1574dce1b292b5b0f85e09c9d9803dce768974912923897c08b60360cdabec11"
+    }
+  },
+  "modes": {
+    "demo26-baseline": [
+      {
+        "id": "spectrum_max_complex_error",
+        "kind": "max",
+        "value": 1e-08,
+        "source": "validation/baseline_reference.csv (= 23D_chi2.csv)",
+        "category": "reference"
+      },
+      {
+        "id": "re_zero_crossings_nm",
+        "kind": "abs",
+        "value": [
+          714.0286425430866,
+          1437.4801147300982
+        ],
+        "source": "DEMO26_REAL_ZERO_CROSSINGS.csv",
+        "category": "reference",
+        "tol": 0.01
+      },
+      {
+        "id": "imag_at_re_zero_crossings",
+        "kind": "rel",
+        "value": [
+          27.278972623707087,
+          -52.99692881378773
+        ],
+        "source": "DEMO26_REAL_ZERO_CROSSINGS.csv",
+        "category": "reference",
+        "tol": 0.005
+      },
+      {
+        "id": "nRMSE_abs",
+        "kind": "abs",
+        "value": 0.26239111786932695,
+        "source": "audit TEST 01",
+        "category": "reference",
+        "tol": 1e-06
+      },
+      {
+        "id": "nRMSE_real",
+        "kind": "abs",
+        "value": 0.38337877530443165,
+        "source": "audit TEST 02",
+        "category": "reference",
+        "tol": 1e-06
+      },
+      {
+        "id": "nRMSE_abs_real",
+        "kind": "abs",
+        "value": 0.23787347931116054,
+        "source": "audit TEST 03",
+        "category": "reference",
+        "tol": 1e-06
+      },
+      {
+        "id": "abs_real_peaks_nm",
+        "kind": "contains",
+        "value": [
+          753.0,
+          1505.0
+        ],
+        "source": "audit TEST 03 P2/P4",
+        "category": "reference",
+        "tol": 1.0
+      },
+      {
+        "id": "dominant_abs_peak_nm",
+        "kind": "abs",
+        "value": 1503.0,
+        "source": "kmax_convergence.csv 23D 0.1",
+        "category": "reference",
+        "tol": 0.5
+      },
+      {
+        "id": "max_abs",
+        "kind": "rel",
+        "value": 81.49066896092887,
+        "source": "kmax_convergence.csv 23D 0.1",
+        "category": "reference",
+        "tol": 1e-06
+      },
+      {
+        "id": "abs_at_1550nm",
+        "kind": "rel",
+        "value": 26.482246954799976,
+        "source": "kmax_convergence.csv 23D 0.1",
+        "category": "reference",
+        "tol": 1e-06
+      },
+      {
+        "id": "k_points",
+        "kind": "exact",
+        "value": 301,
+        "source": "kmax_convergence.csv",
+        "category": "reference"
+      },
+      {
+        "id": "k_max_per_nm",
+        "kind": "abs",
+        "value": 0.5557144392322634,
+        "source": "kmax_convergence.csv",
+        "category": "reference",
+        "tol": 1e-09
+      },
+      {
+        "id": "kp8_pair_ids",
+        "kind": "exact",
+        "value": [
+          [
+            11,
+            12
+          ],
+          [
+            13,
+            14
+          ],
+          [
+            5,
+            6
+          ],
+          [
+            3,
+            4
+          ]
+        ],
+        "source": "RAW_K0_STATE_CHARACTER.csv production labels",
+        "category": "reference"
+      },
+      {
+        "id": "gamma_eV",
+        "kind": "abs",
+        "value": 0.005,
+        "source": "paper Methods / demo23_config",
+        "category": "reference",
+        "tol": 1e-15
+      },
+      {
+        "id": "wavelength_points",
+        "kind": "exact",
+        "value": 1451,
+        "source": "400-1850 nm, 1 nm",
+        "category": "reference"
+      },
+      {
+        "id": "prefactor_pm_per_V",
+        "kind": "rel",
+        "value": 56.69816882497043,
+        "source": "Demo 21 walkthrough",
+        "category": "reference",
+        "tol": 1e-12
+      },
+      {
+        "id": "k_weights_relative_error",
+        "kind": "max",
+        "value": 1e-12,
+        "source": "sum g_s k dk/(2 pi) = g_s k_max^2/(4 pi)",
+        "category": "consistency"
+      },
+      {
+        "id": "eq2_diagonal_cancellation_max_abs_change",
+        "kind": "max",
+        "value": 1e-08,
+        "source": "adding c*I to Ze and Zh cancels between conduction and valence terms",
+        "category": "consistency"
+      },
+      {
+        "id": "modulus_identity_max_error",
+        "kind": "max",
+        "value": 1e-09,
+        "source": "|chi| = sqrt(Re^2 + Im^2)",
+        "category": "consistency"
+      },
+      {
+        "id": "pathway_sum_max_error",
+        "kind": "max",
+        "value": 1e-09,
+        "source": "chi = sum of the 16 pathway terms",
+        "category": "consistency"
+      },
+      {
+        "id": "pathway_count",
+        "kind": "exact",
+        "value": 16,
+        "source": "Eq. 2: 8 conduction + 8 valence",
+        "category": "consistency"
+      }
+    ],
+    "demo26-cutoff": [
+      {
+        "id": "spectrum_max_complex_error",
+        "kind": "max",
+        "value": 0.0001,
+        "source": "validation/cutoff_reference.csv (6 significant digits)",
+        "category": "reference"
+      },
+      {
+        "id": "re_zero_crossings_nm",
+        "kind": "abs",
+        "value": [
+          617.3432226355739,
+          1326.515321297561
+        ],
+        "source": "saved cutoff spectrum",
+        "category": "reference",
+        "tol": 0.01
+      },
+      {
+        "id": "imag_over_max_abs_real_at_re_zero",
+        "kind": "abs",
+        "value": [
+          0.2908581665096464,
+          -0.6226793625521313
+        ],
+        "source": "saved cutoff spectrum",
+        "category": "reference",
+        "tol": 0.002
+      },
+      {
+        "id": "nRMSE_abs_real",
+        "kind": "abs",
+        "value": 0.06575167750605786,
+        "source": "saved cutoff spectrum + paper",
+        "category": "reference",
+        "tol": 0.0002
+      },
+      {
+        "id": "nRMSE_abs",
+        "kind": "abs",
+        "value": 0.23737606445906562,
+        "source": "saved cutoff spectrum + paper",
+        "category": "reference",
+        "tol": 0.0002
+      },
+      {
+        "id": "legacy_max_abs_real",
+        "kind": "rel",
+        "value": 41.1771,
+        "source": "saved cutoff spectrum",
+        "category": "reference",
+        "tol": 0.0001
+      },
+      {
+        "id": "integration_cutoff_per_nm",
+        "kind": "abs",
+        "value": 1.1114190485520998,
+        "source": "0.1 x 2pi/a, a = 0.56533 nm (CUTOFF_ARTIFACT_FINDING)",
+        "category": "reference",
+        "tol": 1e-12
+      },
+      {
+        "id": "modulus_identity_max_error",
+        "kind": "max",
+        "value": 1e-09,
+        "source": "|chi| = sqrt(Re^2 + Im^2)",
+        "category": "consistency"
+      },
+      {
+        "id": "pathway_sum_max_error",
+        "kind": "max",
+        "value": 1e-09,
+        "source": "chi = sum of the 16 pathway terms",
+        "category": "consistency"
+      },
+      {
+        "id": "pathway_count",
+        "kind": "exact",
+        "value": 16,
+        "source": "Eq. 2: 8 conduction + 8 valence",
+        "category": "consistency"
+      }
+    ],
+    "kp8": [
+      {
+        "id": "selected_states",
+        "kind": "exact",
+        "value": {
+          "e1": [
+            11,
+            12
+          ],
+          "e2": [
+            13,
+            14
+          ],
+          "hh1": [
+            5,
+            6
+          ],
+          "hh2": [
+            1,
+            2
+          ]
+        },
+        "source": "RAW_K0_STATE_CHARACTER.csv + documented rule (CB>=0.8 lowest two; HH>=0.8 highest two)",
+        "category": "reference"
+      },
+      {
+        "id": "k0_energies_eV",
+        "kind": "abs",
+        "value": [
+          2.95251167921,
+          3.091148452015,
+          1.44377212187,
+          1.39769425308
+        ],
+        "source": "raw energy_spectrum_k00000.dat",
+        "category": "reference",
+        "tol": 1e-09
+      },
+      {
+        "id": "abs_zh12_nm",
+        "kind": "rel",
+        "value": 1.353216277098565,
+        "source": "nextnano kp8 dipole_moment_matrix_elements (Kramers invariant)",
+        "category": "reference",
+        "tol": 0.0001
+      },
+      {
+        "id": "abs_ze12_nm",
+        "kind": "rel",
+        "value": 1.295475185062886,
+        "source": "nextnano kp8 dipole_moment_matrix_elements (includes non-CB spinor weight)",
+        "category": "reference",
+        "tol": 0.01
+      },
+      {
+        "id": "k_points",
+        "kind": "exact",
+        "value": 301,
+        "source": "kVectors_Gamma_to_y.dat",
+        "category": "reference"
+      },
+      {
+        "id": "gamma_eV",
+        "kind": "abs",
+        "value": 0.005,
+        "source": "paper Methods",
+        "category": "reference",
+        "tol": 1e-15
+      },
+      {
+        "id": "prefactor_pm_per_V",
+        "kind": "rel",
+        "value": 56.69816882497043,
+        "source": "Demo 21 walkthrough",
+        "category": "reference",
+        "tol": 1e-12
+      },
+      {
+        "id": "abs_overlap_matrix",
+        "kind": "abs",
+        "value": [
+          [
+            0.9900469636365046,
+            0.05686547933275442
+          ],
+          [
+            0.09298597214331236,
+            0.811857761429591
+          ]
+        ],
+        "source": "raw envelopes, largest-component extraction + Loewdin (no SVD)",
+        "category": "independent_rederivation",
+        "tol": 1e-08
+      },
+      {
+        "id": "abs_ze_matrix",
+        "kind": "abs",
+        "value": [
+          [
+            12.806182945137397,
+            1.293211542060136
+          ],
+          [
+            1.293211542060136,
+            17.65203582179371
+          ]
+        ],
+        "source": "raw envelopes, largest-component extraction + Loewdin (no SVD)",
+        "category": "independent_rederivation",
+        "tol": 1e-08
+      },
+      {
+        "id": "abs_zh_matrix",
+        "kind": "abs",
+        "value": [
+          [
+            12.653915536635036,
+            1.3532164159202347
+          ],
+          [
+            1.3532164159202347,
+            14.290366295020123
+          ]
+        ],
+        "source": "raw envelopes, largest-component extraction + Loewdin (no SVD)",
+        "category": "independent_rederivation",
+        "tol": 1e-08
+      },
+      {
+        "id": "zh12_vs_this_dataset_nextnano_dipole_rel",
+        "kind": "max",
+        "value": 0.0001,
+        "source": "package |Zh12| vs the analysed dataset's own nextnano dipole file",
+        "category": "consistency"
+      },
+      {
+        "id": "ze12_vs_this_dataset_nextnano_dipole_rel",
+        "kind": "max",
+        "value": 0.01,
+        "source": "package |Ze12| vs the analysed dataset's own nextnano dipole file",
+        "category": "consistency"
+      },
+      {
+        "id": "orthonormality_error_after_lowdin",
+        "kind": "max",
+        "value": 1e-10,
+        "source": "definition",
+        "category": "consistency"
+      },
+      {
+        "id": "max_envelope_second_singular_fraction",
+        "kind": "max",
+        "value": 1e-06,
+        "source": "one scalar envelope per doublet block",
+        "category": "consistency"
+      },
+      {
+        "id": "max_envelope_imaginary_residue",
+        "kind": "max",
+        "value": 1e-06,
+        "source": "envelope real after a global phase",
+        "category": "consistency"
+      },
+      {
+        "id": "composition_file_max_abs_difference",
+        "kind": "max",
+        "value": 1e-06,
+        "source": "raw spinor_composition_k00000_CbHhLhSo.dat",
+        "category": "consistency"
+      },
+      {
+        "id": "origin_invariance_max_abs_change",
+        "kind": "max",
+        "value": 1e-08,
+        "source": "z origin shifted by 20 nm inside the envelope integrals",
+        "category": "consistency"
+      },
+      {
+        "id": "origin_sensitivity_without_lowdin_max_abs_change",
+        "kind": "min",
+        "value": 0.001,
+        "source": "same shift WITHOUT Loewdin must change chi2, proving the origin check can fail",
+        "category": "consistency"
+      },
+      {
+        "id": "min_member_gap_eV",
+        "kind": "min",
+        "value": 0.005,
+        "source": "each selected branch stays >= Gamma from every other dispersion column",
+        "category": "consistency"
+      },
+      {
+        "id": "k_weights_relative_error",
+        "kind": "max",
+        "value": 1e-12,
+        "source": "sum g_s k dk/(2 pi) = g_s k_max^2/(4 pi)",
+        "category": "consistency"
+      },
+      {
+        "id": "eq2_diagonal_cancellation_max_abs_change",
+        "kind": "max",
+        "value": 1e-08,
+        "source": "adding c*I to Ze and Zh cancels between conduction and valence terms",
+        "category": "consistency"
+      },
+      {
+        "id": "modulus_identity_max_error",
+        "kind": "max",
+        "value": 1e-09,
+        "source": "|chi| = sqrt(Re^2 + Im^2)",
+        "category": "consistency"
+      },
+      {
+        "id": "pathway_sum_max_error",
+        "kind": "max",
+        "value": 1e-09,
+        "source": "chi = sum of the 16 pathway terms",
+        "category": "consistency"
+      },
+      {
+        "id": "pathway_count",
+        "kind": "exact",
+        "value": 16,
+        "source": "Eq. 2: 8 conduction + 8 valence",
+        "category": "consistency"
+      }
+    ]
+  }
+}

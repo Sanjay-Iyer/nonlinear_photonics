@@ -1,0 +1,559 @@
+{
+  "timestamp_utc": "2026-09-11T01:57:39.964926+00:00",
+  "equation_implementation_sha256": "6f69da8fe002f7954f6f5013712522c9e63445f7aa5e7ac447e608e36283a460",
+  "configuration": {
+    "model": "demo26-baseline",
+    "raw_input": "nextnano/raw_results",
+    "settings": {
+      "gamma_meV": 5.0,
+      "gamma_sign": 1,
+      "spin_degeneracy": 2,
+      "period_nm": 30.0,
+      "r_e_hh_nm": 0.751
+    },
+    "wavelength_nm": {
+      "min": 400.0,
+      "max": 1850.0,
+      "step": 1.0
+    },
+    "reference_tolerance_pm_per_V": 1e-08,
+    "feature_zero_tolerance_nm": 1e-05,
+    "save_integrand": true
+  },
+  "settings": {
+    "gamma_meV": 5.0,
+    "spin_degeneracy": 2,
+    "period_nm": 30.0,
+    "r_e_hh_nm": 0.751,
+    "gamma_sign": 1
+  },
+  "gamma_eV": 0.005,
+  "raw_root": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\28_kspace_chi2_study\\nextnano\\raw_results",
+  "raw_manifest": "../28H_grid_convergence/raw_manifest.json",
+  "python": "3.11.15",
+  "code_version": "source SHA256 manifest (includes uncommitted code)",
+  "code_manifest": "../28H_grid_convergence/code_manifest.json",
+  "k_units": "nm^-1",
+  "BZ_conversion": "f*pi/a with a=0.565325 nm; radial disk approximation, not full BZ geometry",
+  "numpy": "2.4.6",
+  "licensed_solver_executed": false,
+  "model": "historical Demo26 baseline: kp8 dispersion shifts + single-band matrices",
+  "state_pairs": [
+    [
+      11,
+      12
+    ],
+    [
+      13,
+      14
+    ],
+    [
+      5,
+      6
+    ],
+    [
+      3,
+      4
+    ]
+  ],
+  "limitations": [
+    "Valence pair (3,4) is light-hole dominated; retained for historical reproduction",
+    "No finite-k spinor tracking; fixed solver columns and pair averaging",
+    "Single-band overlaps and matrix elements frozen at k=0",
+    "No explicit carrier occupations, excitons or additional pathways"
+  ],
+  "wavelength_points": 1451,
+  "wavelength_min_nm": 400.0,
+  "wavelength_max_nm": 1850.0,
+  "integration_measure": "g_s*k*dk/(2*pi), trapezoidal; isotropic in-plane approximation",
+  "prefactor": 56.69816882497043,
+  "prefactor_units": "maps nm/eV^2 times nm^-2 to historical pm/V convention",
+  "pathway_count": 16,
+  "normalization": "own maximum for paper and each absolute observable; signed Re/Im plot uses one max|Re| factor",
+  "study": "28J",
+  "audit_configuration": {
+    "baseline_config": "config/baseline.json",
+    "target_wavelengths_nm": [
+      540,
+      760,
+      1080,
+      1520,
+      1550
+    ],
+    "subsample_strides": [
+      10,
+      6,
+      3,
+      2,
+      1
+    ],
+    "independent_grid_datasets": [
+      "nextnano/raw_results/grid_n101",
+      "nextnano/raw_results/grid_n201"
+    ],
+    "tail_fraction": 0.1,
+    "tail_relative_tolerance": 0.01,
+    "paper_peak_prominence": 0.1
+  },
+  "baseline_metrics": {
+    "abs_real": {
+      "nRMSE": 0.23787347931114972,
+      "correlation": 0.3096300795071214
+    },
+    "magnitude": {
+      "nRMSE": 0.26239111786930097,
+      "correlation": 0.24755539373543917
+    }
+  },
+  "paper_peaks_nm": [
+    540.0,
+    760.0,
+    1080.0,
+    1520.0
+  ],
+  "paper_minima_nm": [
+    605.0,
+    850.0,
+    1330.0
+  ],
+  "cutoff_metrics": [
+    {
+      "cutoff_pi_over_a": 0.01,
+      "metrics": {
+        "abs_real": {
+          "nRMSE": 0.26231681725914746,
+          "correlation": 0.5625310380383108
+        },
+        "magnitude": {
+          "nRMSE": 0.29019903184262424,
+          "correlation": 0.501000996904761
+        }
+      },
+      "features": {
+        "abs_real": {
+          "nearest_peak_errors_nm": [
+            210.0,
+            6.0,
+            326.0,
+            11.0
+          ],
+          "nearest_minimum_errors_nm": [
+            147.0,
+            17.0,
+            174.0
+          ]
+        },
+        "magnitude": {
+          "nearest_peak_errors_nm": [
+            212.0,
+            8.0,
+            328.0,
+            16.0
+          ],
+          "nearest_minimum_errors_nm": [
+            230.0,
+            15.0,
+            495.0
+          ]
+        }
+      }
+    },
+    {
+      "cutoff_pi_over_a": 0.02,
+      "metrics": {
+        "abs_real": {
+          "nRMSE": 0.2621655518404122,
+          "correlation": 0.555418372008034
+        },
+        "magnitude": {
+          "nRMSE": 0.2892704048692605,
+          "correlation": 0.4927290652220982
+        }
+      },
+      "features": {
+        "abs_real": {
+          "nearest_peak_errors_nm": [
+            209.0,
+            6.0,
+            326.0,
+            12.0
+          ],
+          "nearest_minimum_errors_nm": [
+            146.0,
+            18.0,
+            173.0
+          ]
+        },
+        "magnitude": {
+          "nearest_peak_errors_nm": [
+            211.0,
+            9.0,
+            329.0,
+            17.0
+          ],
+          "nearest_minimum_errors_nm": [
+            229.0,
+            16.0,
+            496.0
+          ]
+        }
+      }
+    },
+    {
+      "cutoff_pi_over_a": 0.03,
+      "metrics": {
+        "abs_real": {
+          "nRMSE": 0.2595939182878248,
+          "correlation": 0.5425409352868433
+        },
+        "magnitude": {
+          "nRMSE": 0.28323870183994665,
+          "correlation": 0.487125437630275
+        }
+      },
+      "features": {
+        "abs_real": {
+          "nearest_peak_errors_nm": [
+            207.0,
+            7.0,
+            327.0,
+            13.0
+          ],
+          "nearest_minimum_errors_nm": [
+            145.0,
+            19.0,
+            170.0
+          ]
+        },
+        "magnitude": {
+          "nearest_peak_errors_nm": [
+            210.0,
+            10.0,
+            330.0,
+            19.0
+          ],
+          "nearest_minimum_errors_nm": [
+            227.0,
+            18.0,
+            498.0
+          ]
+        }
+      }
+    },
+    {
+      "cutoff_pi_over_a": 0.04,
+      "metrics": {
+        "abs_real": {
+          "nRMSE": 0.2546678082070412,
+          "correlation": 0.5239247865849411
+        },
+        "magnitude": {
+          "nRMSE": 0.2724959673799751,
+          "correlation": 0.4847120776240145
+        }
+      },
+      "features": {
+        "abs_real": {
+          "nearest_peak_errors_nm": [
+            203.0,
+            7.0,
+            327.0,
+            14.0
+          ],
+          "nearest_minimum_errors_nm": [
+            143.0,
+            19.0,
+            167.0
+          ]
+        },
+        "magnitude": {
+          "nearest_peak_errors_nm": [
+            210.0,
+            10.0,
+            330.0,
+            19.0
+          ],
+          "nearest_minimum_errors_nm": [
+            383.0,
+            138.0,
+            342.0
+          ]
+        }
+      }
+    },
+    {
+      "cutoff_pi_over_a": 0.05,
+      "metrics": {
+        "abs_real": {
+          "nRMSE": 0.24865204819494974,
+          "correlation": 0.4978273764244275
+        },
+        "magnitude": {
+          "nRMSE": 0.26233850339571374,
+          "correlation": 0.4760593795533313
+        }
+      },
+      "features": {
+        "abs_real": {
+          "nearest_peak_errors_nm": [
+            196.0,
+            7.0,
+            327.0,
+            14.0
+          ],
+          "nearest_minimum_errors_nm": [
+            141.0,
+            104.0,
+            162.0
+          ]
+        },
+        "magnitude": {
+          "nearest_peak_errors_nm": [
+            211.0,
+            9.0,
+            329.0,
+            18.0
+          ],
+          "nearest_minimum_errors_nm": [
+            380.0,
+            135.0,
+            345.0
+          ]
+        }
+      }
+    },
+    {
+      "cutoff_pi_over_a": 0.06,
+      "metrics": {
+        "abs_real": {
+          "nRMSE": 0.24397706545368486,
+          "correlation": 0.4639519990929904
+        },
+        "magnitude": {
+          "nRMSE": 0.2549609172289754,
+          "correlation": 0.4558419583535238
+        }
+      },
+      "features": {
+        "abs_real": {
+          "nearest_peak_errors_nm": [
+            188.0,
+            7.0,
+            327.0,
+            14.0
+          ],
+          "nearest_minimum_errors_nm": [
+            137.0,
+            108.0,
+            155.0
+          ]
+        },
+        "magnitude": {
+          "nearest_peak_errors_nm": [
+            211.0,
+            9.0,
+            329.0,
+            18.0
+          ],
+          "nearest_minimum_errors_nm": [
+            375.0,
+            130.0,
+            350.0
+          ]
+        }
+      }
+    },
+    {
+      "cutoff_pi_over_a": 0.07,
+      "metrics": {
+        "abs_real": {
+          "nRMSE": 0.24132901830122763,
+          "correlation": 0.42331875503300076
+        },
+        "magnitude": {
+          "nRMSE": 0.2512406574393746,
+          "correlation": 0.4211145218162773
+        }
+      },
+      "features": {
+        "abs_real": {
+          "nearest_peak_errors_nm": [
+            179.0,
+            7.0,
+            327.0,
+            14.0
+          ],
+          "nearest_minimum_errors_nm": [
+            132.0,
+            113.0,
+            147.0
+          ]
+        },
+        "magnitude": {
+          "nearest_peak_errors_nm": [
+            211.0,
+            9.0,
+            329.0,
+            18.0
+          ],
+          "nearest_minimum_errors_nm": [
+            369.0,
+            124.0,
+            356.0
+          ]
+        }
+      }
+    },
+    {
+      "cutoff_pi_over_a": 0.08,
+      "metrics": {
+        "abs_real": {
+          "nRMSE": 0.24027632682835634,
+          "correlation": 0.381730236610158
+        },
+        "magnitude": {
+          "nRMSE": 0.25142353001346673,
+          "correlation": 0.373175926612074
+        }
+      },
+      "features": {
+        "abs_real": {
+          "nearest_peak_errors_nm": [
+            169.0,
+            7.0,
+            327.0,
+            14.0
+          ],
+          "nearest_minimum_errors_nm": [
+            126.0,
+            118.0,
+            136.0
+          ]
+        },
+        "magnitude": {
+          "nearest_peak_errors_nm": [
+            211.0,
+            9.0,
+            329.0,
+            17.0
+          ],
+          "nearest_minimum_errors_nm": [
+            363.0,
+            118.0,
+            128.0
+          ]
+        }
+      }
+    },
+    {
+      "cutoff_pi_over_a": 0.09,
+      "metrics": {
+        "abs_real": {
+          "nRMSE": 0.23953927112285353,
+          "correlation": 0.3413698493588041
+        },
+        "magnitude": {
+          "nRMSE": 0.2553659091665179,
+          "correlation": 0.31292442129100606
+        }
+      },
+      "features": {
+        "abs_real": {
+          "nearest_peak_errors_nm": [
+            158.0,
+            7.0,
+            316.0,
+            15.0
+          ],
+          "nearest_minimum_errors_nm": [
+            118.0,
+            111.0,
+            123.0
+          ]
+        },
+        "magnitude": {
+          "nearest_peak_errors_nm": [
+            212.0,
+            8.0,
+            319.0,
+            17.0
+          ],
+          "nearest_minimum_errors_nm": [
+            356.0,
+            111.0,
+            122.0
+          ]
+        }
+      }
+    },
+    {
+      "cutoff_pi_over_a": 0.1,
+      "metrics": {
+        "abs_real": {
+          "nRMSE": 0.23787347931114972,
+          "correlation": 0.3096300795071214
+        },
+        "magnitude": {
+          "nRMSE": 0.26239111786930097,
+          "correlation": 0.24755539373543917
+        }
+      },
+      "features": {
+        "abs_real": {
+          "nearest_peak_errors_nm": [
+            147.0,
+            7.0,
+            294.0,
+            15.0
+          ],
+          "nearest_minimum_errors_nm": [
+            109.0,
+            103.0,
+            107.0
+          ]
+        },
+        "magnitude": {
+          "nearest_peak_errors_nm": [
+            212.0,
+            8.0,
+            296.0,
+            17.0
+          ],
+          "nearest_minimum_errors_nm": [
+            348.0,
+            103.0,
+            125.0
+          ]
+        }
+      }
+    }
+  ],
+  "best_abs_real_cutoff_pi_over_a": 0.1,
+  "best_magnitude_cutoff_pi_over_a": 0.07,
+  "physically_converged_cutoff": "NOT ESTABLISHED; fit error is not a convergence test",
+  "feature_policy": "nearest prominent features, no one-to-one assignment; digitized-paper sample spacing limits precision",
+  "extended_grid_metrics": [
+    [
+      0.05,
+      0.24865083771024438,
+      0.26233760284394225
+    ],
+    [
+      0.1,
+      0.23787116821013501,
+      0.26238832090356046
+    ],
+    [
+      0.1125,
+      0.23457382184422618,
+      0.2718500237900677
+    ],
+    [
+      0.125,
+      0.22630955249857912,
+      0.27916061074762005
+    ]
+  ],
+  "extended_grid_best_abs_real_cutoff": 0.125,
+  "extended_grid_best_magnitude_cutoff": 0.05
+}

@@ -1,0 +1,357 @@
+{
+  "timestamp_utc": "2026-09-11T01:57:35.883554+00:00",
+  "equation_implementation_sha256": "6f69da8fe002f7954f6f5013712522c9e63445f7aa5e7ac447e608e36283a460",
+  "configuration": {
+    "model": "demo26-baseline",
+    "raw_input": "nextnano/raw_results",
+    "settings": {
+      "gamma_meV": 5.0,
+      "gamma_sign": 1,
+      "spin_degeneracy": 2,
+      "period_nm": 30.0,
+      "r_e_hh_nm": 0.751
+    },
+    "wavelength_nm": {
+      "min": 400.0,
+      "max": 1850.0,
+      "step": 1.0
+    },
+    "reference_tolerance_pm_per_V": 1e-08,
+    "feature_zero_tolerance_nm": 1e-05,
+    "save_integrand": true
+  },
+  "settings": {
+    "gamma_meV": 5.0,
+    "spin_degeneracy": 2,
+    "period_nm": 30.0,
+    "r_e_hh_nm": 0.751,
+    "gamma_sign": 1
+  },
+  "gamma_eV": 0.005,
+  "raw_root": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\28_kspace_chi2_study\\nextnano\\raw_results",
+  "raw_manifest": "raw_manifest.json",
+  "python": "3.11.15",
+  "code_version": "source SHA256 manifest (includes uncommitted code)",
+  "code_manifest": "code_manifest.json",
+  "k_units": "nm^-1",
+  "BZ_conversion": "f*pi/a with a=0.565325 nm; radial disk approximation, not full BZ geometry",
+  "numpy": "2.4.6",
+  "licensed_solver_executed": false,
+  "model": "historical Demo26 baseline: kp8 dispersion shifts + single-band matrices",
+  "state_pairs": [
+    [
+      11,
+      12
+    ],
+    [
+      13,
+      14
+    ],
+    [
+      5,
+      6
+    ],
+    [
+      3,
+      4
+    ]
+  ],
+  "limitations": [
+    "Valence pair (3,4) is light-hole dominated; retained for historical reproduction",
+    "No finite-k spinor tracking; fixed solver columns and pair averaging",
+    "Single-band overlaps and matrix elements frozen at k=0",
+    "No explicit carrier occupations, excitons or additional pathways"
+  ],
+  "wavelength_points": 1451,
+  "wavelength_min_nm": 400.0,
+  "wavelength_max_nm": 1850.0,
+  "integration_measure": "g_s*k*dk/(2*pi), trapezoidal; isotropic in-plane approximation",
+  "prefactor": 56.69816882497043,
+  "prefactor_units": "maps nm/eV^2 times nm^-2 to historical pm/V convention",
+  "pathway_count": 16,
+  "normalization": "signed Re/Im and all sweep plots unnormalized; optional paper comparison uses own maxima",
+  "study": "28H",
+  "audit_configuration": {
+    "baseline_config": "config/baseline.json",
+    "target_wavelengths_nm": [
+      540,
+      760,
+      1080,
+      1520,
+      1550
+    ],
+    "subsample_strides": [
+      10,
+      6,
+      3,
+      2,
+      1
+    ],
+    "independent_grid_datasets": [
+      "nextnano/raw_results/grid_n101",
+      "nextnano/raw_results/grid_n201"
+    ],
+    "tail_fraction": 0.1,
+    "tail_relative_tolerance": 0.01,
+    "paper_peak_prominence": 0.1
+  },
+  "rows": [
+    [
+      31,
+      10,
+      0.555714439232,
+      7.9032848314176505,
+      7.49963177810173,
+      0.9651399653736312,
+      0.04914999683648669
+    ],
+    [
+      51,
+      6,
+      0.555714439232,
+      2.515065632373222,
+      1.94737621124699,
+      0.18388188969887878,
+      0.04914999683648668
+    ],
+    [
+      101,
+      3,
+      0.555714439232,
+      0.5138939027759761,
+      0.33752076931278907,
+      0.034678477459781025,
+      0.04914999683648667
+    ],
+    [
+      151,
+      2,
+      0.555714439232,
+      0.1882250030014916,
+      0.12505732853353635,
+      0.012863712191249226,
+      0.04914999683648669
+    ],
+    [
+      301,
+      1,
+      0.555714439232,
+      0.0,
+      0.0,
+      0.0,
+      0.04914999683648667
+    ]
+  ],
+  "fixed_kmax_per_nm": 0.555714439232,
+  "constant_integrand_area_error_nm_minus2": 1.3877787807814457e-17,
+  "conclusion": "Subsampling tests convergence towards the finest available grid; they cannot certify accuracy beyond301 or extended-cutoff convergence.",
+  "independent_solver_grid_checks": [
+    {
+      "configuration": {
+        "model": "demo26-baseline",
+        "raw_input": "nextnano/raw_results",
+        "settings": {
+          "gamma_meV": 5.0,
+          "gamma_sign": 1,
+          "spin_degeneracy": 2,
+          "period_nm": 30.0,
+          "r_e_hh_nm": 0.751
+        },
+        "wavelength_nm": {
+          "min": 400.0,
+          "max": 1850.0,
+          "step": 1.0
+        },
+        "reference_tolerance_pm_per_V": 1e-08,
+        "feature_zero_tolerance_nm": 1e-05,
+        "save_integrand": true
+      },
+      "settings": {
+        "gamma_meV": 5.0,
+        "spin_degeneracy": 2,
+        "period_nm": 30.0,
+        "r_e_hh_nm": 0.751,
+        "gamma_sign": 1
+      },
+      "gamma_eV": 0.005,
+      "raw_root": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\28_kspace_chi2_study\\nextnano\\raw_results",
+      "raw_manifest": "raw_manifest.json",
+      "python": "3.11.15",
+      "code_version": "source SHA256 manifest (includes uncommitted code)",
+      "code_manifest": "../code_manifest.json",
+      "k_units": "nm^-1",
+      "BZ_conversion": "f*pi/a with a=0.565325 nm; radial disk approximation, not full BZ geometry",
+      "numpy": "2.4.6",
+      "licensed_solver_executed": false,
+      "model": "historical Demo26 baseline: kp8 dispersion shifts + single-band matrices",
+      "state_pairs": [
+        [
+          11,
+          12
+        ],
+        [
+          13,
+          14
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          3,
+          4
+        ]
+      ],
+      "limitations": [
+        "Valence pair (3,4) is light-hole dominated; retained for historical reproduction",
+        "No finite-k spinor tracking; fixed solver columns and pair averaging",
+        "Single-band overlaps and matrix elements frozen at k=0",
+        "No explicit carrier occupations, excitons or additional pathways"
+      ],
+      "wavelength_points": 1451,
+      "wavelength_min_nm": 400.0,
+      "wavelength_max_nm": 1850.0,
+      "integration_measure": "g_s*k*dk/(2*pi), trapezoidal; isotropic in-plane approximation",
+      "prefactor": 56.69816882497043,
+      "prefactor_units": "maps nm/eV^2 times nm^-2 to historical pm/V convention",
+      "pathway_count": 16,
+      "normalization": "signed Re/Im and all sweep plots unnormalized; optional paper comparison uses own maxima",
+      "study": "28H_independent_solver_grid",
+      "source_dataset": "nextnano/raw_results/grid_n101",
+      "k_points": 101,
+      "k_max_per_nm": 0.555714439232,
+      "max_Re_error_pm_per_V": 0.5138939027837068,
+      "max_Im_error_pm_per_V": 0.33752076937246756,
+      "complex_RMS_error_pm_per_V": 0.03467847746164693
+    },
+    {
+      "configuration": {
+        "model": "demo26-baseline",
+        "raw_input": "nextnano/raw_results",
+        "settings": {
+          "gamma_meV": 5.0,
+          "gamma_sign": 1,
+          "spin_degeneracy": 2,
+          "period_nm": 30.0,
+          "r_e_hh_nm": 0.751
+        },
+        "wavelength_nm": {
+          "min": 400.0,
+          "max": 1850.0,
+          "step": 1.0
+        },
+        "reference_tolerance_pm_per_V": 1e-08,
+        "feature_zero_tolerance_nm": 1e-05,
+        "save_integrand": true
+      },
+      "settings": {
+        "gamma_meV": 5.0,
+        "spin_degeneracy": 2,
+        "period_nm": 30.0,
+        "r_e_hh_nm": 0.751,
+        "gamma_sign": 1
+      },
+      "gamma_eV": 0.005,
+      "raw_root": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\28_kspace_chi2_study\\nextnano\\raw_results",
+      "raw_manifest": "raw_manifest.json",
+      "python": "3.11.15",
+      "code_version": "source SHA256 manifest (includes uncommitted code)",
+      "code_manifest": "../code_manifest.json",
+      "k_units": "nm^-1",
+      "BZ_conversion": "f*pi/a with a=0.565325 nm; radial disk approximation, not full BZ geometry",
+      "numpy": "2.4.6",
+      "licensed_solver_executed": false,
+      "model": "historical Demo26 baseline: kp8 dispersion shifts + single-band matrices",
+      "state_pairs": [
+        [
+          11,
+          12
+        ],
+        [
+          13,
+          14
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          3,
+          4
+        ]
+      ],
+      "limitations": [
+        "Valence pair (3,4) is light-hole dominated; retained for historical reproduction",
+        "No finite-k spinor tracking; fixed solver columns and pair averaging",
+        "Single-band overlaps and matrix elements frozen at k=0",
+        "No explicit carrier occupations, excitons or additional pathways"
+      ],
+      "wavelength_points": 1451,
+      "wavelength_min_nm": 400.0,
+      "wavelength_max_nm": 1850.0,
+      "integration_measure": "g_s*k*dk/(2*pi), trapezoidal; isotropic in-plane approximation",
+      "prefactor": 56.69816882497043,
+      "prefactor_units": "maps nm/eV^2 times nm^-2 to historical pm/V convention",
+      "pathway_count": 16,
+      "normalization": "signed Re/Im and all sweep plots unnormalized; optional paper comparison uses own maxima",
+      "study": "28H_independent_solver_grid",
+      "source_dataset": "nextnano/raw_results/grid_n201",
+      "k_points": 201,
+      "k_max_per_nm": 0.555714439232,
+      "max_Re_error_pm_per_V": 0.07784739663406981,
+      "max_Im_error_pm_per_V": 0.05187062519200225,
+      "complex_RMS_error_pm_per_V": 0.005340773881648773
+    }
+  ],
+  "extended_grid_at_same_cutoff": {
+    "baseline_Nk": 301,
+    "extended_Nk": 241,
+    "kmax_nm_minus1": 0.555714439232,
+    "max_Re_error_pm_per_V": 0.034934320882115344,
+    "max_Im_error_pm_per_V": 0.023299304448222813,
+    "complex_RMS_error_pm_per_V": 0.0024000495206685617,
+    "interpretation": "Same endpoint; independently solved301 vs241 native nodes. No interpolated electronic energies."
+  },
+  "extended_tail": [
+    {
+      "wavelength_nm": 540.0,
+      "tail_change_pm_per_V": {
+        "real": 0.6220283871789545,
+        "imag": 0.00840424089095079
+      },
+      "relative_to_max_cumulative_modulus": 0.23500009743972075
+    },
+    {
+      "wavelength_nm": 760.0,
+      "tail_change_pm_per_V": {
+        "real": -2.1207235289817916,
+        "imag": 0.03271548270929481
+      },
+      "relative_to_max_cumulative_modulus": 0.06999039524946517
+    },
+    {
+      "wavelength_nm": 1080.0,
+      "tail_change_pm_per_V": {
+        "real": -2.34319422886367,
+        "imag": -0.0111742266708175
+      },
+      "relative_to_max_cumulative_modulus": 0.19895032177320787
+    },
+    {
+      "wavelength_nm": 1520.0,
+      "tail_change_pm_per_V": {
+        "real": 2.812422863949287,
+        "imag": -0.06751015129307758
+      },
+      "relative_to_max_cumulative_modulus": 0.054442099536722695
+    },
+    {
+      "wavelength_nm": 1550.0,
+      "tail_change_pm_per_V": {
+        "real": 2.4666125616698764,
+        "imag": -0.05493908447583562
+      },
+      "relative_to_max_cumulative_modulus": 0.07812316245103797
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "study": "28K_extended_8band",
+  "lattice_constant_nm": 0.565325,
+  "kmax_pi_over_a": 0.2,
+  "k_points": 1201,
+  "num_electrons": 8,
+  "num_holes": 16,
+  "threads": 4,
+  "timeout_seconds": 86400,
+  "result_directory": "nextnano/extended_8band_work_results",
+  "presentation_cutoffs_pi_over_a": [
+    0.1,
+    0.125,
+    0.15,
+    0.175,
+    0.2
+  ],
+  "analysis_cutoffs_pi_over_a": [
+    0.1,
+    0.11,
+    0.12,
+    0.125,
+    0.13,
+    0.14,
+    0.15,
+    0.16,
+    0.17,
+    0.175,
+    0.18,
+    0.19,
+    0.2
+  ],
+  "tracking_min_overlap": 0.5,
+  "tracking_margin": 0.05,
+  "optical_mapping_status": "REVIEW_REQUIRED: retain full spinor operator matrices; no full-spinor inner product substituted for interband envelope overlap",
+  "historical_reference": "outputs/28A_baseline/chi2_results/chi2_spectrum.csv"
+}

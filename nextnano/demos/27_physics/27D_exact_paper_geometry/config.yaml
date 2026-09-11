@@ -23,13 +23,20 @@ cost:
   k_points_per_deck: 301
   states_per_deck: 14
   runtime_hours: [0.15, 0.5]
-  output_gb: [0.3, 1.0]
+  output_gb: [0.015, 0.03]
   basis: >-
-    One deck identical in cost to the Demo 23 production run (301 k points, 14
-    states, 10 min 20 s measured on the work laptop), plus margin. Only one deck
-    is needed because the graded arm ALREADY EXISTS: demo_results/demo23/raw/
-    production_y_n301_k0100 is this exact structure and solver configuration, so
-    rerunning it would buy nothing. See REUSE_AUDIT.md.
+    MEASURED on the work laptop 2026-09-05: 579.4 s (9.7 min), 740 files,
+    16.3 MB. That matches the Demo 23 production run it was predicted from
+    (301 k points, 14 states, 10 min 20 s) to within 7%, which is good evidence
+    the deck is the intended one. Only one deck is needed because the graded arm
+    ALREADY EXISTS: demo_results/demo23/raw/production_y_n301_k0100 is this exact
+    structure and solver configuration. See REUSE_AUDIT.md.
+    NOTE ON VOLUME: the original 0.3-1 GB estimate was ~20x too high. It budgeted
+    for envelopes at every k, which this deck does not produce - with
+    k_integration_disabled{} the state output is k=0 only, exactly the Demo 23
+    behaviour 27A exists to investigate. Every sub-demo that does not depend on
+    27A is over-estimated the same way; only 27B and 27L, which need per-k
+    envelopes, keep their large budgets.
 
 stages:
   preflight: {kind: generate_and_parse}

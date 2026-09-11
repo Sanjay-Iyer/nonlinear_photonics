@@ -3,13 +3,15 @@
   "demos": {
     "27D": {
       "status": "READY",
-      "updated": "2026-09-05T14:51:24+00:00",
-      "note": "preflight passed"
+      "updated": "2026-09-06T20:20:04+00:00",
+      "note": "reset after local dry-run of the unblock loop",
+      "conclusion": ""
     },
     "27F": {
       "status": "READY",
-      "updated": "2026-09-05T14:51:43+00:00",
-      "note": "preflight passed"
+      "updated": "2026-09-06T20:20:04+00:00",
+      "note": "reset after local dry-run of the unblock loop",
+      "conclusion": "unblocked manually; solver verdict pending analysis"
     },
     "27G": {
       "status": "READY",
@@ -18,8 +20,9 @@
     },
     "27H": {
       "status": "READY",
-      "updated": "2026-09-05T14:51:50+00:00",
-      "note": "preflight passed"
+      "updated": "2026-09-06T20:20:04+00:00",
+      "note": "reset after local dry-run of the unblock loop",
+      "conclusion": "unblocked manually; solver verdict pending analysis"
     },
     "27I": {
       "status": "READY",
@@ -33,8 +36,21 @@
     },
     "27A": {
       "status": "READY",
-      "updated": "2026-09-05T14:37:40+00:00",
-      "note": "preflight passed"
+      "updated": "2026-09-06T20:20:03+00:00",
+      "note": "reset after local dry-run of the unblock loop",
+      "conclusion": "unblocked manually; solver verdict pending analysis"
+    },
+    "27B": {
+      "status": "READY",
+      "updated": "2026-09-06T20:20:03+00:00",
+      "conclusion": "unblocked manually; solver verdict pending analysis",
+      "note": "reset after local dry-run of the unblock loop"
+    },
+    "27C": {
+      "status": "READY",
+      "updated": "2026-09-06T20:20:03+00:00",
+      "conclusion": "unblocked manually; solver verdict pending analysis",
+      "note": "reset after local dry-run of the unblock loop"
     }
   }
 }

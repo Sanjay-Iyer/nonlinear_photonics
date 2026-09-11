@@ -1,0 +1,84 @@
+{
+  "timestamp_utc": "2026-09-11T01:57:28.530721+00:00",
+  "equation_implementation_sha256": "6f69da8fe002f7954f6f5013712522c9e63445f7aa5e7ac447e608e36283a460",
+  "configuration": {
+    "baseline_config": "config/baseline.json",
+    "target_wavelengths_nm": [
+      540,
+      760,
+      1080,
+      1520,
+      1550
+    ],
+    "subsample_strides": [
+      10,
+      6,
+      3,
+      2,
+      1
+    ],
+    "independent_grid_datasets": [
+      "nextnano/raw_results/grid_n101",
+      "nextnano/raw_results/grid_n201"
+    ],
+    "tail_fraction": 0.1,
+    "tail_relative_tolerance": 0.01,
+    "paper_peak_prominence": 0.1
+  },
+  "settings": {
+    "gamma_meV": 5.0,
+    "spin_degeneracy": 2,
+    "period_nm": 30.0,
+    "r_e_hh_nm": 0.751,
+    "gamma_sign": 1
+  },
+  "gamma_eV": 0.005,
+  "raw_root": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\28_kspace_chi2_study\\nextnano\\raw_results",
+  "raw_manifest": "../raw_manifest.json",
+  "python": "3.11.15",
+  "code_version": "source SHA256 manifest (includes uncommitted code)",
+  "code_manifest": "../code_manifest.json",
+  "k_units": "nm^-1",
+  "BZ_conversion": "f*pi/a with a=0.565325 nm; radial disk approximation, not full BZ geometry",
+  "numpy": "2.4.6",
+  "licensed_solver_executed": false,
+  "model": "historical Demo26 baseline: kp8 dispersion shifts + single-band matrices",
+  "state_pairs": [
+    [
+      11,
+      12
+    ],
+    [
+      13,
+      14
+    ],
+    [
+      5,
+      6
+    ],
+    [
+      3,
+      4
+    ]
+  ],
+  "limitations": [
+    "Valence pair (3,4) is light-hole dominated; retained for historical reproduction",
+    "No finite-k spinor tracking; fixed solver columns and pair averaging",
+    "Single-band overlaps and matrix elements frozen at k=0",
+    "No explicit carrier occupations, excitons or additional pathways"
+  ],
+  "wavelength_points": 1451,
+  "wavelength_min_nm": 400.0,
+  "wavelength_max_nm": 1850.0,
+  "integration_measure": "g_s*k*dk/(2*pi), trapezoidal; isotropic in-plane approximation",
+  "prefactor": 56.69816882497043,
+  "prefactor_units": "maps nm/eV^2 times nm^-2 to historical pm/V convention",
+  "pathway_count": 16,
+  "normalization": "signed Re/Im and all sweep plots unnormalized; optional paper comparison uses own maxima",
+  "study": "28H",
+  "stride": 2,
+  "k_points": 151,
+  "k_min_per_nm": 0.0,
+  "k_max_per_nm": 0.555714439232,
+  "sampling": "subset of solved301; no new solver run"
+}

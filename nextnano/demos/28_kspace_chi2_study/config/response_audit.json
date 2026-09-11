@@ -1,0 +1,11 @@
+{
+  "baseline_config": "config/baseline.json",
+  "gamma_meV": [0.1, 0.5, 1.0, 2.0, 5.0, 10.0, 20.0],
+  "selected_gamma_meV": [1.0, 2.0, 5.0, 20.0],
+  "near_resonance_detuning_meV": 25.0,
+  "off_resonance_detuning_meV": 100.0,
+  "ratio_real_floor_fraction": 0.001,
+  "feature_wavelengths_nm": [540.0, 760.0, 1080.0, 1520.0, 1550.0],
+  "top_pathways": 4,
+  "lattice_constant_nm": 0.565325
+}

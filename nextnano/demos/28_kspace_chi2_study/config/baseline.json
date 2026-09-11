@@ -1,0 +1,9 @@
+{
+  "model": "demo26-baseline",
+  "raw_input": "nextnano/raw_results",
+  "settings": {"gamma_meV": 5.0, "gamma_sign": 1, "spin_degeneracy": 2, "period_nm": 30.0, "r_e_hh_nm": 0.751},
+  "wavelength_nm": {"min": 400.0, "max": 1850.0, "step": 1.0},
+  "reference_tolerance_pm_per_V": 1e-8,
+  "feature_zero_tolerance_nm": 1e-5,
+  "save_integrand": true
+}

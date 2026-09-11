@@ -1,0 +1,233 @@
+global{
+    temperature = 300
+    simulate1D{
+    }
+    substrate{
+        name = "GaAs"
+    }
+    crystal_zb{
+        x_hkl = [ 1, 0, 0 ]
+        y_hkl = [ 0, 1, 0 ]
+    }
+}
+
+contacts{
+    fermi{
+        name = "qw_contact"
+        bias = [ 0 ]
+    }
+}
+
+grid{
+    xgrid{
+        line{
+            pos = 0
+            spacing = 0.5
+        }
+        line{
+            pos = 9.1
+            spacing = 0.05
+        }
+        line{
+            pos = 16.2
+            spacing = 0.05
+        }
+        line{
+            pos = 18
+            spacing = 0.05
+        }
+        line{
+            pos = 20.9
+            spacing = 0.05
+        }
+        line{
+            pos = 30
+            spacing = 0.5
+        }
+    }
+}
+
+structure{
+    output_region_index{
+        boxes = "no"
+    }
+    output_material_index{
+        boxes = "no"
+    }
+    output_alloy_composition{
+        boxes = "no"
+    }
+    region{
+        everywhere{
+        }
+        ternary_constant{
+            name = "Al(x)Ga(1-x)As"
+            alloy_x = 0.55
+        }
+    }
+    region{
+        line{
+            x = [ 0, 30 ]
+        }
+        contact{
+            name = "qw_contact"
+        }
+    }
+    region{
+        line{
+            x = [ 9.1, 16.2 ]
+        }
+        binary{
+            name = "GaAs"
+        }
+    }
+    region{
+        line{
+            x = [ 18, 20.9 ]
+        }
+        binary{
+            name = "GaAs"
+        }
+    }
+    region{
+        line{
+            x = [ 8.6, 9.6 ]
+        }
+        ternary_linear{
+            name = "Al(x)Ga(1-x)As"
+            alloy_x = [ 0.55, 0 ]
+            x = [ 8.6, 9.6 ]
+        }
+    }
+    region{
+        line{
+            x = [ 15.7, 16.7 ]
+        }
+        ternary_linear{
+            name = "Al(x)Ga(1-x)As"
+            alloy_x = [ 0, 0.55 ]
+            x = [ 15.7, 16.7 ]
+        }
+    }
+    region{
+        line{
+            x = [ 17.5, 18.5 ]
+        }
+        ternary_linear{
+            name = "Al(x)Ga(1-x)As"
+            alloy_x = [ 0.55, 0 ]
+            x = [ 17.5, 18.5 ]
+        }
+    }
+    region{
+        line{
+            x = [ 20.4, 21.4 ]
+        }
+        ternary_linear{
+            name = "Al(x)Ga(1-x)As"
+            alloy_x = [ 0, 0.55 ]
+            x = [ 20.4, 21.4 ]
+        }
+    }
+}
+
+classical{
+    Gamma{
+    }
+    HH{
+    }
+    LH{
+    }
+    SO{
+    }
+    output_bandedges{
+        averaged = "no"
+    }
+    output_bandgap{
+    }
+}
+
+quantum{
+    region{
+        name = "acqw"
+        x = [ 7.1, 22.9 ]
+        no_density = "yes"
+        boundary{
+            x = "dirichlet"
+        }
+        kp_8band{
+            num_electrons = 6
+            num_holes = 8
+            k_integration_disabled{
+            }
+            dispersion{
+                path{
+                    name = "Gamma_to_y"
+                    num_points = 101
+                    point{
+                        k = [ 0, 0, 0 ]
+                    }
+                    point{
+                        k = [ 0, 0.5557144392, 0 ]
+                    }
+                }
+                output_k_vectors{
+                }
+                output_dispersions{
+                    max_num = 14
+                }
+                output_masses{
+                    max_num = 14
+                }
+            }
+            classify_by_energy{
+            }
+        }
+        output_states{
+            max_num = 14
+            all_k_points = "yes"
+            envelopes = "yes"
+            envelopes_CB_HH_LH_SO = "yes"
+            probabilities = "yes"
+            probabilities_partial_CB_HH_LH_SO = "yes"
+            spinor_composition = "yes"
+            spinor_composition_CB_HH_LH_SO = "yes"
+            in_one_file = "no"
+        }
+        transition_energies{
+            all_k_points = "yes"
+            KP8{
+            }
+        }
+        dipole_moment_matrix_elements{
+            all_k_points = "yes"
+            polarization{
+                name = "growth_z"
+                re = [ 1, 0, 0 ]
+            }
+            KP8{
+            }
+        }
+        momentum_matrix_elements{
+            all_k_points = "yes"
+            output_matrix_elements = "yes"
+            output_oscillator_strengths = "yes"
+            polarization{
+                name = "growth_z"
+                re = [ 1, 0, 0 ]
+            }
+            polarization{
+                name = "inplane_y"
+                re = [ 0, 1, 0 ]
+            }
+            KP8{
+            }
+        }
+    }
+}
+
+run{
+    quantum{
+    }
+}
+

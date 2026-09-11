@@ -207,6 +207,10 @@ def command_physics(parent, subs, sub, machine, args) -> int:
         print("Re-run with --yes to proceed:")
         print("    python run_demo27.py --demo %s --physics --yes" % sub.demo_id)
         return 0
+    # A verdict recorded earlier must survive a rerun of the solver. Without
+    # this, running --physics on a sub-demo that was already PASS would drop it
+    # to RUNNING and silently re-block everything downstream of it.
+    prior = str(status.statuses(parent).get(sub.demo_id, "NOT RUN"))
     status.record(parent, sub.demo_id, "RUNNING", note="physics stage launched")
     try:
         result = physics_module.run(sub, resolved, machine, cost,
@@ -214,8 +218,14 @@ def command_physics(parent, subs, sub, machine, args) -> int:
     except Demo27Error:
         status.record(parent, sub.demo_id, "FAIL", note="physics stage refused or failed")
         raise
-    status.record(parent, sub.demo_id, "RUNNING",
-                  note="physics stage finished; run --analyze to decide PASS/FAIL")
+    if prior in registry.SATISFYING:
+        status.record(parent, sub.demo_id, prior,
+                      note="physics stage rerun and finished; the recorded %s verdict is "
+                           "kept but predates this data - re-run --analyze and re-record "
+                           "if the conclusion changes" % prior)
+    else:
+        status.record(parent, sub.demo_id, "RUNNING",
+                      note="physics stage finished; run --analyze to decide PASS/FAIL")
     print("\n%s physics stage finished (%s)." % (sub.demo_id, result["kind"]))
     print("Next:  python run_demo27.py --demo %s --analyze" % sub.demo_id)
     return 0

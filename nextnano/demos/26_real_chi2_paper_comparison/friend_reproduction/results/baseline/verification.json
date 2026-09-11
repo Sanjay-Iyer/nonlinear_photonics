@@ -1,0 +1,20 @@
+{
+  "mode": "baseline",
+  "reference_max_complex_error": 5.326524332786012e-10,
+  "tolerance": 1e-08,
+  "component_normalization": 71.31058978306214,
+  "zero_crossings_linear_interpolation": [
+    {
+      "wavelength_nm": 714.0286425431304,
+      "imag_normalized": 0.3825374703349569
+    },
+    {
+      "wavelength_nm": 1437.480114730169,
+      "imag_normalized": -0.7431845533040918
+    }
+  ],
+  "units": "historical pm/V convention",
+  "gamma_sign": 1,
+  "python_numpy": "2.4.6",
+  "matplotlib": "3.11.0"
+}

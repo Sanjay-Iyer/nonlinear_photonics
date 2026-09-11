@@ -718,3 +718,171 @@ def test_cost_statement_warns_when_the_declared_count_is_wrong(parent, subs, cfg
     tampered = registry.SubDemo(**{**sub.__dict__, "cost": {**sub.cost, "decks": 99}})
     statement = preflight_module.cost_statement(tampered, resolved)
     assert "warning" in statement
+
+
+# ---------------------------------------------------------------------------
+# 12. parallel sub-demos in separate terminals
+# ---------------------------------------------------------------------------
+
+def test_status_writes_are_atomic(tmp_path):
+    """A reader must never see a half-written file, even mid-write."""
+    from framework.report import write_json, write_text
+
+    target = tmp_path / "MASTER_STATUS.json"
+    write_json(target, {"schema": 1, "demos": {"27A": {"status": "PASS"}}})
+    assert json.loads(target.read_text(encoding="utf-8"))["demos"]["27A"]["status"] == "PASS"
+    # No temporary files are left behind to be mistaken for real output.
+    assert list(tmp_path.glob("*.tmp")) == []
+    write_text(tmp_path / "MASTER_STATUS.md", "# table")
+    assert list(tmp_path.glob("*.tmp")) == []
+
+
+def test_concurrent_records_do_not_lose_updates(tmp_path, monkeypatch, parent, subs):
+    """Two processes recording different sub-demos must both survive.
+
+    This is the parallel-terminal case: every --physics stage records RUNNING at
+    its start and again at its end, so interleaved read-modify-write cycles are
+    the expected traffic, not an edge case.
+    """
+    import multiprocessing.dummy as threading_pool
+
+    json_path = tmp_path / "MASTER_STATUS.json"
+    md_path = tmp_path / "MASTER_STATUS.md"
+    monkeypatch.setattr(status, "status_paths", lambda _p: (json_path, md_path))
+    local = dict(parent)
+    ids = [sub.demo_id for sub in subs]
+
+    def worker(demo_id):
+        for _ in range(4):
+            status.record(local, demo_id, "RUNNING", note="parallel probe")
+
+    with threading_pool.Pool(len(ids)) as pool:
+        pool.map(worker, ids)
+
+    blob = json.loads(json_path.read_text(encoding="utf-8"))
+    assert set(blob["demos"]) == set(ids), (
+        "a concurrent record lost an update: %s"
+        % sorted(set(ids) - set(blob["demos"])))
+    for demo_id in ids:
+        assert blob["demos"][demo_id]["status"] == "RUNNING"
+
+
+def test_a_torn_status_file_does_not_break_reporting(tmp_path, monkeypatch, parent):
+    """--list must still work if it reads during another terminal's write."""
+    json_path = tmp_path / "MASTER_STATUS.json"
+    json_path.write_text('{"schema": 1, "demos": {"27A": ', encoding="utf-8")
+    monkeypatch.setattr(status, "status_paths",
+                        lambda _p: (json_path, tmp_path / "MASTER_STATUS.md"))
+    assert status.load(dict(parent)) == {"schema": 1, "demos": {}}
+
+
+def test_parallel_sub_demos_never_share_an_output_path(parent, subs):
+    """The precondition for running sub-demos in separate terminals at all."""
+    raw_roots, out_roots, deck_dirs = [], [], []
+    for sub in subs:
+        resolved = registry.resolve(sub, parent)
+        raw_roots.append((resolved.results_root / "raw").resolve())
+        out_roots.append(sub.outputs_dir.resolve())
+        deck_dirs.append(sub.inputs_dir.resolve())
+    for label, paths in (("raw", raw_roots), ("outputs", out_roots), ("inputs", deck_dirs)):
+        assert len(set(paths)) == len(paths), "%s directories collide between sub-demos" % label
+
+
+def test_physics_rerun_does_not_clobber_a_recorded_verdict(tmp_path, monkeypatch,
+                                                           parent, subs):
+    """A PASS recorded before a rerun must survive it.
+
+    Otherwise running --physics on an already-passed sub-demo drops it to
+    RUNNING and silently re-blocks everything downstream, which is exactly what
+    happened on the work laptop: 27A and 27H were recorded PASS, their physics
+    stages were then run, and 27K and 27L went back to REFUSED.
+    """
+    json_path = tmp_path / "MASTER_STATUS.json"
+    monkeypatch.setattr(status, "status_paths",
+                        lambda _p: (json_path, tmp_path / "MASTER_STATUS.md"))
+    monkeypatch.setattr(registry.SubDemo, "outputs_dir",
+                        property(lambda self: tmp_path / self.demo_id))
+    local = dict(parent)
+    status.record(local, "27A", "PASS", conclusion="finite-k output works")
+
+    sub = registry.find("27A", subs)
+    (tmp_path / "27A").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "27A" / "COST_STATEMENT.md").write_text("# cost", encoding="utf-8")
+    monkeypatch.setattr(physics_module, "run",
+                        lambda *a, **k: {"kind": "delegated", "returncode": 0})
+    monkeypatch.setattr(solver, "machine_config",
+                        lambda _p: {"exe": tmp_path / "nnp.exe", "database": tmp_path / "d",
+                                    "license": tmp_path / "l", "threads": 1})
+
+    buffer = io.StringIO()
+    with redirect_stdout(buffer), redirect_stderr(buffer):
+        code = run_demo27.main(["--demo", "27A", "--physics", "--yes"])
+    assert code == 0
+    after = status.statuses(local)
+    assert after["27A"] == "PASS", (
+        "the recorded verdict was clobbered by a solver rerun; downstream sub-demos "
+        "would be silently re-blocked")
+    # And the note must say the verdict predates the new data.
+    entry = status.load(local)["demos"]["27A"]
+    assert "predates this data" in entry["note"]
+    # A sub-demo with no prior verdict still lands on RUNNING, as before.
+    assert registry.blocking_prerequisites(registry.find("27B", subs), after) == []
+
+
+def test_a_failed_deck_is_not_reported_as_a_finished_stage(tmp_path, monkeypatch,
+                                                           parent, subs):
+    """A non-zero solver exit must fail the stage, not pass silently."""
+    sub = registry.find("27D", subs)
+    resolved = registry.resolve(sub, parent)
+    monkeypatch.setattr(type(resolved), "results_root", property(lambda self: tmp_path))
+    monkeypatch.setattr(registry.SubDemo, "outputs_dir",
+                        property(lambda self: tmp_path / "out"))
+    monkeypatch.setattr(registry.SubDemo, "inputs_dir",
+                        property(lambda self: tmp_path / "in"))
+    (tmp_path / "in").mkdir(parents=True, exist_ok=True)
+    for entry in resolved.decks:
+        (tmp_path / "in" / ("%s.in" % entry.spec.name)).write_text("global{}", encoding="utf-8")
+
+    class FakeInvocation:
+        def __init__(self):
+            self.returncode = 7
+            self.argv = ["nnp.exe"]
+
+    fake = type(sys)("solver14")
+    fake.execute_real = lambda **kwargs: FakeInvocation()
+    monkeypatch.setitem(sys.modules, "solver14", fake)
+    monkeypatch.setattr(physics_module, "assert_professional",
+                        lambda m: {"executable": "x", "database": "d",
+                                   "license": "l", "threads": 1})
+
+    with pytest.raises(Demo27Error, match="decks failed"):
+        physics_module.run(sub, resolved, {"exe": "x"}, {}, timeout_seconds=1.0)
+    written = tmp_path / "out" / manifest_module.MANIFEST_NAME
+    assert written.is_file(), "the failed attempt must still be on the record"
+    assert json.loads(written.read_text(encoding="utf-8"))["runs"][0]["returncode"] == 7
+
+
+def test_a_refused_delegate_is_not_reported_as_a_finished_stage(tmp_path, monkeypatch,
+                                                                parent, subs):
+    """Demo 25 refusing 27B's production run must fail 27B, not pass silently.
+
+    This is the case that actually occurred on the work laptop: --pilot-audit had
+    not been run, so Demo 25's own gate refused the production stage, and Demo 27
+    still printed "physics stage finished (delegated)".
+    """
+    sub = registry.find("27B", subs)
+    resolved = registry.resolve(sub, parent)
+    monkeypatch.setattr(type(resolved), "results_root", property(lambda self: tmp_path))
+    monkeypatch.setattr(registry.SubDemo, "outputs_dir",
+                        property(lambda self: tmp_path / "out"))
+    monkeypatch.setattr(physics_module, "assert_professional", lambda m: {})
+
+    class Done:
+        returncode = 2
+
+    monkeypatch.setattr(physics_module.subprocess, "run", lambda *a, **k: Done())
+    with pytest.raises(Demo27Error, match="delegated command exited 2"):
+        physics_module.run(sub, resolved,
+                           {"exe": "x", "database": "d", "license": "l", "threads": 1},
+                           {}, timeout_seconds=1.0)
+    assert (tmp_path / "out" / manifest_module.MANIFEST_NAME).is_file()

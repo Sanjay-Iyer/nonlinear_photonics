@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 import json
+import os
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
@@ -24,8 +25,23 @@ def write_csv(path: Path, rows: Iterable[Mapping[str, Any]]) -> Path:
 
 
 def write_json(path: Path, value: Any) -> Path:
+    """Write JSON atomically.
+
+    Sub-demos are meant to be runnable in parallel terminals, so a reader must
+    never observe a half-written status file or manifest. The content is written
+    to a temporary file beside the target and moved into place with os.replace,
+    which is atomic on Windows and POSIX alike.
+    """
+    path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(value, indent=2, default=str) + "\n", encoding="utf-8")
+    blob = json.dumps(value, indent=2, default=str) + "\n"
+    temp = path.with_name("%s.%d.tmp" % (path.name, os.getpid()))
+    try:
+        temp.write_text(blob, encoding="utf-8")
+        os.replace(temp, path)
+    finally:
+        if temp.exists():
+            temp.unlink()
     return path
 
 
@@ -36,9 +52,30 @@ def read_json(path: Path, default: Any = None) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def read_json_tolerant(path: Path, default: Any = None) -> Any:
+    """Read JSON, returning ``default`` if the file is absent or unreadable.
+
+    Used for status display. A reporting command must not crash because a
+    concurrently running sub-demo happened to be mid-write; the writers are
+    atomic, so the next read succeeds.
+    """
+    try:
+        return read_json(path, default)
+    except (json.JSONDecodeError, OSError, UnicodeDecodeError):
+        return default
+
+
 def write_text(path: Path, value: str) -> Path:
+    """Write text atomically, for the same reason as :func:`write_json`."""
+    path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(value.rstrip() + "\n", encoding="utf-8")
+    temp = path.with_name("%s.%d.tmp" % (path.name, os.getpid()))
+    try:
+        temp.write_text(value.rstrip() + "\n", encoding="utf-8")
+        os.replace(temp, path)
+    finally:
+        if temp.exists():
+            temp.unlink()
     return path
 
 

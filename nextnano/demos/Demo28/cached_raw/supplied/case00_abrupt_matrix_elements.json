@@ -1,0 +1,34 @@
+{
+  "reason": "The raw case00 envelopes are absent from this repository. These are explicitly supplied frozen inputs, not reconstructed raw data. A fresh matrices_diagnostic solver run replaces this checkpoint automatically.",
+  "source": "demo_results/demo19/tables/demo19_master_results.csv, case_00; also cutoff_test.py historical constants",
+  "overlap": [
+    [
+      0.9825659268894466,
+      0.024432908041949086
+    ],
+    [
+      -0.08804807050423832,
+      0.45711354825954503
+    ]
+  ],
+  "ze_nm": [
+    [
+      12.734585435956998,
+      1.0340924360961732
+    ],
+    [
+      1.0340924360961732,
+      18.75911084155838
+    ]
+  ],
+  "zh_nm": [
+    [
+      12.65154699565089,
+      1.451016947195746
+    ],
+    [
+      1.451016947195746,
+      12.967036940337104
+    ]
+  ]
+}

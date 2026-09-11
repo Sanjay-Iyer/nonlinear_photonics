@@ -1,0 +1,113 @@
+{
+  "timestamp_utc": "2026-09-11T01:57:14.092920+00:00",
+  "equation_implementation_sha256": "6f69da8fe002f7954f6f5013712522c9e63445f7aa5e7ac447e608e36283a460",
+  "stage": "derived chi2 inputs (not raw nextnano)",
+  "settings": {
+    "gamma_meV": 5.0,
+    "spin_degeneracy": 2,
+    "period_nm": 30.0,
+    "r_e_hh_nm": 0.751,
+    "gamma_sign": 1
+  },
+  "gamma_eV": 0.005,
+  "shapes": {
+    "energies": [
+      2,
+      31
+    ],
+    "transitions": [
+      2,
+      2,
+      31
+    ],
+    "matrices": [
+      2,
+      2,
+      31
+    ],
+    "wavelength": [
+      1451
+    ]
+  },
+  "units": {
+    "energies": "eV",
+    "k": "nm^-1",
+    "weights": "nm^-2",
+    "overlap": "dimensionless",
+    "z": "nm",
+    "wavelength": "fundamental nm"
+  },
+  "matrix_treatment": "constant matrices broadcast to every k; no finite-k matrices fabricated",
+  "state_order": [
+    "e1",
+    "e2",
+    "h1",
+    "h2"
+  ],
+  "kp8_pair_ids": [
+    [
+      11,
+      12
+    ],
+    [
+      13,
+      14
+    ],
+    [
+      5,
+      6
+    ],
+    [
+      3,
+      4
+    ]
+  ],
+  "selection": {
+    "requested_min_per_nm": 0.0,
+    "requested_max_per_nm": 0.05557144392322635,
+    "actual_min_per_nm": 0.0,
+    "actual_max_per_nm": 0.0555714439232,
+    "source_indices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30
+    ],
+    "points": 31,
+    "policy": "native samples only; no interpolation or extrapolation"
+  },
+  "model": "historical Demo26 baseline: kp8 dispersion shifts + single-band matrices",
+  "limitations": [
+    "Valence pair (3,4) is light-hole dominated; retained for historical reproduction",
+    "No finite-k spinor tracking; fixed solver columns and pair averaging",
+    "Single-band overlaps and matrix elements frozen at k=0",
+    "No explicit carrier occupations, excitons or additional pathways"
+  ]
+}

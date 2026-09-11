@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+outputs/test_temp*/
+outputs/test_*/
+outputs/regression_tmp*/
+nextnano/new_results/
+nextnano/extended_8band_work_results/

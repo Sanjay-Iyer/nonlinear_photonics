@@ -97,6 +97,18 @@ def _run_professional(sub: SubDemo, resolved: Resolved, machine: Mapping,
                  record["outputs"]["bytes"] / 1e6), flush=True)
     manifest_module.write(sub.outputs_dir, manifests)
     write_json(resolved.results_root / "physics_invocations.json", records)
+    # Manifests are written first, so a partial run is still recorded, and only
+    # then does the failure surface. A deck that exited non-zero has not produced
+    # trustworthy physics, and reporting the stage as "finished" would let the
+    # campaign build on it.
+    failed = [r for r in records if r["returncode"] not in (0, None)]
+    if failed:
+        raise Demo27Error(
+            "%s: %d of %d decks failed.\n  %s\nThe manifest in %s records what ran. "
+            "Read the solver logs under %s before re-running."
+            % (sub.demo_id, len(failed), len(records),
+               "\n  ".join("%s exited %s" % (r["deck"], r["returncode"]) for r in failed),
+               sub.outputs_dir / manifest_module.MANIFEST_NAME, raw_root))
     return {"kind": "professional", "runs": records, "manifest_count": len(manifests)}
 
 
@@ -131,5 +143,11 @@ def _run_delegated(sub: SubDemo, resolved: Resolved, machine: Mapping,
         changes={}, seconds=elapsed, returncode=done.returncode, argv=argv,
         cost_statement=cost)
     manifest_module.write(sub.outputs_dir, [record])
+    if done.returncode != 0:
+        raise Demo27Error(
+            "%s: the delegated command exited %s.\n    %s\n"
+            "%s owns this calculation and has its own gate; its refusal is reported "
+            "above. Demo 27 does not treat a refused delegate as a finished stage."
+            % (sub.demo_id, done.returncode, " ".join(argv[1:]), delegate["demo"]))
     return {"kind": "delegated", "returncode": done.returncode, "seconds": elapsed,
             "delegate": str(delegate["demo"]), "command": str(command)}

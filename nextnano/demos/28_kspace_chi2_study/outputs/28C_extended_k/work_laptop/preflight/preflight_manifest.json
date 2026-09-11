@@ -1,0 +1,136 @@
+{
+  "created_utc": "2026-09-11T01:39:19.083411+00:00",
+  "mode": "preflight",
+  "professional_execution_performed": false,
+  "missing_configuration": [
+    "executable",
+    "database",
+    "license"
+  ],
+  "threads": 1,
+  "timeout_seconds": 14400.0,
+  "output_root": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\28_kspace_chi2_study\\outputs\\28C_extended_k\\work_laptop\\preflight",
+  "script2_parser_self_test_on_shipped_cached_raw": {
+    "baseline_parser": "PASS",
+    "kp8_pair_ids": [
+      [
+        11,
+        12
+      ],
+      [
+        13,
+        14
+      ],
+      [
+        5,
+        6
+      ],
+      [
+        3,
+        4
+      ]
+    ],
+    "k_points": 301
+  },
+  "jobs": [
+    {
+      "job": "kp8",
+      "kind": "kp8",
+      "purpose": "Provisional extended-k state/model audit, NOT a validated physical extension",
+      "params": {
+        "temperature_K": 300.0,
+        "substrate": "GaAs",
+        "barrier_alloy_x": 0.55,
+        "total_nm": 30.0,
+        "wells_nm": [
+          [
+            9.1,
+            16.2
+          ],
+          [
+            18.0,
+            20.9
+          ]
+        ],
+        "interface_model": "linear_1nm",
+        "grade_width_nm": 1.0,
+        "coarse_spacing_nm": 0.5,
+        "fine_spacing_nm": 0.05,
+        "quantum_region_nm": [
+          7.1,
+          22.9
+        ],
+        "num_electrons": 6,
+        "num_holes": 8,
+        "output_states": 14,
+        "k_direction": [
+          0,
+          1,
+          0
+        ],
+        "k_max_per_nm": 0.8335716588483951,
+        "k_points": 901
+      },
+      "deck_sha256": "edd37c4636b4f4cdc754d4a1f445c69bfdd33bfd4c1c0dc74f504fccbc080369",
+      "static_check": "PASS",
+      "grammar_check": {
+        "status": "SKIPPED",
+        "reason": "no nextnano++ parser configured or found"
+      },
+      "expected_outputs": [
+        "dispersion_*.dat",
+        "kVectors_*.dat",
+        "kp8/energy_spectrum_k00000.dat",
+        "kp8/spinor_composition_k00000_CbHhLhSo.dat",
+        "kp8/envelope_k00000_0001_cb1.dat",
+        "dipole_moment_matrix_elements_k00000_growth_z.txt"
+      ],
+      "argv": [
+        "<NEXTNANO_EXE>",
+        "-d",
+        "<NEXTNANO_DATABASE>",
+        "-l",
+        "<NEXTNANO_LICENSE>",
+        "--threads",
+        "1",
+        "-o",
+        "C:\\code\\nonlinear_photonics\\nextnano\\demos\\28_kspace_chi2_study\\outputs\\28C_extended_k\\work_laptop\\preflight\\kp8",
+        "C:\\code\\nonlinear_photonics\\nextnano\\demos\\28_kspace_chi2_study\\outputs\\28C_extended_k\\work_laptop\\preflight\\decks\\kp8.in"
+      ]
+    },
+    {
+      "job": "singleband_case04_graded",
+      "kind": "singleband",
+      "purpose": "Historical Case04 single-band anchors and frozen matrix elements",
+      "params": null,
+      "deck_sha256": "ec5d1e23688f87491e154c2e9e574fefd33c541ed22e901bf6ab336fbf6da115",
+      "static_check": "PASS",
+      "grammar_check": {
+        "status": "SKIPPED",
+        "reason": "no nextnano++ parser configured or found"
+      },
+      "expected_outputs": [
+        "Gamma/energy_spectrum_k00000.dat",
+        "Gamma/envelopes_k00000.dat",
+        "HH/energy_spectrum_k00000.dat",
+        "HH/envelopes_k00000.dat"
+      ],
+      "argv": [
+        "<NEXTNANO_EXE>",
+        "-d",
+        "<NEXTNANO_DATABASE>",
+        "-l",
+        "<NEXTNANO_LICENSE>",
+        "--threads",
+        "1",
+        "-o",
+        "C:\\code\\nonlinear_photonics\\nextnano\\demos\\28_kspace_chi2_study\\outputs\\28C_extended_k\\work_laptop\\preflight\\singleband_case04_graded",
+        "C:\\code\\nonlinear_photonics\\nextnano\\demos\\28_kspace_chi2_study\\outputs\\28C_extended_k\\work_laptop\\preflight\\decks\\singleband_case04_graded.in"
+      ]
+    }
+  ],
+  "python": "3.11.15",
+  "platform": "win32",
+  "executable_sha256": null,
+  "database_sha256": null
+}

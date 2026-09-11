@@ -1,0 +1,138 @@
+{
+  "configuration": {
+    "model": "demo26-baseline",
+    "raw_input": "nextnano/raw_results",
+    "settings": {
+      "gamma_meV": 5.0,
+      "gamma_sign": 1,
+      "spin_degeneracy": 2,
+      "period_nm": 30.0,
+      "r_e_hh_nm": 0.751
+    },
+    "wavelength_nm": {
+      "min": 400.0,
+      "max": 1850.0,
+      "step": 1.0
+    },
+    "reference_tolerance_pm_per_V": 1e-08,
+    "feature_zero_tolerance_nm": 1e-05,
+    "save_integrand": true
+  },
+  "settings": {
+    "gamma_meV": 5.0,
+    "spin_degeneracy": 2,
+    "period_nm": 30.0,
+    "r_e_hh_nm": 0.751,
+    "gamma_sign": 1
+  },
+  "gamma_eV": 0.005,
+  "raw_root": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\28_kspace_chi2_study\\nextnano\\raw_results",
+  "raw_manifest": "raw_manifest.json",
+  "python": "3.11.15",
+  "code_version": "source SHA256 manifest (includes uncommitted code)",
+  "code_manifest": "code_manifest.json",
+  "k_units": "nm^-1",
+  "BZ_conversion": "f*pi/a with a=0.565325 nm; radial disk approximation, not full BZ geometry",
+  "numpy": "2.4.6",
+  "licensed_solver_executed": false,
+  "model": "historical Demo26 baseline: kp8 dispersion shifts + single-band matrices",
+  "state_pairs": [
+    [
+      11,
+      12
+    ],
+    [
+      13,
+      14
+    ],
+    [
+      5,
+      6
+    ],
+    [
+      3,
+      4
+    ]
+  ],
+  "limitations": [
+    "Valence pair (3,4) is light-hole dominated; retained for historical reproduction",
+    "No finite-k spinor tracking; fixed solver columns and pair averaging",
+    "Single-band overlaps and matrix elements frozen at k=0",
+    "No explicit carrier occupations, excitons or additional pathways"
+  ],
+  "wavelength_points": 1451,
+  "wavelength_min_nm": 400.0,
+  "wavelength_max_nm": 1850.0,
+  "integration_measure": "g_s*k*dk/(2*pi), trapezoidal; isotropic in-plane approximation",
+  "prefactor": 56.69816882497043,
+  "prefactor_units": "maps nm/eV^2 times nm^-2 to historical pm/V convention",
+  "pathway_count": 16,
+  "normalization": "signed Re/Im and all sweep plots unnormalized; optional paper comparison uses own maxima",
+  "study": "28B_shells",
+  "audit_configuration": {
+    "baseline_config": "config/baseline.json",
+    "target_wavelengths_nm": [
+      540,
+      760,
+      1080,
+      1520,
+      1550
+    ],
+    "subsample_strides": [
+      10,
+      6,
+      3,
+      2,
+      1
+    ],
+    "independent_grid_datasets": [
+      "nextnano/raw_results/grid_n101",
+      "nextnano/raw_results/grid_n201"
+    ],
+    "tail_fraction": 0.1,
+    "tail_relative_tolerance": 0.01,
+    "paper_peak_prominence": 0.1
+  },
+  "shell_sum_vs_core_max_error_pm_per_V": 2.3690819652380873e-13,
+  "tail_start_per_nm": 0.5001429953088,
+  "tail_fraction": 0.1,
+  "tail_relative_tolerance": 0.01,
+  "targets": [
+    {
+      "wavelength_nm": 540.0,
+      "tail_Re_pm_per_V": 0.331474484209233,
+      "tail_Im_pm_per_V": 0.0038999641879806906,
+      "tail_change_over_max_cumulative_modulus": 0.2177146640819743,
+      "tail_small_on_this_grid": false
+    },
+    {
+      "wavelength_nm": 760.0,
+      "tail_Re_pm_per_V": -1.53010260728378,
+      "tail_Im_pm_per_V": -0.053119890631712297,
+      "tail_change_over_max_cumulative_modulus": 0.05874581853663135,
+      "tail_small_on_this_grid": false
+    },
+    {
+      "wavelength_nm": 1080.0,
+      "tail_Re_pm_per_V": -1.4236922107453385,
+      "tail_Im_pm_per_V": -0.0033064587523707768,
+      "tail_change_over_max_cumulative_modulus": 0.1922572052717578,
+      "tail_small_on_this_grid": false
+    },
+    {
+      "wavelength_nm": 1520.0,
+      "tail_Re_pm_per_V": 2.368941543286738,
+      "tail_Im_pm_per_V": 0.03161209735414028,
+      "tail_change_over_max_cumulative_modulus": 0.051683660243044084,
+      "tail_small_on_this_grid": false
+    },
+    {
+      "wavelength_nm": 1550.0,
+      "tail_Re_pm_per_V": 2.1959094781589528,
+      "tail_Im_pm_per_V": -0.049519127910349736,
+      "tail_change_over_max_cumulative_modulus": 0.08294113994737941,
+      "tail_small_on_this_grid": false
+    }
+  ],
+  "interpretation": "Finite-range tail diagnostic, not proof of infinite-cutoff convergence. Shells include radial k measure and signed cancellation."
+}

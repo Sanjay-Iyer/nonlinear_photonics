@@ -1,0 +1,230 @@
+{
+  "timestamp_utc": "2026-09-11T01:51:48.265467+00:00",
+  "equation_implementation_sha256": "6f69da8fe002f7954f6f5013712522c9e63445f7aa5e7ac447e608e36283a460",
+  "configuration": {
+    "model": "demo26-baseline",
+    "raw_input": "nextnano/raw_results",
+    "settings": {
+      "gamma_meV": 5.0,
+      "gamma_sign": 1,
+      "spin_degeneracy": 2,
+      "period_nm": 30.0,
+      "r_e_hh_nm": 0.751
+    },
+    "wavelength_nm": {
+      "min": 400.0,
+      "max": 1850.0,
+      "step": 1.0
+    },
+    "reference_tolerance_pm_per_V": 1e-08,
+    "feature_zero_tolerance_nm": 1e-05,
+    "save_integrand": true
+  },
+  "settings": {
+    "gamma_meV": 2.0,
+    "spin_degeneracy": 2,
+    "period_nm": 30.0,
+    "r_e_hh_nm": 0.751,
+    "gamma_sign": 1
+  },
+  "gamma_eV": 0.002,
+  "raw_root": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\28_kspace_chi2_study\\nextnano\\raw_results",
+  "raw_manifest": "../../../28D_imaginary_source/raw_manifest.json",
+  "python": "3.11.15",
+  "code_version": "source SHA256 manifest (includes uncommitted code)",
+  "code_manifest": "../../../28D_imaginary_source/code_manifest.json",
+  "k_units": "nm^-1",
+  "BZ_conversion": "q = k/(pi/a); radial isotropic disk approximation, not an asserted exact BZ geometry",
+  "numpy": "2.4.6",
+  "licensed_solver_executed": false,
+  "model": "historical Demo26 baseline: kp8 dispersion shifts + single-band matrices",
+  "state_pairs": [
+    [
+      11,
+      12
+    ],
+    [
+      13,
+      14
+    ],
+    [
+      5,
+      6
+    ],
+    [
+      3,
+      4
+    ]
+  ],
+  "limitations": [
+    "Valence pair (3,4) is light-hole dominated; retained for historical reproduction",
+    "No finite-k spinor tracking; fixed solver columns and pair averaging",
+    "Single-band overlaps and matrix elements frozen at k=0",
+    "No explicit carrier occupations, excitons or additional pathways"
+  ],
+  "wavelength_points": 1451,
+  "wavelength_min_nm": 400.0,
+  "wavelength_max_nm": 1850.0,
+  "integration_measure": "g_s*k*dk/(2*pi), trapezoidal; isotropic in-plane approximation",
+  "prefactor": 56.69816882497043,
+  "prefactor_units": "maps nm/eV^2 times nm^-2 to historical pm/V convention",
+  "pathway_count": 16,
+  "normalization": "signed Re/Im and all sweep plots unnormalized; optional paper comparison uses own maxima",
+  "git_commit": "88c54ac559bfe90cce29e3d0d3229e95a3ada982",
+  "code_sha256": {
+    "chi2\\__init__.py": "0bd8e881d387715844ef63b6095fdb5817a3ec8b4a776d09b8d7e57ad5f27275",
+    "chi2\\artifacts.py": "543f488acc2b7f54b3ec65afd41160d6377773433e7147e75b5123f2a14a575d",
+    "chi2\\causality.py": "47ef40d8fb5d2eb4a16cdefcfb8278e2c2cd42bc95cf49f2a81ae7f5e9bb367d",
+    "chi2\\decks.py": "db08342483f4988d6df91b8c0a1b541b16eb42aab7e8c6127af8a099fc79cfd3",
+    "chi2\\diagnostics.py": "864ca3af9b26ec8ad848b4d0f081bc22be061bc10e78da54f47b383d847985c8",
+    "chi2\\equation2.py": "6f69da8fe002f7954f6f5013712522c9e63445f7aa5e7ac447e608e36283a460",
+    "chi2\\input_builder.py": "e3209cbaebda5951dae5832fe7e69d6408d38f238669da298780e692e7dea6df",
+    "chi2\\k_integration.py": "c0e2085e7c33817a6583712cac17637bef45ae565fbdbe8f310bbfb7f85adbe6",
+    "chi2\\matrix_elements.py": "a655fc37046f7f047a5a7c40c2f017fa87d96d713893407ffe235ebc3bc67407",
+    "chi2\\nextnano_runner.py": "2e14cce692d52bc9fbaf0c10bd24a124a490f5981e1909fcb099f5512412f046",
+    "chi2\\numerical_audit.py": "8e96e5b962e440bc8051d17cf69a75d834cd2fb30ec4e03696615e701a65f374",
+    "chi2\\parse_nextnano.py": "0f0577055b39c6ab33aa20e4b6d5965c18b894cde7a1176d26a0ba112efaa2a2",
+    "chi2\\plotting.py": "48ae1612dddde5b846e991688b678852009d52313307671fe838bb5a0ff20be1",
+    "chi2\\response_audit.py": "51ab5209b5bf3db2e298c76d9fe9113491cf1deaafb9b17b5c13e5b6dbd054f1",
+    "chi2\\state_audit.py": "b122ff6a7f5b41fa552702281e65f880b37dfe9daf2f6488ceafc83eefcc8e16",
+    "chi2\\studies.py": "4af12d80038a4c1dd5514bef7059819dcf0cf4fffe4ce61c5275943ad9c7c480"
+  },
+  "equation_implementation": "chi2/equation2.py::calculate_chi2",
+  "code_note": "Source hashes identify working-tree code even if Git commit is unavailable or dirty.",
+  "response_configuration": {
+    "baseline_config": "config/baseline.json",
+    "gamma_meV": [
+      0.1,
+      0.5,
+      1.0,
+      2.0,
+      5.0,
+      10.0,
+      20.0
+    ],
+    "selected_gamma_meV": [
+      1.0,
+      2.0,
+      5.0,
+      20.0
+    ],
+    "near_resonance_detuning_meV": 25.0,
+    "off_resonance_detuning_meV": 100.0,
+    "ratio_real_floor_fraction": 0.001,
+    "feature_wavelengths_nm": [
+      540.0,
+      760.0,
+      1080.0,
+      1520.0,
+      1550.0
+    ],
+    "top_pathways": 4,
+    "lattice_constant_nm": 0.565325
+  },
+  "k_points": 301,
+  "k_min_per_nm": 0.0,
+  "k_max_per_nm": 0.555714439232,
+  "lattice_constant_nm": 0.565325,
+  "input_arrays": "../../../28D_imaginary_source/chi2_inputs",
+  "numerical_warning": "Small Gamma on fixed 301-point k and 1 nm wavelength grids is not a converged Gamma-to-zero limit.",
+  "study": "28E_linewidth",
+  "features": {
+    "dominant_abs_Re_wavelength_nm": 1505.0,
+    "dominant_abs_Im_wavelength_nm": 1501.0,
+    "max_abs_Re_pm_per_V": 97.14828137813146,
+    "max_abs_Im_pm_per_V": 68.5724166323937,
+    "Re_peaks": [
+      {
+        "wavelength_nm": 687.0,
+        "signed_value_pm_per_V": 39.264324840250865
+      },
+      {
+        "wavelength_nm": 752.0,
+        "signed_value_pm_per_V": -50.134808552924795
+      },
+      {
+        "wavelength_nm": 1374.0,
+        "signed_value_pm_per_V": -83.04430493921132
+      },
+      {
+        "wavelength_nm": 1505.0,
+        "signed_value_pm_per_V": 97.14828137813146
+      }
+    ],
+    "Im_peaks": [
+      {
+        "wavelength_nm": 700.0,
+        "signed_value_pm_per_V": 28.8748810434128
+      },
+      {
+        "wavelength_nm": 750.0,
+        "signed_value_pm_per_V": 34.3369283463046
+      },
+      {
+        "wavelength_nm": 807.0,
+        "signed_value_pm_per_V": -1.5803789143123748
+      },
+      {
+        "wavelength_nm": 1392.0,
+        "signed_value_pm_per_V": -57.585121377137824
+      },
+      {
+        "wavelength_nm": 1501.0,
+        "signed_value_pm_per_V": -68.5724166323937
+      },
+      {
+        "wavelength_nm": 1616.0,
+        "signed_value_pm_per_V": 2.3153285199868536
+      }
+    ],
+    "Re_zero_crossings": [
+      {
+        "wavelength_nm": 713.7885165546212,
+        "real_pm_per_V": 2.8421709430404007e-13,
+        "imag_pm_per_V": 27.969563663462985
+      },
+      {
+        "wavelength_nm": 1436.9617176492256,
+        "real_pm_per_V": 2.2737367544323206e-13,
+        "imag_pm_per_V": -54.234460233965976
+      }
+    ],
+    "target_wavelength_nm": 1550.0,
+    "Re_at_target_pm_per_V": 26.549210688245665,
+    "Im_at_target_pm_per_V": 1.8359367915637017,
+    "feature_policy": "maxima refer to absolute component amplitude; labels do not track physical branches across peak switches"
+  },
+  "near_resonance": {
+    "samples": 500,
+    "safe_ratio_samples": 499,
+    "l2_abs_Im_over_Re": 1.1380019162139445,
+    "median_safe_abs_Im_over_Re": 0.1326261711517281,
+    "fraction_Im_dominant": 0.364,
+    "fraction_Re_dominant": 0.636
+  },
+  "off_resonance": {
+    "samples": 736,
+    "safe_ratio_samples": 736,
+    "l2_abs_Im_over_Re": 0.005755898407577626,
+    "median_safe_abs_Im_over_Re": 0.00311117429555954,
+    "fraction_Im_dominant": 0.0,
+    "fraction_Re_dominant": 1.0
+  },
+  "ratio_real_floor_pm_per_V": 0.09714828137813146,
+  "apparent_lobe_width": {
+    "Re": {
+      "status": "SAMPLED_HALF_PROMINENCE_LOBE",
+      "width_nm": 18.126140180429502,
+      "points_across_width": 18.126140180429502,
+      "peak_nm": 1505.0
+    },
+    "Im": {
+      "status": "SAMPLED_HALF_PROMINENCE_LOBE",
+      "width_nm": 130.42836617853686,
+      "points_across_width": 130.42836617853686,
+      "peak_nm": 1501.0
+    }
+  },
+  "resonance_definition": "min over solved k, n,m and p=1,2 of |E_nm(k)-p*hc/lambda|; fixed energy masks across all Gamma",
+  "wavelength_energy_step_max_eV": 0.0077296881795509975
+}

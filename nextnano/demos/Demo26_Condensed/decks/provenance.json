@@ -1,0 +1,23 @@
+{
+  "note": "kp8_dispersion.in is rendered by src/decks.py from config/runner.json; tests assert it token-matches validation/decks/demo23_production_y_n301_k0100.in. Single-band decks are byte-identical copies.",
+  "decks": [
+    {
+      "file": "kp8_dispersion.in",
+      "sha256": "fda48138d49d8423e0fc5162ac6708af9abe9d1bda3d557b8d34efa2b3be7a66",
+      "token_equivalent_to": "validation/decks/demo23_production_y_n301_k0100.in",
+      "historical_source": "demo_results/demo23/raw/production_y_n301_k0100/production_y_n301_k0100/production_y_n301_k0100.in"
+    },
+    {
+      "file": "singleband_case04_graded.in",
+      "sha256": "ec5d1e23688f87491e154c2e9e574fefd33c541ed22e901bf6ab336fbf6da115",
+      "historical_source": "demo_results/demo20/inputs/case_04/case.in",
+      "byte_identical": true
+    },
+    {
+      "file": "singleband_case00_abrupt.in",
+      "sha256": "8d472c29634c14eea016a2d2cda4256c5f5ec43a83625720a707cb3061e34eb0",
+      "historical_source": "demo_results/demo20/inputs/case_00/case.in",
+      "byte_identical": true
+    }
+  ]
+}

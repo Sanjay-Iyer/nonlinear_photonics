@@ -11,6 +11,7 @@
   "artifacts_written": [
     ".gitkeep",
     "ANALYSIS.md",
+    "ANALYSIS_STATUS.json",
     "CONTROLLED_CHANGE_DIFF.md",
     "COST_STATEMENT.json",
     "COST_STATEMENT.md",
