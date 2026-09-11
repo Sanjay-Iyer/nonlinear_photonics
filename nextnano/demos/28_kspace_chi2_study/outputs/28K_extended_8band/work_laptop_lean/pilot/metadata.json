@@ -1,0 +1,62 @@
+{
+  "timestamp_utc": "2026-09-11T15:56:42.539045+00:00",
+  "equation_implementation_sha256": "6f69da8fe002f7954f6f5013712522c9e63445f7aa5e7ac447e608e36283a460",
+  "study": "28K_preflight",
+  "static_status": "PASS",
+  "grammar": {
+    "status": "PASS",
+    "parser": "nextnano++_Microsoft_32bit_free.exe",
+    "errors": []
+  },
+  "configuration": {
+    "study": "28K_extended_8band",
+    "lattice_constant_nm": 0.565325,
+    "kmax_pi_over_a": 0.2,
+    "k_points": 3,
+    "output_profile": "lean",
+    "transfer_limit_bytes": 1000000000,
+    "num_electrons": 8,
+    "num_holes": 16,
+    "threads": 4,
+    "timeout_seconds": 86400,
+    "result_directory": "nextnano/extended_8band_lean_pilot",
+    "presentation_cutoffs_pi_over_a": [
+      0.1,
+      0.125,
+      0.15,
+      0.175,
+      0.2
+    ],
+    "analysis_cutoffs_pi_over_a": [
+      0.1,
+      0.11,
+      0.12,
+      0.125,
+      0.13,
+      0.14,
+      0.15,
+      0.16,
+      0.17,
+      0.175,
+      0.18,
+      0.19,
+      0.2
+    ],
+    "tracking_min_overlap": 0.5,
+    "tracking_margin": 0.05,
+    "optical_mapping_status": "REVIEW_REQUIRED: retain full spinor operator matrices; no full-spinor inner product substituted for interband envelope overlap",
+    "historical_reference": "outputs/28A_baseline/chi2_results/chi2_spectrum.csv",
+    "pilot": true
+  },
+  "kmax_per_nm": 1.111428878464527,
+  "requested_Nk": 3,
+  "requested_dk_per_nm": 0.5557144392322635,
+  "professional_execution_performed": false,
+  "state_count": 24,
+  "deck_sha256": "a637474c2c0995ec7c447ca50e1b926ab0a4f9fb6ee63f0fe86ad3b544553277",
+  "output_contract": "24 states and eight complex components at every explicit dispersion k; coverage must be verified after run",
+  "grid_distinction": "Only one radial dispersion path; NOT a multidirectional k_integration grid",
+  "plan_directory": "C:\\code\\nonlinear_photonics\\nextnano\\demos\\28_kspace_chi2_study\\outputs\\28K_extended_8band\\work_laptop_lean\\pilot",
+  "wavefunction_binary_bytes_at_281_spatial_nodes": 2589696,
+  "pending": "Professional execution and actual finite-k output coverage; scalar Eq2 optical mapping review"
+}

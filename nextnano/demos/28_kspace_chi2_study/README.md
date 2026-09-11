@@ -15,10 +15,12 @@ No Professional solve was launched on the home laptop. All executed physics uses
 ## Start here
 
 For the **new 28K/28L/28M Professional acquisition**, use
-[WORK_LAPTOP_8BAND_RUN.md](WORK_LAPTOP_8BAND_RUN.md) and
-[TRANSFER_BACK.md](TRANSFER_BACK.md). This extension requests 1201 finite-k
+[LEAN_8BAND_RUN.md](LEAN_8BAND_RUN.md) and
+[TRANSFER_BACK.md](TRANSFER_BACK.md). This extension now requests 601 finite-k
 8-band points through 0.20 pi/a; it does not replace or rerun 28A–28J.
-Acquisition preflight passes, but Professional output coverage and the reviewed
+Duplicate outputs are trimmed and numerical data is losslessly packed into a
+size-checked transfer folder (target below 1 GB; WORK text files are larger).
+Full/pilot preflight passes, but Professional output coverage and the reviewed
 8-band-to-Equation-2 optical mapping remain pending. No new physics results exist.
 
 From this directory, with Python 3.10+ and the packages in `requirements.txt` installed:

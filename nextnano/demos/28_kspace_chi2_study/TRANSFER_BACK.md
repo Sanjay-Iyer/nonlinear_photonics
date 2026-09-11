@@ -1,4 +1,32 @@
-# Copy one complete directory home
+# Current lean run: copy one compact directory home
+
+For the updated 601-point run, copy ONLY:
+
+```text
+nextnano/demos/28_kspace_chi2_study/nextnano/extended_8band_lean_work_results_transfer/
+```
+
+The runner automatically creates this lossless numerical bundle after a successful
+lean run. It includes all complex CB/HH/LH/SO envelopes, energies, composition,
+grids/state IDs, exact deck/config/log, provenance and checksums. The whole folder
+is checked against a 1 GB budget. Original text remains on WORK and is not deleted.
+
+From the HOME repository root:
+
+```powershell
+python nextnano/demos/28_kspace_chi2_study/scripts/run_extended_8band.py --validate nextnano/demos/28_kspace_chi2_study/nextnano/extended_8band_lean_work_results_transfer
+```
+
+Use [LEAN_8BAND_RUN.md](LEAN_8BAND_RUN.md) for pilot/full-run commands, the compact
+layout, size caveats, direct HOME ingestion and packing an already-completed run.
+No chi2 calculation or plots need to run on WORK. Compact storage preserves the
+parsed numbers exactly, not original text formatting. Keep the original WORK text
+until transfer and HOME analysis have been verified.
+
+## Historical uncompressed transfer instructions
+
+The instructions below apply only to an original raw-text bundle, NOT the current
+compact default. They are retained for already-existing runs.
 
 After the new WORK-laptop command finishes, copy this entire directory, preserving
 all nested paths, into the same location in the home repository:

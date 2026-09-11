@@ -16,7 +16,7 @@ from .artifacts import write_json,manifest,csv
 import numpy as np
 
 ROOT=Path(__file__).resolve().parents[1]
-PLAN=ROOT/'outputs/28K_extended_8band/work_laptop'
+PLAN=ROOT/'outputs/28K_extended_8band/work_laptop_lean'
 
 
 def load_config(path=ROOT/'config/extended_8band.json'):
@@ -24,6 +24,8 @@ def load_config(path=ROOT/'config/extended_8band.json'):
     if c['k_points']<2 or c['num_electrons']<4 or c['num_holes']<4:raise ValueError('Insufficient points/states')
     if not 0<c['kmax_pi_over_a']<=.2 or c['lattice_constant_nm']<=0:raise ValueError('Invalid acquisition range')
     if c['threads']<1 or c['timeout_seconds']<=0:raise ValueError('Invalid execution settings')
+    if c.get('output_profile') not in (None,'lean'):raise ValueError('Unknown output profile')
+    if c.get('transfer_limit_bytes',1000000000)<=0:raise ValueError('Transfer byte limit must be positive')
     for f in c['analysis_cutoffs_pi_over_a']+c['presentation_cutoffs_pi_over_a']:
         if not 0<f<=c['kmax_pi_over_a']:raise ValueError('Cutoff outside requested run')
     return c
@@ -40,30 +42,39 @@ def render(c):
     text=text.replace('            k_integration_disabled{}','            lapack{ accuracy = 1e-10 }\n            k_integration_disabled{}')
     text=text.replace('        output_states{',f'        output_energies_on_grid{{ max_num = {n} all_k_points = yes }}\n        output_states{{')
     text=text.replace('            output_masses{ max_num = '+str(n)+' }','')
+    if c.get('output_profile')=='lean':
+        text=text.replace('            envelopes = yes','            energy_shift = not_shifted\n            envelopes = no')
+        text=text.replace('            probabilities = yes','            probabilities = no')
+        text=text.replace('            probabilities_partial_CB_HH_LH_SO = yes','            probabilities_partial_CB_HH_LH_SO = no')
+        text=text.replace('            spinor_composition = yes','            spinor_composition = no')
+        text=text.replace('            output_oscillator_strengths = yes','            output_oscillator_strengths = no')
     problems=decks.static_check(text,'kp8')
     if problems:raise ValueError(problems)
     return text
 
 
 def prepare(c,parser_exe=None,parser_database=None,no_parse=False,parser_license=None):
-    PLAN.mkdir(parents=True,exist_ok=True)
-    path=PLAN/'extended_8band.in';path.write_text(render(c),encoding='utf-8')
-    write_json(PLAN/'runner.json',c)
+    plan=PLAN/'pilot' if c.get('pilot') else PLAN
+    plan.mkdir(parents=True,exist_ok=True)
+    path=plan/'extended_8band.in';path.write_text(render(c),encoding='utf-8')
+    write_json(plan/'runner.json',c)
     k=np.linspace(0,c['kmax_pi_over_a']*np.pi/c['lattice_constant_nm'],c['k_points'])
-    csv(PLAN/'requested_k_grid.csv',np.column_stack([np.arange(len(k)),k,np.zeros(len(k)),k,np.zeros(len(k))]),
+    csv(plan/'requested_k_grid.csv',np.column_stack([np.arange(len(k)),k,np.zeros(len(k)),k,np.zeros(len(k))]),
         'requested_index,k_per_nm,kx_per_nm,ky_per_nm,kz_per_nm')
     if not parser_exe:parser_exe,parser_database=discover_parser()
     grammar={'status':'NOT_CHECKED','reason':'No configured parser or --no-parse'}
     if not no_parse and parser_exe and parser_database:
-        grammar=parse_check(parser_exe,parser_database,path,PLAN/'parser_scratch',parser_license)
+        grammar=parse_check(parser_exe,parser_database,path,plan/'parser_scratch',parser_license)
     report={'study':'28K_preflight','static_status':'PASS','grammar':grammar,'configuration':c,
         'kmax_per_nm':float(k[-1]),'requested_Nk':len(k),'requested_dk_per_nm':float(k[1]-k[0]),
         'professional_execution_performed':False,'state_count':c['num_electrons']+c['num_holes'],
         'deck_sha256':hashlib.sha256(path.read_bytes()).hexdigest(),
         'output_contract':'24 states and eight complex components at every explicit dispersion k; coverage must be verified after run',
-        'grid_distinction':'Only one radial dispersion path; NOT k_integration num_points=1201 (2D grid parameter)',
+        'grid_distinction':'Only one radial dispersion path; NOT a multidirectional k_integration grid',
+        'plan_directory':str(plan),
+        'wavefunction_binary_bytes_at_281_spatial_nodes':len(k)*(c['num_electrons']+c['num_holes'])*8*281*16,
         'pending':'Professional execution and actual finite-k output coverage; scalar Eq2 optical mapping review'}
-    write_json(PLAN/'metadata.json',report)
+    write_json(plan/'metadata.json',report)
     print('28K static PASS; grammar '+grammar['status']+'; no Professional solve launched')
     if grammar['status']=='FAIL':
         print('Parser: '+grammar['parser']+'\nErrors: '+'; '.join(grammar['errors']))
@@ -74,6 +85,9 @@ def prepare(c,parser_exe=None,parser_database=None,no_parse=False,parser_license
 def inventory(root,c,check_hashes=True):
     """Fail closed on old k=0-only archives, wrong grid, missing components or transfer corruption."""
     root=Path(root);problems=[]
+    if (root/'compact.json').is_file():
+        from .compact8band import validate_compact
+        return validate_compact(root,c,check_hashes)
     required=['run_configuration.json','run_metadata.json','decks/extended_8band.in','checksums.json','solver.log']
     problems.extend('missing '+p for p in required if not (root/p).is_file())
     raw=root/'raw'
@@ -151,7 +165,8 @@ def machine_paths(args):
 
 
 # Per-k files the return validator requires: energy spectrum, composition, 8 components per state.
-PER_K=re.compile(r'^(energy_spectrum_k\d{5}\.dat|spinor_composition_k\d{5}_CbHhLhSo\.dat|envelope_k\d{5}_\d{4}_\w+\.dat)$')
+# nextnano++ also writes SXYZ, envelope_shift and probability files per k; those must not count.
+PER_K=re.compile(r'^(energy_spectrum_k\d{5}\.dat|spinor_composition_k\d{5}_CbHhLhSo\.dat|envelope_k\d{5}_\d{4}_(cb|hh|lh|so)[12]\.dat)$')
 K_DONE=re.compile(r'^energy_spectrum_k(\d{5})\.dat$')
 
 
@@ -181,7 +196,7 @@ def watch_solver(argv,result,c,interval):
     """
     import time
     nk=c['k_points'];expected=nk*(2+8*(c['num_electrons']+c['num_holes']))
-    log_path=result/'solver.log';pos=0;last='(no solver output yet)';first=None
+    log_path=result/'solver.log';pos=0;last='(no solver output yet)';first=None;wait=interval
     start=time.monotonic()
     with log_path.open('w',encoding='utf-8') as log:
         proc=subprocess.Popen(argv,cwd=result,stdout=log,stderr=subprocess.STDOUT)
@@ -190,7 +205,7 @@ def watch_solver(argv,result,c,interval):
               f'also written to {result/"progress.json"}. Ctrl+C stops the solver.',flush=True)
         try:
             while True:
-                try:code=proc.wait(timeout=interval)
+                try:code=proc.wait(timeout=wait)
                 except subprocess.TimeoutExpired:code=None
                 with log_path.open('rb') as f:
                     f.seek(pos);new=f.read();pos+=len(new)
@@ -198,6 +213,8 @@ def watch_solver(argv,result,c,interval):
                 if lines:last=lines[-1][:80]
                 now=time.monotonic();elapsed=now-start
                 raw_files,done,k_done=scan_raw(result/'raw')
+                # A full raw/ can reach ~1.5M files; keep the directory walk under ~10% of wall time.
+                wait=max(interval,10*(time.monotonic()-now))
                 if done and first is None:first=(now,done)
                 eta='done' if done>=expected else '?'
                 if first and first[1]<done<expected:eta=fmt_secs((expected-done)*(now-first[0])/(done-first[1]))
@@ -228,7 +245,7 @@ def run(c,args):
     result.mkdir(parents=True);(result/'decks').mkdir()
     deck=result/'decks/extended_8band.in';deck.write_text(render(c),encoding='utf-8')
     write_json(result/'run_configuration.json',c)
-    (result/'requested_k_grid.csv').write_bytes((PLAN/'requested_k_grid.csv').read_bytes())
+    (result/'requested_k_grid.csv').write_bytes((Path(prep['plan_directory'])/'requested_k_grid.csv').read_bytes())
     argv=command(exe,db,lic,deck,result/'raw',c['threads'])
     info={'study':'28K','started_utc':datetime.now(timezone.utc).isoformat(),'professional_execution_performed':False,
           'argv':argv,'executable_sha256':hashlib.sha256(Path(exe).read_bytes()).hexdigest(),
@@ -247,27 +264,44 @@ def run(c,args):
         print('Interrupted; solver killed. Partial run left in '+str(result)+' (rename/delete it before re-running).')
         return 130
     info['finished_utc']=datetime.now(timezone.utc).isoformat();write_json(result/'run_metadata.json',info)
-    print(f"Solver finished (return code {info['return_code']}). Hashing and validating outputs; this can take a while for ~230k files...",flush=True)
+    print(f"Solver finished (return code {info['return_code']}). Hashing and validating raw outputs...",flush=True)
     write_json(result/'checksums.json',[p for p in manifest(result) if p['file'] not in ['checksums.json','return_validation.json']])
-    validation=inventory(result,c);write_json(result/'return_validation.json',validation)
-    print('Return-data coverage '+validation['status']+'. Keep the ENTIRE directory: '+str(result))
+    # Freshly hashed closed run: avoid immediately rereading all raw bytes again.
+    validation=inventory(result,c,check_hashes=False)
+    validation['hash_policy']='Fresh checksums recorded; full recheck on standalone --pack/--validate'
+    write_json(result/'return_validation.json',validation)
+    print('Raw coverage '+validation['status']+'. Original raw files retained: '+str(result))
+    if validation['status']=='PASS' and c.get('output_profile')=='lean':
+        from .compact8band import pack
+        transfer=pack(result,result.with_name(result.name+'_transfer'),validated=True)
+        print('Copy only the compact folder: '+str(transfer))
     return 0 if validation['status']=='PASS' else 2
 
 
 def main(argv=None):
     p=argparse.ArgumentParser(description=__doc__);m=p.add_mutually_exclusive_group()
-    m.add_argument('--run',action='store_true');m.add_argument('--preflight',action='store_true');m.add_argument('--dry-run',action='store_true');m.add_argument('--validate',type=Path)
+    m.add_argument('--run',action='store_true');m.add_argument('--preflight',action='store_true');m.add_argument('--dry-run',action='store_true');m.add_argument('--validate',type=Path);m.add_argument('--pack',type=Path,help='package an existing completed raw run; never launches nextnano')
+    p.add_argument('--pilot',action='store_true',help='three-k output check; combine with --run only on WORK')
     p.add_argument('--config',type=Path,default=ROOT/'config/extended_8band.json');p.add_argument('--output',type=Path)
     p.add_argument('--exe');p.add_argument('--database');p.add_argument('--license');p.add_argument('--no-parse',action='store_true')
     p.add_argument('--progress-interval',type=int,default=60,help='seconds between progress lines during --run')
     a=p.parse_args(argv)
     try:
+        if a.progress_interval<1:raise ValueError('Progress interval must be positive')
         c=load_config(a.config)
+        if a.pilot:
+            if a.validate or a.pack:raise ValueError('--pilot is only for preflight or --run')
+            c={**c,'k_points':3,'pilot':True,'result_directory':'nextnano/extended_8band_lean_pilot'}
         if a.validate:
+            c=load_config(a.validate/'run_configuration.json')
             r=inventory(a.validate,c);print(json.dumps(r,indent=2));return 0 if r['status']=='PASS' else 2
+        if a.pack:
+            from .compact8band import pack
+            dest=a.output or a.pack.with_name(a.pack.name+'_transfer')
+            print('Compact transfer folder: '+str(pack(a.pack,dest)));return 0
         if a.run:return run(c,a)
         exe,db,lic=machine_paths(a)
         r=prepare(c,exe,db,a.no_parse,lic)
-        print('Work command (from repo root): python nextnano/demos/28_kspace_chi2_study/scripts/run_extended_8band.py --run')
+        print('Work command (from repo root): python nextnano/demos/28_kspace_chi2_study/scripts/run_extended_8band.py --run'+(' --pilot' if a.pilot else ''))
         return 1 if r['grammar']['status']=='FAIL' else 0
     except (OSError,ValueError,KeyError) as exc:print('ERROR:',exc);return 2

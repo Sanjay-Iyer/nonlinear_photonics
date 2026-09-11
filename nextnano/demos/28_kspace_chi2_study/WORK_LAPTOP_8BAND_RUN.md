@@ -1,5 +1,9 @@
 # 28K / 28L / 28M — acquisition handoff
 
+> **Historical 1201-point plan.** For the current 601-point lean run and compact
+> transfer, use [LEAN_8BAND_RUN.md](LEAN_8BAND_RUN.md). The settings below describe
+> the original run, not the new default.
+
 Status: preparation only. No new Professional data or new physics results exist.
 28A–28J and Equation 2 are retained unchanged. This is separate from the earlier
 28C work-laptop plan; use the command below for the new extended 8-band run.

@@ -11,6 +11,7 @@ from scipy.optimize import linear_sum_assignment
 from . import parse_nextnano as io
 from .artifacts import csv, write_json
 from .extended8band import ROOT, load_config, inventory
+from .compact8band import source_frames
 
 
 def matrix_data(z, psi):
@@ -41,47 +42,38 @@ def assign(previous,current,w,min_overlap=.5,margin=.05):
 
 
 def ingest(source,out,c):
+    if c.get('pilot'):raise ValueError('Pilot is for output coverage only, not production state/chi2 analysis')
     report=inventory(source,c)
     if report['status']!='PASS':raise ValueError('Returned-data validation failed: '+str(report['problems'][:8]))
     out=Path(out)
     if out.exists():raise ValueError('Refusing existing analysis output')
-    k,energy,_=io.read_dispersion(Path(source)/'raw');n=energy.shape[1]
-    lookup={p.name:p for p in (Path(source)/'raw').rglob('*') if p.is_file()}
+    n=c['num_electrons']+c['num_holes']
     out.mkdir(parents=True);(out/'operator_blocks').mkdir()
     rows=[];previous=None;zref=None;ambiguous_total=0
-    for i,ki in enumerate(k):
-        parts=[]
-        for s in range(1,n+1):
-            block=[]
-            for tag in io.KP8_COMPONENTS:
-                _,d=io.read_table(lookup[f'envelope_k{i:05d}_{s:04d}_{tag}.dat'])
-                if zref is None:zref=d[:,0]
-                if len(d)!=len(zref) or not np.allclose(zref,d[:,0],rtol=0,atol=1e-9):raise ValueError('Spatial grid mismatch')
-                if d.shape[1]!=3:raise ValueError('Expected z, real, imaginary envelope columns')
-                block.append(d[:,1]+1j*d[:,2])
-            parts.append(block)
-        psi,tensor,zm,norm=matrix_data(zref,np.asarray(parts));w=io.trapezoid_weights(zref)
+    for i,(ki,energy,z,parts,comp) in enumerate(source_frames(source)):
+        if zref is None:zref=z
+        if not np.array_equal(zref,z):raise ValueError('Spatial grid mismatch')
+        psi,tensor,zm,norm=matrix_data(zref,parts);w=io.trapezoid_weights(zref)
         gram=np.einsum('abmm->ab',tensor)
         if np.max(abs(gram-np.eye(n)))>.02:raise ValueError(f'Nonorthogonal spinors at k index {i}')
         char=np.einsum('acz,acz,z->ac',psi.conj(),psi,w).real
-        comp=io.read_composition(lookup[f'spinor_composition_k{i:05d}_CbHhLhSo.dat'])
-        if not np.allclose(char,np.column_stack([comp[t] for t in io.KP8_COMPONENTS]),atol=.02,rtol=0):
+        if not np.allclose(char,comp,atol=.02,rtol=0):
             raise ValueError(f'Envelope/composition mismatch at k index {i}')
         if previous is None:order=np.arange(n);score=np.ones(n);gap=np.full(n,np.nan);flags=np.zeros(n,bool)
         else:order,score,gap,flags=assign(previous,psi,w,c['tracking_min_overlap'],c['tracking_margin'])
         # A small energy separation also marks a basis-dependent individual label.
-        separation=abs(energy[i,:,None]-energy[i,None,:]);np.fill_diagonal(separation,np.inf)
+        separation=abs(energy[:,None]-energy[None,:]);np.fill_diagonal(separation,np.inf)
         flags|=(separation.min(axis=1)[order]<1e-6)
         ambiguous_total+=int(flags.sum())
         for branch,s in enumerate(order):
             blocks=char[s].reshape(4,2).sum(axis=1)
-            rows.append([i,ki,branch+1,s+1,energy[i,s],*blocks,score[branch],gap[branch],int(flags[branch])])
-        np.savez_compressed(out/'operator_blocks'/f'k{i:05d}.npz',k_per_nm=ki,energy_eV=energy[i],
+            rows.append([i,ki,branch+1,s+1,energy[s],*blocks,score[branch],gap[branch],int(flags[branch])])
+        np.savez_compressed(out/'operator_blocks'/f'k{i:05d}.npz',k_per_nm=ki,energy_eV=energy,
             solver_state=np.arange(1,n+1),branch_to_solver=order+1,component_overlap=tensor,z_nm=zm,
             components=np.array(io.KP8_COMPONENTS),normalization_before=norm,ambiguous=flags)
         previous=psi[order]
     csv(out/'tracked_candidates.csv',rows,'k_index,k_per_nm,candidate_branch,solver_state,energy_eV,CB,HH,LH,SO,adjacent_overlap,assignment_margin,ambiguous')
-    write_json(out/'metadata.json',{'study':'28L_28M_preparation','source':str(Path(source).resolve()),'Nk':len(k),
+    write_json(out/'metadata.json',{'study':'28L_28M_preparation','source':str(Path(source).resolve()),'Nk':c['k_points'],
         'ambiguous_assignments':ambiguous_total,'assignment':'maximum adjacent overlap, all candidate states; NOT certified e1/e2/hh1/hh2',
         'review_required':'Inspect flagged crossings/degenerate subspaces before selecting branches; supply reviewed optical operator and spin convention',
         'chi2_evaluated':False,'historical_inputs_used':False})
@@ -117,4 +109,4 @@ def eq2_inputs(blocks,electron_branches,valence_branches,optical_operator,review
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--input',type=Path,required=True)
     p.add_argument('--output',type=Path,default=ROOT/'outputs/28L_state_tracking/returned_data')
-    a=p.parse_args();ingest(a.input,a.output,load_config())
+    a=p.parse_args();ingest(a.input,a.output,load_config(a.input/'run_configuration.json'))

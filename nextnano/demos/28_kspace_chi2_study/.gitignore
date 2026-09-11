@@ -6,3 +6,6 @@ outputs/test_*/
 outputs/regression_tmp*/
 nextnano/new_results/
 nextnano/extended_8band_work_results/
+nextnano/extended_8band_lean_work_results*/
+nextnano/extended_8band_lean_pilot*/
+nextnano/extended_8band_work_results_transfer/

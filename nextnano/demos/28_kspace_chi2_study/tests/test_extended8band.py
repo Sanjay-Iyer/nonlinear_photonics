@@ -10,7 +10,10 @@ from chi2.extended8band_plots import meeting_spectra
 
 def test_dense_deck_contract():
     c=ext.load_config();deck=ext.render(c)
-    assert c['k_points']==1201 and c['kmax_pi_over_a']==.2
+    assert c['k_points']==601 and c['kmax_pi_over_a']==.2
+    assert 'energy_shift = not_shifted' in deck
+    assert 'envelopes = no' in deck and 'envelopes_CB_HH_LH_SO = yes' in deck
+    assert 'probabilities = no' in deck
     assert re.search(r'num_holes\s*=\s*16',deck)
     for text in ('num_electrons = 8','all_k_points = yes','k_point_subdirectories = yes','output_energies_on_grid','k_integration_disabled{}'):
         assert text in deck
@@ -24,7 +27,7 @@ def test_preflight_never_solves(tmp_path,monkeypatch):
     monkeypatch.setattr(ext.subprocess,'run',lambda *a,**k:pytest.fail('Unexpected subprocess'))
     r=ext.prepare(ext.load_config(),no_parse=True)
     assert not r['professional_execution_performed']
-    assert r['requested_Nk']==1201
+    assert r['requested_Nk']==601
 
 
 def test_free_rejected(tmp_path):
