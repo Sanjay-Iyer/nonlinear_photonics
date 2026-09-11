@@ -131,10 +131,26 @@ def inventory(root,c,check_hashes=True):
             'new_physics_analysis_performed':False}
 
 
+MACHINE_YAML=ROOT.parents[1]/'config/paths.local.yaml'
+
+
+def machine_paths(args):
+    """CLI flag > NEXTNANO_* env > nextnano/config/paths.local.yaml (same file the other demos use)."""
+    local={}
+    if MACHINE_YAML.is_file():
+        import yaml
+        block=(yaml.safe_load(MACHINE_YAML.read_text(encoding='utf-8')) or {}).get('nextnano++') or {}
+        local={k:os.path.expanduser(os.path.expandvars(str(v))) for k,v in block.items()
+               if k in ('exe','database','license') and v and not str(v).startswith('PATH_TO_')}
+    pick=lambda flag,env,key:flag or os.environ.get(env) or local.get(key)
+    return (pick(args.exe,'NEXTNANO_EXE','exe'),pick(args.database,'NEXTNANO_DATABASE','database'),
+            pick(args.license,'NEXTNANO_LICENSE','license'))
+
+
 def run(c,args):
-    exe=args.exe or os.environ.get('NEXTNANO_EXE');db=args.database or os.environ.get('NEXTNANO_DATABASE');lic=args.license or os.environ.get('NEXTNANO_LICENSE')
+    exe,db,lic=machine_paths(args)
     for label,p in [('executable',exe),('database',db),('license',lic)]:
-        if not p or not Path(p).is_file():raise ValueError('Configure Professional '+label+' via CLI or NEXTNANO_* environment')
+        if not p or not Path(p).is_file():raise ValueError('Configure Professional '+label+' via CLI, NEXTNANO_* environment or '+str(MACHINE_YAML)+' (got '+repr(p)+')')
     if 'free' in Path(exe).name.lower():raise ValueError('Professional required; Free executable rejected')
     result=(args.output or ROOT/c['result_directory']).resolve()
     if result.exists():raise ValueError('Refusing existing output directory; choose a new --output')
@@ -177,7 +193,8 @@ def main(argv=None):
         if a.validate:
             r=inventory(a.validate,c);print(json.dumps(r,indent=2));return 0 if r['status']=='PASS' else 2
         if a.run:return run(c,a)
-        r=prepare(c,a.exe,a.database,a.no_parse)
+        exe,db,_=machine_paths(a)
+        r=prepare(c,exe,db,a.no_parse)
         print('Work command: python scripts/run_extended_8band.py --run')
         return 1 if r['grammar']['status']=='FAIL' else 0
     except (OSError,ValueError,KeyError) as exc:print('ERROR:',exc);return 2

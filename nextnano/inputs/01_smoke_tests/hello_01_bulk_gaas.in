@@ -15,10 +15,15 @@ grid{
     }
 }
 
+contacts{
+    fermi{ name = bulk_contact  bias = 0.0 }
+}
+
 structure{
     region{
         everywhere{}
         binary{ name = "GaAs" }
+        contact{ name = bulk_contact }
     }
 }
 
@@ -28,6 +33,10 @@ classical{
     LH{}
     SO{}
     output_bandedges{ averaged = no }
+}
+
+strain{
+    pseudomorphic_strain{}
 }
 
 run{

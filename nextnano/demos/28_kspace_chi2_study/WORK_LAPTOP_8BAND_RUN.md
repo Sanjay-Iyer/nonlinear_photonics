@@ -12,9 +12,10 @@ From the repository root on the WORK laptop, with the project Python environment
 python nextnano/demos/28_kspace_chi2_study/scripts/run_extended_8band.py --run
 ```
 
-Beforehand, configure `NEXTNANO_EXE`, `NEXTNANO_DATABASE`, and `NEXTNANO_LICENSE`
-to existing absolute paths for the Professional executable, its matching material
-database, and your license file. Alternatively pass `--exe`, `--database`, `--license`.
+Paths come from the same gitignored `nextnano/config/paths.local.yaml` the other
+demos use (`exe`, `database`, `license` under `nextnano++:`), so nothing extra is
+needed if that file is already filled in. `NEXTNANO_EXE`, `NEXTNANO_DATABASE`,
+`NEXTNANO_LICENSE`, or `--exe`/`--database`/`--license` override it (flag > env > yaml).
 Do not put license contents in Git. Install the package's `requirements.txt` in the
 Python environment if needed. No new Python dependency is introduced.
 
