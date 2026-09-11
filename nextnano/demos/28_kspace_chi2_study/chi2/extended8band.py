@@ -150,6 +150,71 @@ def machine_paths(args):
             pick(args.license,'NEXTNANO_LICENSE','license'))
 
 
+# Per-k files the return validator requires: energy spectrum, composition, 8 components per state.
+PER_K=re.compile(r'^(energy_spectrum_k\d{5}\.dat|spinor_composition_k\d{5}_CbHhLhSo\.dat|envelope_k\d{5}_\d{4}_\w+\.dat)$')
+K_DONE=re.compile(r'^energy_spectrum_k(\d{5})\.dat$')
+
+
+def fmt_secs(s):
+    s=int(s);return f'{s//3600:d}h{s%3600//60:02d}m{s%60:02d}s'
+
+
+def scan_raw(root):
+    """(all files, per-k files, distinct k with an energy spectrum) currently under raw/."""
+    total=per_k=0;ks=set()
+    for _,_,names in os.walk(root):
+        total+=len(names)
+        for name in names:
+            if PER_K.match(name):
+                per_k+=1;m=K_DONE.match(name)
+                if m:ks.add(m.group(1))
+    return total,per_k,len(ks)
+
+
+def watch_solver(argv,result,c,interval):
+    """Run nextnano++ to solver.log and print a rough progress estimate every `interval` seconds.
+
+    nextnano++ prints no per-k counter, so percent = per-k files on disk / Nk*(2+8*states), and
+    ETA extrapolates the file rate since the first one appeared. If nextnano++ buffers writes
+    to the end, percent sits near 0 until then; 'raw files' and the last log line still move.
+    The same snapshot goes to progress.json so another window can check it.
+    """
+    import time
+    nk=c['k_points'];expected=nk*(2+8*(c['num_electrons']+c['num_holes']))
+    log_path=result/'solver.log';pos=0;last='(no solver output yet)';first=None
+    start=time.monotonic()
+    with log_path.open('w',encoding='utf-8') as log:
+        proc=subprocess.Popen(argv,cwd=result,stdout=log,stderr=subprocess.STDOUT)
+        print(f'nextnano++ started (pid {proc.pid}). Log: {log_path}')
+        print(f'Progress every {interval}s, estimated from {expected:,} expected per-k files ({nk} k); '
+              f'also written to {result/"progress.json"}. Ctrl+C stops the solver.',flush=True)
+        try:
+            while True:
+                try:code=proc.wait(timeout=interval)
+                except subprocess.TimeoutExpired:code=None
+                with log_path.open('rb') as f:
+                    f.seek(pos);new=f.read();pos+=len(new)
+                lines=[l.strip() for l in new.decode('utf-8','replace').splitlines() if l.strip()]
+                if lines:last=lines[-1][:80]
+                now=time.monotonic();elapsed=now-start
+                raw_files,done,k_done=scan_raw(result/'raw')
+                if done and first is None:first=(now,done)
+                eta='done' if done>=expected else '?'
+                if first and first[1]<done<expected:eta=fmt_secs((expected-done)*(now-first[0])/(done-first[1]))
+                pct=100*min(done,expected)/expected
+                state={'elapsed':fmt_secs(elapsed),'percent':round(pct,1),'eta':eta,'k_with_energy_spectrum':k_done,
+                       'k_points':nk,'per_k_files':done,'expected_per_k_files':expected,'raw_files':raw_files,
+                       'last_log_line':last,'running':code is None,'updated_utc':datetime.now(timezone.utc).isoformat()}
+                write_json(result/'progress.json',state)
+                print(f"[{state['elapsed']}] ~{pct:5.1f}% | ETA {eta} | k {k_done}/{nk} | "
+                      f"per-k files {done:,}/{expected:,} | raw files {raw_files:,} | {last}",flush=True)
+                if code is not None:return code
+                if elapsed>c['timeout_seconds']:
+                    proc.kill();proc.wait();raise subprocess.TimeoutExpired(argv,c['timeout_seconds'])
+        except KeyboardInterrupt:
+            proc.kill();proc.wait();raise
+
+
 def run(c,args):
     exe,db,lic=machine_paths(args)
     for label,p in [('executable',exe),('database',db),('license',lic)]:
@@ -171,14 +236,18 @@ def run(c,args):
           'note':'License contents not copied; exact solver version/header retained in solver.log and simulation_info'}
     write_json(result/'run_metadata.json',info)
     try:
-        with (result/'solver.log').open('w',encoding='utf-8') as log:
-            info['professional_execution_performed']=True;write_json(result/'run_metadata.json',info)
-            done=subprocess.run(argv,cwd=result,stdout=log,stderr=subprocess.STDOUT,timeout=c['timeout_seconds'],check=False)
-        info['return_code']=done.returncode
+        info['professional_execution_performed']=True;write_json(result/'run_metadata.json',info)
+        info['return_code']=watch_solver(argv,result,c,args.progress_interval)
         blob=(result/'solver.log').read_text(errors='replace').lower()
         if any(x in blob for x in FATAL):info['return_code']=info['return_code'] or 1
     except (OSError,subprocess.TimeoutExpired) as exc:info.update(return_code=-1,error=str(exc))
+    except KeyboardInterrupt:
+        info.update(return_code=-2,error='Interrupted by user (Ctrl+C); solver killed')
+        info['finished_utc']=datetime.now(timezone.utc).isoformat();write_json(result/'run_metadata.json',info)
+        print('Interrupted; solver killed. Partial run left in '+str(result)+' (rename/delete it before re-running).')
+        return 130
     info['finished_utc']=datetime.now(timezone.utc).isoformat();write_json(result/'run_metadata.json',info)
+    print(f"Solver finished (return code {info['return_code']}). Hashing and validating outputs; this can take a while for ~230k files...",flush=True)
     write_json(result/'checksums.json',[p for p in manifest(result) if p['file'] not in ['checksums.json','return_validation.json']])
     validation=inventory(result,c);write_json(result/'return_validation.json',validation)
     print('Return-data coverage '+validation['status']+'. Keep the ENTIRE directory: '+str(result))
@@ -190,6 +259,7 @@ def main(argv=None):
     m.add_argument('--run',action='store_true');m.add_argument('--preflight',action='store_true');m.add_argument('--dry-run',action='store_true');m.add_argument('--validate',type=Path)
     p.add_argument('--config',type=Path,default=ROOT/'config/extended_8band.json');p.add_argument('--output',type=Path)
     p.add_argument('--exe');p.add_argument('--database');p.add_argument('--license');p.add_argument('--no-parse',action='store_true')
+    p.add_argument('--progress-interval',type=int,default=60,help='seconds between progress lines during --run')
     a=p.parse_args(argv)
     try:
         c=load_config(a.config)
@@ -198,6 +268,6 @@ def main(argv=None):
         if a.run:return run(c,a)
         exe,db,lic=machine_paths(a)
         r=prepare(c,exe,db,a.no_parse,lic)
-        print('Work command: python scripts/run_extended_8band.py --run')
+        print('Work command (from repo root): python nextnano/demos/28_kspace_chi2_study/scripts/run_extended_8band.py --run')
         return 1 if r['grammar']['status']=='FAIL' else 0
     except (OSError,ValueError,KeyError) as exc:print('ERROR:',exc);return 2

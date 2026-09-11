@@ -19,6 +19,20 @@ needed if that file is already filled in. `NEXTNANO_EXE`, `NEXTNANO_DATABASE`,
 Do not put license contents in Git. Install the package's `requirements.txt` in the
 Python environment if needed. No new Python dependency is introduced.
 
+During `--run` a progress line prints every 60 s (`--progress-interval N` to change):
+
+```
+[1h12m00s] ~ 18.4% | ETA 5h19m40s | k 221/1201 | per-k files 42,871/232,994 | raw files 43,020 | <last solver.log line>
+```
+
+nextnano++ prints no per-k counter, so the percent is a rough estimate: per-k output files
+on disk (energy spectrum + composition + 24×8 envelopes per k) over the 232,994 expected.
+The ETA extrapolates the file-writing rate. If the percent stays near 0 while `raw files`
+and the log keep moving, nextnano++ is holding per-k output until the end (or writing only
+k=0); let it finish and let the validator decide. The same snapshot is in `<result>/progress.json`; the full solver
+output is in `<result>/solver.log` (`Get-Content <result>\solver.log -Tail 20 -Wait`).
+Ctrl+C kills the solver and records the interruption; rename/delete that result before re-running.
+
 The runner checks syntax first, refuses a Free executable and refuses an existing
 result directory. `--preflight` checks syntax without a physics solve;
 `--dry-run` has the same safe behavior. `--no-parse` is a static-only check and is
