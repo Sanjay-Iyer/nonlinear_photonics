@@ -71,18 +71,28 @@ def discover_parser() -> tuple[str | None, str | None]:
     return None, None
 
 
-def parse_check(exe, database, deck: Path, scratch: Path) -> dict:
-    """Grammar-only check with any nextnano++ build (a Free build needs no license)."""
-    argv = [str(exe), "--parse", "-d", str(database), "--threads", "1", "-o", str(scratch), str(deck)]
+def parse_check(exe, database, deck: Path, scratch: Path, license=None) -> dict:
+    """Grammar-only check. A Free build needs no license; a licensed build is given one when available."""
+    argv = [str(exe), "--parse", "-d", str(database)]
+    if license:
+        argv += ["-l", str(license)]
+    argv += ["--threads", "1", "-o", str(scratch), str(deck)]
+    tail = []
     try:
         done = subprocess.run(argv, capture_output=True, text=True, timeout=300, check=False)
         blob = (done.stdout or "") + (done.stderr or "")
         ok = done.returncode == 0 and "DONE." in blob
         errors = [l.strip()[:200] for l in blob.splitlines()
                   if "error" in l.lower() and "checking database for errors" not in l.lower()][:3]
+        if not ok:
+            tail = [l.rstrip()[:200] for l in blob.splitlines() if l.strip()][-15:]
+            errors = errors or [f"exit code {done.returncode}"]
     except (OSError, subprocess.TimeoutExpired) as exc:
         ok, errors = False, [str(exc)]
-    return {"status": "PASS" if ok else "FAIL", "parser": Path(exe).name, "errors": errors}
+    out = {"status": "PASS" if ok else "FAIL", "parser": Path(exe).name, "errors": errors}
+    if tail:
+        out["output_tail"] = tail
+    return out
 
 
 def build_jobs(config: dict, which: str, overrides: dict) -> list[dict]:

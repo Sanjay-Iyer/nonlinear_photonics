@@ -45,7 +45,7 @@ def render(c):
     return text
 
 
-def prepare(c,parser_exe=None,parser_database=None,no_parse=False):
+def prepare(c,parser_exe=None,parser_database=None,no_parse=False,parser_license=None):
     PLAN.mkdir(parents=True,exist_ok=True)
     path=PLAN/'extended_8band.in';path.write_text(render(c),encoding='utf-8')
     write_json(PLAN/'runner.json',c)
@@ -55,7 +55,7 @@ def prepare(c,parser_exe=None,parser_database=None,no_parse=False):
     if not parser_exe:parser_exe,parser_database=discover_parser()
     grammar={'status':'NOT_CHECKED','reason':'No configured parser or --no-parse'}
     if not no_parse and parser_exe and parser_database:
-        grammar=parse_check(parser_exe,parser_database,path,PLAN/'parser_scratch')
+        grammar=parse_check(parser_exe,parser_database,path,PLAN/'parser_scratch',parser_license)
     report={'study':'28K_preflight','static_status':'PASS','grammar':grammar,'configuration':c,
         'kmax_per_nm':float(k[-1]),'requested_Nk':len(k),'requested_dk_per_nm':float(k[1]-k[0]),
         'professional_execution_performed':False,'state_count':c['num_electrons']+c['num_holes'],
@@ -65,6 +65,9 @@ def prepare(c,parser_exe=None,parser_database=None,no_parse=False):
         'pending':'Professional execution and actual finite-k output coverage; scalar Eq2 optical mapping review'}
     write_json(PLAN/'metadata.json',report)
     print('28K static PASS; grammar '+grammar['status']+'; no Professional solve launched')
+    if grammar['status']=='FAIL':
+        print('Parser: '+grammar['parser']+'\nErrors: '+'; '.join(grammar['errors']))
+        for line in grammar.get('output_tail',[]):print('  | '+line)
     return report
 
 
@@ -155,7 +158,7 @@ def run(c,args):
     result=(args.output or ROOT/c['result_directory']).resolve()
     if result.exists():raise ValueError('Refusing existing output directory; choose a new --output')
     # Strict grammar check before any licensed solve.
-    prep=prepare(c,exe,db)
+    prep=prepare(c,exe,db,parser_license=lic)
     if prep['grammar']['status']!='PASS':raise ValueError('Grammar must PASS before --run')
     result.mkdir(parents=True);(result/'decks').mkdir()
     deck=result/'decks/extended_8band.in';deck.write_text(render(c),encoding='utf-8')
@@ -193,8 +196,8 @@ def main(argv=None):
         if a.validate:
             r=inventory(a.validate,c);print(json.dumps(r,indent=2));return 0 if r['status']=='PASS' else 2
         if a.run:return run(c,a)
-        exe,db,_=machine_paths(a)
-        r=prepare(c,exe,db,a.no_parse)
+        exe,db,lic=machine_paths(a)
+        r=prepare(c,exe,db,a.no_parse,lic)
         print('Work command: python scripts/run_extended_8band.py --run')
         return 1 if r['grammar']['status']=='FAIL' else 0
     except (OSError,ValueError,KeyError) as exc:print('ERROR:',exc);return 2
