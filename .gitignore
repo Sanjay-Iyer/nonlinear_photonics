@@ -109,3 +109,23 @@ demo_results/demo25/raw/
 !demo_results/**/envelopes.csv
 !demo_results/**/matrix_elements.json
 !demo_results/**/paper_target_*/**
+
+# Generated nextnano data and transfer archives
+/nextnano/results/
+/nextnano_pro_raw_results/
+/nextnano/demos/**/results/
+/nextnano/demos/**/work_runs/
+/nextnano/demos/**/transfer/
+/nextnano/demos/**/raw_results/
+/nextnano/demos/**/solver_results/
+*.zip
+*.7z
+*.tar
+*.tar.gz
+
+# Generated Demo 28 presentation data and figures
+/nextnano/demos/28_kspace_chi2_study/presentation/**/data/
+/nextnano/demos/28_kspace_chi2_study/presentation/**/plots/
+/docs/study_guides/*.pdf
+/docs/study_guides/*.pptx
+/ol-19-22-1828*.pdf
