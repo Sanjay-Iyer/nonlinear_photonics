@@ -2,7 +2,9 @@ __pycache__/
 .pytest_cache/
 outputs/test_*/
 nextnano/work_runs/
+nextnano/run_logs/
 nextnano/transfer/
 nextnano/raw/
 demo29_*_raw.zip
+demo29_*_debug*.zip
 *.log
