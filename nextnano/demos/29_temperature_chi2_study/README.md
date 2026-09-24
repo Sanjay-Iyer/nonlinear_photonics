@@ -1,32 +1,39 @@
 # Demo 29 — solver-temperature dependence of selected-subband χ²
 
-**Status after the first WORK acquisition:** the new 300 K 8-band and 300 K
-single-band Professional jobs completed, but the 8-band output contains only
-`k00000` spinors/composition. The separate dispersion path has 301 k points.
-The full-8-band baseline and temperature sweep are **paused**; no production
-susceptibility has been claimed. Preserve the original 300 K work-run folder.
+**Current status:** 29A is developing the full-8-band 300 K baseline. The
+first finite-k pilot exported nine complete state frames, but only k=0 is
+inside the required positive Γ→y interval. The optical operator remains
+unresolved. 29B full-8-band 100/300/500 K production remains paused. 29C is
+the separately labeled historical mixed-model temperature control: the matched
+300 K result exists, and 100/500 K controls can now be acquired.
 
-## Next WORK step: 300 K finite-k state-output pilot
+## Next WORK session: three separate jobs
 
-After the updated Demo 29 branch is published, use the WORK laptop on that branch:
+Copy/paste commands and exact ZIP names are in [WORK_COMMANDS.md](WORK_COMMANDS.md).
+
+After these changes are published and pulled on WORK, from the Demo 29 folder:
 
 ```powershell
-git fetch origin codex/demo29-temperature-chi2
-git switch codex/demo29-temperature-chi2
-git pull --ff-only
-cd nextnano\demos\29_temperature_chi2_study
 python scripts\run_nextnano.py --check
 python scripts\run_nextnano.py --run --temperature 300 --pilot-finite-k
+python scripts\run_nextnano.py --run --temperature 100
+python scripts\transfer_mixed.py --pack nextnano\work_runs\100K
+python scripts\run_nextnano.py --run --temperature 500
+python scripts\transfer_mixed.py --pack nextnano\work_runs\500K
 ```
 
 This pilot runs **only an 8-band job**. It retains the 301-point Γ→y dispersion
 through `0.10 π/a` and the existing geometry, mesh, state pool and solver
 temperature. For state export it replaces `k_integration_disabled{}` with a
-small `k_integration{}` grid: `relative_size = 0.10`, `num_points = 2` per
-direction, `num_subpoints = 1`, `symmetry = none`, and
-`force_k0_subspace = no`. In a 1D quantum-well calculation the documented
-grid rule implies **49 nominal solved k points** (7×7); the debug report records
-the actual count. See the [nextnano k-grid explanation](https://www.nextnano.com/docu/nextnanoplus/latest/tutorials/quantum_well_optical_absorption.html)
+small `k_integration{}` grid: `relative_size = 0.03`, `num_points = 5`,
+`num_subpoints = 1`, `symmetry = none`, and `force_k0_subspace = no`.
+The first actual pilot had `relative_size = 0.10`, `num_points = 2`, and its
+positive-y endpoint was 1.5478201 nm⁻¹. Linear scaling of that observed extent
+predicts about 0.464346 nm⁻¹ at 0.03, inside the 0.555714439232 nm⁻¹ target.
+The increased `num_points` is intended to provide nearby samples. This is an
+empirical pilot prediction, **not** an assertion about nextnano's exact grid;
+the diagnostic reads the actual `k_points.txt` and determines success from its
+coordinates. See the [nextnano k-grid explanation](https://www.nextnano.com/docu/nextnanoplus/latest/tutorials/general_k_integration.html)
 and [state-output definition](https://www.nextnano.com/docu/nextnanoplus/latest/reference/keywords/quantum/region/output_states.html).
 `output_states{ all_k_points = yes }` requests unshifted
 CB/HH/LH/SO component envelopes and composition. The licensed WORK solver must
@@ -50,10 +57,12 @@ The original solver result is never overwritten. **Send the small debug ZIP to
 the HOME LLM first.** Transfer full raw scientific data only after the pilot
 proves the needed files exist.
 
-A pilot is a useful output-coverage result when it reports the 301-point
-dispersion plus all 49 nominal k frames with composition and 14 states × eight
-parseable complex component envelopes per frame. Review its frame IDs and k
-mapping before preparing a production acquisition; a passing pilot alone does
+A pilot is useful when it reports the 301-point dispersion and at least three
+complete state frames on the positive Γ→y target interval, including k=0 and
+two nearby nonzero points. Each frame needs composition, 14 states × eight
+parseable complex component envelopes, and the dipole/momentum tables. The
+diagnostic reports actual kx, ky, kz, |k|, direction and file coverage for every
+integration point. A passing pilot alone does
 not establish state output on every one of the 301 dispersion points, the
 full-8-band optical operator, or a χ² spectrum. The integration grid and
 dispersion path remain distinct nextnano calculations.
@@ -84,8 +93,8 @@ Each temperature has two matched nextnano++ jobs:
 
 | Path | Solver input | Scientific role |
 |---|---|---|
-| 29A/29B full 8-band | 8-band energies and complex eight-component spinors at all 301 k points | Planned primary model; the current solver deck did not export finite-k spinors, and optical mapping remains gated |
-| 29C mixed control | That temperature's 8-band dispersion **plus** that temperature's single-band anchors/envelopes | Historical-method trend control |
+| 29A/29B full 8-band | 8-band energies and complex eight-component spinors along the target path | New primary model; 300 K pilot and optical mapping still in development |
+| 29C mixed control | That temperature's 8-band dispersion **plus** that temperature's single-band anchors/envelopes | Operational historical-method trend control; acquire 100/500 K now |
 
 The old Demo 28 raw data is never a Demo 29 production input. Its mixed 300 K
 spectrum may later be plotted as an explicitly historical reference. The two
@@ -110,8 +119,9 @@ configuration for all three temperatures must be reviewed before producing the
 final sweep.
 
 The planned full 8-band path uses raw 8-band energy anchors and derives finite-k
-same-band `<i|z|j>` from complex spinors. The current run cannot support that
-derivation or remove `M(k)=M(0)`. Its selected-subband Equation 2 optical
+same-band `<i|z|j>` from complex spinors. The first finite-k pilot supports
+that derivation at nine integration points, but only k=0 lies on the target
+dispersion interval, so it cannot remove `M(k)=M(0)` there. Its selected-subband Equation 2 optical
 coupling also requires the gate in [OPTICAL_MAPPING.md](OPTICAL_MAPPING.md).
 
 ## Directory map
@@ -200,28 +210,40 @@ sourced parameters in `config/optical_operator.json` and implement the gated
 selected-subband response step. At present that gate intentionally prevents an
 unjustified primary χ² spectrum; [RESULTS.md](RESULTS.md) records the status.
 
-## WORK — remaining temperatures after the 300 K review
+## WORK — 29C mixed-model controls now
 
-**Paused. Do not run 100 K or 500 K with the current 8-band deck.** The
-following commands describe the intended order only after an amended,
-pilot-verified acquisition emits the required finite-k states on the fixed
-301-point Γ→y grid for all temperatures:
+The standard `--run --temperature 100` and `500` commands each run a matched
+8-band dispersion job and single-band job at the same temperature. They do not
+enable experimental finite-k state acquisition. The runner displays parse and
+solver status about every 15 seconds and preserves any completed run if the
+next command fails. Execute each line separately from this Demo 29 folder:
 
 ```powershell
 python scripts/run_nextnano.py --run --temperature 100
-python scripts/transfer_raw.py --pack nextnano/work_runs/100K
+python scripts/transfer_mixed.py --pack nextnano/work_runs/100K
 python scripts/run_nextnano.py --run --temperature 500
-python scripts/transfer_raw.py --pack nextnano/work_runs/500K
+python scripts/transfer_mixed.py --pack nextnano/work_runs/500K
 ```
 
-Copy `demo29_100K_raw.zip` and `demo29_500K_raw.zip` HOME. For each zip, run the
-same `transfer_raw.py --unpack`, `prepare_full8.py` and `calculate_mixed.py`
-commands with its temperature in the paths. Add
-`--reference-bundle nextnano/raw/300K` to each 100/500 K `prepare_full8.py`
-invocation so k=0 doublet labels are compared by spinor-subspace overlap to
-the new 300 K run. Use `outputs/29B_temperature_full8band/100K_prepared` and
-`outputs/29B_temperature_full8band/500K_prepared` as those preparation outputs.
-Review any inconsistent matches. Once all three mixed spectra exist:
+The two small archives are
+`nextnano/transfer/demo29_100K_mixed_raw.zip` and
+`nextnano/transfer/demo29_500K_mixed_raw.zip`. Each has eight scientific text
+files, the two executed decks, run metadata, logs, and a SHA-256 manifest.
+Copy those two ZIPs HOME through the existing transfer route. Keep the original
+WORK solver folders. The 300 K reference is already on HOME and does not need
+a new licensed solve.
+
+On HOME, from this Demo 29 folder, after placing the ZIPs under
+`C:\code\nonlinear_photonics\nextnano_raw\`:
+
+```powershell
+python scripts/transfer_mixed.py --unpack C:\code\nonlinear_photonics\nextnano_raw\demo29_100K_mixed_raw.zip
+python scripts/transfer_mixed.py --unpack C:\code\nonlinear_photonics\nextnano_raw\demo29_500K_mixed_raw.zip
+python scripts/calculate_mixed.py --input C:\code\nonlinear_photonics\nextnano_raw\demo29_100K_mixed_raw --output outputs/29C_mixed_control/100K
+python scripts/calculate_mixed.py --input C:\code\nonlinear_photonics\nextnano_raw\demo29_500K_mixed_raw --output outputs/29C_mixed_control/500K
+```
+
+Once all three mixed spectra exist:
 
 ```powershell
 python scripts/plot_temperature.py --model mixed

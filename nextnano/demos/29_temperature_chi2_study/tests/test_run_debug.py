@@ -37,11 +37,13 @@ def _run(root: Path):
 def test_elapsed_and_pilot_deck():
     assert run_debug.elapsed_hms(0) == "00:00:00"
     assert run_debug.elapsed_hms(3671.8) == "01:01:11"
-    assert check_decks(config())["finite_k_pilot"]["nominal_state_frames"] == 49
+    assert check_decks(config())["finite_k_pilot"]["frame_count"] == "read from k_points.txt after solver run"
     deck = job_decks(300, config(), pilot_finite_k=True)["kp8"]
     assert "num_points = 301" in deck
     assert "point{ k = [0, 0.555714439232, 0] }" in deck
     assert "k_integration_disabled{}" not in deck
+    assert "relative_size = 0.03" in deck
+    assert "num_points = 5" in deck
     assert "force_k0_subspace = no" in deck
     assert "all_k_points = yes" in deck
 
@@ -55,8 +57,8 @@ def test_frame_discovery_missing_and_unexpected_paths(tmp_path):
     assert report["missing_frames"] == ["k00001", "k00002"]
     assert report["actual_finite_k_state_frames"] == 1
     assert report["complete_state_frames"] == 1
-    assert report["parser_recognized_frames"] == []
-    assert report["unexpected_file_locations_total"] == 1
+    assert report["parser_recognized_frames"] == ["k00000"]
+    assert report["unexpected_file_locations_total"] == 0
     assert any("momentum_unexpected" in path for path in report["relevant_files_ignored_by_parser"])
     assert any(row["relative_path"].endswith("spinor_composition_CbHhLhSo.dat")
                and row["bytes"] > 0 and row["modified_utc"] for row in report["tree"])
@@ -67,7 +69,7 @@ def test_debug_zip_manifest_redaction_and_no_raw_data(tmp_path):
     _run(root)
     _file(root / "kp8/kp8/bias_00000/Quantum/acqw/kp8/huge_raw.dat", "1 2 3\n" * 100000)
     destination = tmp_path / "reports"
-    result = run_debug.collect_debug(root, destination, 300, 49, "test_run",
+    result = run_debug.collect_debug(root, destination, 300, None, "test_run",
                                      {"git": {"branch": "codex/test", "commit": "abc", "dirty_before_run": False},
                                       "path_checks": {"license_configured_and_exists": True}},
                                      redactions=["SECRET-LICENSE-CONTENT"])
@@ -144,6 +146,21 @@ def test_runner_auto_diagnoses_after_synthetic_job(tmp_path, monkeypatch, capsys
     assert (logs / "paths_report.txt").is_file()
     assert (logs / "finite_k_diagnostic.json").is_file()
     assert (logs / "demo29_300K_debug_synthetic_test.zip").is_file()
-    assert "WARNING: finite-k state output incomplete" in capsys.readouterr().out
+    assert "WARNING: target-path coverage incomplete" in capsys.readouterr().out
     manifest = json.loads((logs / "run_manifest.json").read_text())
     assert manifest["execution"]["kp8"]["command"][manifest["execution"]["kp8"]["command"].index("-l") + 1] == "<LICENSE_PATH_REDACTED>"
+
+
+def test_actual_integration_grid_is_distinct_from_dispersion():
+    run = (Path(__file__).resolve().parents[4] / "nextnano_raw" /
+           "pilot_finite_k_300K_pilotfk_20260924T184053442360Z_26300" /
+           "pilot_finite_k_300K_pilotfk_20260924T184053442360Z_26300")
+    if not run.is_dir():
+        return  # The licensed data live outside Git and may be absent on WORK.
+    report = run_debug.scan_output(run)
+    grid = report["integration_grid"]
+    assert report["dispersion"]["points"] == 301
+    assert grid["points"] == 9
+    assert grid["complete_target_path_frames"] == 1
+    assert grid["rows"][8]["direction"] == "+y"
+    assert grid["rows"][8]["magnitude_per_nm"] > report["dispersion"]["k_max_per_nm"]

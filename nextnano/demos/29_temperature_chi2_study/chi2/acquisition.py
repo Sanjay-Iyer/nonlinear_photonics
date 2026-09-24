@@ -77,7 +77,7 @@ def check_decks(c: dict) -> dict:
             raise ValueError("Missing fixed 8-band field: " + token)
     pilot = job_decks(300, c, pilot_finite_k=True)["kp8"]
     for token in ("num_points = 301", "point{ k = [0, 0.555714439232, 0] }",
-                  "relative_size = 0.10", "num_points = 2", "num_subpoints = 1",
+                  "relative_size = 0.03", "num_points = 5", "num_subpoints = 1",
                   "force_k0_subspace = no", "all_k_points = yes"):
         if token not in pilot:
             raise ValueError("Finite-k pilot is missing " + token)
@@ -86,9 +86,9 @@ def check_decks(c: dict) -> dict:
             "k_points": 301, "state_pool": [6, 8],
             "scope": "static deck check only; finite-k state output is not verified",
             "finite_k_pilot": {"temperature_K": 300, "dispersion_points": 301,
-                               "integration_relative_size": 0.10,
-                               "integration_num_points_per_direction": 2,
-                               "nominal_state_frames": 49,
+                               "integration_relative_size": 0.03,
+                               "integration_num_points": 5,
+                               "frame_count": "read from k_points.txt after solver run",
                                "force_k0_subspace": "no"}}
 
 
@@ -252,12 +252,12 @@ def run(t: int, c: dict, result: Path, pilot: bool = False,
     def event(message: str):
         with (log_dir / "runner.log").open("a", encoding="utf-8") as handle:
             handle.write(f"{run_debug.now_utc()} {message}\n")
-    expected = 49 if pilot_finite_k else None
+    expected = None  # The solver, not the deck's num_points, determines frame count.
     provenance = {"git": git_before, "kmax_pi_over_a": c["kmax_pi_over_a"],
                   "dispersion_points": 301 if pilot_finite_k else c["k_points"],
-                  "k_integration": ({"relative_size": 0.10, "num_points_per_direction": 2,
+                  "k_integration": ({"relative_size": 0.03, "num_points": 5,
                                      "num_subpoints": 1, "symmetry": "none", "force_k0_subspace": "no",
-                                     "nominal_state_frames": 49} if pilot_finite_k else "disabled"),
+                                     "frame_count": "read from k_points.txt"} if pilot_finite_k else "disabled"),
                   "output_states": {"all_k_points": "yes", "envelopes_CB_HH_LH_SO": "yes",
                                     "spinor_composition_CB_HH_LH_SO": "yes", "in_one_file": "no"},
                   "path_checks": {"executable": paths["exe"], "executable_exists": True,
@@ -351,15 +351,16 @@ def run(t: int, c: dict, result: Path, pilot: bool = False,
                   f"{' / ' + str(expected) + ' nominal' if expected else ''}")
             print(f"Complete complex 8-component frames: {status['complete_state_frames']}")
             print(f"Composition frames found: {status['composition_files']}")
+            grid = status.get("integration_grid", {})
             complete = (pilot_finite_k and status["dispersion"]["points"] == 301 and
-                        status["actual_finite_k_state_frames"] == expected and
-                        status["complete_state_frames"] == expected and
-                        status["composition_files"] == expected and
-                        status["k0_exists"] and not status["duplicate_frames"] and
-                        not status["missing_frames"])
+                        abs(status["dispersion"]["k_max_per_nm"] - c["k_max_per_nm"]) < 5e-10 and
+                        grid.get("points") == status["actual_finite_k_state_frames"] and
+                        status["complete_state_frames"] == grid.get("points") and
+                        grid.get("complete_target_path_frames", 0) >= 3 and
+                        status["k0_exists"] and not status["duplicate_frames"])
             if pilot_finite_k:
-                print("Finite-k pilot output looks complete." if complete else
-                      "WARNING: finite-k state output incomplete or layout differs; inspect debug ZIP.")
+                print("Target-aligned finite-k pilot has at least three complete path frames." if complete else
+                      "WARNING: target-path coverage incomplete; inspect k_points.txt and debug ZIP.")
             if debug["warnings"]:
                 print("Recent solver warnings/errors: " + " | ".join(debug["warnings"][-3:]))
             print(f"Runtime logs: {log_dir}\nDebug bundle: {debug['zip']}", flush=True)

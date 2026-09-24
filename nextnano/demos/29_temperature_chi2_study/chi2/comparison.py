@@ -33,7 +33,7 @@ def plot(root: Path, out: Path, model: str) -> None:
     if out.exists():
         raise ValueError("Refusing to overwrite comparison output")
     out.mkdir(parents=True)
-    for name, col in (("real", 2), ("imag", 3), ("abs_real", 4)):
+    for name, col in (("real", 2), ("imag", 3), ("abs_real", 4), ("abs_chi2", 5)):
         fig, ax = plt.subplots(figsize=(8, 4.5))
         for t, values in data.items():
             ax.plot(values[:, 0], values[:, col], label=f"{t} K", lw=1.5)
@@ -46,17 +46,23 @@ def plot(root: Path, out: Path, model: str) -> None:
     with (out / "temperature_summary.csv").open("w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(["temperature_K", "Re_1550_pm_per_V", "Im_1550_pm_per_V",
-                         "abs_Re_1550_pm_per_V", "dominant_abs_Re_wavelength_nm",
-                         "dominant_abs_Im_wavelength_nm"])
+                         "abs_Re_1550_pm_per_V", "abs_chi2_1550_pm_per_V",
+                         "dominant_abs_Re_wavelength_nm", "dominant_abs_Im_wavelength_nm",
+                         "E11_k0_eV", "E12_k0_eV", "E21_k0_eV", "E22_k0_eV"])
         for t, v in data.items():
             target = np.flatnonzero(v[:, 0] == 1550)
             if len(target) != 1:
                 raise ValueError("1550 nm absent from wavelength grid")
             j = int(target[0])
-            writer.writerow([t, v[j, 2], v[j, 3], v[j, 4],
-                             v[np.argmax(abs(v[:, 2])), 0], v[np.argmax(abs(v[:, 3])), 0]])
+            transitions = np.loadtxt(root / f"{t}K/chi2_inputs/transition_energies.csv",
+                                     delimiter=",", skiprows=1)
+            if transitions.shape != (len(v), 5):
+                raise ValueError(f"Missing or malformed transition energies for {t} K")
+            writer.writerow([t, v[j, 2], v[j, 3], v[j, 4], v[j, 5],
+                             v[np.argmax(abs(v[:, 2])), 0], v[np.argmax(abs(v[:, 3])), 0],
+                             *transitions[0, 1:5]])
     fig, ax = plt.subplots(figsize=(6, 4))
-    for col, label in ((2, "Re"), (3, "Im"), (4, "|Re|")):
+    for col, label in ((2, "Re"), (3, "Im"), (4, "|Re|"), (5, "|chi2|")):
         ax.plot(list(data), [v[v[:, 0] == 1550, col][0] for v in data.values()], "-o", label=label)
     ax.set(xlabel="solver temperature (K)", ylabel=r"$\chi^{(2)}$ at 1550 nm (pm/V)", title=model)
     ax.legend(frameon=False)

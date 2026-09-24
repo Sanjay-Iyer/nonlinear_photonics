@@ -20,12 +20,12 @@ at 1.443772122 and 1.416747842 eV. `(5,6)` is HH dominated; `(3,4)` is
 97.6% LH. The latter is deliberately retained only in the historical mixed
 control, not silently labeled HH in the new primary model.
 
-**29A full 8-band remains blocked.** The Professional `output_states` export
-has only k=0 envelopes/composition despite 301 dispersion points. The attempted
-full-8-band packer correctly rejected the run, and no finite-k position matrix
-or full-8-band χ² spectrum was produced. The interband optical operator/spin
-mapping also remains unresolved. The current 100/500 K acquisition is paused
-until a supported full-8-band data path is established.
+**29A full 8-band remains in development.** The first finite-k pilot exported
+nine complete 8-band frames, but only k=0 lies on the requested positive Γ→y
+interval 0–0.10π/a. A new 300 K target-aligned pilot is prepared. The
+interband optical operator/spin mapping remains unresolved; no full-8-band χ²
+spectrum has been produced. **29B** full-8-band 100/500 K production is paused.
+**29C** historical mixed-model 100/500 K controls are prepared for WORK now.
 
 The control result is a same-temperature **mixed** calculation and retains
 single-band k=0 matrix elements with `M(k)=M(0)`. It is not evidence that the
@@ -33,5 +33,5 @@ full-8-band model is complete. The old Demo 28 mixed 300 K curve can be added
 only as a labeled historical comparison; no numerical match is required.
 
 After the same frozen workflow processes new 100 K and 500 K data, add signed
-Re/Im and |Re| temperature overlays, χ² at 1550 nm, key transition energies,
+Re/Im, |Re| and |χ²| temperature overlays, χ² at 1550 nm, key transition energies,
 major feature locations, and a concise primary-versus-control trend summary.

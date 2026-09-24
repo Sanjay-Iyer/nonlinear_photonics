@@ -13,6 +13,7 @@ def main(argv=None) -> int:
     parser.add_argument("--input", type=Path, help="existing Demo 29 solver run root")
     parser.add_argument("--temperature", type=int, help="100, 300 or 500 K")
     parser.add_argument("--output-dir", type=Path, help="new directory for reports and ZIP")
+    parser.add_argument("--run-id", help="optional explicit diagnostic label for a predictable ZIP name")
     args = parser.parse_args(argv)
     if args.input is None and args.temperature is None:
         parser.error("Specify --input or --temperature")
@@ -26,8 +27,10 @@ def main(argv=None) -> int:
         if metadata and int(metadata.get("temperature_K", t)) != t:
             raise ValueError("--temperature disagrees with run_metadata.json")
         is_finite_pilot = metadata.get("pilot_kind") == "finite_k"
-        expected = 49 if is_finite_pilot else 301
-        run_id = run_debug.new_run_id("diagnose")
+        expected = None  # Determine actual integration-grid size from k_points.txt.
+        run_id = args.run_id or run_debug.new_run_id("diagnose")
+        if not all(c.isalnum() or c in "_-" for c in run_id):
+            raise ValueError("--run-id must contain only letters, digits, underscore, or dash")
         destination = (args.output_dir or run_debug.ROOT / "nextnano/run_logs" / f"{t}K" / run_id).resolve()
         if destination.exists():
             raise ValueError(f"Refusing to overwrite diagnostic folder: {destination}")
@@ -37,15 +40,14 @@ def main(argv=None) -> int:
         git_now["dirty_before_run"] = None
         provenance = {"git": git_now, "kmax_pi_over_a": study.get("kmax_pi_over_a"),
                       "dispersion_points": 301 if is_finite_pilot else study.get("k_points"),
-                      "k_integration": ({"relative_size": 0.10, "num_points_per_direction": 2,
-                                         "num_subpoints": 1, "force_k0_subspace": "no",
-                                         "nominal_state_frames": 49} if is_finite_pilot else "disabled"),
+                      "k_integration": run_debug._settings_from_deck(source).get("k_integration"),
                       "path_checks": {"existing_input": str(source), "exists": source.is_dir(),
                                       "diagnostic_only": True, "scientific_output_modified": False}}
         result = run_debug.collect_debug(source, destination, t, expected, run_id, provenance)
         diagnostic = result["diagnostic"]
         print(f"Run ID: {run_id}\n8-band dispersion points: {diagnostic['dispersion']['points']}\n"
-              f"Finite-k state frames: {diagnostic['actual_finite_k_state_frames']} / {expected} nominal\n"
+              f"Finite-k state frames: {diagnostic['actual_finite_k_state_frames']}\n"
+              f"Complete frames on target path: {diagnostic['integration_grid'].get('complete_target_path_frames')}\n"
               f"Complete complex 8-component frames: {diagnostic['complete_state_frames']}\n"
               f"Relevant unrecognized files: {diagnostic['relevant_files_ignored_total']}\n"
               f"Runtime reports: {destination}\nDebug bundle: {result['zip']}")

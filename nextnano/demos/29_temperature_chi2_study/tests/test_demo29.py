@@ -12,6 +12,8 @@ from chi2.acquisition import config, check_decks, job_decks
 from chi2 import decks
 from chi2.full8 import matrix_data, pair_score, choose_k0, contract_interband, optical_gate, prepare, compare_k0_to_reference
 from chi2.mixed_control import calculate
+from chi2 import mixed_transfer
+from chi2.comparison import plot as plot_temperature
 from chi2.transfer import validate, unpack, packed_frames, pack
 
 
@@ -82,6 +84,9 @@ def test_original_solver_layout_keeps_mixed_control_operational(tmp_path):
                     original / "singleband_case04_graded")
     shutil.copytree(bundle / "decks", original / "decks")
     shutil.copy2(bundle / "run_metadata.json", original / "run_metadata.json")
+    for name in ("kp8.log", "kp8_parse.log", "singleband_case04_graded.log",
+                 "singleband_case04_graded_parse.log"):
+        _write(original / name, "synthetic fixture only\n")
     kp = original / "kp8/bias_00000/Quantum/acqw/kp8"
     frame = kp / "k00000"
     frame.mkdir()
@@ -95,6 +100,16 @@ def test_original_solver_layout_keeps_mixed_control_operational(tmp_path):
     assert result["temperature_K"] == 300
     assert result["finite"] is True
     assert result["source_format"] == "original_solver_run"
+    packed = tmp_path / "demo29_300K_mixed_raw"
+    archive = tmp_path / "demo29_300K_mixed_raw.zip"
+    assert mixed_transfer.pack(original, packed, archive)["raw_scientific_files"] == 8
+    assert mixed_transfer.unpack(archive, tmp_path / "returned")["status"] == "PASS"
+    assert calculate(tmp_path / "returned" / packed.name,
+                     tmp_path / "returned_control_output")["finite"] is True
+    with (packed / "run_metadata.json").open("ab") as handle:
+        handle.write(b"altered")
+    with pytest.raises((ValueError, json.JSONDecodeError)):
+        mixed_transfer.validate(packed)
 
 
 def test_decks_temperature_is_only_sweep_change():
@@ -105,6 +120,26 @@ def test_decks_temperature_is_only_sweep_change():
         assert all(decks.without_temperature(body) == decks.without_temperature(decks_by_t[300])
                    for body in decks_by_t.values())
         assert all(f"temperature = {t}" in decks_by_t[t] for t in (100,300,500))
+
+
+def test_mixed_temperature_summary_includes_magnitude_and_transitions(tmp_path):
+    root = tmp_path / "controls"
+    for t in (100, 300, 500):
+        scale = t / 100
+        spectrum = np.array([[1549, 0.8, scale, -scale, abs(scale), np.sqrt(2)*scale],
+                             [1550, 0.8, 2*scale, scale, 2*scale, np.sqrt(5)*scale]])
+        transitions = np.array([[0, 1, 2, 3, 4], [1, 1.1, 2.1, 3.1, 4.1]])
+        folder = root / f"{t}K"
+        _write(folder / "chi2_results/chi2_spectrum.csv", "a,b,c,d,e,f\n" +
+               "\n".join(",".join(map(str, row)) for row in spectrum) + "\n")
+        _write(folder / "chi2_inputs/transition_energies.csv", "k,E11,E12,E21,E22\n" +
+               "\n".join(",".join(map(str, row)) for row in transitions) + "\n")
+    output = tmp_path / "comparison"
+    plot_temperature(root, output, "mixed")
+    assert (output / "abs_chi2.png").is_file()
+    text = (output / "temperature_summary.csv").read_text(encoding="utf-8")
+    assert "abs_chi2_1550_pm_per_V" in text
+    assert "E11_k0_eV" in text
 
 
 def test_spinor_matrices_and_optical_gate(tmp_path):

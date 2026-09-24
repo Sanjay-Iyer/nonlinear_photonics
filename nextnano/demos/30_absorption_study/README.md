@@ -52,6 +52,7 @@ where. These runs are byte-identical copies of tracked historical data, re-regis
 
 | What | Where |
 |---|---|
+| One-page summary for presenting | [BOSS_SUMMARY.md](BOSS_SUMMARY.md) |
 | Approved plan and decisions | [PLAN.md](PLAN.md) |
 | Findings, tables, validation map | [RESULTS.md](RESULTS.md) |
 | Copied code and data, with hashes | [PROVENANCE.md](PROVENANCE.md) |
@@ -78,18 +79,23 @@ where. These runs are byte-identical copies of tracked historical data, re-regis
 | `plots/30D_absorption_factor.png` | How much does absorption suppress the SH, by wavelength and thickness? | required |
 | `plots/30E_fig2d_comparison.png` | Do transparent vs absorption-aware SH predictions match the measured Fig. 2d? | **main result** |
 | `plots/30C_diagnostic_chi1_re_im.png` | Where are the transitions and the cutoff edges in χ(1)? | diagnostic |
+| `plots/30_boss_absorption_comparison.png` | Presentation version of 30E and 30D: does absorption move the calculated peak, and how much SH survives? | **presentation** |
+
+The presentation figure is drawn by `presentation/make_boss_figure.py` from the saved outputs
+only. It refuses to draw if the outputs are stale or not PASS.
 
 ## Directory map
 
 ```text
 30_absorption_study/
-  README.md, PLAN.md, RESULTS.md, PROVENANCE.md, SOURCES.md, requirements.txt
+  README.md, BOSS_SUMMARY.md, PLAN.md, RESULTS.md, PROVENANCE.md, SOURCES.md, requirements.txt
   config/demo30.json            every constant
   inputs/raw_data.lock.json     exact raw runs + hashes
   inputs/registration/          RUN_RECORD metadata used to register them
   reference/                    copied Demo 28 references + new Fig. 2d digitization
   demo30/                       the package (unique name; copies of Demo 28 modules + new physics)
   scripts/                      run_demo30.py, audit_isolation.py, digitize_fig2d_measured.py
+  presentation/                 make_boss_figure.py (reads saved outputs only)
   work_laptop/                  optional 0.2·π/a run: decks, kmax_run.py, README
   outputs/                      30A-30F results (CSV/JSON), summary.json
   plots/                        the figure set

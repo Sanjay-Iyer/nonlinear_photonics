@@ -40,8 +40,8 @@ def render_kp8(params: dict | None = None, header: str = "Demo29 kp8 dispersion 
     q0, q1 = p["quantum_region_nm"]
     n = p["output_states"]
     k_integration = ("k_integration{\n"
-                     "                relative_size = 0.10\n"
-                     "                num_points = 2\n"
+                     "                relative_size = 0.03\n"
+                     "                num_points = 5\n"
                      "                num_subpoints = 1\n"
                      "                symmetry = none\n"
                      "                force_k0_subspace = no\n"

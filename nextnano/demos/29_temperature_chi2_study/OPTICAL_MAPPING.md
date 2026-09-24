@@ -61,3 +61,35 @@ convention. Do not invent missing spinors, freeze matrices at k=0 while
 claiming finite-k treatment, or publish a primary spectrum to bypass either.
 Do not alter kmax, k density, Γ, geometry, or temperature-specific processing
 without a reviewed technical reason.
+
+## First finite-k pilot evidence (300 K, 2026-09-24)
+
+The transferred Professional pilot exported nine complete 14-state frames,
+each with eight complex spinor components, composition, and growth-dipole and
+momentum tables. Integrated spinor probabilities agree with composition;
+off-diagonal `<a|z|b>` from spinors agrees with the growth-dipole table to its
+printed precision. The separate 301-point dispersion was unchanged. Its
+positive-y path ended at 0.555714439232 nm⁻¹, while the integration-grid
+positive-y sample was 1.5478201 nm⁻¹. Thus only the k=0 frame lies on the
+required path. The previous 49-frame prediction was incorrect; the diagnostic
+now reads actual `k_points.txt` coordinates.
+
+The reported in-plane-y envelope momentum tables contain zeros for every
+sampled pair. They are not an approved replacement for the Bloch interband
+operator; nextnano's momentum-matrix documentation describes the exported
+quantity as envelope momentum. Its Matrix elements reference explicitly says
+these `quantum{}` matrix tables are not used by nextnano's optical spectra.
+The nextnano optical-absorption tutorial instead uses an 8×8 kinematic-momentum
+operator (including spin-orbit effects) and exports transition intensities
+proportional to the **squared magnitude** of its optical matrix element.
+Those intensities alone do not retain the complex phase needed for the coherent
+products in χ² Equation 2. A sourced implementation of the 8×8 operator, or
+another validated phase-preserving output, is still required. Sources:
+https://www.nextnano.com/docu/nextnanoplus/latest/reference/models/quantum/matrix_elements.html
+and https://www.nextnano.com/docu/nextnanoplus/latest/tutorials/quantum_well_optical_absorption.html .
+
+The optical polarization, complex 8×8 operator,
+units, historical `r_e,hh` relationship, and spin factor remain **UNRESOLVED**.
+The old mixed-model control can be run separately at 100/300/500 K without
+changing this gate. Its single-band k=0 factors and `M(k)=M(0)` must always
+remain labeled as historical mixed-model assumptions.

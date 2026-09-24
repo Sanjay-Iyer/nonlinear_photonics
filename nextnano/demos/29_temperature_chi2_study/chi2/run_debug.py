@@ -4,6 +4,7 @@ from __future__ import annotations
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 import json
+import math
 import os
 from pathlib import Path
 import platform
@@ -95,6 +96,69 @@ def _dispersion_summary(files: list[Path]) -> dict:
     return result
 
 
+def _integration_grid(files: list[Path], frames: list[dict], dispersion: dict) -> dict:
+    """Map actual nextnano integration vectors to kNNNNN state/matrix folders."""
+    candidates = [p for p in files if p.name == "k_points.txt" and p.parent.name == "kp8"]
+    if len(candidates) != 1:
+        return {"points": None, "candidate_files": [str(p) for p in candidates],
+                "error": "Expected one kp8/k_points.txt"}
+    frame_by_id = {row["id"]: row for row in frames}
+    kmax = dispersion["k_max_per_nm"]
+    path_points = dispersion["points"]
+    rows = []
+    try:
+        lines = candidates[0].read_text(encoding="utf-8", errors="replace").splitlines()
+        for line in lines[1:]:
+            parts = line.split()
+            if not parts:
+                continue
+            index = int(parts[0])
+            kx, ky, kz = (float(value.replace("D", "E")) for value in parts[1:4])
+            norm = math.sqrt(kx*kx + ky*ky + kz*kz)
+            frame_id = f"k{index:05d}"
+            frame = frame_by_id.get(frame_id, {})
+            folder = candidates[0].parent / frame_id
+            matrix_folder = candidates[0].parent.parent / "kp8_kp8" / frame_id
+            names = {p.name for p in matrix_folder.glob("*.txt")}
+            origin = norm < 1e-8
+            positive_y = ky > 1e-8 and abs(kx) < 1e-6 and abs(kz) < 1e-6
+            angle = 0.0 if origin else math.degrees(math.acos(max(-1.0, min(1.0, ky / norm))))
+            near_positive_y = origin or (ky > 0 and angle <= 10.0)
+            in_range = kmax is not None and norm <= kmax + 5e-7
+            nearest = (max(0, min(path_points - 1, round(ky / (kmax / (path_points - 1)))))
+                       if (origin or positive_y) and path_points and path_points > 1 and kmax else None)
+            path_gap = abs(ky - nearest * kmax / (path_points - 1)) if nearest is not None else None
+            rows.append({"id": frame_id, "kx_per_nm": kx, "ky_per_nm": ky,
+                         "kz_per_nm": kz, "magnitude_per_nm": norm,
+                         "direction": "origin" if origin else "+y" if positive_y else
+                                      "-y" if ky < -1e-8 and abs(kx) < 1e-6 and abs(kz) < 1e-6 else "off-axis",
+                         "angle_from_positive_y_deg": angle,
+                         "within_target_range": in_range,
+                         "on_positive_gamma_y": origin or positive_y,
+                         "near_positive_gamma_y": near_positive_y,
+                         "on_target_path": in_range and (origin or positive_y),
+                         "near_target_path": in_range and near_positive_y,
+                         "nearest_dispersion_index": nearest,
+                         "nearest_dispersion_k_gap_per_nm": path_gap,
+                         "state_folder": str(folder),
+                         "composition_present": bool(frame.get("composition_files")),
+                         "complex_spinors_complete": bool(frame.get("state_component_complete")),
+                         "dipole_present": "dipole_moment_matrix_elements_growth_z.txt" in names,
+                         "momentum_growth_present": "momentum_matrix_elements_growth_z.txt" in names,
+                         "momentum_inplane_present": "momentum_matrix_elements_inplane_y.txt" in names})
+    except (IndexError, ValueError, OSError) as exc:
+        return {"points": None, "file": str(candidates[0]), "error": str(exc)}
+    if len({row["id"] for row in rows}) != len(rows):
+        return {"points": None, "file": str(candidates[0]), "error": "Duplicate k-point IDs"}
+    complete = [r for r in rows if r["on_target_path"] and r["composition_present"] and
+                r["complex_spinors_complete"] and r["dipole_present"] and
+                r["momentum_growth_present"] and r["momentum_inplane_present"]]
+    return {"file": str(candidates[0]), "points": len(rows), "rows": rows,
+            "target_path_frames": sum(r["on_target_path"] for r in rows),
+            "complete_target_path_frames": len(complete),
+            "complete_nonzero_positive_y_frames": sum(r["magnitude_per_nm"] > 1e-8 for r in complete)}
+
+
 def scan_output(run_root: Path, expected_frames: int | None = None,
                 expected_states: int = 14, quick: bool = False) -> dict:
     """Inventory a single run root without reading or changing scientific arrays."""
@@ -164,18 +228,22 @@ def scan_output(run_root: Path, expected_frames: int | None = None,
                            "state_component_complete": complete})
     duplicate_frames = [row["id"] for row in frame_rows if len(row["composition_files"]) > 1]
     parser_recognized = [row["id"] for row in frame_rows if any(
-        Path(path).name == f"spinor_composition_{row['id']}_CbHhLhSo.dat"
+        Path(path).name == f"spinor_composition_{row['id']}_CbHhLhSo.dat" or
+        (Path(path).name == "spinor_composition_CbHhLhSo.dat" and row["id"] in Path(path).parts)
         for path in row["composition_files"])]
-    relevant = [p.relative_to(root).as_posix() for p in files if RELEVANT.search(p.name)]
+    relevant = [p.relative_to(root).as_posix() for p in files
+                if p.name != "alloy_composition.dat" and RELEVANT.search(p.name)]
     recognized = {path for row in frame_rows for path in row["composition_files"]}
     recognized.update(path.relative_to(root).as_posix() for path in envelopes if _frame_id(path, root))
     recognized.update(path.relative_to(root).as_posix() for path in files if path.name in
-                      ("dispersion_Gamma_to_y.dat", "kVectors_Gamma_to_y.dat"))
+                      ("dispersion_Gamma_to_y.dat", "kVectors_Gamma_to_y.dat", "k_points.txt",
+                       "energy_spectrum.dat", "energy_subbands.dat") or path.name.startswith(
+                       ("dipole_moment_matrix_elements_", "momentum_matrix_elements_")))
     ignored_relevant = [path for path in relevant if path not in recognized]
     candidate_roots = sorted({p.parent.relative_to(root).as_posix() for p in files
                               if p.name == "job_done.txt" or p.name == "dispersion_Gamma_to_y.dat"})
     unexpected = [path for path in relevant if "spinor_composition" in path.lower() and
-                  not re.search(r"spinor_composition_k\d{5}_CbHhLhSo\.dat$", path, re.I)]
+                  not re.search(r"(?:k\d{5}/spinor_composition_CbHhLhSo|spinor_composition_k\d{5}_CbHhLhSo)\.dat$", path, re.I)]
     report = {
         "run_root": str(root), "scanned_utc": now_utc(), "total_files": len(files),
         "tree_truncated": len(files) > MAX_TREE_FILES, "tree": records,
@@ -194,8 +262,8 @@ def scan_output(run_root: Path, expected_frames: int | None = None,
                             if f"k{i:05d}" not in frames] if expected_frames is not None else []),
         "missing_file_examples": missing_files[:100],
         "missing_file_count_within_discovered_frames": len(missing_files),
-        "discovered_k_values_per_nm": {},
-        "k_value_note": "No reliable mapping from k-point directory IDs to k vectors was exported; dispersion vectors describe a separate grid.",
+        "integration_grid": _integration_grid(files, frame_rows, _dispersion_summary(files)),
+        "k_value_note": "k_points.txt maps integration frame IDs; dispersion vectors are a separate grid.",
         "parser_recognized_frames": parser_recognized,
         "unassigned_state_files": unassigned[:100],
         "unassigned_state_files_total": len(unassigned),
@@ -299,6 +367,8 @@ def collect_debug(run_root: Path, log_dir: Path, temperature: int,
                f"Composition files: {report['composition_files']}",
                f"Envelope files: {report['spinor_envelope_files']}",
                f"Frame IDs: {', '.join(report['frame_identifiers'][:100])}",
+               f"Integration-grid points: {report['integration_grid'].get('points')}",
+               f"Complete target-path frames: {report['integration_grid'].get('complete_target_path_frames')}",
                f"Parser-recognized IDs: {', '.join(report['parser_recognized_frames'][:100])}",
                f"Ignored relevant files: {report['relevant_files_ignored_total']}",
                f"Unexpected composition locations: {report['unexpected_file_locations_total']}",
@@ -376,6 +446,9 @@ def collect_debug(run_root: Path, log_dir: Path, temperature: int,
             z.write(ROOT / "config/study.json", "config/study.json")
         if source_meta.is_file():
             z.writestr("source_run_metadata.json", _safe_text(source_meta, redactions, 500_000))
+        grid_file = report["integration_grid"].get("file")
+        if grid_file:
+            z.writestr("integration_grid/k_points.txt", _safe_text(Path(grid_file), redactions, 500_000))
         for index, path in enumerate(preview_candidates):
             relative = path.relative_to(root).as_posix().replace("/", "__")
             z.writestr(f"file_previews/{index:02d}_{relative}.txt", _preview(path, redactions))
