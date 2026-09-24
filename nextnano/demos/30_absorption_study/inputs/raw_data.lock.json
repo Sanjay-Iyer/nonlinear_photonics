@@ -1,0 +1,97 @@
+{
+  "schema": 1,
+  "demo": 30,
+  "purpose": "The raw nextnano++ runs Demo 30 reads. demo30/rawdata.py resolves <raw root>/<expected_dir> exactly and verifies every hash below before anything is parsed.",
+  "raw_root": {
+    "default": "<repository>/nextnano_raw",
+    "override": ["--raw-root DIR", "environment variable NEXTNANO_RAW_ROOT"]
+  },
+  "selection_rule": "Exact folder named by expected_dir. No globbing across runs, no 'newest folder', no 'latest run'.",
+  "runs": {
+    "singleband": {
+      "required": true,
+      "run_id": "D020_2026-08-20_sb-case04-graded-300K",
+      "originating_demo": 20,
+      "date": "2026-08-20",
+      "model": "single-band effective mass: Gamma + heavy hole, no k.p",
+      "temperature_K": 300.0,
+      "k_max": "k = 0 only",
+      "k_points": 1,
+      "expected_dir": "demo_020/D020_2026-08-20_sb-case04-graded-300K",
+      "parser_root": "data/nextnano_output/case",
+      "status": "valid",
+      "deck": {
+        "path": "data/nextnano_input/case.in",
+        "sha256": "ec5d1e23688f87491e154c2e9e574fefd33c541ed22e901bf6ab336fbf6da115"
+      },
+      "files": {
+        "data/nextnano_output/case/bias_00000/Quantum/acqw/Gamma/energy_spectrum_k00000.dat": "3fc1961458ccb807e37d66b775a1581d6ed89f3f79ee6229fe26baaff078bed6",
+        "data/nextnano_output/case/bias_00000/Quantum/acqw/Gamma/envelopes_k00000.dat": "df87abf606573e2d74ffa96c5dfa26add3b2cabec8b604b634108e4e87c51cf8",
+        "data/nextnano_output/case/bias_00000/Quantum/acqw/HH/energy_spectrum_k00000.dat": "65b9b6c1a13af93b815ade71b164af0c05fea731c49d19d36fb489ce9bb8968f",
+        "data/nextnano_output/case/bias_00000/Quantum/acqw/HH/envelopes_k00000.dat": "9614a43cccca9a650af79d3f8479c5e6de1e7d99c240ab2eac0d6f4ceede5e33",
+        "data/nextnano_output/case/bias_00000/bandedges.dat": "04c1837f1646a5a153939452c3b45da4165a5dc1c30c7bfd61347bd816ece254",
+        "data/nextnano_output/case/bias_00000/Quantum/acqw/Gamma_HH/overlap_integrals_k00000.txt": "ac281d29954588a67d75baffd9fc2c716d1ad7046c38764ba32d368e3eb75a6d"
+      },
+      "sha256sums_sha256": "add43763110bff1d8464950f911ee4a8e96ce5eaa8c44dbf9b36525e35df0850",
+      "used_for": "k=0 anchors e1, e2, hh1, hh2 and the envelopes behind O, z_e, z_h (Demo 28A model); all six Gamma and six HH states for expanded_bound_states; band edges for the validity window; nextnano's own Gamma-HH overlaps as a cross-check",
+      "historical_source": "docs/case_04",
+      "registration_record": "inputs/registration/D020_2026-08-20_sb-case04-graded-300K.record.json",
+      "identical_to_demo28A_inputs": "the four consumed .dat files match Demo 28 outputs/28A_baseline/raw_manifest.json byte for byte (checked 2026-09-24)"
+    },
+    "kp8_dispersion": {
+      "required": true,
+      "run_id": "D023_2026-09-04_kp8-disp-k0p10pia-n301-300K",
+      "originating_demo": 23,
+      "date": "2026-09-04",
+      "model": "8-band k.p dispersion path Gamma->y, k=0 spinors and composition",
+      "temperature_K": 300.0,
+      "k_max": "0.1·π/a = 0.555714439232 nm^-1 (a = 0.565325 nm)",
+      "k_points": 301,
+      "expected_dir": "demo_023/D023_2026-09-04_kp8-disp-k0p10pia-n301-300K",
+      "parser_root": "data/production_y_n301_k0100",
+      "status": "valid",
+      "deck": {
+        "path": "data/production_y_n301_k0100/production_y_n301_k0100.in",
+        "sha256": "41b5c78dfe98e479edc9afa7bc4b92366971e2429b9b36cb4994b4befbfb3a5d"
+      },
+      "files": {
+        "data/production_y_n301_k0100/bias_00000/QuantumDispersions/acqw/kp8/dispersion_Gamma_to_y.dat": "2c22e32532e81f5a3d7c5eef2a063d3a0f4102a5412e74f08b9970a66c15ce94",
+        "data/production_y_n301_k0100/bias_00000/QuantumDispersions/acqw/kp8/kVectors_Gamma_to_y.dat": "36211f4e473695856a4acc93cb7e40fd21f0bd0f73ad8c985c606ae46c9361e1",
+        "data/production_y_n301_k0100/bias_00000/Quantum/acqw/kp8/energy_spectrum_k00000.dat": "75f33be44511234b4332d333ff97e0373b2359489b6e607b39b65c78a466e102",
+        "data/production_y_n301_k0100/bias_00000/Quantum/acqw/kp8/spinor_composition_k00000_CbHhLhSo.dat": "519f62c68e9c54aecdfe21e382fef63250e35b4e37b095f7c022ba9730a7baf8"
+      },
+      "sha256sums_sha256": "8456d47381d3b88ad013cbe177ba0e34f8773034138c5a2b88dee492c565f911",
+      "used_for": "in-plane dispersion shifts of the Demo 28A mixed model (the control k grid for chi2 and chi1)",
+      "historical_source": "demo_results/demo23/raw/production_y_n301_k0100",
+      "registration_record": "inputs/registration/D023_2026-09-04_kp8-disp-k0p10pia-n301-300K.record.json",
+      "identical_to_demo28A_inputs": "all four consumed files match Demo 28 outputs/28A_baseline/raw_manifest.json byte for byte (checked 2026-09-24)"
+    },
+    "kp8_dispersion_k0p125": {
+      "required": false,
+      "run_id": "D023_2026-09-04_kp8-disp-k0p125pia-n301-300K",
+      "originating_demo": 23,
+      "date": "2026-09-04",
+      "model": "8-band k.p dispersion path Gamma->y, k=0 spinors and composition",
+      "temperature_K": 300.0,
+      "k_max": "0.125·π/a = 0.69464304904 nm^-1 (a = 0.565325 nm)",
+      "k_points": 301,
+      "expected_dir": "demo_023/D023_2026-09-04_kp8-disp-k0p125pia-n301-300K",
+      "parser_root": "data/kmax_y_n301_k0125",
+      "status": "valid",
+      "deck": {
+        "path": "data/kmax_y_n301_k0125/kmax_y_n301_k0125.in",
+        "sha256": "364a529fb0ed0ff9ab9b134160eaa37eee565ef2def08e8f0de8a62aa7882fb0"
+      },
+      "files": {
+        "data/kmax_y_n301_k0125/bias_00000/QuantumDispersions/acqw/kp8/dispersion_Gamma_to_y.dat": "f0072b43de33e1cef40029befe904be4773fdf248bb0b33eff8c0492461c5176",
+        "data/kmax_y_n301_k0125/bias_00000/QuantumDispersions/acqw/kp8/kVectors_Gamma_to_y.dat": "c1a2c6417f2f79b4ae541bd7697589783b311a13be2de8e238e1eede2107ec6b",
+        "data/kmax_y_n301_k0125/bias_00000/Quantum/acqw/kp8/energy_spectrum_k00000.dat": "75f33be44511234b4332d333ff97e0373b2359489b6e607b39b65c78a466e102",
+        "data/kmax_y_n301_k0125/bias_00000/Quantum/acqw/kp8/spinor_composition_k00000_CbHhLhSo.dat": "519f62c68e9c54aecdfe21e382fef63250e35b4e37b095f7c022ba9730a7baf8"
+      },
+      "sha256sums_sha256": "8bbd6083fb1b5bc75197e8f3fa4d601473cc349d3a990ac057c9bc3fa4f32182",
+      "used_for": "30F only (optional): existing-data k extension to 0.125·π/a and a direct check of the analytical absorption tail; the deck differs from the control deck only in the k endpoint",
+      "historical_source": "demo_results/demo23/raw/kmax_y_n301_k0125",
+      "registration_record": "inputs/registration/D023_2026-09-04_kp8-disp-k0p125pia-n301-300K.record.json"
+    }
+  }
+}

@@ -1,5 +1,10 @@
 # nextnano++ home-to-work workflow
 
+> **Demo 30 onward:** demo isolation, the local raw-data store `nextnano_raw/` (never in
+> Git) and the Google Drive transfer are defined in [DEMO_WORKFLOW.md](DEMO_WORKFLOW.md),
+> which takes precedence for new demos and all new raw data. This document describes the
+> original portable workflow used by Demos 1–27.
+
 Two laptops, one git repository, a repeated push/pull cycle.
 
 - **Home laptop = development.** Write Python, author and edit input decks,

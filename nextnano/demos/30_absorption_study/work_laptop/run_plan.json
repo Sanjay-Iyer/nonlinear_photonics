@@ -1,0 +1,46 @@
+{
+  "control_run": "D023_2026-09-04_kp8-disp-k0p10pia-n301-300K",
+  "control_deck_sha256": "41b5c78dfe98e479edc9afa7bc4b92366971e2429b9b36cb4994b4befbfb3a5d",
+  "changed_lines": [
+    "point{ k = [0, 0.555714439232, 0] }  ->  point{ k = [0, 1.111428878464, 0] }",
+    "num_points = 301  ->  num_points = N"
+  ],
+  "k_max_per_nm": 1.111428878464,
+  "k_max_label": "0.2\u00b7\u03c0/a (a = 0.565325 nm; exactly 2x the control endpoint)",
+  "decks": {
+    "pilot": {
+      "path": "work_laptop/decks/k0p20pia_n7_pilot.in",
+      "sha256": "f4a78c7476674958cdc5e806377d2083d3a0d35be78c50d191f02c3db6895a11",
+      "k_points": 7,
+      "run_id_pattern": "D030_<YYYY-MM-DD>_kp8-disp-k0p20pia-n7-pilot-300K",
+      "free_parse_check": {
+        "status": "PASS",
+        "return_code": 0,
+        "error_lines": [],
+        "parser": "Free nextnano++ 3.0.0 (grammar check only; not a licensed run)"
+      }
+    },
+    "full": {
+      "path": "work_laptop/decks/k0p20pia_n601.in",
+      "sha256": "dbeb8cad8fa2cf408ad460f9fe85d49d25a4842696774f80b434bafe30f15276",
+      "k_points": 601,
+      "run_id_pattern": "D030_<YYYY-MM-DD>_kp8-disp-k0p20pia-n601-300K",
+      "free_parse_check": {
+        "status": "PASS",
+        "return_code": 0,
+        "error_lines": [],
+        "parser": "Free nextnano++ 3.0.0 (grammar check only; not a licensed run)"
+      }
+    }
+  },
+  "runtime_estimate": {
+    "basis": "control run D023 (301 k points, 14 states) took 10 min 20 s on WORK; 28K (601 k, 24 states) took 16.6 min",
+    "pilot": "about 1-2 min",
+    "full": "about 20 min"
+  },
+  "storage_estimate": {
+    "basis": "control run folder = 18 MB, 738 files, dominated by k=0 state output; k-dependent files ~0.2 MB per 301 points",
+    "pilot": "about 18 MB",
+    "full": "about 18.5 MB (zip about 5-7 MB)"
+  }
+}

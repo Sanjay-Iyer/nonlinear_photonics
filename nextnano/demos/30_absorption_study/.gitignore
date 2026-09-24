@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+# scratch output of tests and determinism checks
+outputs/_scratch*/
+# raw nextnano output never lives here (it belongs in <repo>/nextnano_raw, which is ignored)
+*.dat
+*.zip

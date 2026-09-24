@@ -1,0 +1,78 @@
+{
+  "source": {
+    "pdf": "2602.23246v1.pdf",
+    "page": 7,
+    "image": "Im1.png",
+    "image_sha256": "865de45249bc9cb2ba77f012b173b8695ccd79a6d4cde4032de68da54373c288",
+    "image_size_px": [
+      4441,
+      1122
+    ]
+  },
+  "calibration": {
+    "spines_px": {
+      "top": [
+        41,
+        43
+      ],
+      "bottom": [
+        910,
+        912
+      ],
+      "left": [
+        368,
+        370
+      ],
+      "right": [
+        4174,
+        4176
+      ]
+    },
+    "x_fit_px_per_nm": [
+      2.5737832512315277,
+      -660.5059113300492
+    ],
+    "x_ticks": 29,
+    "x_fit_max_residual_px": 0.4798029556659458,
+    "right_fit_px_per_unit": [
+      -3.4733333333333305,
+      823.8888888888887
+    ],
+    "right_ticks": 9,
+    "right_fit_max_residual_px": 0.4444444444443434,
+    "left_fit_px_per_pm_per_V": [
+      -0.1930000000000001,
+      910.9999999999999
+    ],
+    "left_ticks": 5,
+    "left_fit_max_residual_px": 4.547473508864641e-13
+  },
+  "marker_side_px": 27,
+  "resolution": {
+    "px_per_nm": 2.5737832512315277,
+    "px_per_sh_unit": 3.4733333333333305
+  },
+  "max_distance_from_nominal_10nm_grid_nm": 0.17589257346685372,
+  "counts": {
+    "80pd_sample": 11,
+    "AlGaAs_control": 11,
+    "GaAs_control": 11
+  },
+  "hidden_edges": 2,
+  "script": "scripts/digitize_fig2d_measured.py",
+  "simulated_trace": {
+    "columns_with_curve": 2669,
+    "wavelength_range_nm": [
+      401.5512614885219,
+      1844.5632160588575
+    ],
+    "gray_level": 82,
+    "note": "dash gaps and marker-covered columns have no points",
+    "eye_45_point_minus_trace_pm_per_V": {
+      "points_compared": 34,
+      "rms": 92.18342796991351,
+      "max_abs": 303.70045177262955,
+      "worst_wavelength_nm": 1580.0
+    }
+  }
+}

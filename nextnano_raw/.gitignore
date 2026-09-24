@@ -1,0 +1,7 @@
+# nextnano_raw/ holds LOCAL raw nextnano++ output only.
+# Nothing in this folder may ever be committed except this file and README.md.
+# No size exceptions. Policy: nextnano/docs/DEMO_WORKFLOW.md section 3.
+# (The root .gitignore repeats this rule so it survives if this file is deleted.)
+*
+!.gitignore
+!README.md

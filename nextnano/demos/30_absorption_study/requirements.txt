@@ -1,0 +1,7 @@
+numpy>=2.0
+scipy>=1.10
+matplotlib>=3.6
+pytest>=7
+# only for scripts/digitize_fig2d_measured.py (re-digitizing Fig. 2d from the paper PDF)
+pypdf>=4
+pillow>=9

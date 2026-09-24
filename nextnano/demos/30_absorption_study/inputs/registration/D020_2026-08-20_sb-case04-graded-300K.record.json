@@ -1,0 +1,26 @@
+{
+  "date": "2026-08-20",
+  "started_utc": "2026-08-20T13:56:57Z",
+  "machine": "WORK",
+  "licensed": true,
+  "solver": {
+    "name": "nextnano++",
+    "version": "3.0.0 from 2026-06-16 (kernel 2026-06-16a, lib 2026-06-15)",
+    "edition": "Professional (licensed banner in logs/stdout.txt)",
+    "version_source": "logs/stdout.txt of this run"
+  },
+  "deck": {"path": "data/nextnano_input/case.in"},
+  "physics": {
+    "model": "single-band effective mass: Gamma conduction band + heavy-hole band, no k.p coupling",
+    "temperature_K": 300.0,
+    "k_direction": null,
+    "k_max_per_nm": 0.0,
+    "k_max_label": "k = 0 only",
+    "k_points": 1,
+    "states": {"Gamma": 6, "HH": 6}
+  },
+  "structure": "Demo 20 case 04 'Linear 1.0 nm': GaAs wells 7.1 nm and 2.9 nm separated by a 1.8 nm Al0.55Ga0.45As tunnel barrier, Al0.55Ga0.45As period barrier, 30 nm period, 1 nm linear grading at all four interfaces; quantum region 7.1-22.9 nm with Dirichlet boundaries",
+  "status": "valid",
+  "provenance": "Byte-identical copy of the tracked historical folder docs/case_04 (Demo 20 case 04, run on the WORK laptop). The historical folder is not moved or edited.",
+  "notes": "Demo 28A and Demo 30 read the k=0 anchors (e1, e2, hh1, hh2) and the envelopes behind O, z_e and z_h. Demo 30 also reads all six Gamma and six HH states for the expanded_bound_states comparison, and bandedges.dat for the validity window. logs/stdout.txt contains the licensee line; this folder is local-only and never committed."
+}

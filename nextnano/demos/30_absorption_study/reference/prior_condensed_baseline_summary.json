@@ -1,0 +1,469 @@
+{
+  "mode": "demo26-baseline",
+  "units": "pm/V",
+  "settings": {
+    "gamma_meV": 5.0,
+    "spin_degeneracy": 2,
+    "period_nm": 30.0,
+    "r_e_hh_nm": 0.751,
+    "gamma_sign": 1,
+    "gamma_eV": 0.005
+  },
+  "wavelength_is_fundamental": true,
+  "wavelength_points": 1451,
+  "wavelength_range_nm": [
+    400.0,
+    1850.0
+  ],
+  "k_points": 301,
+  "k_max_per_nm": 0.555714439232,
+  "k_max_over_pi_over_a": 0.09999999999995261,
+  "k_weights_relative_error": 2.8235582301222507e-16,
+  "prefactor_pm_per_V": 56.69816882497043,
+  "reference_spectrum": {
+    "reference_file": "baseline_reference.csv",
+    "max_complex_error": 6.971134427479871e-10,
+    "absolute_tolerance": 1e-08,
+    "status": "PASS"
+  },
+  "energy_treatment": "doublet-averaged energies (historical)",
+  "integration": "trapezoid over solved k points, measure g_s k dk/(2 pi), 0..k_max of the nextnano dispersion",
+  "eq2_diagonal_cancellation_max_abs_change": 2.2914762248355123e-12,
+  "integration_cutoff_per_nm": 0.555714439232,
+  "pathway_count": 16,
+  "pathway_labels": [
+    "C_m1_n1_l1",
+    "C_m1_n1_l2",
+    "V_m1_n1_l1",
+    "V_m1_n1_l2",
+    "C_m1_n2_l1",
+    "C_m1_n2_l2",
+    "V_m1_n2_l1",
+    "V_m1_n2_l2",
+    "C_m2_n1_l1",
+    "C_m2_n1_l2",
+    "V_m2_n1_l1",
+    "V_m2_n1_l2",
+    "C_m2_n2_l1",
+    "C_m2_n2_l2",
+    "V_m2_n2_l1",
+    "V_m2_n2_l2"
+  ],
+  "pathway_sum_max_error": 0.0,
+  "modulus_identity_max_error": 1.4210854715202004e-14,
+  "features": {
+    "re_zero_crossings": [
+      {
+        "wavelength_nm": 714.0283285725802,
+        "real": 5.684341886080802e-14,
+        "imag": 27.278991400142317,
+        "abs": 27.278991400142317,
+        "abs_over_max_abs": 0.3347498768628388,
+        "abs_imag_over_max_abs": 0.3347498768628388
+      },
+      {
+        "wavelength_nm": 1437.4792785382026,
+        "real": 0.0,
+        "imag": -52.99683658085765,
+        "abs": 52.99683658085765,
+        "abs_over_max_abs": 0.6503423920383483,
+        "abs_imag_over_max_abs": 0.6503423920383483
+      }
+    ],
+    "abs_real_peaks": [
+      {
+        "wavelength_nm": 687.0,
+        "value": 30.716725271440467
+      },
+      {
+        "wavelength_nm": 753.0,
+        "value": 38.62360490799301
+      },
+      {
+        "wavelength_nm": 1374.0,
+        "value": 65.89030231653288
+      },
+      {
+        "wavelength_nm": 1505.0,
+        "value": 71.31058978306794
+      }
+    ],
+    "abs_real_minima": [
+      {
+        "wavelength_nm": 714.0,
+        "value": 0.015486015821248866
+      },
+      {
+        "wavelength_nm": 953.0,
+        "value": 6.490403070057454
+      },
+      {
+        "wavelength_nm": 1437.0,
+        "value": 0.23086564381764862
+      }
+    ],
+    "abs_peaks": [
+      {
+        "wavelength_nm": 688.0,
+        "value": 35.068996648570646
+      },
+      {
+        "wavelength_nm": 752.0,
+        "value": 43.175139983653004
+      },
+      {
+        "wavelength_nm": 1376.0,
+        "value": 73.95280575792009
+      },
+      {
+        "wavelength_nm": 1503.0,
+        "value": 81.49066896093191
+      }
+    ],
+    "abs_minima": [
+      {
+        "wavelength_nm": 720.0,
+        "value": 27.11229590759094
+      },
+      {
+        "wavelength_nm": 953.0,
+        "value": 6.4905104980621475
+      },
+      {
+        "wavelength_nm": 1455.0,
+        "value": 52.58955718798885
+      }
+    ],
+    "dominant_abs_real_peak_nm": 1505.0,
+    "dominant_abs_peak_nm": 1503.0,
+    "max_abs_real": 71.31058978306794,
+    "max_abs": 81.49066896093191,
+    "min_abs_over_max_abs": 0.0049073899408546475,
+    "min_abs_real_over_max_abs_real": 0.00021716291883657764,
+    "chi2_at_1550nm": {
+      "real": 26.470241072024216,
+      "imag": 0.7973339096454737
+    }
+  },
+  "paper_metrics": {
+    "null_best_constant": {
+      "constant": 0.28040024775580347,
+      "nRMSE": 0.19039624538863967
+    },
+    "real": {
+      "nRMSE": 0.3833787753044152,
+      "correlation": 0.3643059329585773,
+      "beats_null": false,
+      "informative": false
+    },
+    "abs_real": {
+      "nRMSE": 0.23787347931114972,
+      "correlation": 0.3096300795071214,
+      "beats_null": false,
+      "informative": false
+    },
+    "abs": {
+      "nRMSE": 0.26239111786930097,
+      "correlation": 0.24755539373543922,
+      "beats_null": false,
+      "informative": false
+    },
+    "imag": {
+      "nRMSE": 0.4913026946929989,
+      "correlation": -0.029178513346182273,
+      "beats_null": false,
+      "informative": false
+    }
+  },
+  "finding": {
+    "mechanism": {
+      "question": "At the zeros of Re chi2, is Im chi2 (and therefore |chi2|) still finite?",
+      "re_zero_count": 2,
+      "at_re_zeros": [
+        {
+          "wavelength_nm": 714.0283285725802,
+          "abs_real": 0.0,
+          "abs_imag_over_max_abs": 0.3347498768628388,
+          "abs_over_max_abs": 0.3347498768628388
+        },
+        {
+          "wavelength_nm": 1437.4792785382026,
+          "abs_real": 0.0,
+          "abs_imag_over_max_abs": 0.6503423920383483,
+          "abs_over_max_abs": 0.6503423920383483
+        }
+      ],
+      "imag_nonzero_at_every_re_zero": true,
+      "abs_nonzero_at_every_re_zero": true
+    },
+    "shape_comparison": {
+      "question": "Does |Re chi2| or |chi2| actually reproduce the digitized Fig. 2d line shape?",
+      "null_best_constant_nRMSE": 0.19039624538863967,
+      "abs_real": {
+        "nRMSE": 0.23787347931114972,
+        "correlation": 0.3096300795071214,
+        "beats_null": false,
+        "informative": false
+      },
+      "abs": {
+        "nRMSE": 0.26239111786930097,
+        "correlation": 0.24755539373543922,
+        "beats_null": false,
+        "informative": false
+      },
+      "comparison_informative": false,
+      "abs_real_closer_than_abs": true,
+      "rule": "informative = nRMSE below the best flat line AND correlation >= 0.5"
+    },
+    "global_min_abs_over_max_abs_info": 0.0049073899408546475,
+    "note": "|Re chi2| is exactly zero at every refined Re zero crossing and |chi2| equals |Im chi2| there. Global minima include off-resonance spectral tails and are informational only.",
+    "thresholds": {
+      "imag_nonzero_fraction_of_max_abs": 0.05,
+      "abs_nonzero_fraction_of_max_abs": 0.05
+    }
+  },
+  "cutoff_scan": [
+    {
+      "label": "$k_{max}=0.050\\,\\pi/a$",
+      "paper_metrics": {
+        "null_best_constant": {
+          "constant": 0.28040024775580347,
+          "nRMSE": 0.19039624538863967
+        },
+        "real": {
+          "nRMSE": 0.36568112893751303,
+          "correlation": 0.2623869866315119,
+          "beats_null": false,
+          "informative": false
+        },
+        "abs_real": {
+          "nRMSE": 0.2486520481949497,
+          "correlation": 0.4978273764244275,
+          "beats_null": false,
+          "informative": false
+        },
+        "abs": {
+          "nRMSE": 0.26233850339571374,
+          "correlation": 0.4760593795533313,
+          "beats_null": false,
+          "informative": false
+        },
+        "imag": {
+          "nRMSE": 0.396381241136456,
+          "correlation": -0.2160457928654382,
+          "beats_null": false,
+          "informative": false
+        }
+      },
+      "re_zero_crossings_nm": [
+        745.6559519148345,
+        1491.5502612174096
+      ],
+      "dominant_abs_real_peak_nm": 1506.0
+    },
+    {
+      "label": "$k_{max}=0.075\\,\\pi/a$",
+      "paper_metrics": {
+        "null_best_constant": {
+          "constant": 0.28040024775580347,
+          "nRMSE": 0.19039624538863967
+        },
+        "real": {
+          "nRMSE": 0.37102718694583275,
+          "correlation": 0.34447738273379497,
+          "beats_null": false,
+          "informative": false
+        },
+        "abs_real": {
+          "nRMSE": 0.24060176041585754,
+          "correlation": 0.4026866878246253,
+          "beats_null": false,
+          "informative": false
+        },
+        "abs": {
+          "nRMSE": 0.2508504746544592,
+          "correlation": 0.3988618000253394,
+          "beats_null": false,
+          "informative": false
+        },
+        "imag": {
+          "nRMSE": 0.44121491523390843,
+          "correlation": -0.14963949904538146,
+          "beats_null": false,
+          "informative": false
+        }
+      },
+      "re_zero_crossings_nm": [
+        734.3629837295484,
+        1472.1338447221096
+      ],
+      "dominant_abs_real_peak_nm": 1506.0
+    },
+    {
+      "label": "$k_{max}=0.100\\,\\pi/a$",
+      "paper_metrics": {
+        "null_best_constant": {
+          "constant": 0.28040024775580347,
+          "nRMSE": 0.19039624538863967
+        },
+        "real": {
+          "nRMSE": 0.3833787753044152,
+          "correlation": 0.3643059329585773,
+          "beats_null": false,
+          "informative": false
+        },
+        "abs_real": {
+          "nRMSE": 0.23787347931114972,
+          "correlation": 0.3096300795071214,
+          "beats_null": false,
+          "informative": false
+        },
+        "abs": {
+          "nRMSE": 0.26239111786930097,
+          "correlation": 0.24755539373543922,
+          "beats_null": false,
+          "informative": false
+        },
+        "imag": {
+          "nRMSE": 0.4913026946929989,
+          "correlation": -0.029178513346182273,
+          "beats_null": false,
+          "informative": false
+        }
+      },
+      "re_zero_crossings_nm": [
+        714.0286425431339,
+        1437.4801147299388
+      ],
+      "dominant_abs_real_peak_nm": 1505.0
+    }
+  ],
+  "inputs": {
+    "state_ids": {
+      "electron": [
+        1,
+        2
+      ],
+      "valence": [
+        1,
+        2
+      ],
+      "kp8_pairs_for_dispersion": [
+        [
+          11,
+          12
+        ],
+        [
+          13,
+          14
+        ],
+        [
+          5,
+          6
+        ],
+        [
+          3,
+          4
+        ]
+      ]
+    },
+    "kp8_pair_ids": [
+      [
+        11,
+        12
+      ],
+      [
+        13,
+        14
+      ],
+      [
+        5,
+        6
+      ],
+      [
+        3,
+        4
+      ]
+    ],
+    "overlap": [
+      [
+        0.9822755287674644,
+        0.015403328122089333
+      ],
+      [
+        -0.08353004083929513,
+        0.3831404861807044
+      ]
+    ],
+    "ze_nm": [
+      [
+        12.72452731946466,
+        1.0251735847808656
+      ],
+      [
+        1.0251735847808656,
+        18.661190322705767
+      ]
+    ],
+    "zh_nm": [
+      [
+        12.65139233424412,
+        1.4323684065114468
+      ],
+      [
+        1.4323684065114468,
+        12.730145536017773
+      ]
+    ],
+    "limitations": [
+      "Historical mixed-model chain (single-band matrices, kp8 dispersion shape)",
+      "Valence pair (3,4) selected by energy match is light-hole dominated",
+      "M(k)=M(0)"
+    ],
+    "supplied_inputs": [],
+    "dispersion": {
+      "dispersion_file": "dispersion_Gamma_to_y.dat",
+      "kvectors_file": "kVectors_Gamma_to_y.dat",
+      "direction": [
+        0.0,
+        1.0,
+        0.0
+      ]
+    },
+    "envelope_grid_points": 281,
+    "single_band_gram_error": 1.9984014443252818e-15,
+    "model": "demo26-baseline",
+    "k0_energies_eV": [
+      2.9411581380879994,
+      3.0610228581580006,
+      1.447805442384,
+      1.4127914221860003
+    ],
+    "k0_transition_energies_eV": [
+      [
+        1.4933526957039993,
+        1.5283667159019991
+      ],
+      [
+        1.6132174157740005,
+        1.6482314359720003
+      ]
+    ]
+  },
+  "plots": [
+    "01_chi2_real.png",
+    "02_chi2_imag.png",
+    "03_chi2_abs_real.png",
+    "04_chi2_magnitude.png",
+    "05_paper_vs_absreal_vs_magnitude.png",
+    "05b_absreal_vs_magnitude_absolute.png",
+    "06_real_and_imag.png",
+    "07_k_cutoff_dependence.png"
+  ],
+  "normalization": {
+    "paper": "divided by its own maximum",
+    "abs_real": "divided by its own maximum",
+    "abs": "divided by its own maximum",
+    "signed_plots": "absolute pm/V, no normalization"
+  }
+}

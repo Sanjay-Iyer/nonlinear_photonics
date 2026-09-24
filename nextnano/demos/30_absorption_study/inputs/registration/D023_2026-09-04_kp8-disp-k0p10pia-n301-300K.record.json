@@ -1,0 +1,27 @@
+{
+  "date": "2026-09-04",
+  "started_utc": "2026-09-04T16:35:49Z",
+  "finished_utc": "2026-09-04T16:46:09Z",
+  "machine": "WORK",
+  "licensed": true,
+  "solver": {
+    "name": "nextnano++",
+    "version": "3.0.0 (2026_07_03 portable package)",
+    "edition": "Professional",
+    "version_source": "inferred from the WORK install path in simulation_info.txt; the run output itself does not print a version string"
+  },
+  "deck": {"path": "data/production_y_n301_k0100/production_y_n301_k0100.in"},
+  "physics": {
+    "model": "8-band k.p (kp8): dispersion path Gamma->y plus k=0 spinor envelopes and composition",
+    "temperature_K": 300.0,
+    "k_direction": [0, 1, 0],
+    "k_max_per_nm": 0.555714439232,
+    "k_max_label": "0.1·π/a (a = 0.565325 nm)",
+    "k_points": 301,
+    "states": {"num_electrons": 6, "num_holes": 8, "output_states": 14}
+  },
+  "structure": "Same asymmetric coupled wells as D020 case 04 (1 nm linear grading); quantum region 7.1-22.9 nm; k_integration_disabled{} with a dispersion path, so states and composition exist only at k = 0",
+  "status": "valid",
+  "provenance": "Byte-identical copy of the tracked historical folder demo_results/demo23/raw/production_y_n301_k0100 (Demo 23 WORK campaign demo23_20260904T163548Z). The historical folder is not moved or edited.",
+  "notes": "Supplies the in-plane dispersion shifts of the Demo 28A mixed model. Demo 28 nextnano/raw_results/kp8 holds copies of the same files."
+}

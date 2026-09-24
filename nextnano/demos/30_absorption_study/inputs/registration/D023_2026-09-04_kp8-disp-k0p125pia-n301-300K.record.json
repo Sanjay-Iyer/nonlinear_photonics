@@ -1,0 +1,27 @@
+{
+  "date": "2026-09-04",
+  "started_utc": "2026-09-04T17:18:24Z",
+  "finished_utc": "2026-09-04T17:28:33Z",
+  "machine": "WORK",
+  "licensed": true,
+  "solver": {
+    "name": "nextnano++",
+    "version": "3.0.0 (2026_07_03 portable package)",
+    "edition": "Professional",
+    "version_source": "inferred from the WORK install path in simulation_info.txt; the run output itself does not print a version string"
+  },
+  "deck": {"path": "data/kmax_y_n301_k0125/kmax_y_n301_k0125.in"},
+  "physics": {
+    "model": "8-band k.p (kp8): dispersion path Gamma->y plus k=0 spinor envelopes and composition",
+    "temperature_K": 300.0,
+    "k_direction": [0, 1, 0],
+    "k_max_per_nm": 0.69464304904,
+    "k_max_label": "0.125·π/a (a = 0.565325 nm)",
+    "k_points": 301,
+    "states": {"num_electrons": 6, "num_holes": 8, "output_states": 14}
+  },
+  "structure": "Same as D023_2026-09-04_kp8-disp-k0p10pia-n301-300K; the deck differs from it ONLY in the k endpoint (0.69464304904 instead of 0.555714439232 nm^-1)",
+  "status": "valid",
+  "provenance": "Byte-identical copy of the tracked historical folder demo_results/demo23/raw/kmax_y_n301_k0125 (Demo 23 WORK campaign demo23_20260904T163548Z). The historical folder is not moved or edited.",
+  "notes": "Used by Demo 30 30F only: an existing-data k extension to 0.125·π/a and a direct check of the analytical absorption tail. Also Demo 28's raw_extended (28C)."
+}

@@ -1,0 +1,67 @@
+{
+  "schema": 1,
+  "baseline_chi2": {
+    "note": "Demo 28A control, unchanged. Values are identical to Demo 28 config/baseline.json.",
+    "model": "demo26-baseline",
+    "settings": {"gamma_meV": 5.0, "gamma_sign": 1, "spin_degeneracy": 2, "period_nm": 30.0, "r_e_hh_nm": 0.751},
+    "wavelength_nm": {"min": 400.0, "max": 1850.0, "step": 1.0},
+    "lattice_constant_nm": 0.565325,
+    "k_max_pi_over_a": 0.1,
+    "k_max_per_nm": 0.555714439232,
+    "k_max_label": "0.1·π/a",
+    "reference_tolerance_pm_per_V": 1e-8,
+    "feature_zero_tolerance_nm": 1e-5,
+    "demo28J_paper_nrmse": {"abs_real": 0.237873, "magnitude": 0.262391, "tolerance": 1e-6}
+  },
+  "chi1": {
+    "term": "resonant term only, with the same transition energies, k weights, Gamma and +i*Gamma sign convention as Eq. 2 (Eq. 2 itself has no antiresonant terms)",
+    "tail": {
+      "fit_last_fraction_of_k_nodes": 0.1,
+      "definition": "Analytical continuation beyond the stored k_max: each transition continues as E(k^2) = E(k_max^2) + s*(k^2 - k_max^2), with s = dE/d(k^2) fitted to the last 10% of native k nodes. Only Im chi1 (absorption) is continued; Re chi1 has no finite continuation and is reported for the strict cutoff only."
+    },
+    "expanded_bound_states": {
+      "binding_rule": "Gamma states below the barrier Gamma band edge and HH states above the barrier HH band edge, both read from bandedges.dat at the quantum-region boundary",
+      "tracked_pairs": "the four 2x2 pairs keep their real 8-band dispersion, exactly as in consistent_2x2",
+      "extra_pair_dispersion": "parabolic in k^2 with slope = mean of the four tracked pairs' average slopes over the native k range",
+      "extra_pair_slope_sensitivity": [0.7, 1.3]
+    }
+  },
+  "background_index": {
+    "purpose": "Only for alpha = omega*Im(chi1)/(2 n c) (alpha scales as 1/n) and for the coherence-length estimate. Not a propagation model.",
+    "effective_medium": "TE (in-plane) layer average of the permittivity: eps = f_well*n_well^2 + (1 - f_well)*n_barrier^2 with f_well = 10 nm / 30 nm",
+    "well_fraction": 0.3333333333333333,
+    "values": {
+      "GaAs": {
+        "1550nm": {"n": 3.370, "source": "Skauli et al., J. Appl. Phys. 94, 6447 (2003), Sellmeier at 22 C, evaluated at 1.55 um"},
+        "775nm": {"n": 3.700, "source": "Aspnes et al., J. Appl. Phys. 60, 754 (1986), tabulated at 0.7749 um (k = 0.091, bulk band-edge absorption; not used)"}
+      },
+      "Al0.55Ga0.45As": {
+        "1550nm": {"n": 3.107, "source": "linear in x between GaAs 3.370 (Skauli 2003) and AlAs 2.892 (Fern and Onton, J. Appl. Phys. 42, 3499 (1971), Sellmeier) at 1.55 um"},
+        "775nm": {"n": 3.296, "source": "linear in x between Aspnes et al. (1986) x = 0.491 (3.329) and x = 0.590 (3.274) at 0.7749 um"}
+      }
+    },
+    "uncertainty": "about +/-0.02 in each n; treated as constant across the measured window",
+    "database": "values read from the refractiveindex.info database (github.com/polyanskiy/refractiveindex.info-database) on 2026-09-24"
+  },
+  "samples": {
+    "period_nm": 30.0,
+    "period_note": "The 2026 paper's text says 'Each period is 20 nm (10 nm total QW thickness, 1.8 nm barrier, and 18.2 nm period barrier)', but those layers add to 30 nm and the Fig. 1 caption says 30 nm. 30 nm is used, as in Demo 28's N_z.",
+    "periods": [4, 12, 16, 80],
+    "fig2d_sample_periods": 80,
+    "paper_effective_chi2_at_1550nm_pm_per_V": {"4": 2750, "12": 1170, "16": 1170, "80": 1730},
+    "paper_effective_chi2_note": "Section 2.3 text: about 1170 pm/V for 12 and 16 periods, 1730 pm/V for 80 periods, 2750 pm/V for 4 periods. Context only; nothing is fitted to these.",
+    "incidence_deg": 45.0,
+    "path_length_rule": "L = periods x period (normal-incidence thickness). The ~2.5% longer oblique internal path and all multilayer optics belong to Demo 31."
+  },
+  "windows": {
+    "measured_fundamental_nm": [1400.0, 1800.0],
+    "validity_rule": "Absorption-aware SH is meaningful only where the SH photon energy is below the first bound-to-continuum onset, min(E_e1 - E_VB,barrier, E_CB,barrier - E_hh1), computed from the raw band edges",
+    "alpha_omega_negligible_if_alphaE_L_below": 0.01,
+    "table_wavelengths_nm": [1500.0, 1550.0, 1560.0, 1600.0, 1700.0]
+  },
+  "comparison": {
+    "sh_intensity_model": "S(lambda) = (omega/(n_2w c))^2 |chi2|^2 L^2 |A|^2, the square of 1994 Eq. 5 per unit E_w(0)^2; transparent means A = 1",
+    "normalization": "for shape comparisons each curve is divided by its own maximum inside the comparison window",
+    "metrics": "nRMSE and Pearson correlation at the measured wavelengths inside the validity window, plus peak wavelengths; indicative only (few eye-digitized points)"
+  }
+}

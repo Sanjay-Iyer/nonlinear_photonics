@@ -129,3 +129,9 @@ demo_results/demo25/raw/
 /docs/study_guides/*.pdf
 /docs/study_guides/*.pptx
 /ol-19-22-1828*.pdf
+/nextnano_raw/*
+!/nextnano_raw/.gitignore
+!/nextnano_raw/README.md
+/nextnano/demos/29_temperature_chi2_study/outputs/
+/nextnano/demos/30_absorption_study/outputs/
+/nextnano/demos/30_absorption_study/plots/
