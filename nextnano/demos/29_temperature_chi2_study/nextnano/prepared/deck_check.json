@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "temperatures_K": [
+    100,
+    300,
+    500
+  ],
+  "only_deck_difference": "global temperature",
+  "kmax_pi_over_a": 0.1,
+  "k_points": 301,
+  "state_pool": [
+    6,
+    8
+  ]
+}

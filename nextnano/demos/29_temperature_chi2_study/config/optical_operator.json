@@ -1,0 +1,11 @@
+{
+  "status": "UNRESOLVED",
+  "basis": ["cb1", "cb2", "hh1", "hh2", "lh1", "lh2", "so1", "so2"],
+  "polarization": "UNRESOLVED interband choice; deck exports growth_x and inplane_y; Equation 2 uses growth-position intersubband matrices",
+  "operator_matrix": null,
+  "operator_units": null,
+  "operator_source": null,
+  "relationship_to_r_e_hh": null,
+  "spin_reduction": null,
+  "note": "No full-8-band susceptibility may be reported until these fields are established and reviewed. An identity overlap is invalid."
+}

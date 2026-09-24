@@ -1,0 +1,21 @@
+{
+  "temperatures_K": [100, 300, 500],
+  "lattice_constant_nm": 0.565325,
+  "kmax_pi_over_a": 0.10,
+  "k_max_per_nm": 0.555714439232,
+  "k_points": 301,
+  "num_electrons": 6,
+  "num_holes": 8,
+  "threads": 4,
+  "timeout_seconds_per_job": 86400,
+  "wavelength_nm": {"min": 400.0, "max": 1850.0, "step": 1.0},
+  "settings": {
+    "gamma_meV": 5.0,
+    "gamma_sign": 1,
+    "spin_degeneracy": 2,
+    "period_nm": 30.0,
+    "r_e_hh_nm": 0.751
+  },
+  "tracking": {"min_overlap": 0.5, "minimum_margin": 0.05, "near_degenerate_eV": 1e-6},
+  "optical_mapping": "UNRESOLVED: no approved eight-component Bloch optical operator or spin reduction"
+}
