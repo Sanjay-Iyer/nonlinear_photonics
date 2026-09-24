@@ -71,7 +71,7 @@ python -m pytest tests -q -p no:cacheprovider --basetemp outputs/test_local
 
 `--prepare` writes both decks for every temperature under `nextnano/prepared/`.
 It does not invoke nextnano. Inspect the generated decks and `deck_check.json`
-before committing. Commit and push this Demo 29 folder, then pull it on WORK.
+before committing. Publish the Demo 29 branch, then fetch it on WORK.
 Do not stage `nextnano/work_runs/`, `nextnano/transfer/`, returned `nextnano/raw/`
 or any zip; they are ignored and move outside Git.
 
@@ -80,7 +80,8 @@ or any zip; they are ignored and move outside Git.
 From the repository root, after activating the existing project Python environment:
 
 ```powershell
-git pull --ff-only
+git fetch origin codex/demo29-temperature-chi2
+git switch --track origin/codex/demo29-temperature-chi2
 cd nextnano/demos/29_temperature_chi2_study
 python scripts/run_nextnano.py --check
 python scripts/run_nextnano.py --run --temperature 300
