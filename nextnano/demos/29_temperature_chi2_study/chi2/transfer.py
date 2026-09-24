@@ -172,6 +172,15 @@ def pack(run_root: Path, output_dir: Path, archive: Path) -> dict:
         body = (run_root / "decks" / f"{name}.in").read_text(encoding="utf-8")
         if f"temperature = {t}" not in body and f"temperature = {t}.0" not in body:
             raise ValueError(f"Wrong executed deck temperature: {name}")
+    frames = list((run_root / "kp8").rglob("spinor_composition*CbHhLhSo.dat"))
+    if len(frames) != c["k_points"]:
+        raise ValueError(
+            f"Full-8-band transfer needs {c['k_points']} spinor-composition frames; "
+            f"this run has {len(frames)}. Preserve the original solver run. "
+            "nextnano output_states/all_k_points covers the k-integration grid, "
+            "not the separate dispersion path. The matched mixed control can "
+            "still be analyzed from the original solver run."
+        )
     if output_dir.exists() or archive.exists():
         raise ValueError("Refusing to overwrite transfer folder or zip")
     output_dir.mkdir(parents=True)

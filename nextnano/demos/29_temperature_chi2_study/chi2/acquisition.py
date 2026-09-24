@@ -70,7 +70,8 @@ def check_decks(c: dict) -> dict:
             raise ValueError("Missing fixed 8-band field: " + token)
     return {"status": "PASS", "temperatures_K": c["temperatures_K"],
             "only_deck_difference": "global temperature", "kmax_pi_over_a": .10,
-            "k_points": 301, "state_pool": [6, 8]}
+            "k_points": 301, "state_pool": [6, 8],
+            "scope": "static deck check only; finite-k state output is not verified"}
 
 
 def prepare(c: dict, root: Path) -> dict:

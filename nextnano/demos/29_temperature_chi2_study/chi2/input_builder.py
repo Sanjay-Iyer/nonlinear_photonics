@@ -12,9 +12,15 @@ def build_inputs(root):
     matrix=from_envelopes(sb)
     anchors=np.r_[sb['electron_eV'],sb['hole_eV']]
     kp=root/'kp8'
-    energy=io.read_energy_spectrum(io.find_one(kp,'kp8/energy_spectrum_k00000.dat'))
-    comp=io.read_composition(io.find_one(kp,'spinor_composition_k00000_CbHhLhSo.dat'))
     k,disp,meta=io.read_dispersion(kp)
+    energy=disp[0].copy()
+    spectrum=(io.find_optional(kp,'k00000/energy_spectrum.dat') or
+              io.find_optional(kp,'energy_spectrum_k00000.dat'))
+    if spectrum is not None and not np.allclose(io.read_energy_spectrum(spectrum),energy,atol=1e-9,rtol=0):
+        raise ValueError('k=0 energy spectrum differs from dispersion')
+    composition=(io.find_optional(kp,'k00000/spinor_composition_CbHhLhSo.dat') or
+                 io.find_one(kp,'spinor_composition_k00000_CbHhLhSo.dat'))
+    comp=io.read_composition(composition)
     if len(energy)%2 or not np.allclose(energy,disp[0],atol=1e-9,rtol=0):
         raise ValueError('k=0 energies disagree with dispersion or are not paired')
     spin=np.column_stack([comp[c] for c in io.KP8_COMPONENTS])

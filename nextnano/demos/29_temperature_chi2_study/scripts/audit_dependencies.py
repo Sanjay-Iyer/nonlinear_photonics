@@ -6,6 +6,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 FORBIDDEN = re.compile(r"(?:demo[_\\/]*2[0-8]|demos[/\\]2[0-8]|Demo2[0-8])", re.I)
+LOCAL_REFERENCE_FIXTURES = {"validation/historical_demo28_mixed_300K.csv"}
 
 
 def check() -> list[str]:
@@ -22,6 +23,10 @@ def check() -> list[str]:
             else:
                 continue
             for name in names:
+                # A copied CSV inside Demo 29 is a local comparison fixture,
+                # not a runtime dependency on the Demo 28 directory.
+                if name in LOCAL_REFERENCE_FIXTURES:
+                    continue
                 if FORBIDDEN.search(name):
                     problems.append(f"{path.name}:{node.lineno}: {name[:100]}")
     return problems

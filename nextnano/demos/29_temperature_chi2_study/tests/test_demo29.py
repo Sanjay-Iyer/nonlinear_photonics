@@ -2,6 +2,7 @@
 import hashlib
 import json
 from pathlib import Path
+import shutil
 import zipfile
 
 import numpy as np
@@ -11,7 +12,7 @@ from chi2.acquisition import config, check_decks, job_decks
 from chi2 import decks
 from chi2.full8 import matrix_data, pair_score, choose_k0, contract_interband, optical_gate, prepare, compare_k0_to_reference
 from chi2.mixed_control import calculate
-from chi2.transfer import validate, unpack, packed_frames
+from chi2.transfer import validate, unpack, packed_frames, pack
 
 
 def _write(path: Path, value: str):
@@ -71,6 +72,29 @@ def synthetic_bundle(root: Path) -> Path:
                          "sha256": hashlib.sha256(path.read_bytes()).hexdigest()})
     _write(bundle / "checksums.json", json.dumps(rows))
     return bundle
+
+
+def test_original_solver_layout_keeps_mixed_control_operational(tmp_path):
+    bundle = synthetic_bundle(tmp_path / "fixture")
+    original = tmp_path / "original_run"
+    shutil.copytree(bundle / "mixed/kp8", original / "kp8")
+    shutil.copytree(bundle / "mixed/singleband_case04_graded",
+                    original / "singleband_case04_graded")
+    shutil.copytree(bundle / "decks", original / "decks")
+    shutil.copy2(bundle / "run_metadata.json", original / "run_metadata.json")
+    kp = original / "kp8/bias_00000/Quantum/acqw/kp8"
+    frame = kp / "k00000"
+    frame.mkdir()
+    (kp / "energy_spectrum_k00000.dat").rename(frame / "energy_spectrum.dat")
+    (kp / "spinor_composition_k00000_CbHhLhSo.dat").rename(
+        frame / "spinor_composition_CbHhLhSo.dat")
+    with pytest.raises(ValueError, match="needs 301 spinor-composition frames"):
+        pack(original, tmp_path / "incomplete_transfer", tmp_path / "incomplete.zip")
+    assert not (tmp_path / "incomplete_transfer").exists()
+    result = calculate(original, tmp_path / "control_output")
+    assert result["temperature_K"] == 300
+    assert result["finite"] is True
+    assert result["source_format"] == "original_solver_run"
 
 
 def test_decks_temperature_is_only_sweep_change():
