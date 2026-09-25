@@ -78,7 +78,9 @@ transition calculation before enabling Eq. 2.
 The current five target-path samples do establish k-dependent same-band
 position matrices, but hh1–hh2 changes sharply and nonmonotonically and hh2
 has one weak tracking step. The 29A2 leave-one-out interpolation check rejects
-five-point interpolation. 29A3 therefore acquires more 300 K spinors while
-preserving the 301-point dispersion and `0.10·π/a` cutoff. This does **not**
-authorize 29A4 or any 100/500 K full-8-band solve. No explicit thermal carrier
+five-point interpolation for a full χ² spectrum. Under the revised priority,
+29A3 is paused and the **same five-point acquisition** is used at 100 and
+500 K to compare electronic structure against the original 300 K run.
+These data can reveal temperature-driven state changes without authorizing
+29A4 or a full-8-band χ² temperature spectrum. No explicit thermal carrier
 occupations are introduced by the existing Equation 2 engine.

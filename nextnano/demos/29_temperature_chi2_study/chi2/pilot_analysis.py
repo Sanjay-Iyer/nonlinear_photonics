@@ -13,6 +13,7 @@ from scipy.optimize import linear_sum_assignment
 from . import parse_nextnano as io, run_debug
 from .acquisition import ROOT, config
 from .full8 import choose_k0, matrix_data, pair_score
+from .sampling import block_strength
 
 
 def _state_frame(folder: Path, n: int):
@@ -41,6 +42,11 @@ def analyze(run: Path, output: Path) -> dict:
     if output.exists():
         raise ValueError(f"Refusing to overwrite {output}")
     c = config()
+    metadata_path = run / "run_metadata.json"
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8")) if metadata_path.is_file() else {}
+    temperature = metadata.get("temperature_K")
+    if temperature not in (100, 300, 500):
+        raise ValueError("Run metadata must identify a 100, 300 or 500 K solver result")
     report = run_debug.scan_output(run)
     grid = report["integration_grid"]
     if grid.get("points") is None or report["dispersion"]["points"] != 301:
@@ -87,15 +93,27 @@ def analyze(run: Path, output: Path) -> dict:
         native = (run / "kp8/kp8/bias_00000/Quantum/acqw/kp8_kp8" /
                   row["id"] / "dipole_moment_matrix_elements_growth_z.txt")
         native_error = None
+        native_matrices = {}
         if native.is_file():
             values = np.loadtxt(native, skiprows=1)
             if values.shape != (len(energy)**2, 6):
                 raise ValueError(f"Unexpected native dipole table dimensions: {native}")
             native_matrix = np.empty_like(zm)
             native_matrix[values[:, 0].astype(int)-1, values[:, 1].astype(int)-1] = values[:, 4] + 1j * values[:, 5]
+            native_matrices["growth_dipole_e_nm"] = native_matrix
             off_diagonal = ~np.eye(len(energy), dtype=bool)
             native_error = float(np.max(abs(native_matrix - zm)[off_diagonal]))
             native_dipole_max_error = max(native_dipole_max_error, native_error)
+        for name, key in (("momentum_matrix_elements_growth_z.txt", "growth_momentum_hbar_per_nm"),
+                          ("momentum_matrix_elements_inplane_y.txt", "inplane_momentum_hbar_per_nm")):
+            path = native.parent / name
+            if path.is_file():
+                _, values = io.read_table(path)
+                if values.shape != (len(energy)**2, 6):
+                    raise ValueError(f"Unexpected native momentum table dimensions: {path}")
+                matrix = np.empty_like(zm)
+                matrix[values[:, 0].astype(int)-1, values[:, 1].astype(int)-1] = values[:, 4] + 1j * values[:, 5]
+                native_matrices[key] = matrix
         labels = {}
         for label, seed in selected["selected"].items():
             pair = int(track[seed])
@@ -124,12 +142,21 @@ def analyze(run: Path, output: Path) -> dict:
                             z_matrix_nm=zm, component_overlap=tensor,
                             pair_to_solver=track, pair_overlap=score,
                             components=np.array(io.KP8_COMPONENTS))
+        native_summary = {}
+        for key, matrix in native_matrices.items():
+            native_summary[key] = {"finite": bool(np.isfinite(matrix).all()),
+                                   "max_abs": float(np.max(abs(matrix))),
+                                   "e1_e2_block": block_strength(matrix, labels["e1"]["solver_states"],
+                                                                 labels["e2"]["solver_states"]),
+                                   "hh1_hh2_block": block_strength(matrix, labels["hh1"]["solver_states"],
+                                                                   labels["hh2"]["solver_states"])}
         finite_phases = np.angle(zm[abs(zm) > 1e-6])
         results.append({"id": row["id"], "ky_per_nm": row["ky_per_nm"],
                         "nearest_dispersion_index": row["nearest_dispersion_index"],
                         "nearest_dispersion_k_gap_per_nm": row["nearest_dispersion_k_gap_per_nm"],
                         "normalization_max_error": float(np.max(abs(norm - 1))),
                         "composition_sum_max_error": float(np.max(abs(observed.sum(axis=1) - 1))),
+                        "native_tables": native_summary,
                         "matrix_diagnostics": {
                             "growth_position_shape": list(zm.shape), "growth_position_units": "nm",
                             "component_overlap_shape": list(tensor.shape),
@@ -149,8 +176,8 @@ def analyze(run: Path, output: Path) -> dict:
                          "overlap_previous", "next_best_overlap", "assignment_margin",
                          "energy_change_eV", "reassigned_from_k0", "weak_overlap_or_margin"])
         writer.writerows(table)
-    summary = {"model": "29A full-8-band pilot analysis; no chi2 spectrum",
-               "temperature_K": 300, "source_run": str(run.resolve()),
+    summary = {"model": "full-8-band electronic structure; no chi2 spectrum",
+               "temperature_K": temperature, "source_run": str(run.resolve()),
                "integration_grid_points": grid["points"],
                "target_path_complete_frames": len(rows),
                "native_growth_dipole_offdiagonal_max_abs_difference_nm": native_dipole_max_error,

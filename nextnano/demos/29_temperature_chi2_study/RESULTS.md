@@ -4,10 +4,25 @@
 |---|---|---|
 | 29A1 | Five aligned 300 K finite-k spinor frames | Preserved diagnostic |
 | 29A2 | 300 K tracking, matrices, optical and sampling analysis | Complete for present data; gates below |
-| 29A3 | Dense 300 K validation | Deck/runner prepared; no WORK solve yet |
+| 29A3 | Dense 300 K validation | Prepared; paused under current priority |
 | 29A4 | Full-8-band 300 K χ² | **Not calculated** |
-| 29B | Full-8-band temperature comparison | **Not started** |
+| 29B | Full-8-band temperature electronic-structure comparison | 100/500 K acquisition prepared; no new WORK solve yet |
 | 29C | Historical mixed 100/300/500 K χ² | Complete, reference only |
+
+## Current 29B acquisition decision
+
+The user selected temperature acquisition as the next priority. The 100 K
+and 500 K full-8-band decks are byte-identical to the **executed successful
+300 K pilot deck** except for the global temperature assignment. The original
+deck hash and run ID are frozen in `config/29b_reference.json`; the new
+`--check-29b` report verifies this mechanically. The finite-k acquisition
+remains `relative_size = 0.03`, `num_points = 5`, `num_subpoints = 1`,
+`symmetry = none`, `force_k0_subspace = no`, with 301 dispersion points to
+`0.10·π/a`. The existing 300 K raw is the 29B reference; it is not rerun.
+The 100/500 K licensed runs have **not** been performed on HOME. They will
+compare solver-temperature effects on energies, character, localization,
+tracking and envelope position/dipole/momentum matrices. No full-8-band χ²
+temperature result is implied while the optical mapping remains unresolved.
 
 ## 29A2 five-point physics decision (2026-09-24)
 
@@ -32,8 +47,8 @@ At the first finite-k step, hh2's best continuation is still solver states
 localization stays high (0.952→0.934). Thus the observed candidate pool does
 not show a better replacement, but the 0.4096 overlap is too weak to certify
 tracking over that 0.116 nm⁻¹ jump. A rapid change/crossing or sparse
-sampling remains possible. The pool remains 14 states for 29A3; denser
-adjacent-k tracking will determine whether it must expand. Fixed solver
+sampling remains possible. The pool remains 14 states for 29B. A future denser
+adjacent-k study may determine whether it must expand. Fixed solver
 indices alone are not accepted.
 
 The e1–e2 position block varies 0.9160→0.9096 nm. Its maximum interior
@@ -51,8 +66,8 @@ off-diagonal growth-position elements match nextnano's native growth-dipole
 table to at most 4.1×10⁻⁶ nm. These checks validate envelope position
 matrices, **not** the missing interband Bloch optical operator. The paper and
 nextnano definitions, spin and scalar-prefactor questions are documented in
-`OPTICAL_MAPPING.md`; the gate remains closed. 29A3 acquires a denser 300 K
-state set, retaining the same 301-point dispersion. 29A4 and 29B are not ready.
+`OPTICAL_MAPPING.md`; the gate remains closed. 29A3 is paused. 29B electronic
+structure acquisition can proceed, but 29A4/full-8-band χ² is not ready.
 
 **300 K matched Professional pair acquired; 29C mixed control computed.** The
 original work-run folder was returned outside Git at
@@ -79,7 +94,7 @@ nine complete 8-band frames, but only k=0 lies on the requested positive Γ→y
 interval 0–0.10π/a. A second, target-aligned 300 K pilot produced five usable
 path frames, described below. The interband optical operator/spin mapping
 remains unresolved; no full-8-band χ² spectrum has been produced. **29B**
-full-8-band 100/500 K production is paused. **29C** historical mixed-model
+100/500 K electronic-structure acquisition is prepared. **29C** historical mixed-model
 100/300/500 K controls have been computed.
 
 The control result is a same-temperature **mixed** calculation and retains

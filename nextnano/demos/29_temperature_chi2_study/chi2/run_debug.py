@@ -403,7 +403,9 @@ def collect_debug(run_root: Path, log_dir: Path, temperature: int,
     (destination / "paths_report.txt").write_text(_safe_inline("\n".join(path_lines), redactions), encoding="utf-8")
     source_meta = root / "run_metadata.json"
     metadata = json.loads(source_meta.read_text(encoding="utf-8")) if source_meta.is_file() else {}
-    log_sources = sorted({*root.glob("*.log"), *destination.rglob("*.log")})
+    original_logs = Path(metadata.get("log_dir", "")) if metadata.get("log_dir") else None
+    log_sources = sorted({*root.glob("*.log"), *destination.rglob("*.log"),
+                          *(original_logs.rglob("*.log") if original_logs and original_logs.is_dir() else [])})
     messages = _solver_messages(log_sources, redactions)
     version = next((line for line in messages if re.match(r"nextnano\+\+\s+\d", line, re.I)), None)
     deck_settings = _settings_from_deck(root)
@@ -435,7 +437,7 @@ def collect_debug(run_root: Path, log_dir: Path, temperature: int,
     except ImportError:
         pass
     preliminary = None
-    if stage == "29A3":
+    if stage in ("29A3", "29B"):
         try:
             from .pilot_analysis import analyze as analyze_states
             from .sampling import analyze as analyze_sampling
@@ -470,8 +472,9 @@ def collect_debug(run_root: Path, log_dir: Path, temperature: int,
         matches = [p for p in preview_files if p.name.lower().startswith(prefix)]
         if matches:
             preview_candidates.append(matches[0])
-    archive = destination / (f"demo29_29A3_300K_debug_{run_id}.zip" if stage == "29A3"
-                             else f"demo29_{temperature}K_debug_{run_id}.zip")
+    archive = destination / (f"demo29_29A3_300K_debug_{run_id}.zip" if stage == "29A3" else
+                             f"demo29_29B_{temperature}K_debug_{run_id}.zip" if stage == "29B" else
+                             f"demo29_{temperature}K_debug_{run_id}.zip")
     if archive.exists():
         raise ValueError(f"Refusing to overwrite debug ZIP: {archive}")
     with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as z:
@@ -486,7 +489,8 @@ def collect_debug(run_root: Path, log_dir: Path, temperature: int,
                 z.write(path, name)
         for path in log_sources:
             label = (path.relative_to(destination).as_posix() if destination in path.parents
-                     else f"solver_root/{path.name}")
+                     else f"runtime_logs/{path.relative_to(original_logs).as_posix()}"
+                     if original_logs and original_logs in path.parents else f"solver_root/{path.name}")
             z.writestr(f"logs/{label}", _safe_text(path, redactions))
         for path in sorted((root / "decks").glob("*.in")) if (root / "decks").is_dir() else []:
             z.writestr(f"executed_decks/{path.name}", _safe_text(path, redactions, 500_000))

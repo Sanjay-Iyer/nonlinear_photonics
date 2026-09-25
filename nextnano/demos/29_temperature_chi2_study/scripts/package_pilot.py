@@ -15,16 +15,24 @@ def main(argv=None) -> int:
     p.add_argument("--input", type=Path, required=True)
     p.add_argument("--zip", type=Path, required=True)
     p.add_argument("--dense", action="store_true", help="Require 29A3 coverage and metadata")
+    p.add_argument("--temperature-study", action="store_true", help="Require complete 29B reference-matched raw data")
     a = p.parse_args(argv)
     try:
         root = a.input.resolve()
         if not root.is_dir() or a.zip.exists() or root in a.zip.resolve().parents:
             raise ValueError("Input missing, ZIP exists, or ZIP is inside solver folder")
         metadata = json.loads((root / "run_metadata.json").read_text(encoding="utf-8"))
-        kind = "dense_finite_k" if a.dense else "finite_k"
-        if (metadata.get("temperature_K") != 300 or metadata.get("pilot_kind") != kind or
+        if a.dense and a.temperature_study:
+            raise ValueError("Choose one raw-package mode")
+        kind = ("temperature_full8_finite_k" if a.temperature_study else
+                "dense_finite_k" if a.dense else "finite_k")
+        allowed_temperatures = (100, 500) if a.temperature_study else (300,)
+        if (metadata.get("temperature_K") not in allowed_temperatures or metadata.get("pilot_kind") != kind or
                 metadata.get("jobs", {}).get("kp8", {}).get("status") != "PASS"):
-            raise ValueError(f"Expected a successful 300 K {kind} run")
+            raise ValueError(f"Expected a successful {kind} run")
+        if a.temperature_study:
+            from chi2.temperature_study import validate_run
+            validate_run(root, metadata["temperature_K"])
         report = run_debug.scan_output(root)
         grid = report["integration_grid"]
         if (report["dispersion"]["points"] != 301 or
@@ -35,11 +43,11 @@ def main(argv=None) -> int:
         if a.dense and max((r["ky_per_nm"] for r in grid["rows"] if r["on_target_path"] and
                             r["complex_spinors_complete"]), default=0) < .9 * 0.555714439232:
             raise ValueError("29A3 states do not reach 90% of target kmax; send debug ZIP first")
-        logs = Path(metadata["log_dir"]) if a.dense else None
+        logs = Path(metadata["log_dir"]) if (a.dense or a.temperature_study) else None
         required_logs = ("runner.log", "run_manifest.json", "paths_report.txt",
                          "finite_k_diagnostic.json", "warnings_errors.txt")
-        if a.dense and (not logs.is_dir() or any(not (logs / name).is_file() for name in required_logs)):
-            raise ValueError("29A3 runtime logs missing; send debug ZIP and retain solver directory")
+        if (a.dense or a.temperature_study) and (not logs.is_dir() or any(not (logs / name).is_file() for name in required_logs)):
+            raise ValueError("Runtime logs missing; send debug ZIP and retain solver directory")
         a.zip.parent.mkdir(parents=True, exist_ok=True)
         hashes = {}
         with zipfile.ZipFile(a.zip, "w", compression=zipfile.ZIP_DEFLATED,
@@ -51,12 +59,15 @@ def main(argv=None) -> int:
                 if file.is_file():
                     relative = file.relative_to(root).as_posix()
                     add(file, relative)
-            if a.dense:
+            if a.dense or a.temperature_study:
                 for file in sorted(logs.rglob("*")):
                     if file.is_file() and file.suffix.lower() in (".log", ".json", ".txt", ".tsv"):
                         add(file, (Path("runtime_logs") / file.relative_to(logs)).as_posix())
                 demo = Path(__file__).resolve().parents[1]
-                for name in ("config/study.json", "config/optical_operator.json"):
+                names = ["config/study.json", "config/optical_operator.json"]
+                if a.temperature_study:
+                    names += ["config/29b_reference.json", "nextnano/inputs/29B_300K_reference_kp8.in"]
+                for name in names:
                     add(demo / name, name)
             archive.writestr((Path(root.name) / "transfer_manifest.json").as_posix(),
                              json.dumps({"source_run_id": metadata["run_id"],

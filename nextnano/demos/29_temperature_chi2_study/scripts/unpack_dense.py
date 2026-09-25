@@ -1,4 +1,4 @@
-"""Safely unpack and SHA-256 verify a 29A3 scientific raw ZIP on HOME."""
+"""Safely unpack and SHA-256 verify a Demo 29 scientific raw ZIP on HOME."""
 import argparse
 import hashlib
 import json

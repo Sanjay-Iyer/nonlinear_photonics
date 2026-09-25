@@ -1,0 +1,20 @@
+{
+  "reference_temperature_K": 300,
+  "reference_run_id": "pilotfk_20260924T194157969113Z_33224",
+  "reference_deck": "nextnano/inputs/29B_300K_reference_kp8.in",
+  "reference_deck_sha256": "854354bb01452521279d52557c2e1ef6663cf90fa422d350b5476724981cd4c6",
+  "reference_k_points_sha256": "df566790ce60344c6b36b54b79833631db1a7b299b67ac073eee25f03d1009d6",
+  "reference_executable_sha256": "133ceb421bb1873762efe066b821823e016cdf1fa742144a5a7f12efa98c291a",
+  "reference_database_sha256": "e1ad8460cad1a8ea230ea0650bbf86a4a80485f80ee8ab69383cd9025bef2545",
+  "source": "300 K pilot_target_300K_trial2 run_metadata.json and executed decks/kp8.in; verified on HOME",
+  "kmax_pi_over_a": 0.1,
+  "k_max_per_nm": 0.555714439232,
+  "dispersion_points": 301,
+  "finite_k_integration": {
+    "relative_size": 0.03,
+    "num_points": 5,
+    "num_subpoints": 1,
+    "symmetry": "none",
+    "force_k0_subspace": "no"
+  }
+}

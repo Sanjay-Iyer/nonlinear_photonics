@@ -44,17 +44,18 @@ def config() -> dict:
 
 
 def job_decks(temperature: int, c: dict, pilot: bool = False,
-              pilot_finite_k: bool = False, dense_finite_k: bool = False) -> dict[str, str]:
+              pilot_finite_k: bool = False, dense_finite_k: bool = False,
+              temperature_full8: bool = False) -> dict[str, str]:
     if temperature not in c["temperatures_K"]:
         raise ValueError("Temperature must be 100, 300 or 500 K")
-    if sum((pilot, pilot_finite_k, dense_finite_k)) > 1:
+    if sum((pilot, pilot_finite_k, dense_finite_k, temperature_full8)) > 1:
         raise ValueError("Choose only one diagnostic mode")
     if (pilot_finite_k or dense_finite_k) and temperature != 300:
         raise ValueError("Finite-k diagnostic runs require 300 K")
     kp_config = {**c, "k_points": 3} if pilot else c
     result = {"kp8": decks.render_full_kp8(temperature, kp_config,
-              finite_k_pilot=pilot_finite_k, dense_finite_k=dense_finite_k)}
-    if not (pilot or pilot_finite_k or dense_finite_k):
+              finite_k_pilot=(pilot_finite_k or temperature_full8), dense_finite_k=dense_finite_k)}
+    if not (pilot or pilot_finite_k or dense_finite_k or temperature_full8):
         result["singleband_case04_graded"] = decks.render_singleband(temperature, decks.read(SINGLE))
     for kind, body in result.items():
         problems = decks.static_check(body, "kp8" if kind == "kp8" else "singleband")
@@ -237,12 +238,19 @@ def _copy_logs(log_dir: Path, destination: Path) -> None:
 
 def run(t: int, c: dict, result: Path, pilot: bool = False,
         pilot_finite_k: bool = False, poll_seconds: float = 15.0,
-        run_id: str | None = None, dense_finite_k: bool = False) -> None:
+        run_id: str | None = None, dense_finite_k: bool = False,
+        temperature_full8: bool = False) -> None:
     paths = _solver_paths()
     if result.exists():
         raise ValueError(f"Refusing to overwrite {result}")
     jobs = job_decks(t, c, pilot=pilot, pilot_finite_k=pilot_finite_k,
-                     dense_finite_k=dense_finite_k)
+                     dense_finite_k=dense_finite_k, temperature_full8=temperature_full8)
+    if temperature_full8:
+        from . import temperature_study
+        if t not in (100, 500):
+            raise ValueError("29B new acquisitions require 100 or 500 K; preserve the 300 K reference")
+        temperature_study.check_decks()
+        temperature_study.check_solver(paths["exe"], paths["database"])
     audit = subprocess.run([sys.executable, str(ROOT / "scripts/audit_dependencies.py")],
                            capture_output=True, text=True, timeout=30, check=False)
     if audit.returncode:
@@ -251,7 +259,7 @@ def run(t: int, c: dict, result: Path, pilot: bool = False,
     if not result.parent.is_dir():
         raise ValueError(f"Cannot create output root: {result.parent}")
     git_before = run_debug.git_state()
-    run_id = run_id or run_debug.new_run_id("29A3" if dense_finite_k else
+    run_id = run_id or run_debug.new_run_id(f"29B_{t}K" if temperature_full8 else "29A3" if dense_finite_k else
                "pilotfk" if pilot_finite_k else "pilot" if pilot else "production")
     log_dir = ROOT / "nextnano/run_logs" / f"{t}K" / run_id
     if log_dir.exists():
@@ -259,8 +267,9 @@ def run(t: int, c: dict, result: Path, pilot: bool = False,
     log_dir.mkdir(parents=True)
     result.mkdir()
     (result / "decks").mkdir()
-    metadata = {"temperature_K": t, "pilot": pilot or pilot_finite_k or dense_finite_k,
-                "pilot_kind": "dense_finite_k" if dense_finite_k else
+    metadata = {"temperature_K": t, "pilot": pilot or pilot_finite_k or dense_finite_k or temperature_full8,
+                "pilot_kind": "temperature_full8_finite_k" if temperature_full8 else
+                              "dense_finite_k" if dense_finite_k else
                               "finite_k" if pilot_finite_k else "legacy_three_point" if pilot else None,
                 "run_id": run_id, "log_dir": str(log_dir), "started_utc": run_debug.now_utc(),
                 "professional_execution_performed": False,
@@ -274,12 +283,12 @@ def run(t: int, c: dict, result: Path, pilot: bool = False,
             handle.write(f"{run_debug.now_utc()} {message}\n")
     expected = None  # The solver, not the deck's num_points, determines frame count.
     provenance = {"git": git_before, "kmax_pi_over_a": c["kmax_pi_over_a"],
-                  "dispersion_points": 301 if (pilot_finite_k or dense_finite_k) else c["k_points"],
+                  "dispersion_points": 301 if (pilot_finite_k or dense_finite_k or temperature_full8) else c["k_points"],
                   "k_integration": ({"relative_size": 0.036 if dense_finite_k else 0.03,
                                      "num_points": 11 if dense_finite_k else 5,
                                      "num_subpoints": 1, "symmetry": "none", "force_k0_subspace": "no",
                                      "frame_count": "read from k_points.txt"}
-                                    if (pilot_finite_k or dense_finite_k) else "disabled"),
+                                    if (pilot_finite_k or dense_finite_k or temperature_full8) else "disabled"),
                   "output_states": {"all_k_points": "yes", "envelopes_CB_HH_LH_SO": "yes",
                                     "spinor_composition_CB_HH_LH_SO": "yes", "in_one_file": "no"},
                   "path_checks": {"executable": paths["exe"], "executable_exists": True,
@@ -295,7 +304,7 @@ def run(t: int, c: dict, result: Path, pilot: bool = False,
           f"Preflight: output parent exists: {result.parent}\n"
           f"Preflight: Demo directory: {ROOT}\n"
           f"Preflight: numbered-demo dependency audit: {audit.stdout.strip()}", flush=True)
-    event(f"Run started; temperature={t}K; pilot_finite_k={pilot_finite_k}; dense_finite_k={dense_finite_k}; output={result}")
+    event(f"Run started; temperature={t}K; pilot_finite_k={pilot_finite_k}; dense_finite_k={dense_finite_k}; temperature_full8={temperature_full8}; output={result}")
     (log_dir / "run_manifest.json").write_text(json.dumps({
         "run_id": run_id, "temperature_K": t, "started_utc": metadata["started_utc"],
         "git_before_run": git_before, "solver_output": str(result),
@@ -306,7 +315,8 @@ def run(t: int, c: dict, result: Path, pilot: bool = False,
     failure = None
     try:
         for name, body in jobs.items():
-            label = (f"29A3 dense 8-band; run ID {run_id}" if dense_finite_k else
+            label = (f"29B {t} K full 8-band; run ID {run_id}" if temperature_full8 else
+                     f"29A3 dense 8-band; run ID {run_id}" if dense_finite_k else
                      "8-band finite-k pilot" if pilot_finite_k else "8-band" if name == "kp8" else "single-band")
             deck = result / "decks" / f"{name}.in"
             deck.write_text(body, encoding="utf-8", newline="\n")
@@ -344,6 +354,10 @@ def run(t: int, c: dict, result: Path, pilot: bool = False,
             event(f"{name}: solver exited with code {code}")
             if code:
                 raise RuntimeError(f"{name} solver failed; see {result / (name + '.log')}")
+        if temperature_full8:
+            print("Validating all 29B spinors, compositions, k points and native matrices...", flush=True)
+            metadata["validation"] = temperature_study.validate_run(result, t)
+            save()
     except BaseException as exc:
         failure = exc
         event(f"Run interrupted/failed: {type(exc).__name__}: {exc}")
@@ -365,7 +379,8 @@ def run(t: int, c: dict, result: Path, pilot: bool = False,
                 provenance["path_checks"][f"{name}_job_done_locations"] = found
                 provenance["path_checks"][f"{name}_expected_target_exists"] = target.is_dir()
             debug = run_debug.collect_debug(result, log_dir, t, expected, run_id, provenance,
-                                            redactions=[paths["license"]], stage="29A3" if dense_finite_k else None)
+                                            redactions=[paths["license"]],
+                                            stage="29B" if temperature_full8 else "29A3" if dense_finite_k else None)
             status = debug["diagnostic"]
             print("\nRun complete." if failure is None else "\nRun stopped.")
             print(f"Total elapsed runtime: {run_debug.elapsed_hms(metadata['total_elapsed_seconds'])}")
@@ -375,19 +390,19 @@ def run(t: int, c: dict, result: Path, pilot: bool = False,
             print(f"Complete complex 8-component frames: {status['complete_state_frames']}")
             print(f"Composition frames found: {status['composition_files']}")
             grid = status.get("integration_grid", {})
-            complete = ((pilot_finite_k or dense_finite_k) and status["dispersion"]["points"] == 301 and
+            complete = ((pilot_finite_k or dense_finite_k or temperature_full8) and status["dispersion"]["points"] == 301 and
                         abs(status["dispersion"]["k_max_per_nm"] - c["k_max_per_nm"]) < 5e-10 and
                         grid.get("points") == status["actual_finite_k_state_frames"] and
                         status["complete_state_frames"] == grid.get("points") and
                         grid.get("complete_target_path_frames", 0) >= 3 and
                         status["k0_exists"] and not status["duplicate_frames"])
-            if pilot_finite_k or dense_finite_k:
+            if pilot_finite_k or dense_finite_k or temperature_full8:
                 enough = 8 if dense_finite_k else 3
                 covered = [row["ky_per_nm"] for row in grid.get("rows", [])
                            if row["on_target_path"] and row["complex_spinors_complete"]]
                 complete = (complete and grid.get("complete_target_path_frames", 0) >= enough and
                             (not dense_finite_k or max(covered, default=0) >= .9 * c["k_max_per_nm"]))
-                print(f"{'29A3' if dense_finite_k else 'Pilot'} coverage has at least {enough} complete path frames." if complete else
+                print(f"{'29B' if temperature_full8 else '29A3' if dense_finite_k else 'Pilot'} coverage has at least {enough} complete path frames." if complete else
                       "WARNING: target-path coverage incomplete; inspect k_points.txt and debug ZIP.")
             if debug["warnings"]:
                 print("Recent solver warnings/errors: " + " | ".join(debug["warnings"][-3:]))
@@ -402,6 +417,7 @@ def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__)
     mode = p.add_mutually_exclusive_group(required=True)
     mode.add_argument("--check", action="store_true", help="static checks only; no solver")
+    mode.add_argument("--check-29b", action="store_true", help="machine-readable temperature-only pilot-deck comparison")
     mode.add_argument("--prepare", action="store_true", help="write all three temperature deck pairs; no solver")
     mode.add_argument("--run", action="store_true", help="Professional work-laptop execution")
     p.add_argument("--temperature", type=int)
@@ -410,6 +426,9 @@ def main(argv=None) -> int:
                    help="300 K small k-integration pilot; retain the 301-point dispersion")
     p.add_argument("--dense-finite-k", action="store_true",
                    help="29A3: 300 K dense k-integration diagnostic; retain 301-point dispersion")
+    p.add_argument("--temperature-full8", action="store_true",
+                   help="29B: 100/500 K 8-band electronic structure using the frozen 300 K pilot")
+    p.add_argument("--reference-run", type=Path, help="optional 300 K original solver root for --check-29b")
     p.add_argument("--output", type=Path)
     a = p.parse_args(argv)
     try:
@@ -417,25 +436,39 @@ def main(argv=None) -> int:
         check = check_decks(c)
         if a.check:
             print(json.dumps(check, indent=2))
+        elif a.check_29b:
+            from .temperature_study import check_decks as check_29b
+            report = check_29b(a.reference_run)
+            if a.output:
+                if a.output.exists():
+                    raise ValueError(f"Refusing to overwrite {a.output}")
+                a.output.parent.mkdir(parents=True, exist_ok=True)
+                a.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+            print(json.dumps(report, indent=2))
         elif a.prepare:
-            if a.pilot or a.pilot_finite_k or a.dense_finite_k:
+            if a.pilot or a.pilot_finite_k or a.dense_finite_k or a.temperature_full8:
                 raise ValueError("Pilot switches require --run")
             print(json.dumps(prepare(c, a.output or ROOT / "nextnano/prepared"), indent=2))
         else:
             if a.temperature is None:
                 raise ValueError("--run requires --temperature")
-            if sum((a.pilot, a.pilot_finite_k, a.dense_finite_k)) > 1:
+            if sum((a.pilot, a.pilot_finite_k, a.dense_finite_k, a.temperature_full8)) > 1:
                 raise ValueError("Choose only one diagnostic mode")
             if (a.pilot_finite_k or a.dense_finite_k) and a.temperature != 300:
                 raise ValueError("Finite-k diagnostic requires --temperature 300")
-            new_id = run_debug.new_run_id("29A3") if a.dense_finite_k else (
-                     run_debug.new_run_id("pilotfk") if a.pilot_finite_k else None)
-            suffix = f"29A3_300K_{new_id}" if a.dense_finite_k else (
+            if a.temperature_full8 and a.temperature not in (100, 500):
+                raise ValueError("29B new acquisitions require --temperature 100 or 500")
+            new_id = run_debug.new_run_id(f"29B_{a.temperature}K") if a.temperature_full8 else (
+                     run_debug.new_run_id("29A3") if a.dense_finite_k else (
+                     run_debug.new_run_id("pilotfk") if a.pilot_finite_k else None))
+            suffix = f"29B_{a.temperature}K_full8" if a.temperature_full8 else (
+                     f"29A3_300K_{new_id}" if a.dense_finite_k else (
                      f"pilot_finite_k_{a.temperature}K_{new_id}" if a.pilot_finite_k else
-                     f"pilot_{a.temperature}K" if a.pilot else f"{a.temperature}K")
+                     f"pilot_{a.temperature}K" if a.pilot else f"{a.temperature}K"))
             output = a.output or ROOT / "nextnano/work_runs" / suffix
             run(a.temperature, c, output.resolve(), a.pilot, a.pilot_finite_k,
-                run_id=new_id, dense_finite_k=a.dense_finite_k)
+                run_id=new_id, dense_finite_k=a.dense_finite_k,
+                temperature_full8=a.temperature_full8)
         return 0
     except (ValueError, OSError, RuntimeError, subprocess.TimeoutExpired) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)

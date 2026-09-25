@@ -26,8 +26,9 @@ def main(argv=None) -> int:
             raise ValueError("Temperature is missing or outside 100/300/500 K")
         if metadata and int(metadata.get("temperature_K", t)) != t:
             raise ValueError("--temperature disagrees with run_metadata.json")
-        is_finite_pilot = metadata.get("pilot_kind") in ("finite_k", "dense_finite_k")
-        stage = "29A3" if metadata.get("pilot_kind") == "dense_finite_k" else None
+        is_finite_pilot = metadata.get("pilot_kind") in ("finite_k", "dense_finite_k", "temperature_full8_finite_k")
+        stage = ("29B" if metadata.get("pilot_kind") == "temperature_full8_finite_k" else
+                 "29A3" if metadata.get("pilot_kind") == "dense_finite_k" else None)
         expected = None  # Determine actual integration-grid size from k_points.txt.
         run_id = args.run_id or run_debug.new_run_id("diagnose")
         if not all(c.isalnum() or c in "_-" for c in run_id):
