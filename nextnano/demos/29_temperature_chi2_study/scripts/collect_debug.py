@@ -26,7 +26,8 @@ def main(argv=None) -> int:
             raise ValueError("Temperature is missing or outside 100/300/500 K")
         if metadata and int(metadata.get("temperature_K", t)) != t:
             raise ValueError("--temperature disagrees with run_metadata.json")
-        is_finite_pilot = metadata.get("pilot_kind") == "finite_k"
+        is_finite_pilot = metadata.get("pilot_kind") in ("finite_k", "dense_finite_k")
+        stage = "29A3" if metadata.get("pilot_kind") == "dense_finite_k" else None
         expected = None  # Determine actual integration-grid size from k_points.txt.
         run_id = args.run_id or run_debug.new_run_id("diagnose")
         if not all(c.isalnum() or c in "_-" for c in run_id):
@@ -43,7 +44,8 @@ def main(argv=None) -> int:
                       "k_integration": run_debug._settings_from_deck(source).get("k_integration"),
                       "path_checks": {"existing_input": str(source), "exists": source.is_dir(),
                                       "diagnostic_only": True, "scientific_output_modified": False}}
-        result = run_debug.collect_debug(source, destination, t, expected, run_id, provenance)
+        result = run_debug.collect_debug(source, destination, t, expected, run_id,
+                                         provenance, stage=stage)
         diagnostic = result["diagnostic"]
         print(f"Run ID: {run_id}\n8-band dispersion points: {diagnostic['dispersion']['points']}\n"
               f"Finite-k state frames: {diagnostic['actual_finite_k_state_frames']}\n"

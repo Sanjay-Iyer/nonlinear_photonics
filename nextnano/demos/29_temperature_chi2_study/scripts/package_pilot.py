@@ -14,31 +14,50 @@ def main(argv=None) -> int:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--input", type=Path, required=True)
     p.add_argument("--zip", type=Path, required=True)
+    p.add_argument("--dense", action="store_true", help="Require 29A3 coverage and metadata")
     a = p.parse_args(argv)
     try:
         root = a.input.resolve()
         if not root.is_dir() or a.zip.exists() or root in a.zip.resolve().parents:
             raise ValueError("Input missing, ZIP exists, or ZIP is inside solver folder")
         metadata = json.loads((root / "run_metadata.json").read_text(encoding="utf-8"))
-        if (metadata.get("temperature_K") != 300 or metadata.get("pilot_kind") != "finite_k" or
+        kind = "dense_finite_k" if a.dense else "finite_k"
+        if (metadata.get("temperature_K") != 300 or metadata.get("pilot_kind") != kind or
                 metadata.get("jobs", {}).get("kp8", {}).get("status") != "PASS"):
-            raise ValueError("Expected a successful 300 K finite-k pilot")
+            raise ValueError(f"Expected a successful 300 K {kind} run")
         report = run_debug.scan_output(root)
         grid = report["integration_grid"]
         if (report["dispersion"]["points"] != 301 or
                 abs(report["dispersion"]["k_max_per_nm"] - 0.555714439232) > 5e-10 or
-                grid.get("points") !=
-                report["complete_state_frames"] or grid.get("complete_target_path_frames", 0) < 3):
-            raise ValueError("Pilot lacks three complete states on target path; send debug ZIP first")
+                grid.get("points") != report["complete_state_frames"] or
+                grid.get("complete_target_path_frames", 0) < (8 if a.dense else 3)):
+            raise ValueError("Insufficient complete target-path states; send debug ZIP first")
+        if a.dense and max((r["ky_per_nm"] for r in grid["rows"] if r["on_target_path"] and
+                            r["complex_spinors_complete"]), default=0) < .9 * 0.555714439232:
+            raise ValueError("29A3 states do not reach 90% of target kmax; send debug ZIP first")
+        logs = Path(metadata["log_dir"]) if a.dense else None
+        required_logs = ("runner.log", "run_manifest.json", "paths_report.txt",
+                         "finite_k_diagnostic.json", "warnings_errors.txt")
+        if a.dense and (not logs.is_dir() or any(not (logs / name).is_file() for name in required_logs)):
+            raise ValueError("29A3 runtime logs missing; send debug ZIP and retain solver directory")
         a.zip.parent.mkdir(parents=True, exist_ok=True)
         hashes = {}
         with zipfile.ZipFile(a.zip, "w", compression=zipfile.ZIP_DEFLATED,
                              compresslevel=6) as archive:
+            def add(source: Path, relative: str) -> None:
+                hashes[relative] = hashlib.sha256(source.read_bytes()).hexdigest()
+                archive.write(source, (Path(root.name) / relative).as_posix())
             for file in sorted(root.rglob("*")):
                 if file.is_file():
                     relative = file.relative_to(root).as_posix()
-                    hashes[relative] = hashlib.sha256(file.read_bytes()).hexdigest()
-                    archive.write(file, (Path(root.name) / relative).as_posix())
+                    add(file, relative)
+            if a.dense:
+                for file in sorted(logs.rglob("*")):
+                    if file.is_file() and file.suffix.lower() in (".log", ".json", ".txt", ".tsv"):
+                        add(file, (Path("runtime_logs") / file.relative_to(logs)).as_posix())
+                demo = Path(__file__).resolve().parents[1]
+                for name in ("config/study.json", "config/optical_operator.json"):
+                    add(demo / name, name)
             archive.writestr((Path(root.name) / "transfer_manifest.json").as_posix(),
                              json.dumps({"source_run_id": metadata["run_id"],
                                          "sha256": hashes}, indent=2) + "\n")

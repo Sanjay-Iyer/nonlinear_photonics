@@ -1,117 +1,132 @@
-# Demo 29: next WORK session, one command per step
+# Demo 29 next handoff: 29A3 dense 300 K validation only
 
-Run these in PowerShell on the licensed WORK laptop **after this code is
-published and pulled there**. Each Python line is a separate command. The
-runner prints status about every 15 seconds; it never estimates percent done.
-Every output folder is new and the scripts refuse overwrites.
+The 29A2 five-point analysis rejected matrix interpolation. This next solve
+acquires more 300 K 8-band spinors. It is **not** a full-8-band χ² result and
+does not start the 100 K or 500 K full-8-band runs. Keep the original WORK
+solver directory until HOME verifies the returned archive.
 
-## Enter Demo 29 and check decks
+## 1. WORK: pull the updated branch
+
+From a clean work-laptop checkout (save any tracked local changes first):
 
 ```powershell
+Set-Location C:\Code\optics\nextnano\nonlinear_photonics
+git fetch origin
+git switch codex/demo29-temperature-chi2
+git status -sb
+```
+
+If this branch was already checked out from its **old rewritten history**, a
+fast-forward pull may refuse. Confirm `git status --porcelain` is empty, then
+run `git reset --hard origin/codex/demo29-temperature-chi2` to align that
+clean checkout. Do not run the reset if Git reports tracked edits you need.
+
+## 2. WORK: environment and static preflight
+
+```powershell
+conda activate photonics
 Set-Location C:\Code\optics\nextnano\nonlinear_photonics\nextnano\demos\29_temperature_chi2_study
+python --version
+python -c "import numpy, scipy, nextnanopy; print('NumPy',numpy.__version__,'SciPy',scipy.__version__,'nextnanopy available')"
 python scripts\run_nextnano.py --check
+python scripts\audit_dependencies.py
 ```
 
-## Job 1: 300 K target-aligned full-8-band pilot
+`--check` must show `status: PASS`, `kmax_pi_over_a: 0.1`, 301 dispersion
+points, and `29A3_dense` with `relative_size: 0.036`, `num_points: 11`.
+The runner uses `NEXTNANO_EXE`, `NEXTNANO_DATABASE`, `NEXTNANO_LICENSE` or
+the work-laptop's gitignored `nextnano/config/paths.local.yaml`; it checks
+the paths before a Professional run. Do not print or transfer license text.
+
+## 3. WORK: run 29A3 once
 
 ```powershell
-python scripts\run_nextnano.py --run --temperature 300 --pilot-finite-k --output nextnano\work_runs\pilot_target_300K_trial2
+python scripts\run_nextnano.py --run --temperature 300 --dense-finite-k --output nextnano\work_runs\29A3_300K_dense_validation
 ```
 
-The run automatically writes a debug ZIP and prints its path. For a second
-debug ZIP at a predictable path, run:
+The runner refuses to overwrite this directory. It prints a unique **Run ID**,
+the solver and log paths, then roughly 15-second status blocks with current
+stage, start/current time, elapsed time, PID, process state, last output age,
+actual discovered frames, complete spinor frames, and latest solver message.
+There is no invented percentage or time-remaining estimate. After the solver
+exits, expect a 301-point dispersion through `0.555714439232 nm⁻¹` and a
+coverage report from the **actual** `k_points.txt`. A useful 29A3 result
+needs at least eight complete on-path frames reaching at least 90% of kmax;
+the debug package still appears if this check fails. A solver exit code 0
+alone is not the scientific validation.
+
+## 4. WORK: identify and save the small debug ZIP
 
 ```powershell
-python scripts\collect_debug.py --input nextnano\work_runs\pilot_target_300K_trial2 --temperature 300 --run-id target300_trial2 --output-dir nextnano\transfer\pilot_target_300K_debug_trial2
+$run = 'nextnano\work_runs\29A3_300K_dense_validation'
+$meta = Get-Content "$run\run_metadata.json" -Raw | ConvertFrom-Json
+$runId = $meta.run_id
+$debug = "nextnano\run_logs\300K\$runId\demo29_29A3_300K_debug_$runId.zip"
+Get-Item $debug | Select-Object FullName,Length
 ```
 
-Send this small ZIP first:
+Transfer **`$debug` first**, especially on failure. It contains the executed
+deck, study configuration, Git/solver/Python provenance, stdout/stderr and
+runner logs, warnings/errors, k-grid mapping, frame inventory, short file
+previews, and preliminary target-path tracking/matrix summaries when those
+checks can run. It excludes the complete wavefunction dataset.
 
-```text
-nextnano\transfer\pilot_target_300K_debug_trial2\demo29_300K_debug_target300_trial2.zip
-```
-
-If the diagnostic reports at least three complete target-path frames, create
-the full raw pilot ZIP for home state-tracking and matrix analysis:
+If automatic debug packaging fails, regenerate without rerunning nextnano:
 
 ```powershell
-python scripts\package_pilot.py --input nextnano\work_runs\pilot_target_300K_trial2 --zip nextnano\transfer\demo29_300K_target_pilot_raw.zip
+python scripts\collect_debug.py --input nextnano\work_runs\29A3_300K_dense_validation --temperature 300 --output-dir "nextnano\run_logs\300K\${runId}_retry"
 ```
 
-Keep the original `nextnano\work_runs\pilot_target_300K_trial2` folder on WORK.
-The full ZIP includes all solver outputs, the executed deck, logs and a hash
-manifest. If packaging refuses due to insufficient target-path coverage, send
-only the debug ZIP and its printed error. Do not run full-8-band 100/500 K yet.
-
-## Job 2: 100 K historical mixed-model control
+## 5. WORK: package the complete scientific raw data after success
 
 ```powershell
-python scripts\run_nextnano.py --run --temperature 100
+python scripts\package_dense.py --input nextnano\work_runs\29A3_300K_dense_validation
+$rawZip = "nextnano\transfer\demo29_29A3_300K_full8_raw_$runId.zip"
+Get-Item $rawZip | Select-Object FullName,Length
 ```
+
+`package_dense.py` refuses insufficient path coverage and an existing ZIP.
+Its lossless archive contains the exact deck, `k_points.txt`, 301-point
+dispersion, all exported 8-component spinors/compositions/energies and native
+matrix tables, solver and runtime logs, configuration, metadata, and SHA-256
+manifest. **Retain `nextnano\work_runs\29A3_300K_dense_validation` untouched**
+on WORK until HOME verifies this archive and analyzes the frames. Neither ZIP
+belongs in Git.
+
+## 6. HOME: place, unpack, verify, analyze
+
+Copy the ZIP to `C:\code\nonlinear_photonics\nextnano_raw\` by your normal
+manual transfer route. Substitute the printed `$runId` from WORK:
 
 ```powershell
-python scripts\transfer_mixed.py --pack nextnano\work_runs\100K
+Set-Location C:\code\nonlinear_photonics\nextnano\demos\29_temperature_chi2_study
+$py = 'C:\Users\iyer95\miniconda3\envs\NMIP\python.exe'
+$runId = '<paste-the-WORK-Run-ID>'
+$zip = "C:\code\nonlinear_photonics\nextnano_raw\demo29_29A3_300K_full8_raw_$runId.zip"
+& $py scripts\unpack_dense.py --zip $zip --destination C:\code\nonlinear_photonics\nextnano_raw\demo29
 ```
 
-Send `nextnano\transfer\demo29_100K_mixed_raw.zip`. The run has a standard
-8-band dispersion job plus a 100 K single-band job. The ZIP contains the eight
-scientific files needed by the historical mixed calculation, executed decks,
-metadata, logs and checksums.
-
-## Job 3: 500 K historical mixed-model control
+The unpacker verifies **every** SHA-256 hash before extraction and refuses
+an existing run folder. Then:
 
 ```powershell
-python scripts\run_nextnano.py --run --temperature 500
+$raw = 'C:\code\nonlinear_photonics\nextnano_raw\demo29\29A3_300K_dense_validation'
+& $py scripts\analyze_pilot.py --input $raw --output outputs\29A_full8band_300K\29A3_dense_validation\target_path
+& $py scripts\analyze_sampling.py --analysis outputs\29A_full8band_300K\29A3_dense_validation\target_path --output outputs\29A_full8band_300K\29A3_dense_validation\sampling.json
+& $py scripts\check_optical.py
 ```
 
-```powershell
-python scripts\transfer_mixed.py --pack nextnano\work_runs\500K
-```
+The first analysis writes state tracking (`tracking.csv`), complex position
+and component-overlap blocks, normalization/composition checks, and a native
+growth-dipole comparison. The sampling report tests interpolation. The
+optical check currently prints **BLOCKED** because the phase-preserving
+8-band Bloch operator, polarization and spin convention are unresolved;
+this is the expected scientific gate, not a failed solver run. There is no
+authorized `calculate_full8.py` command until that mapping is established.
 
-Send `nextnano\transfer\demo29_500K_mixed_raw.zip`.
+## Decision after HOME analysis
 
-## HOME after copying ZIPs into nextnano_raw
-
-Run each line from the HOME Demo 29 folder. The existing 300 K mixed result is
-already in `outputs\29C_mixed_control\300K`; recalculate it from the original
-HOME solver run only if that output is missing.
-
-```powershell
-python scripts\transfer_mixed.py --unpack C:\code\nonlinear_photonics\nextnano_raw\demo29_100K_mixed_raw.zip
-```
-
-```powershell
-python scripts\transfer_mixed.py --unpack C:\code\nonlinear_photonics\nextnano_raw\demo29_500K_mixed_raw.zip
-```
-
-```powershell
-python scripts\calculate_mixed.py --input C:\code\nonlinear_photonics\nextnano_raw\demo29_100K_mixed_raw --output outputs\29C_mixed_control\100K
-```
-
-```powershell
-python scripts\calculate_mixed.py --input C:\code\nonlinear_photonics\nextnano_raw\demo29_500K_mixed_raw --output outputs\29C_mixed_control\500K
-```
-
-```powershell
-python scripts\plot_temperature.py --model mixed
-```
-
-```powershell
-python scripts\plot_electronic_temperature.py
-```
-
-The plot command writes Re, Im, |Re| and |χ²| overlays, a 1550 nm table and
-k=0 transition energies. Feature positions and zero crossings are in each
-temperature's `metadata.json`. The 29C results remain historical mixed-model
-controls, including single-band k=0 matrices and `M(k)=M(0)`.
-
-If `demo29_300K_target_pilot_raw.zip` was produced, also unpack it into
-`C:\code\nonlinear_photonics\nextnano_raw` on HOME and run:
-
-```powershell
-python scripts\analyze_pilot.py --input C:\code\nonlinear_photonics\nextnano_raw\pilot_target_300K_trial2 --output outputs\29A_full8band_baseline\target_pilot_trial2
-```
-
-This writes state-tracking flags and complex growth-position/component-overlap
-matrices for the exported target-path points. It does not calculate a
-full-8-band χ² while the optical operator is unresolved.
+Accept 29A3 as a state/matrix validation only if actual path coverage,
+tracking confidence and interpolation sensitivity pass. Resolve the optical
+mapping separately before 29A4. Do not launch 29B's 100 K and 500 K
+full-8-band runs until a defensible 300 K full-8-band χ² baseline exists.

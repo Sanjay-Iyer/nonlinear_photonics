@@ -43,7 +43,7 @@ def git_state() -> dict:
         done = subprocess.run(["git", "-C", str(ROOT), *args], capture_output=True,
                               text=True, timeout=10, check=False)
         return done.stdout.strip() if done.returncode == 0 else "unavailable"
-    changed = git("status", "--porcelain", "--untracked-files=no")
+    changed = git("status", "--porcelain", "--untracked-files=normal")
     return {"branch": git("branch", "--show-current"), "commit": git("rev-parse", "HEAD"),
             "dirty_before_run": changed != "" and changed != "unavailable",
             "git_status_available": changed != "unavailable"}
@@ -343,7 +343,8 @@ def _settings_from_deck(root: Path) -> dict:
 
 def collect_debug(run_root: Path, log_dir: Path, temperature: int,
                   expected_frames: int | None = None, run_id: str | None = None,
-                  provenance: dict | None = None, redactions: list[str] | None = None) -> dict:
+                  provenance: dict | None = None, redactions: list[str] | None = None,
+                  stage: str | None = None) -> dict:
     """Write reports and a compact ZIP outside the solver directory."""
     root = Path(run_root).resolve()
     destination = Path(log_dir).resolve()
@@ -358,6 +359,18 @@ def collect_debug(run_root: Path, log_dir: Path, temperature: int,
         f"{row['relative_path']}\t{row['bytes']}\t{row['modified_utc']}" for row in report["tree"]) + "\n"
     (destination / "output_tree.txt").write_text(inventory, encoding="utf-8")
     (destination / "finite_k_diagnostic.json").write_text(json.dumps(safe_report, indent=2) + "\n", encoding="utf-8")
+    grid_rows = report["integration_grid"].get("rows", [])
+    grid_header = "frame\tkx_per_nm\tky_per_nm\tkz_per_nm\tmagnitude_per_nm\tdirection\ton_target_path\tcomplete_spinors\n"
+    (destination / "k_grid_report.tsv").write_text(grid_header + "".join(
+        f"{r['id']}\t{r['kx_per_nm']}\t{r['ky_per_nm']}\t{r['kz_per_nm']}\t"
+        f"{r['magnitude_per_nm']}\t{r['direction']}\t{int(r['on_target_path'])}\t"
+        f"{int(r['complex_spinors_complete'])}\n" for r in grid_rows), encoding="utf-8")
+    inventory_header = "frame\tcomposition_files\tenvelope_files\tcomplex_files\tcomplete\tmissing_components\n"
+    (destination / "state_frame_inventory.tsv").write_text(inventory_header + "".join(
+        f"{r['id']}\t{len(r['composition_files'])}\t{r['envelope_count']}\t"
+        f"{r['complex_envelope_files']}\t{int(r['state_component_complete'])}\t"
+        f"{json.dumps(r['missing_components_by_state'], separators=(',', ':'))}\n"
+        for r in report["frames"]), encoding="utf-8")
     summary = [f"Demo 29 finite-k diagnostic: {temperature} K", f"Run ID: {run_id}",
                f"Dispersion points: {report['dispersion']['points']}",
                f"Dispersion k range (nm^-1): {report['dispersion']['k_min_per_nm']} to {report['dispersion']['k_max_per_nm']}",
@@ -395,8 +408,10 @@ def collect_debug(run_root: Path, log_dir: Path, temperature: int,
     version = next((line for line in messages if re.match(r"nextnano\+\+\s+\d", line, re.I)), None)
     deck_settings = _settings_from_deck(root)
     manifest = {"run_id": run_id, "temperature_K": temperature, "created_utc": now_utc(),
+                "stage": stage,
                 "run_root": str(root), "git": (provenance or {}).get("git", git_state()),
                 "python_version": sys.version, "operating_system": platform.platform(),
+                "numpy_version": None, "scipy_version": None,
                 "nextnano_version_build": version,
                 "nextnano_executable_path": (provenance or {}).get("path_checks", {}).get("executable"),
                 "nextnano_database_path": (provenance or {}).get("path_checks", {}).get("database"),
@@ -412,6 +427,32 @@ def collect_debug(run_root: Path, log_dir: Path, temperature: int,
                 "diagnostic": {"dispersion_points": report["dispersion"]["points"],
                                "composition_frames": report["actual_finite_k_state_frames"],
                                "complete_frames": report["complete_state_frames"]}}
+    try:
+        import numpy
+        import scipy
+        manifest["numpy_version"] = numpy.__version__
+        manifest["scipy_version"] = scipy.__version__
+    except ImportError:
+        pass
+    preliminary = None
+    if stage == "29A3":
+        try:
+            from .pilot_analysis import analyze as analyze_states
+            from .sampling import analyze as analyze_sampling
+            preliminary_root = destination / "preliminary_tracking"
+            preliminary = analyze_states(root, preliminary_root)
+            if preliminary["target_path_complete_frames"] >= 5:
+                analyze_sampling(preliminary_root, destination / "preliminary_sampling.json")
+            manifest["preliminary_state_tracking"] = "PASS"
+            manifest["preliminary_matrix_check"] = {
+                "native_offdiagonal_max_abs_difference_nm": preliminary[
+                    "native_growth_dipole_offdiagonal_max_abs_difference_nm"],
+                "target_path_frames": preliminary["target_path_complete_frames"]}
+        except (ValueError, OSError, KeyError, ImportError) as exc:
+            manifest["preliminary_state_tracking"] = "FAILED; inspect preliminary_analysis_error.txt"
+            (destination / "preliminary_analysis_error.txt").write_text(
+                f"{type(exc).__name__}: {exc}\n", encoding="utf-8")
+    manifest["optical_operator_status"] = "UNRESOLVED; no full-8-band chi2 calculated"
     (destination / "run_manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     warnings = [line for line in messages if re.search(r"warning|error|fail|limited free", line, re.I)]
     (destination / "warnings_errors.txt").write_text("\n".join(warnings[-200:]) + "\n", encoding="utf-8")
@@ -429,13 +470,20 @@ def collect_debug(run_root: Path, log_dir: Path, temperature: int,
         matches = [p for p in preview_files if p.name.lower().startswith(prefix)]
         if matches:
             preview_candidates.append(matches[0])
-    archive = destination / f"demo29_{temperature}K_debug_{run_id}.zip"
+    archive = destination / (f"demo29_29A3_300K_debug_{run_id}.zip" if stage == "29A3"
+                             else f"demo29_{temperature}K_debug_{run_id}.zip")
     if archive.exists():
         raise ValueError(f"Refusing to overwrite debug ZIP: {archive}")
     with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as z:
         for name in ("run_manifest.json", "paths_report.txt", "output_tree.txt",
-                     "finite_k_diagnostic.json", "finite_k_diagnostic.txt", "warnings_errors.txt"):
+                     "finite_k_diagnostic.json", "finite_k_diagnostic.txt", "warnings_errors.txt",
+                     "k_grid_report.tsv", "state_frame_inventory.tsv"):
             z.write(destination / name, name)
+        for name in ("preliminary_tracking/pilot_analysis.json", "preliminary_tracking/tracking.csv",
+                     "preliminary_sampling.json", "preliminary_analysis_error.txt"):
+            path = destination / name
+            if path.is_file():
+                z.write(path, name)
         for path in log_sources:
             label = (path.relative_to(destination).as_posix() if destination in path.parents
                      else f"solver_root/{path.name}")

@@ -17,5 +17,8 @@
     "r_e_hh_nm": 0.751
   },
   "tracking": {"min_overlap": 0.5, "minimum_margin": 0.05, "near_degenerate_eV": 1e-6},
+  "29A3_dense_validation": {"relative_size": 0.036, "num_points": 11, "num_subpoints": 1,
+                            "symmetry": "none", "force_k0_subspace": "no",
+                            "frame_count": "read from k_points.txt"},
   "optical_mapping": "UNRESOLVED: no approved eight-component Bloch optical operator or spin reduction"
 }
